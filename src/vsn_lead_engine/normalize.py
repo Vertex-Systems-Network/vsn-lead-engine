@@ -32,12 +32,15 @@ def normalize_name(name: str) -> str:
     value=re.sub(r"[^a-z0-9]+"," ",(name or "").lower()).strip()
     return re.sub(r"\s+"," ",value)
 
+def business_city_key(name: str, city: str) -> str:
+    return "|".join([normalize_name(name),normalize_name(city)])
+
 def business_location_key(name: str, city: str, region: str) -> str:
     return "|".join([normalize_name(name),normalize_name(city),normalize_name(region)])
 
-def unique_key(source_id: str, domain: str, phone: str, name: str, city: str, region: str) -> str:
-    if source_id:
-        return f"source:{source_id.lower()}"
+def unique_key(place_id: str, domain: str, phone: str, name: str, city: str, region: str) -> str:
+    if place_id:
+        return f"place:{place_id.lower()}"
     if domain:
         return f"domain:{domain.lower()}"
     if phone:

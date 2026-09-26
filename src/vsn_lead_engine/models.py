@@ -14,6 +14,7 @@ class Lead:
     region: str
     source: str
     source_id: str
+    google_place_id: str = ""
     street_address: str = ""
     postal_code: str = ""
     latitude: Optional[float] = None
