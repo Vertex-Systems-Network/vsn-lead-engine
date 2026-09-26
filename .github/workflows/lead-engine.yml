@@ -1,0 +1,59 @@
+name: Lead Engine
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run discovery without Google writes"
+        required: true
+        default: true
+        type: boolean
+  schedule:
+    - cron: "0 3-18 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vsn-lead-engine-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m vsn_lead_engine.cli validate
+      - run: pytest -q
+
+  run:
+    needs: validate
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -e .
+      - name: Scheduled run
+        if: ${{ github.event_name == 'schedule' }}
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: python -m vsn_lead_engine.cli run
+      - name: Manual dry run
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: python -m vsn_lead_engine.cli run --dry-run
+      - name: Manual real run
+        if: ${{ github.event_name == 'workflow_dispatch' && !inputs.dry_run }}
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: python -m vsn_lead_engine.cli run

@@ -1,0 +1,72 @@
+{
+  "runtime": {
+    "enabled": false,
+    "mode": "free",
+    "timezone": "Asia/Karachi",
+    "start_hour": 8,
+    "end_hour": 23,
+    "daily_target_per_category": 1000,
+    "batch_accept_limit": 100
+  },
+  "drive": {
+    "folder_id": "1CPnHX5lXNb_wqcwk2O4bfACL4qNZ5IEh",
+    "master_registry_spreadsheet_id": "1FO2zSa6q4ENaPjCq4L4a4of22RxNTO4w5nzHyOxoh_U",
+    "master_registry_tab": "Registry",
+    "daily_title_prefix": "US + Canada Business Leads"
+  },
+  "sources": {
+    "overpass": {
+      "enabled": true,
+      "timeout_seconds": 45,
+      "min_request_interval_seconds": 8
+    }
+  },
+  "categories": [
+    "AI & Automation",
+    "Medical & Clinics",
+    "Property & Real Estate",
+    "Business & Consulting",
+    "IT & Software",
+    "Media & Creative",
+    "Other Website-Critical",
+    "Spa",
+    "Salon",
+    "Cars",
+    "Motorbikes",
+    "Insurance"
+  ],
+  "geographies": [
+    {"country":"United States","region":"Arizona","city":"Phoenix"},
+    {"country":"United States","region":"California","city":"Los Angeles"},
+    {"country":"United States","region":"California","city":"San Diego"},
+    {"country":"United States","region":"Colorado","city":"Denver"},
+    {"country":"United States","region":"Florida","city":"Miami"},
+    {"country":"United States","region":"Florida","city":"Tampa"},
+    {"country":"United States","region":"Georgia","city":"Atlanta"},
+    {"country":"United States","region":"Illinois","city":"Chicago"},
+    {"country":"United States","region":"Massachusetts","city":"Boston"},
+    {"country":"United States","region":"Michigan","city":"Detroit"},
+    {"country":"United States","region":"Minnesota","city":"Minneapolis"},
+    {"country":"United States","region":"Nevada","city":"Las Vegas"},
+    {"country":"United States","region":"New York","city":"Buffalo"},
+    {"country":"United States","region":"North Carolina","city":"Charlotte"},
+    {"country":"United States","region":"Ohio","city":"Columbus"},
+    {"country":"United States","region":"Oregon","city":"Portland"},
+    {"country":"United States","region":"Pennsylvania","city":"Philadelphia"},
+    {"country":"United States","region":"Tennessee","city":"Nashville"},
+    {"country":"United States","region":"Texas","city":"Austin"},
+    {"country":"United States","region":"Texas","city":"Dallas"},
+    {"country":"United States","region":"Texas","city":"Houston"},
+    {"country":"United States","region":"Washington","city":"Seattle"},
+    {"country":"Canada","region":"Alberta","city":"Calgary"},
+    {"country":"Canada","region":"Alberta","city":"Edmonton"},
+    {"country":"Canada","region":"British Columbia","city":"Vancouver"},
+    {"country":"Canada","region":"Manitoba","city":"Winnipeg"},
+    {"country":"Canada","region":"Nova Scotia","city":"Halifax"},
+    {"country":"Canada","region":"Ontario","city":"Hamilton"},
+    {"country":"Canada","region":"Ontario","city":"Ottawa"},
+    {"country":"Canada","region":"Ontario","city":"Toronto"},
+    {"country":"Canada","region":"Quebec","city":"Montreal"},
+    {"country":"Canada","region":"Saskatchewan","city":"Saskatoon"}
+  ]
+}
