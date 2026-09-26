@@ -36,131 +36,77 @@ class GoogleSheetsStore:
             raise RuntimeError("GOOGLE_SERVICE_ACCOUNT_JSON is required for real writes.")
         creds = service_account.Credentials.from_service_account_info(
             json.loads(raw),
-            scopes=[
-                "https://www.googleapis.com/auth/spreadsheets",
-                "https://www.googleapis.com/auth/drive",
-            ],
+            scopes=["https://www.googleapis.com/auth/spreadsheets"],
         )
         self.sheets = build("sheets", "v4", credentials=creds, cache_discovery=False)
-        self.drive = build("drive", "v3", credentials=creds, cache_discovery=False)
         self.config = config
 
-    def _daily_title(self) -> str:
-        today = datetime.now(ZoneInfo(self.config["runtime"]["timezone"])).date().isoformat()
-        return f'{self.config["drive"]["daily_title_prefix"]} — {today}'
+    def _today(self) -> str:
+        return datetime.now(ZoneInfo(self.config["runtime"]["timezone"])).date().isoformat()
 
-    def _find_daily(self):
-        folder = self.config["drive"]["folder_id"]
-        title = self._daily_title().replace("'", "\\'")
-        query = (
-            f"'{folder}' in parents and trashed=false and "
-            "mimeType='application/vnd.google-apps.spreadsheet' and "
-            f"name='{title}'"
-        )
-        files = self.drive.files().list(
-            q=query, fields="files(id,name,webViewLink)", pageSize=10
-        ).execute().get("files", [])
-        if len(files) > 1:
-            raise RuntimeError(f"Duplicate dated spreadsheets found for {self._daily_title()}.")
-        return files[0] if files else None
-
-    def ensure_daily_sheet(self):
-        existing = self._find_daily()
-        if existing:
-            self._ensure_tabs(existing["id"])
-            return existing
-        created = self.sheets.spreadsheets().create(
-            body={"properties":{"title":self._daily_title()}},
-            fields="spreadsheetId"
+    def ensure_lead_workbook(self):
+        sid = self.config["drive"]["lead_workbook_spreadsheet_id"]
+        metadata = self.sheets.spreadsheets().get(
+            spreadsheetId=sid,
+            fields="properties(title,timeZone),sheets.properties"
         ).execute()
-        sid = created["spreadsheetId"]
-        folder = self.config["drive"]["folder_id"]
-        parents = self.drive.files().get(fileId=sid, fields="parents").execute().get("parents", [])
-        self.drive.files().update(
-            fileId=sid,
-            addParents=folder,
-            removeParents=",".join(parents) if parents else None,
-            fields="id"
-        ).execute()
-        self._ensure_tabs(sid)
+        self._ensure_tabs(sid, metadata)
         return {
-            "id":sid,
-            "name":self._daily_title(),
-            "webViewLink":f"https://docs.google.com/spreadsheets/d/{sid}/edit"
+            "id": sid,
+            "name": metadata.get("properties", {}).get(
+                "title", self.config["drive"].get("lead_workbook_name", "US + Canada Business Leads — Master")
+            ),
+            "webViewLink": f"https://docs.google.com/spreadsheets/d/{sid}/edit",
         }
 
     def _overview_seed(self):
         categories = self.config["categories"]
         target = int(self.config["runtime"]["daily_target_per_category"])
         rows = [
+            ["VSN Lead Engine — Permanent US + Canada Workbook",""],
             ["Metric","Value"],
+            ["Tracking Date",'=TEXT(TODAY(),"yyyy-mm-dd")'],
             ["Countries","United States + Canada"],
-            ["Daily Target per Category",target],
+            ["Daily Target / Category",target],
             ["Total Daily Target",target * len(categories)],
         ]
-        actual_start = len(rows) + 1
         for category in categories:
             rows.append([
-                f"Actual Leads — {category}",
-                f"=MAX(COUNTA('{category}'!A:A)-1,0)"
+                f"Actual — {category}",
+                f'=COUNTIF(\'{category}\'!A:A,TEXT(TODAY(),"yyyy-mm-dd"))'
             ])
-        shortfall_start = len(rows) + 1
         for category in categories:
             rows.append([
                 f"Shortfall — {category}",
-                f"=MAX({target}-(COUNTA('{category}'!A:A)-1),0)"
+                f'=MAX($B$5-COUNTIF(\'{category}\'!A:A,TEXT(TODAY(),"yyyy-mm-dd")),0)'
             ])
-        actual_end = actual_start + len(categories) - 1
         rows.extend([
-            ["Total Actual Leads",f"=SUM(B{actual_start}:B{actual_end})"],
-            ["Total Shortfall",f"=MAX({target * len(categories)}-B{len(rows)+1},0)"],
-        ])
-        score_ranges = [f"'{c}'!Y2:Y" for c in categories]
-        sum_expr = "+".join(f"SUM({r})" for r in score_ranges)
-        count_expr = "+".join(f"COUNT({r})" for r in score_ranges)
-        high_expr = "+".join(f'COUNTIF({r},">=75")' for r in score_ranges)
-        medium_expr = "+".join(f'COUNTIFS({r},">=50",{r},"<75")' for r in score_ranges)
-        low_expr = "+".join(f'COUNTIFS({r},">0",{r},"<50")' for r in score_ranges)
-        rows.extend([
-            ["Avg Score",f"=IFERROR(({sum_expr})/({count_expr}),0)"],
-            ["High",f"={high_expr}"],
-            ["Medium",f"={medium_expr}"],
-            ["Low",f"={low_expr}"],
+            ["Total Actual Today","=SUM(B7:B18)"],
+            ["Total Shortfall Today","=MAX(B6-B31,0)"],
+            ["Status",'=IF(B31>=B6,"Complete","In Progress")'],
             ["Duplicate Rejections",0],
             ["Missing-Phone Rejections",0],
-            ["Google Maps/Places Candidates",0],
-            ["Directory Candidates",0],
-            ["Cross-Source Matches",0],
             ["Free-Source Candidates",0],
-            ["Source / Tool Limitation Notes","FREE mode: no paid Google Places calls; throughput depends on compliant public-source coverage and rate limits."],
+            ["Notes","Permanent workbook mode. Daily counts use Date Added, so targets reset automatically each day."],
         ])
         return rows
 
-    def _ensure_tabs(self, spreadsheet_id: str):
-        metadata = self.sheets.spreadsheets().get(
-            spreadsheetId=spreadsheet_id, fields="sheets.properties"
-        ).execute()
+    def _ensure_tabs(self, spreadsheet_id: str, metadata: dict | None = None):
+        if metadata is None:
+            metadata = self.sheets.spreadsheets().get(
+                spreadsheetId=spreadsheet_id, fields="sheets.properties"
+            ).execute()
         props = [s["properties"] for s in metadata.get("sheets", [])]
         existing = {p["title"] for p in props}
         wanted = ["Overview", *self.config["categories"]]
-        requests = [{"addSheet":{"properties":{"title":name}}} for name in wanted if name not in existing]
+        requests = [
+            {"addSheet":{"properties":{"title":name}}}
+            for name in wanted if name not in existing
+        ]
         if requests:
             self.sheets.spreadsheets().batchUpdate(
                 spreadsheetId=spreadsheet_id, body={"requests":requests}
             ).execute()
-
-        metadata = self.sheets.spreadsheets().get(
-            spreadsheetId=spreadsheet_id, fields="sheets.properties"
-        ).execute()
-        props = [s["properties"] for s in metadata.get("sheets", [])]
-        if len(props) > 1:
-            for p in props:
-                if p["title"] == "Sheet1" and p["title"] not in wanted:
-                    self.sheets.spreadsheets().batchUpdate(
-                        spreadsheetId=spreadsheet_id,
-                        body={"requests":[{"deleteSheet":{"sheetId":p["sheetId"]}}]}
-                    ).execute()
-                    break
 
         for name in wanted:
             row = self.sheets.spreadsheets().values().get(
@@ -168,10 +114,7 @@ class GoogleSheetsStore:
             ).execute().get("values", [])
             if row:
                 continue
-            if name == "Overview":
-                values = self._overview_seed()
-            else:
-                values = [DAILY_COLUMNS]
+            values = self._overview_seed() if name == "Overview" else [DAILY_COLUMNS]
             self.sheets.spreadsheets().values().update(
                 spreadsheetId=spreadsheet_id,
                 range=f"'{name}'!A1",
@@ -180,13 +123,23 @@ class GoogleSheetsStore:
             ).execute()
 
     def category_counts(self, spreadsheet_id: str) -> dict[str,int]:
+        today = self._today()
+        ranges = [f"'{category}'!A2:A" for category in self.config["categories"]]
+        response = self.sheets.spreadsheets().values().batchGet(
+            spreadsheetId=spreadsheet_id,
+            ranges=ranges,
+            valueRenderOption="UNFORMATTED_VALUE",
+        ).execute()
+        value_ranges = response.get("valueRanges", [])
         counts = {}
-        for category in self.config["categories"]:
-            rows = self.sheets.spreadsheets().values().get(
-                spreadsheetId=spreadsheet_id,
-                range=f"'{category}'!A:A"
-            ).execute().get("values", [])
-            counts[category] = max(0, len(rows) - 1)
+        for category, value_range in zip(self.config["categories"], value_ranges):
+            values = value_range.get("values", [])
+            counts[category] = sum(
+                1 for row in values
+                if row and str(row[0]).strip() == today
+            )
+        for category in self.config["categories"][len(value_ranges):]:
+            counts[category] = 0
         return counts
 
     def _registry_rows(self):
@@ -246,91 +199,100 @@ class GoogleSheetsStore:
 
         return result
 
-    def commit_lead(self, daily: dict, lead: Lead):
-        fp = fingerprints(lead)
+    @staticmethod
+    def _column_letter(index_zero_based: int) -> str:
+        n = index_zero_based + 1
+        out = ""
+        while n:
+            n, rem = divmod(n - 1,26)
+            out = chr(65 + rem) + out
+        return out
+
+    def commit_leads(self, workbook: dict, leads: list[Lead]):
+        if not leads:
+            return
+        category = leads[0].category
+        if any(lead.category != category for lead in leads):
+            raise ValueError("A commit batch must contain a single category.")
+
         registry_id = self.config["drive"]["master_registry_spreadsheet_id"]
         registry_tab = self.config["drive"]["master_registry_tab"]
-        normalized_phone = normalize_phone(lead.phone, lead.country)
-        registry_row = [
-            lead.date_added,
-            lead.category,
-            "North America",
-            lead.country,
-            lead.city,
-            lead.category,
-            lead.business_name,
-            lead.website,
-            normalize_domain(lead.website),
-            lead.phone,
-            normalized_phone,
-            business_city_key(lead.business_name,lead.city),
-            fp.unique,
-            daily["name"],
-            daily.get("webViewLink",f'https://docs.google.com/spreadsheets/d/{daily["id"]}/edit'),
-            "PendingDaily",
-            lead.region,
-            lead.postal_code,
-            lead.google_place_id,
-            lead.source,
-            f"{lead.source}; Source ID: {lead.source_id}",
-            fp.business_location,
-        ]
-        self.sheets.spreadsheets().values().append(
+        registry_rows = []
+        daily_rows = []
+
+        for lead in leads:
+            fp = fingerprints(lead)
+            normalized_phone = normalize_phone(lead.phone, lead.country)
+            registry_rows.append([
+                lead.date_added,
+                lead.category,
+                "North America",
+                lead.country,
+                lead.city,
+                lead.category,
+                lead.business_name,
+                lead.website,
+                normalize_domain(lead.website),
+                lead.phone,
+                normalized_phone,
+                business_city_key(lead.business_name,lead.city),
+                fp.unique,
+                workbook["name"],
+                workbook.get("webViewLink",f'https://docs.google.com/spreadsheets/d/{workbook["id"]}/edit'),
+                "PendingDaily",
+                lead.region,
+                lead.postal_code,
+                lead.google_place_id,
+                lead.source,
+                f"{lead.source}; Source ID: {lead.source_id}",
+                fp.business_location,
+            ])
+
+            score = score_lead(lead)
+            daily_rows.append([
+                lead.date_added,lead.country,lead.category,lead.business_name,lead.phone,lead.email,
+                lead.website,lead.website_status,"","","","","","",lead.street_address,lead.city,
+                lead.region,lead.postal_code,lead.latitude if lead.latitude is not None else "",
+                lead.longitude if lead.longitude is not None else "","",
+                lead.rating if lead.rating is not None else "",
+                lead.reviews if lead.reviews is not None else "",
+                lead.contact_person,score,pitch(lead),"New",fp.unique,
+                f"{lead.notes}; Primary source: {lead.source}; Source ID: {lead.source_id}"
+            ])
+
+        registry_append = self.sheets.spreadsheets().values().append(
             spreadsheetId=registry_id,
             range=f"'{registry_tab}'!A:V",
             valueInputOption="RAW",
             insertDataOption="INSERT_ROWS",
-            body={"values":[registry_row]}
+            body={"values":registry_rows}
         ).execute()
 
-        score = score_lead(lead)
-        daily_row = [
-            lead.date_added,lead.country,lead.category,lead.business_name,lead.phone,lead.email,
-            lead.website,lead.website_status,"","","","","","",lead.street_address,lead.city,
-            lead.region,lead.postal_code,lead.latitude if lead.latitude is not None else "",
-            lead.longitude if lead.longitude is not None else "","",
-            lead.rating if lead.rating is not None else "",
-            lead.reviews if lead.reviews is not None else "",
-            lead.contact_person,score,pitch(lead),"New",fp.unique,
-            f"{lead.notes}; Primary source: {lead.source}; Source ID: {lead.source_id}"
-        ]
+        updated_range = registry_append.get("updates", {}).get("updatedRange", "")
+        match = re.search(r"!A(\d+):V(\d+)$", updated_range)
+        if not match:
+            raise RuntimeError(f"Could not resolve appended registry rows from: {updated_range}")
+        start_row, end_row = int(match.group(1)), int(match.group(2))
+
         self.sheets.spreadsheets().values().append(
-            spreadsheetId=daily["id"],
-            range=f"'{lead.category}'!A:AC",
+            spreadsheetId=workbook["id"],
+            range=f"'{category}'!A:AC",
             valueInputOption="RAW",
             insertDataOption="INSERT_ROWS",
-            body={"values":[daily_row]}
+            body={"values":daily_rows}
         ).execute()
 
-        rows = self._registry_rows()
-        if not rows:
-            return
-        header = rows[0]
-        key_col = header.index("Unique Key")
-        status_col = header.index("Status")
+        status_letter = self._column_letter(REGISTRY_COLUMNS.index("Status"))
+        self.sheets.spreadsheets().values().update(
+            spreadsheetId=registry_id,
+            range=f"'{registry_tab}'!{status_letter}{start_row}:{status_letter}{end_row}",
+            valueInputOption="RAW",
+            body={"values":[["Active"] for _ in leads]}
+        ).execute()
 
-        def column_letter(index_zero_based: int) -> str:
-            n = index_zero_based + 1
-            out = ""
-            while n:
-                n, rem = divmod(n - 1,26)
-                out = chr(65 + rem) + out
-            return out
-
-        status_letter = column_letter(status_col)
-        for row_number,row in enumerate(rows[1:],start=2):
-            if key_col < len(row) and str(row[key_col]).strip().lower() == fp.unique.lower():
-                self.sheets.spreadsheets().values().update(
-                    spreadsheetId=registry_id,
-                    range=f"'{registry_tab}'!{status_letter}{row_number}",
-                    valueInputOption="RAW",
-                    body={"values":[["Active"]]}
-                ).execute()
-                break
-
-    def update_overview(self, daily_id: str, counts: dict[str,int], increments: dict[str,int]):
+    def update_overview(self, workbook_id: str, counts: dict[str,int], increments: dict[str,int]):
         rows = self.sheets.spreadsheets().values().get(
-            spreadsheetId=daily_id,
+            spreadsheetId=workbook_id,
             range="'Overview'!A1:B100"
         ).execute().get("values", [])
         metric_rows = {}
@@ -358,6 +320,6 @@ class GoogleSheetsStore:
             })
         if data:
             self.sheets.spreadsheets().values().batchUpdate(
-                spreadsheetId=daily_id,
+                spreadsheetId=workbook_id,
                 body={"valueInputOption":"RAW","data":data}
             ).execute()
