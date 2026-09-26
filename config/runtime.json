@@ -6,7 +6,9 @@
     "start_hour": 8,
     "end_hour": 23,
     "daily_target_per_category": 1000,
-    "batch_accept_limit": 100
+    "batch_accept_limit": 1000,
+    "max_shard_attempts": 12,
+    "candidate_limit_per_shard": 500
   },
   "drive": {
     "folder_id": "1CPnHX5lXNb_wqcwk2O4bfACL4qNZ5IEh",
@@ -16,8 +18,14 @@
     "lead_workbook_name": "US + Canada Business Leads — Master"
   },
   "sources": {
-    "overpass": {
+    "overture": {
       "enabled": true,
+      "release": "latest",
+      "stac_url": "https://stac.overturemaps.org/catalog.json",
+      "candidate_limit": 500
+    },
+    "overpass": {
+      "enabled": false,
       "timeout_seconds": 45,
       "min_request_interval_seconds": 8
     }
@@ -37,37 +45,357 @@
     "Insurance"
   ],
   "geographies": [
-    {"country":"United States","region":"Arizona","city":"Phoenix"},
-    {"country":"United States","region":"California","city":"Los Angeles"},
-    {"country":"United States","region":"California","city":"San Diego"},
-    {"country":"United States","region":"Colorado","city":"Denver"},
-    {"country":"United States","region":"Florida","city":"Miami"},
-    {"country":"United States","region":"Florida","city":"Tampa"},
-    {"country":"United States","region":"Georgia","city":"Atlanta"},
-    {"country":"United States","region":"Illinois","city":"Chicago"},
-    {"country":"United States","region":"Massachusetts","city":"Boston"},
-    {"country":"United States","region":"Michigan","city":"Detroit"},
-    {"country":"United States","region":"Minnesota","city":"Minneapolis"},
-    {"country":"United States","region":"Nevada","city":"Las Vegas"},
-    {"country":"United States","region":"New York","city":"Buffalo"},
-    {"country":"United States","region":"North Carolina","city":"Charlotte"},
-    {"country":"United States","region":"Ohio","city":"Columbus"},
-    {"country":"United States","region":"Oregon","city":"Portland"},
-    {"country":"United States","region":"Pennsylvania","city":"Philadelphia"},
-    {"country":"United States","region":"Tennessee","city":"Nashville"},
-    {"country":"United States","region":"Texas","city":"Austin"},
-    {"country":"United States","region":"Texas","city":"Dallas"},
-    {"country":"United States","region":"Texas","city":"Houston"},
-    {"country":"United States","region":"Washington","city":"Seattle"},
-    {"country":"Canada","region":"Alberta","city":"Calgary"},
-    {"country":"Canada","region":"Alberta","city":"Edmonton"},
-    {"country":"Canada","region":"British Columbia","city":"Vancouver"},
-    {"country":"Canada","region":"Manitoba","city":"Winnipeg"},
-    {"country":"Canada","region":"Nova Scotia","city":"Halifax"},
-    {"country":"Canada","region":"Ontario","city":"Hamilton"},
-    {"country":"Canada","region":"Ontario","city":"Ottawa"},
-    {"country":"Canada","region":"Ontario","city":"Toronto"},
-    {"country":"Canada","region":"Quebec","city":"Montreal"},
-    {"country":"Canada","region":"Saskatchewan","city":"Saskatoon"}
+    {
+      "country": "United States",
+      "region": "Arizona",
+      "city": "Phoenix",
+      "bbox": [
+        -112.35,
+        33.2,
+        -111.75,
+        33.75
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "California",
+      "city": "Los Angeles",
+      "bbox": [
+        -118.75,
+        33.7,
+        -117.85,
+        34.35
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "California",
+      "city": "San Diego",
+      "bbox": [
+        -117.4,
+        32.5,
+        -116.8,
+        33.2
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Colorado",
+      "city": "Denver",
+      "bbox": [
+        -105.3,
+        39.45,
+        -104.55,
+        40.1
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Florida",
+      "city": "Miami",
+      "bbox": [
+        -80.55,
+        25.55,
+        -80,
+        26.1
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Florida",
+      "city": "Tampa",
+      "bbox": [
+        -82.8,
+        27.6,
+        -82.1,
+        28.2
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Georgia",
+      "city": "Atlanta",
+      "bbox": [
+        -84.75,
+        33.45,
+        -84.05,
+        34.1
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Illinois",
+      "city": "Chicago",
+      "bbox": [
+        -88.2,
+        41.5,
+        -87.4,
+        42.15
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Massachusetts",
+      "city": "Boston",
+      "bbox": [
+        -71.4,
+        42.1,
+        -70.8,
+        42.65
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Michigan",
+      "city": "Detroit",
+      "bbox": [
+        -83.5,
+        42.1,
+        -82.7,
+        42.65
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Minnesota",
+      "city": "Minneapolis",
+      "bbox": [
+        -93.7,
+        44.7,
+        -92.9,
+        45.25
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Nevada",
+      "city": "Las Vegas",
+      "bbox": [
+        -115.5,
+        35.8,
+        -114.8,
+        36.45
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "New York",
+      "city": "Buffalo",
+      "bbox": [
+        -79.2,
+        42.65,
+        -78.55,
+        43.2
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "North Carolina",
+      "city": "Charlotte",
+      "bbox": [
+        -81.2,
+        34.9,
+        -80.5,
+        35.5
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Ohio",
+      "city": "Columbus",
+      "bbox": [
+        -83.35,
+        39.7,
+        -82.65,
+        40.3
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Oregon",
+      "city": "Portland",
+      "bbox": [
+        -123.1,
+        45.2,
+        -122.2,
+        45.8
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Pennsylvania",
+      "city": "Philadelphia",
+      "bbox": [
+        -75.55,
+        39.7,
+        -74.8,
+        40.25
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Tennessee",
+      "city": "Nashville",
+      "bbox": [
+        -87.2,
+        35.75,
+        -86.4,
+        36.45
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Texas",
+      "city": "Austin",
+      "bbox": [
+        -98.05,
+        30,
+        -97.35,
+        30.65
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Texas",
+      "city": "Dallas",
+      "bbox": [
+        -97.2,
+        32.45,
+        -96.35,
+        33.15
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Texas",
+      "city": "Houston",
+      "bbox": [
+        -95.9,
+        29.4,
+        -94.9,
+        30.15
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Washington",
+      "city": "Seattle",
+      "bbox": [
+        -122.65,
+        47.3,
+        -121.95,
+        47.85
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Alberta",
+      "city": "Calgary",
+      "bbox": [
+        -114.5,
+        50.8,
+        -113.6,
+        51.35
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Alberta",
+      "city": "Edmonton",
+      "bbox": [
+        -113.9,
+        53.3,
+        -113.1,
+        53.8
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "British Columbia",
+      "city": "Vancouver",
+      "bbox": [
+        -123.5,
+        49,
+        -122.8,
+        49.5
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Manitoba",
+      "city": "Winnipeg",
+      "bbox": [
+        -97.55,
+        49.65,
+        -96.7,
+        50.15
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Nova Scotia",
+      "city": "Halifax",
+      "bbox": [
+        -63.9,
+        44.4,
+        -63.2,
+        44.9
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Ontario",
+      "city": "Hamilton",
+      "bbox": [
+        -80.2,
+        43.05,
+        -79.55,
+        43.5
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Ontario",
+      "city": "Ottawa",
+      "bbox": [
+        -76.1,
+        45.1,
+        -75.2,
+        45.65
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Ontario",
+      "city": "Toronto",
+      "bbox": [
+        -79.9,
+        43.4,
+        -78.9,
+        44
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Quebec",
+      "city": "Montreal",
+      "bbox": [
+        -74.2,
+        45.3,
+        -73.25,
+        45.8
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Saskatchewan",
+      "city": "Saskatoon",
+      "bbox": [
+        -106.95,
+        51.9,
+        -106.3,
+        52.35
+      ]
+    }
   ]
 }

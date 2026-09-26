@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Optional
 
+
 @dataclass(slots=True)
 class Lead:
     country: str
@@ -25,9 +26,15 @@ class Lead:
     reviews: Optional[int] = None
     contact_person: str = ""
     source_url: str = ""
+    instagram: str = ""
+    facebook: str = ""
+    linkedin: str = ""
+    twitter: str = ""
+    tiktok: str = ""
+    google_maps_url: str = ""
     notes: str = ""
     date_added: str = field(default_factory=lambda: date.today().isoformat())
 
     @property
     def website_status(self) -> str:
-        return "Active" if self.website else "Unknown"
+        return "Listed" if self.website else "Missing"
