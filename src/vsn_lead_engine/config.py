@@ -1,11 +1,15 @@
 from __future__ import annotations
-import json, os
+
+import json
+import os
 from pathlib import Path
+
 
 def load_config() -> dict:
     path=Path(os.getenv("VSN_RUNTIME_CONFIG","config/runtime.json"))
     with path.open("r",encoding="utf-8") as handle:
         config=json.load(handle)
+
     required={"runtime","drive","sources","categories","geographies"}
     missing=required.difference(config)
     if missing:
@@ -18,4 +22,17 @@ def load_config() -> dict:
         raise ValueError("This branch only supports FREE mode.")
     if not config["drive"].get("lead_workbook_spreadsheet_id"):
         raise ValueError("Permanent lead workbook spreadsheet ID is required.")
+    if int(config["runtime"].get("max_shard_attempts",0)) < 1:
+        raise ValueError("max_shard_attempts must be at least 1.")
+    if int(config["runtime"].get("batch_accept_limit",0)) < 1:
+        raise ValueError("batch_accept_limit must be at least 1.")
+
+    for geo in config["geographies"]:
+        bbox=geo.get("bbox")
+        if not isinstance(bbox,list) or len(bbox)!=4:
+            raise ValueError(f"Geography is missing a 4-value bbox: {geo}")
+        xmin,ymin,xmax,ymax=[float(v) for v in bbox]
+        if not (xmin < xmax and ymin < ymax):
+            raise ValueError(f"Invalid bbox order: {bbox}")
+
     return config

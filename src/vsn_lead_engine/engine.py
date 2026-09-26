@@ -1,27 +1,35 @@
 from __future__ import annotations
+
 from collections import defaultdict
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from .dedupe import fingerprints,is_duplicate
 from .normalize import normalize_phone
+from .scheduler import build_shard_plan, run_cursor
 from .sheets import GoogleSheetsStore
-from .sources import OverpassSource
+from .sources import build_sources
+
+
+def _empty_fingerprints() -> dict[str, set[str]]:
+    return {
+        k:set()
+        for k in ["place_id","source_id","domain","phone_name","business_location","unique"]
+    }
+
 
 def run_once(config: dict,dry_run: bool=False) -> dict:
     runtime=config["runtime"]
     if not runtime.get("enabled") and not dry_run:
         return {"status":"disabled","message":"Lead collection is disabled pending explicit user consent."}
 
-    source_cfg=config["sources"]["overpass"]
-    source=OverpassSource(
-        timeout_seconds=int(source_cfg["timeout_seconds"]),
-        min_interval_seconds=int(source_cfg["min_request_interval_seconds"])
-    )
+    sources=build_sources(config)
+    if not sources:
+        return {"status":"no-sources","message":"No compliant free discovery source is enabled."}
 
     if dry_run:
         counts={c:0 for c in config["categories"]}
-        existing={k:set() for k in ["place_id","source_id","domain","phone_name","business_location","unique"]}
+        existing=_empty_fingerprints()
         workbook=None
     else:
         store=GoogleSheetsStore(config)
@@ -30,60 +38,152 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
         existing=store.registry_fingerprints()
 
     target=int(runtime["daily_target_per_category"])
-    pending=[c for c in config["categories"] if counts.get(c,0)<target]
-    if not pending:
-        return {"status":"complete","counts":counts}
+    cursor=run_cursor()
+    max_attempts=int(runtime.get("max_shard_attempts",12))
+    batch_limit=int(runtime.get("batch_accept_limit",1000))
+    per_shard_limit=int(runtime.get("candidate_limit_per_shard",500))
+    plan=build_shard_plan(
+        config["categories"],
+        config["geographies"],
+        counts,
+        target,
+        cursor=cursor,
+        max_attempts=max_attempts,
+    )
+    if not plan:
+        return {"status":"complete","counts":counts,"cursor":cursor}
 
-    category=min(pending,key=lambda c:(counts.get(c,0)/target,counts.get(c,0),c))
-    geography=config["geographies"][counts.get(category,0)%len(config["geographies"])]
-    candidates=source.search(category,geography)
-
-    accepted=[]
-    rejections=defaultdict(int)
     local={k:set(v) for k,v in existing.items()}
+    accepted_by_category=defaultdict(list)
+    rejections=defaultdict(int)
+    attempts=[]
+    total_discovered=0
+    source_errors=0
+    zero_result_shards=0
+    accepted_total=0
     today=datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
 
-    for lead in candidates:
-        phone=normalize_phone(lead.phone,lead.country)
-        if not phone:
-            rejections["missing_or_invalid_phone"]+=1
-            continue
-        lead.phone=phone
-        lead.date_added=today
-        fp=fingerprints(lead)
-        if is_duplicate(fp,local):
-            rejections["duplicate"]+=1
-            continue
-        accepted.append(lead)
-        if fp.place_id: local["place_id"].add(fp.place_id)
-        if fp.source_id: local["source_id"].add(fp.source_id)
-        if fp.domain: local["domain"].add(fp.domain)
-        if fp.phone_name: local["phone_name"].add(fp.phone_name)
-        local["business_location"].add(fp.business_location)
-        local["unique"].add(fp.unique)
-        if len(accepted)>=int(runtime["batch_accept_limit"]):
+    for shard in plan:
+        if accepted_total >= batch_limit:
             break
+        category=shard["category"]
+        geography=shard["geography"]
+        already_today=counts.get(category,0)+len(accepted_by_category[category])
+        if already_today >= target:
+            continue
+
+        shard_discovered=0
+        shard_accepted_before=accepted_total
+        source_attempts=[]
+
+        for source in sources:
+            if accepted_total >= batch_limit:
+                break
+            remaining=min(
+                per_shard_limit,
+                batch_limit-accepted_total,
+                target-(counts.get(category,0)+len(accepted_by_category[category])),
+            )
+            if remaining <= 0:
+                break
+
+            try:
+                candidates=source.search(category,geography,limit=remaining)
+                source_error=""
+            except Exception as exc:  # isolate one source/shard from the whole batch
+                candidates=[]
+                source_error=f"{type(exc).__name__}: {exc}"
+                source_errors+=1
+
+            shard_discovered+=len(candidates)
+            total_discovered+=len(candidates)
+            accepted_from_source=0
+
+            for lead in candidates:
+                phone=normalize_phone(lead.phone,lead.country)
+                if not phone:
+                    rejections["missing_or_invalid_phone"]+=1
+                    continue
+                lead.phone=phone
+                lead.date_added=today
+                fp=fingerprints(lead)
+                if is_duplicate(fp,local):
+                    rejections["duplicate"]+=1
+                    continue
+
+                accepted_by_category[category].append(lead)
+                accepted_total+=1
+                accepted_from_source+=1
+
+                if fp.place_id:
+                    local["place_id"].add(fp.place_id)
+                if fp.source_id:
+                    local["source_id"].add(fp.source_id)
+                if fp.domain:
+                    local["domain"].add(fp.domain)
+                if fp.phone_name:
+                    local["phone_name"].add(fp.phone_name)
+                local["business_location"].add(fp.business_location)
+                local["unique"].add(fp.unique)
+
+                if accepted_total>=batch_limit:
+                    break
+                if counts.get(category,0)+len(accepted_by_category[category])>=target:
+                    break
+
+            source_attempts.append({
+                "source":source.name,
+                "discovered":len(candidates),
+                "accepted":accepted_from_source,
+                "error":source_error,
+            })
+
+        if shard_discovered == 0:
+            zero_result_shards+=1
+
+        attempts.append({
+            "attempt":shard["attempt"],
+            "category":category,
+            "geography":{
+                "country":geography["country"],
+                "region":geography["region"],
+                "city":geography["city"],
+            },
+            "discovered":shard_discovered,
+            "accepted":accepted_total-shard_accepted_before,
+            "sources":source_attempts,
+        })
 
     result={
-        "category":category,
-        "geography":geography,
-        "discovered":len(candidates),
-        "accepted":len(accepted),
-        "rejections":dict(rejections)
+        "cursor":cursor,
+        "shard_attempts":len(attempts),
+        "zero_result_shards":zero_result_shards,
+        "source_errors":source_errors,
+        "discovered":total_discovered,
+        "accepted":accepted_total,
+        "accepted_by_category":{k:len(v) for k,v in accepted_by_category.items()},
+        "rejections":dict(rejections),
+        "attempts":attempts,
     }
     if dry_run:
         return {"status":"dry-run",**result}
 
-    store.commit_leads(workbook,accepted)
+    for category in config["categories"]:
+        leads=accepted_by_category.get(category,[])
+        if leads:
+            store.commit_leads(workbook,leads)
 
     counts=store.category_counts(workbook["id"])
     store.update_overview(
         workbook["id"],
         counts,
         {
-            "Free-Source Candidates":len(candidates),
+            "Free-Source Candidates":total_discovered,
             "Duplicate Rejections":int(rejections.get("duplicate",0)),
             "Missing-Phone Rejections":int(rejections.get("missing_or_invalid_phone",0)),
+            "Shard Attempts":len(attempts),
+            "Zero-Result Shards":zero_result_shards,
+            "Source Errors":source_errors,
         }
     )
     return {"status":"ok",**result,"lead_workbook":workbook,"counts":counts}

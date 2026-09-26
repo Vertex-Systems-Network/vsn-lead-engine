@@ -28,6 +28,15 @@ REGISTRY_COLUMNS = [
     "Verification Sources","Business+City+State Key"
 ]
 
+OVERVIEW_INCREMENT_METRICS = [
+    "Duplicate Rejections",
+    "Missing-Phone Rejections",
+    "Free-Source Candidates",
+    "Shard Attempts",
+    "Zero-Result Shards",
+    "Source Errors",
+]
+
 
 class GoogleSheetsStore:
     def __init__(self, config: dict):
@@ -51,6 +60,7 @@ class GoogleSheetsStore:
             fields="properties(title,timeZone),sheets.properties"
         ).execute()
         self._ensure_tabs(sid, metadata)
+        self._ensure_overview_metrics(sid)
         return {
             "id": sid,
             "name": metadata.get("properties", {}).get(
@@ -87,6 +97,10 @@ class GoogleSheetsStore:
             ["Duplicate Rejections",0],
             ["Missing-Phone Rejections",0],
             ["Free-Source Candidates",0],
+            ["Shard Attempts",0],
+            ["Zero-Result Shards",0],
+            ["Source Errors",0],
+            ["Primary Free Source","Overture Maps Places"],
             ["Notes","Permanent workbook mode. Daily counts use Date Added, so targets reset automatically each day."],
         ])
         return rows
@@ -120,6 +134,24 @@ class GoogleSheetsStore:
                 range=f"'{name}'!A1",
                 valueInputOption="USER_ENTERED",
                 body={"values":values}
+            ).execute()
+
+    def _ensure_overview_metrics(self, spreadsheet_id: str):
+        rows=self.sheets.spreadsheets().values().get(
+            spreadsheetId=spreadsheet_id,
+            range="'Overview'!A1:B100",
+        ).execute().get("values",[])
+        existing={str(row[0]).strip() for row in rows if row}
+        missing=[[metric,0] for metric in OVERVIEW_INCREMENT_METRICS if metric not in existing]
+        if "Primary Free Source" not in existing:
+            missing.append(["Primary Free Source","Overture Maps Places"])
+        if missing:
+            self.sheets.spreadsheets().values().append(
+                spreadsheetId=spreadsheet_id,
+                range="'Overview'!A:B",
+                valueInputOption="RAW",
+                insertDataOption="INSERT_ROWS",
+                body={"values":missing},
             ).execute()
 
     def category_counts(self, spreadsheet_id: str) -> dict[str,int]:
@@ -251,7 +283,8 @@ class GoogleSheetsStore:
             score = score_lead(lead)
             daily_rows.append([
                 lead.date_added,lead.country,lead.category,lead.business_name,lead.phone,lead.email,
-                lead.website,lead.website_status,"","","","","","",lead.street_address,lead.city,
+                lead.website,lead.website_status,lead.instagram,lead.facebook,lead.linkedin,lead.twitter,
+                lead.tiktok,lead.google_maps_url,lead.street_address,lead.city,
                 lead.region,lead.postal_code,lead.latitude if lead.latitude is not None else "",
                 lead.longitude if lead.longitude is not None else "","",
                 lead.rating if lead.rating is not None else "",
