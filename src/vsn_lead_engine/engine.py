@@ -1,5 +1,8 @@
 from __future__ import annotations
 from collections import defaultdict
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from .dedupe import fingerprints,is_duplicate
 from .normalize import normalize_phone
 from .sheets import GoogleSheetsStore
@@ -19,11 +22,11 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
     if dry_run:
         counts={c:0 for c in config["categories"]}
         existing={k:set() for k in ["place_id","source_id","domain","phone_name","business_location","unique"]}
-        daily=None
+        workbook=None
     else:
         store=GoogleSheetsStore(config)
-        daily=store.ensure_daily_sheet()
-        counts=store.category_counts(daily["id"])
+        workbook=store.ensure_lead_workbook()
+        counts=store.category_counts(workbook["id"])
         existing=store.registry_fingerprints()
 
     target=int(runtime["daily_target_per_category"])
@@ -38,12 +41,15 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
     accepted=[]
     rejections=defaultdict(int)
     local={k:set(v) for k,v in existing.items()}
+    today=datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
+
     for lead in candidates:
         phone=normalize_phone(lead.phone,lead.country)
         if not phone:
             rejections["missing_or_invalid_phone"]+=1
             continue
         lead.phone=phone
+        lead.date_added=today
         fp=fingerprints(lead)
         if is_duplicate(fp,local):
             rejections["duplicate"]+=1
@@ -68,12 +74,11 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
     if dry_run:
         return {"status":"dry-run",**result}
 
-    for lead in accepted:
-        store.commit_lead(daily,lead)
+    store.commit_leads(workbook,accepted)
 
-    counts=store.category_counts(daily["id"])
+    counts=store.category_counts(workbook["id"])
     store.update_overview(
-        daily["id"],
+        workbook["id"],
         counts,
         {
             "Free-Source Candidates":len(candidates),
@@ -81,4 +86,4 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
             "Missing-Phone Rejections":int(rejections.get("missing_or_invalid_phone",0)),
         }
     )
-    return {"status":"ok",**result,"daily_sheet":daily,"counts":counts}
+    return {"status":"ok",**result,"lead_workbook":workbook,"counts":counts}

@@ -12,7 +12,8 @@
     "folder_id": "1CPnHX5lXNb_wqcwk2O4bfACL4qNZ5IEh",
     "master_registry_spreadsheet_id": "1FO2zSa6q4ENaPjCq4L4a4of22RxNTO4w5nzHyOxoh_U",
     "master_registry_tab": "Registry",
-    "daily_title_prefix": "US + Canada Business Leads"
+    "lead_workbook_spreadsheet_id": "1HxEm11XAXYJcOzcuCXBJveYjawtxA8BsuqYcvCBVTl4",
+    "lead_workbook_name": "US + Canada Business Leads — Master"
   },
   "sources": {
     "overpass": {

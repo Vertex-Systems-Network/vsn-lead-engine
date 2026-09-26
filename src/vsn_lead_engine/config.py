@@ -16,4 +16,6 @@ def load_config() -> dict:
         raise ValueError("Daily target must remain 1000 per category.")
     if config["runtime"]["mode"]!="free":
         raise ValueError("This branch only supports FREE mode.")
+    if not config["drive"].get("lead_workbook_spreadsheet_id"):
+        raise ValueError("Permanent lead workbook spreadsheet ID is required.")
     return config
