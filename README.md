@@ -2,9 +2,11 @@
 
 Zero-paid-API lead discovery engine for Vertex Systems Network.
 
-## Safety / consent gate
+## Consent / runtime status
 
-Real lead collection is **OFF by default**. Scheduled runs will not collect or write leads until explicit user approval is given and `config/runtime.json -> runtime.enabled` is changed to `true`.
+Real lead collection has been **APPROVED** by the user and the runtime gate is enabled.
+
+The scheduled runner still enforces a credential preflight. If the GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON` is missing, the real run exits safely without collecting or writing leads. As soon as the credential is configured, the next scheduled run can start automatically.
 
 ## Daily objective
 
@@ -33,9 +35,9 @@ Initial discovery source: OpenStreetMap/Overpass with rate limiting. The adapter
 
 ## Schedule
 
-GitHub Actions: hourly from 08:00 through 23:00 Asia/Karachi (03:00–18:00 UTC). While collection is disabled, scheduled runs exit safely.
+GitHub Actions: hourly from 08:00 through 23:00 Asia/Karachi (03:00–18:00 UTC).
 
-## Production prerequisite
+## Production credential
 
 A Google service account must have access to the configured Drive folder and Master Registry. Add its JSON key as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`. Do not commit credentials.
 
@@ -50,5 +52,8 @@ python -m vsn_lead_engine.cli run --dry-run
 
 ## Current status
 
-- Foundation: setup PR
-- Lead collection: **NOT STARTED — awaiting user consent**
+- Foundation: merged
+- User consent: **APPROVED**
+- Runtime gate: **ENABLED**
+- Paid discovery APIs: **DISABLED**
+- Real scheduled writes: start automatically after Google credential preflight succeeds

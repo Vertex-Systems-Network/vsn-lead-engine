@@ -1,6 +1,6 @@
 {
   "runtime": {
-    "enabled": false,
+    "enabled": true,
     "mode": "free",
     "timezone": "Asia/Karachi",
     "start_hour": 8,
