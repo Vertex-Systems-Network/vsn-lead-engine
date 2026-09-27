@@ -76,9 +76,28 @@ python -m vsn_lead_engine.cli workbook-ready
 ```
 
 If My Drive ownership prevents service-account creation and the user-owned
-precreator has not produced the file yet, this readiness workflow fails
-explicitly before lead collection instead of discovering the problem inside the
-quota run.
+precreator has not produced the file yet, readiness now enters a bounded recovery
+window instead of failing on the first error.
+
+### P6 readiness recovery and incident telemetry
+
+The 07:50 readiness job now runs the recovery command:
+
+```
+python -m vsn_lead_engine.cli workbook-ready-recover --attempts 3 --delay-seconds 60
+```
+
+Behavior:
+
+- first success returns `ready`;
+- a later retry success returns `recovered` and preserves prior failure details;
+- production uses at most **3 attempts**, separated by **60 seconds**;
+- each failed attempt records timestamp, exception type and message;
+- exhausted recovery returns `incident` with the final error and exits non-zero;
+- GitHub Step Summary always publishes the readiness state, attempts used, workbook
+  details when available, and every recovery failure;
+- missing or invalid telemetry is itself treated as an incident;
+- no lead discovery, enrichment, quota write or R2 mutation occurs in this recovery path.
 
 ## Primary free source
 
@@ -369,6 +388,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P3 partition-aware zero-progress retry: **3 BOUNDED CYCLES ACTIVE**
 - P4 quality observability: **FUNNEL + ENRICHMENT METRICS ACTIVE**
 - P5 daily workbook readiness: **07:50 PKT PRE-START CERTIFICATION ACTIVE**
+- P6 readiness recovery: **3-ATTEMPT RETRY + INCIDENT TELEMETRY ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
