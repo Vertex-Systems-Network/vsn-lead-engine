@@ -18,7 +18,9 @@
     "workbook_readiness_attempts": 3,
     "workbook_readiness_retry_delay_seconds": 60,
     "adaptive_yield_routing": true,
-    "adaptive_yield_exploration_bonus": 0.15
+    "adaptive_yield_exploration_bonus": 0.15,
+    "adaptive_yield_persist_daily": true,
+    "adaptive_yield_state_max_entries": 1500
   },
   "drive": {
     "folder_id": "1CPnHX5lXNb_wqcwk2O4bfACL4qNZ5IEh",
