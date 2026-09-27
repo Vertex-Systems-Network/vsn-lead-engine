@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import datetime
+import os
 import time
 from zoneinfo import ZoneInfo
 
 from .dedupe import fingerprints,is_duplicate
 from .enrichment import build_contact_enricher
+from .health import DailyHealthLedgerStore, run_health_event
 from .normalize import normalize_phone
 from .scheduler import build_shard_plan, run_cursor, yield_hint_key
 from .registry import build_registry_index, fingerprint_token, registry_mode
@@ -616,7 +618,13 @@ def run_once(
 
 
 
-def run_until_quota(config: dict, dry_run: bool=False) -> dict:
+def run_until_quota(
+    config: dict,
+    dry_run: bool=False,
+    *,
+    origin: str | None = None,
+    schedule: dict | None = None,
+) -> dict:
     """Run multiple bounded collection cycles inside one process.
 
     Production cycles re-read live sheet/registry state each time, but reuse the
@@ -660,6 +668,29 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
         "save_error":"",
     }
     yield_state_dirty=False
+    health_store=None
+    health_telemetry={
+        "enabled":False,
+        "recorded":False,
+        "error":"",
+        "origin":str(
+            origin or os.getenv("VSN_RUN_ORIGIN","manual") or "manual"
+        ).strip(),
+    }
+    final_result={}
+
+    if bool(runtime.get("health_ledger_enabled",True)) and registry_index is not None:
+        try:
+            health_store=DailyHealthLedgerStore(
+                registry_index,
+                max_events=int(runtime.get("health_ledger_max_events",96)),
+            )
+            health_telemetry["enabled"]=True
+        except Exception as exc:
+            health_telemetry.update({
+                "enabled":True,
+                "error":f"{type(exc).__name__}: {exc}",
+            })
 
     adaptive_enabled=bool(runtime.get("adaptive_yield_routing",True))
     persist_daily=bool(runtime.get("adaptive_yield_persist_daily",True))
@@ -735,6 +766,43 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
                 })
             except Exception as exc:
                 yield_state_telemetry["save_error"]=f"{type(exc).__name__}: {exc}"
+
+        final_result={
+            "status":final_status,
+            "run_date":run_date,
+            "cycles_executed":len(cycles),
+            "max_cycles_per_run":max_cycles,
+            "max_zero_progress_cycles":max_zero_progress_cycles,
+            "zero_progress_streak":zero_progress_streak,
+            "accepted":accepted_total,
+            "counts":final_counts,
+            "country_counts":final_country_counts,
+            "adaptive_yield":_yield_hint_summary(yield_hints),
+            "adaptive_yield_state":yield_state_telemetry,
+            "cycles":cycles,
+        }
+        if schedule:
+            final_result["schedule"]=dict(schedule)
+
+        if health_store is not None:
+            try:
+                health_meta=health_store.append(
+                    run_date,
+                    run_health_event(
+                        final_result,
+                        origin=health_telemetry["origin"],
+                    ),
+                )
+                health_telemetry.update({
+                    "recorded":health_meta.get("status") in {"appended","duplicate"},
+                    "write_status":health_meta.get("status",""),
+                    "event_count":int(health_meta.get("events",0) or 0),
+                    "bytes":int(health_meta.get("bytes",0) or 0),
+                    "key":health_meta.get("key",""),
+                })
+            except Exception as exc:
+                health_telemetry["error"]=f"{type(exc).__name__}: {exc}"
+        final_result["health_ledger"]=health_telemetry
     finally:
         _close_sources(sources)
         if registry_index is not None:
@@ -746,17 +814,4 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
             if callable(close):
                 close()
 
-    return {
-        "status": final_status,
-        "run_date": run_date,
-        "cycles_executed": len(cycles),
-        "max_cycles_per_run": max_cycles,
-        "max_zero_progress_cycles": max_zero_progress_cycles,
-        "zero_progress_streak": zero_progress_streak,
-        "accepted": accepted_total,
-        "counts": final_counts,
-        "country_counts": final_country_counts,
-        "adaptive_yield":_yield_hint_summary(yield_hints),
-        "adaptive_yield_state":yield_state_telemetry,
-        "cycles": cycles,
-    }
+    return final_result
