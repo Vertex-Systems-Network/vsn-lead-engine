@@ -10,7 +10,7 @@ def load_config() -> dict:
     with path.open("r",encoding="utf-8") as handle:
         config=json.load(handle)
 
-    required={"runtime","drive","sources","categories","geographies"}
+    required={"runtime","drive","sources","categories","geographies","registry"}
     missing=required.difference(config)
     if missing:
         raise ValueError(f"Missing config sections: {sorted(missing)}")
@@ -45,6 +45,19 @@ def load_config() -> dict:
         raise ValueError("source_retry_backoff_seconds cannot be negative.")
     if int(config["runtime"].get("max_cycles_per_run",3)) < 1:
         raise ValueError("max_cycles_per_run must be at least 1.")
+
+    registry=config["registry"]
+    registry_mode=str(registry.get("mode","sheets")).strip().lower()
+    if registry_mode not in {"sheets","dual","supabase"}:
+        raise ValueError("registry.mode must be one of: sheets, dual, supabase.")
+    if int(registry.get("batch_size",500)) < 1:
+        raise ValueError("registry.batch_size must be at least 1.")
+    if float(registry.get("request_timeout_seconds",30)) <= 0:
+        raise ValueError("registry.request_timeout_seconds must be positive.")
+    if not registry.get("supabase_url_env"):
+        raise ValueError("registry.supabase_url_env is required.")
+    if not registry.get("supabase_service_role_key_env"):
+        raise ValueError("registry.supabase_service_role_key_env is required.")
 
     for geo in config["geographies"]:
         bbox=geo.get("bbox")
