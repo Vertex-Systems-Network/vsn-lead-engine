@@ -2,8 +2,14 @@ from __future__ import annotations
 import argparse,json,sys
 from .config import load_config
 from .engine import run_until_quota
-from .registry import R2RegistryIndex, audit_sheet_registry, backfill_sheet_registry, live_smoke_test
+from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
 from .sheets import GoogleSheetsStore
+
+def _registry_index(config: dict):
+    index=build_registry_index(config)
+    if index is None:
+        raise RuntimeError("Registry maintenance requires registry.mode dual or r2.")
+    return index
 
 def main() -> int:
     parser=argparse.ArgumentParser(prog="vsn-lead-engine")
@@ -32,7 +38,7 @@ def main() -> int:
         return 0
     if args.command=="registry-backfill":
         store=GoogleSheetsStore(config)
-        index=R2RegistryIndex(config)
+        index=_registry_index(config)
         try:
             result=backfill_sheet_registry(store,index,dry_run=args.dry_run)
         finally:
@@ -40,7 +46,7 @@ def main() -> int:
         print(json.dumps(result,indent=2,default=str))
         return 0
     if args.command=="registry-stats":
-        index=R2RegistryIndex(config)
+        index=_registry_index(config)
         try:
             result=index.stats()
         finally:
@@ -48,7 +54,7 @@ def main() -> int:
         print(json.dumps(result,indent=2,default=str))
         return 0
     if args.command=="registry-check":
-        index=R2RegistryIndex(config)
+        index=_registry_index(config)
         try:
             result=index.verify()
         finally:
@@ -57,7 +63,7 @@ def main() -> int:
         return 0
     if args.command=="registry-audit":
         store=GoogleSheetsStore(config)
-        index=R2RegistryIndex(config)
+        index=_registry_index(config)
         try:
             result=audit_sheet_registry(store,index)
         finally:
@@ -70,7 +76,7 @@ def main() -> int:
         return 0 if result["status"]=="ok" else 2
     if args.command=="registry-migrate":
         store=GoogleSheetsStore(config)
-        index=R2RegistryIndex(config)
+        index=_registry_index(config)
         try:
             check=index.verify()
             dry=backfill_sheet_registry(store,index,dry_run=True)
