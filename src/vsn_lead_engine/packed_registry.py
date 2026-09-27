@@ -536,7 +536,6 @@ class PackedR2RegistryIndex(R2RegistryIndex):
 
             for token in tokens:
                 self._batch_by_token.pop(token, None)
-            self._invalidate_pending_cache()
             return changed
         finally:
             self._invalidate_pending_cache()
@@ -599,7 +598,6 @@ class PackedR2RegistryIndex(R2RegistryIndex):
 
             for token in tokens:
                 self._batch_by_token.pop(token, None)
-            self._invalidate_pending_cache()
             return changed
         finally:
             self._invalidate_pending_cache()
