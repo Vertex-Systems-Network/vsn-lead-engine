@@ -41,9 +41,16 @@ class PackedR2RegistryIndex(R2RegistryIndex):
             min(1024, int(settings.get("read_cache_max_entries", 128))),
         )
         self._pack_cache: dict[str,set[str]] = {}
+        self._legacy_cache: dict[str,bool] = {}
         self._pack_cache_lock = threading.Lock()
         self._pack_cache_hits = 0
         self._pack_cache_misses = 0
+        self._legacy_cache_hits = 0
+        self._legacy_cache_misses = 0
+        self.legacy_read_cache_max_entries = max(
+            64,
+            min(20000, int(settings.get("legacy_read_cache_max_entries", 4096))),
+        )
 
     def verify(self) -> dict:
         result = super().verify()
@@ -53,6 +60,7 @@ class PackedR2RegistryIndex(R2RegistryIndex):
             "pack_shard_chars": self.pack_shard_chars,
             "read_cache_enabled": self.read_cache_enabled,
             "read_cache_max_entries": self.read_cache_max_entries,
+            "legacy_read_cache_max_entries": self.legacy_read_cache_max_entries,
         }
 
     def _pack_key(self, token: str) -> str:
@@ -132,11 +140,15 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                 "entries":len(self._pack_cache),
                 "hits":self._pack_cache_hits,
                 "misses":self._pack_cache_misses,
+                "legacy_entries":len(self._legacy_cache),
+                "legacy_hits":self._legacy_cache_hits,
+                "legacy_misses":self._legacy_cache_misses,
             }
 
     def clear_read_cache(self) -> None:
         with self._pack_cache_lock:
             self._pack_cache.clear()
+            self._legacy_cache.clear()
 
     def _packed_hits(
         self,
@@ -168,17 +180,54 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                         hits.add(token)
         return hits
 
-    def _legacy_hits(self, tokens: Iterable[str]) -> set[str]:
-        tokens = set(tokens)
-        if not tokens:
+    def _legacy_hits(
+        self,
+        tokens: Iterable[str],
+        *,
+        use_cache: bool = False,
+    ) -> set[str]:
+        requested={token for token in tokens if token}
+        if not requested:
             return set()
-        hits: set[str] = set()
-        with ThreadPoolExecutor(max_workers=min(self.max_workers, len(tokens))) as pool:
-            futures = {pool.submit(self._token_exists, token): token for token in tokens}
-            for future in as_completed(futures):
-                token = futures[future]
-                if future.result():
-                    hits.add(token)
+
+        hits:set[str]=set()
+        uncached=set(requested)
+        if use_cache and self.read_cache_enabled:
+            with self._pack_cache_lock:
+                uncached=set()
+                for token in requested:
+                    if token in self._legacy_cache:
+                        self._legacy_cache_hits += 1
+                        if self._legacy_cache[token]:
+                            hits.add(token)
+                    else:
+                        uncached.add(token)
+
+        if uncached:
+            resolved:dict[str,bool]={}
+            with ThreadPoolExecutor(
+                max_workers=min(self.max_workers,len(uncached))
+            ) as pool:
+                futures={
+                    pool.submit(self._token_exists,token):token
+                    for token in uncached
+                }
+                for future in as_completed(futures):
+                    token=futures[future]
+                    exists=bool(future.result())
+                    resolved[token]=exists
+                    if exists:
+                        hits.add(token)
+
+            if use_cache and self.read_cache_enabled:
+                with self._pack_cache_lock:
+                    self._legacy_cache_misses += len(resolved)
+                    for token,exists in resolved.items():
+                        self._legacy_cache[token]=exists
+                    while len(self._legacy_cache) > self.legacy_read_cache_max_entries:
+                        oldest=next(iter(self._legacy_cache))
+                        self._legacy_cache.pop(oldest,None)
+
         return hits
 
     def _existing_tokens(
@@ -191,7 +240,10 @@ class PackedR2RegistryIndex(R2RegistryIndex):
         packed = self._packed_hits(requested,use_cache=use_cache)
         # Historical v1 fingerprints remain authoritative until an explicit
         # compaction migration removes them in a later, independently audited step.
-        legacy = self._legacy_hits(requested - packed)
+        legacy = self._legacy_hits(
+            requested - packed,
+            use_cache=use_cache,
+        )
         return packed | legacy
 
     def _pending_tokens(self, *, exclude_batch_ids: set[str] | None = None) -> set[str]:
@@ -285,6 +337,14 @@ class PackedR2RegistryIndex(R2RegistryIndex):
     def _release_lock(self, owner: str) -> None:
         if owner:
             self._delete_owned(self._lock_key(), owner)
+
+    def import_rows(self, rows: list[dict]) -> dict[str,int]:
+        result=super().import_rows(rows)
+        # import_rows mutates historical objects-v1; discard any advisory
+        # positive/negative cache so subsequent checks observe the new state.
+        with self._pack_cache_lock:
+            self._legacy_cache.clear()
+        return result
 
     def reserve_pending(self, leads: Iterable[Lead], workbook: dict) -> set[str]:
         rows = [lead_registry_payload(lead, workbook) for lead in leads]

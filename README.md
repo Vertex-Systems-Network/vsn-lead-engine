@@ -500,6 +500,30 @@ fingerprints and lead values are not persisted in health telemetry.
 This makes P19 measurable on real production runs without changing the cache,
 registry, source, quota or enrichment behavior.
 
+### P21 legacy objects-v1 advisory cache
+
+Historical objects-v1 fingerprints remain authoritative and readable, but
+repeated advisory collision checks no longer repeat the same R2 HEAD request
+for every unchanged token within one event.
+
+Production behavior:
+
+- event-local legacy existence cache enabled through the existing advisory
+  cache switch;
+- maximum cached legacy token states: **4,096**;
+- positive and negative existence results are cached only for advisory
+  `collision_keys()` checks;
+- `reserve_pending()` bypasses advisory caches and performs fresh packed-v2
+  and legacy-v1 checks under the registry lock;
+- audit paths remain fresh;
+- `import_rows()` clears legacy advisory state after historical object
+  mutations;
+- smoke cleanup clears both packed and legacy advisory caches.
+
+P11 health telemetry now records separate legacy cache entries, hits and misses
+so the reduction in historical R2 fallback reads can be measured independently
+from packed-v2 cache efficiency.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -806,6 +830,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P18 source-batch dedupe: **LOCAL BEST-REPRESENTATIVE COLLAPSE ACTIVE**
 - P19 packed registry cache: **ADVISORY READ CACHE ACTIVE; RESERVATIONS FRESH**
 - P20 cache observability: **P11 HIT/MISS/ENTRY TELEMETRY ACTIVE**
+- P21 legacy fallback cache: **ADVISORY OBJECTS-V1 HEAD CACHE ACTIVE; RESERVATIONS FRESH**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

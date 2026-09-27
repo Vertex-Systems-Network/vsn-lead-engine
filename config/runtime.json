@@ -698,7 +698,8 @@
     "pack_shard_chars": 1,
     "lock_stale_seconds": 180,
     "read_cache_enabled": true,
-    "read_cache_max_entries": 128
+    "read_cache_max_entries": 128,
+    "legacy_read_cache_max_entries": 4096
   },
   "enrichment": {
     "enabled": true,
@@ -708,7 +709,7 @@
     "max_pages_per_site": 2,
     "max_response_bytes": 524288,
     "respect_robots_txt": true,
-    "user_agent": "VSN-Lead-Engine/0.26.1 (+https://vertexsystemsnetwork.com/)",
+    "user_agent": "VSN-Lead-Engine/0.27 (+https://vertexsystemsnetwork.com/)",
     "common_crawl": {
       "enabled": true,
       "max_lookups_per_run": 8,
