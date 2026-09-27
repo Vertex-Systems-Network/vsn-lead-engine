@@ -241,6 +241,11 @@ def load_config() -> dict:
             raise ValueError("registry.pack_shard_chars must be 1 or 2.")
         if int(registry.get("lock_stale_seconds",180)) < 30:
             raise ValueError("registry.lock_stale_seconds must be at least 30.")
+        read_cache_max=int(registry.get("read_cache_max_entries",128))
+        if read_cache_max < 16 or read_cache_max > 1024:
+            raise ValueError(
+                "registry.read_cache_max_entries must be between 16 and 1024."
+            )
 
     _validate_geographies(config["geographies"])
 
