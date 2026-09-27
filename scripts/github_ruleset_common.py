@@ -114,9 +114,57 @@ def normalize_ruleset(ruleset: dict[str, Any]) -> dict[str, Any]:
     return canonical_policy(ruleset)
 
 
+def _project_actual_to_expected(expected: Any, actual: Any) -> Any:
+    """Ignore GitHub-added response defaults while preserving real policy drift."""
+    if isinstance(expected, dict):
+        actual_dict = actual if isinstance(actual, dict) else {}
+        return {
+            key: _project_actual_to_expected(value, actual_dict.get(key))
+            for key, value in expected.items()
+        }
+
+    if isinstance(expected, list):
+        actual_list = actual if isinstance(actual, list) else []
+
+        # Rules are identified by stable type, not response ordering.
+        if expected and all(
+            isinstance(item, dict) and "type" in item for item in expected
+        ):
+            actual_by_type = {
+                item.get("type"): item
+                for item in actual_list
+                if isinstance(item, dict) and item.get("type")
+            }
+            return [
+                _project_actual_to_expected(
+                    item,
+                    actual_by_type.get(item.get("type"), {}),
+                )
+                for item in expected
+            ]
+
+        # For lists of structured values (e.g. required status checks), compare
+        # the expected fields only while retaining cardinality/order.
+        if expected and all(isinstance(item, dict) for item in expected):
+            return [
+                _project_actual_to_expected(
+                    expected[index] if index < len(expected) else {},
+                    item,
+                )
+                for index, item in enumerate(actual_list)
+            ]
+
+        return actual_list
+
+    return actual
+
+
 def policy_diff(expected: dict[str, Any], actual: dict[str, Any]) -> dict[str, Any]:
     expected_norm = canonical_policy(expected)
-    actual_norm = normalize_ruleset(actual)
+    actual_norm = _project_actual_to_expected(
+        expected_norm,
+        normalize_ruleset(actual),
+    )
     return {
         key: {
             "expected": expected_norm[key],
