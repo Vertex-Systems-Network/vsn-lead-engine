@@ -458,6 +458,7 @@ def run_once(
                 enrichment_candidates.append(lead)
 
             remote_prefilter_candidates=0
+            remote_prefilter_duplicates=0
             if mode=="r2" and enricher is not None and enrichment_candidates:
                 prefilter_targets=[
                     lead for lead in enrichment_candidates
@@ -481,6 +482,7 @@ def run_once(
                             if token and token in prefilter_collisions:
                                 rejections["duplicate"]+=1
                                 rejections["remote_prefilter_duplicate"]+=1
+                                remote_prefilter_duplicates+=1
                                 continue
                             survivors.append(lead)
                         enrichment_candidates=survivors
@@ -535,9 +537,7 @@ def run_once(
                 "candidate_partition":search_geography["_candidate_partition"],
                 "candidate_partition_count":search_geography["_candidate_partition_count"],
                 "remote_prefilter_candidates":remote_prefilter_candidates,
-                "remote_prefilter_duplicates":int(
-                    rejections.get("remote_prefilter_duplicate",0)
-                ),
+                "remote_prefilter_duplicates":remote_prefilter_duplicates,
                 "error":source_error,
             })
 
