@@ -273,3 +273,32 @@ def test_same_batch_secondary_fingerprint_collision_accepts_only_first(monkeypat
     assert len(reserved) == 1
     batch = index.pending_rows()[0]
     assert len(batch["rows"]) == 1
+
+
+def test_live_smoke_activates_and_cleans_packed_layout(monkeypatch):
+    from vsn_lead_engine import packed_registry as packed_module
+    from vsn_lead_engine import registry as registry_module
+
+    set_r2_env(monkeypatch)
+    fake = FakeS3()
+
+    class SmokePackedIndex(PackedR2RegistryIndex):
+        def __init__(self, config):
+            super().__init__(config, client=fake)
+
+    monkeypatch.setattr(packed_module, "PackedR2RegistryIndex", SmokePackedIndex)
+    result = registry_module.live_smoke_test(config())
+
+    assert result["status"] == "ok"
+    assert result["layout"] == "packed-v2"
+    assert result["rollback_reserved"] == 1
+    assert result["rolled_back"] == 1
+    assert result["activation_reserved"] == 1
+    assert result["activated"] == 1
+    assert result["collision_after_activation"] == 1
+    assert result["permanent_objects_during_activation"] > 0
+    assert result["permanent_tokens_during_activation"] >= 3
+    assert result["cleanup_objects_deleted"] > 0
+    assert result["collision_after_cleanup"] == 0
+    assert result["remaining_fingerprint_objects"] == 0
+    assert result["remaining_packed_objects"] == 0
