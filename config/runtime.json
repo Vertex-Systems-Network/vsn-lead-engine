@@ -699,7 +699,8 @@
     "lock_stale_seconds": 180,
     "read_cache_enabled": true,
     "read_cache_max_entries": 128,
-    "legacy_read_cache_max_entries": 4096
+    "legacy_read_cache_max_entries": 4096,
+    "pending_read_cache_enabled": true
   },
   "enrichment": {
     "enabled": true,
