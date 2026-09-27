@@ -410,6 +410,9 @@
     "bucket_env": "R2_BUCKET",
     "prefix": "vsn-lead-ledger/v1",
     "max_workers": 32,
-    "retry_attempts": 4
+    "retry_attempts": 4,
+    "layout": "packed-v2",
+    "pack_shard_chars": 1,
+    "lock_stale_seconds": 180
   }
 }

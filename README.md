@@ -188,36 +188,53 @@ phone number, business name, domain, email, address or social profile.
 ```
 <bucket>/
   vsn-lead-ledger/v1/
-    fp/
-      p/<prefix>/<digest>   # place
-      s/<prefix>/<digest>   # source
-      d/<prefix>/<digest>   # domain
-      n/<prefix>/<digest>   # phone+name
-      l/<prefix>/<digest>   # business+location
+    fp/                         # historical objects-v1; read-only compatibility
+      p/<prefix>/<digest>
+      s/<prefix>/<digest>
+      d/<prefix>/<digest>
+      n/<prefix>/<digest>
+      l/<prefix>/<digest>
+    packs/v2/                   # current permanent write layout
+      p/<shard>.bin
+      s/<shard>.bin
+      d/<shard>.bin
+      n/<shard>.bin
+      l/<shard>.bin
     pending/
       <batch-id>.json
+    locks/
+      packed-v2.lock
 ```
 
-Fingerprint objects are zero-byte private objects. `HEAD` gives an exact
-membership check. Conditional `PUT If-None-Match: *` makes reservations
-atomic at the object key.
+Packed-v2 stores exact 96-bit digests as fixed-width binary records. With the
+production one-nibble shard setting, each fingerprint type has at most 16 pack
+objects, so the five normal dimensions use at most 80 active pack shards.
+Historical objects-v1 remain readable and blocking; the cutover does not delete
+or weaken the already-certified dedupe history.
 
 ### Registry-first transaction and crash recovery
 
-For each category batch:
+For each category batch in packed-v2:
 
-1. create one compact pending transaction marker;
-2. conditionally reserve fingerprint objects;
-3. append only successfully reserved leads to the dated Google Sheet;
-4. delete the pending marker after the Sheet write succeeds.
+1. acquire the short-lived exact Registry lock;
+2. check permanent packed-v2 hashes, historical objects-v1 hashes and all live
+   pending reservations;
+3. write one compact pending transaction marker for the accepted reservation;
+4. release the lock and append only reserved leads to the dated Google Sheet;
+5. after the Sheet write succeeds, re-acquire the lock, merge the reserved
+   fingerprints into the touched binary pack shards, then clear the marker.
 
 If a runner dies, the next real run scans only the small `pending/` prefix.
 For each pending lead it hashes the dated Sheet Unique Key column:
 
-- written lead -> keep its permanent fingerprints and clear pending state;
-- missing lead -> delete only fingerprint objects owned by that reservation.
+- written lead -> idempotently merge its fingerprints into packed-v2 and clear
+  pending state;
+- missing lead -> discard its pending reservation without adding a permanent
+  packed fingerprint.
 
-This prevents both duplicate writes and stale dedupe poisoning.
+Legacy pending markers are still reconciled with their original objects-v1
+ownership rules. This preserves crash recovery while removing per-lead permanent
+object writes from the normal production path.
 
 ### Migration
 
@@ -251,13 +268,17 @@ The bucket name is never hard-coded; `R2_BUCKET` is the authority.
 ### Scale model
 
 R2 is used as an exact object ledger, so there is no fixed SQL database-size
-ceiling and no index rebuild/vacuum requirement. At the 12,000 accepted
-leads/day target, the engine writes at most five permanent zero-byte fingerprint
-objects per lead. Read checks are parallelized and short-lived pending objects
-are deleted after successful commits.
+ceiling and no index rebuild/vacuum requirement. Packed-v2 removes the old
+worst-case pattern of up to five permanent `PUT` operations per accepted lead.
+One category activation now rewrites only the pack shards actually touched by
+that batch; with one-nibble sharding the absolute shard ceiling is 80 across
+all five normal fingerprint dimensions, even for a 1,000-lead category batch.
 
-The ledger never expires accepted-history fingerprints merely to save space,
-because deleting them would allow old businesses to re-enter as duplicates.
+Collision checks remain exact. Packed-v2 is checked first and historical
+objects-v1 are checked as a fallback, so the certified pre-cutover history
+continues blocking duplicates. The ledger never expires accepted-history
+fingerprints merely to save space, because deleting them would allow old
+businesses to re-enter as duplicates.
 
 ## Production credential
 
@@ -277,6 +298,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P0 reliability hardening: **ENABLED**
 - P1 runner performance + quota cycles: **ENABLED**
 - P2 permanent R2 dedupe ledger: **R2 AUTHORITY — LIVE**
+- P0 free-tier R2 write hardening: **PACKED-V2 ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
