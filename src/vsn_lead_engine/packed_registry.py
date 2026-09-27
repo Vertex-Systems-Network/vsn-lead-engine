@@ -134,6 +134,10 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                 "misses":self._pack_cache_misses,
             }
 
+    def clear_read_cache(self) -> None:
+        with self._pack_cache_lock:
+            self._pack_cache.clear()
+
     def _packed_hits(
         self,
         tokens: Iterable[str],
