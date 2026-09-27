@@ -524,6 +524,28 @@ P11 health telemetry now records separate legacy cache entries, hits and misses
 so the reduction in historical R2 fallback reads can be measured independently
 from packed-v2 cache efficiency.
 
+### P22 pending-marker advisory cache
+
+Repeated advisory collision checks also reuse the compact set of currently
+reserved pending fingerprints instead of re-listing the R2 `pending/` prefix
+for every P17/final dedupe pass.
+
+Correctness boundaries:
+
+- pending cache is event-local and advisory only;
+- `collision_keys()` may reuse cached pending tokens;
+- `reserve_pending()` always performs a fresh pending scan under the registry
+  lock before accepting a reservation;
+- own reserve, activate, retryable rollback and reconciliation mutations
+  invalidate the pending cache;
+- the cache can be disabled independently with
+  `registry.pending_read_cache_enabled=false`;
+- smoke cleanup clears it together with the packed/legacy advisory caches.
+
+P11 health telemetry records pending cache enabled state, token entries, hits
+and misses. This reduces repeated R2 LIST/GET work without allowing stale
+pending state to become commit-time dedupe authority.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -831,6 +853,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P19 packed registry cache: **ADVISORY READ CACHE ACTIVE; RESERVATIONS FRESH**
 - P20 cache observability: **P11 HIT/MISS/ENTRY TELEMETRY ACTIVE**
 - P21 legacy fallback cache: **ADVISORY OBJECTS-V1 HEAD CACHE ACTIVE; RESERVATIONS FRESH**
+- P22 pending-marker cache: **ADVISORY PENDING LIST/GET CACHE ACTIVE; RESERVATIONS FRESH**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
