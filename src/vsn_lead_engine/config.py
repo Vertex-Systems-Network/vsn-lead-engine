@@ -46,6 +46,35 @@ def load_config() -> dict:
     if int(config["runtime"].get("max_cycles_per_run",3)) < 1:
         raise ValueError("max_cycles_per_run must be at least 1.")
 
+    enrichment=config.get("enrichment",{})
+    if enrichment.get("enabled",False):
+        if int(enrichment.get("max_candidates_per_run",160)) < 1:
+            raise ValueError("enrichment.max_candidates_per_run must be at least 1.")
+        workers=int(enrichment.get("workers",8))
+        if workers < 1 or workers > 16:
+            raise ValueError("enrichment.workers must be between 1 and 16.")
+        if float(enrichment.get("request_timeout_seconds",6)) < 1:
+            raise ValueError("enrichment.request_timeout_seconds must be at least 1.")
+        pages=int(enrichment.get("max_pages_per_site",2))
+        if pages < 1 or pages > 3:
+            raise ValueError("enrichment.max_pages_per_site must be between 1 and 3.")
+        response_bytes=int(enrichment.get("max_response_bytes",524288))
+        if response_bytes < 65536 or response_bytes > 2000000:
+            raise ValueError("enrichment.max_response_bytes must be 65536..2000000.")
+        if not str(enrichment.get("user_agent","")).strip():
+            raise ValueError("enrichment.user_agent is required when enrichment is enabled.")
+
+        common=enrichment.get("common_crawl",{})
+        if common.get("enabled",False):
+            if int(common.get("max_lookups_per_run",8)) < 1:
+                raise ValueError("enrichment.common_crawl.max_lookups_per_run must be at least 1.")
+            if float(common.get("min_interval_seconds",2.5)) < 1:
+                raise ValueError("enrichment.common_crawl.min_interval_seconds must be at least 1.")
+            for key in ["index_url","data_url"]:
+                value=str(common.get(key,"")).strip()
+                if not value.startswith("https://"):
+                    raise ValueError(f"enrichment.common_crawl.{key} must use HTTPS.")
+
     registry=config["registry"]
     registry_mode=str(registry.get("mode","sheets")).strip().lower()
     if registry_mode not in {"sheets","dual","r2"}:
