@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import threading
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
@@ -34,6 +35,15 @@ class PackedR2RegistryIndex(R2RegistryIndex):
         settings = config.get("registry", {})
         self.pack_shard_chars = max(1, min(2, int(settings.get("pack_shard_chars", 1))))
         self.lock_stale_seconds = max(30, int(settings.get("lock_stale_seconds", 180)))
+        self.read_cache_enabled = bool(settings.get("read_cache_enabled", True))
+        self.read_cache_max_entries = max(
+            16,
+            min(1024, int(settings.get("read_cache_max_entries", 128))),
+        )
+        self._pack_cache: dict[str,set[str]] = {}
+        self._pack_cache_lock = threading.Lock()
+        self._pack_cache_hits = 0
+        self._pack_cache_misses = 0
 
     def verify(self) -> dict:
         result = super().verify()
@@ -41,6 +51,8 @@ class PackedR2RegistryIndex(R2RegistryIndex):
             **result,
             "layout": self.LAYOUT,
             "pack_shard_chars": self.pack_shard_chars,
+            "read_cache_enabled": self.read_cache_enabled,
+            "read_cache_max_entries": self.read_cache_max_entries,
         }
 
     def _pack_key(self, token: str) -> str:
@@ -68,14 +80,32 @@ class PackedR2RegistryIndex(R2RegistryIndex):
     def _encode_pack(digests: Iterable[str]) -> bytes:
         return b"".join(bytes.fromhex(digest) for digest in sorted(set(digests)))
 
-    def _read_pack(self, key: str) -> set[str]:
+    def _read_pack(self, key: str, *, use_cache: bool = False) -> set[str]:
+        if use_cache and self.read_cache_enabled:
+            with self._pack_cache_lock:
+                cached=self._pack_cache.get(key)
+                if cached is not None:
+                    self._pack_cache_hits += 1
+                    return set(cached)
+
         try:
             response = self.client.get_object(Bucket=self.bucket, Key=key)
         except ClientError as exc:
             if self._is_missing(exc):
-                return set()
-            raise
-        return self._decode_pack(response["Body"].read())
+                digests=set()
+            else:
+                raise
+        else:
+            digests=self._decode_pack(response["Body"].read())
+
+        if use_cache and self.read_cache_enabled:
+            with self._pack_cache_lock:
+                self._pack_cache_misses += 1
+                self._pack_cache[key]=set(digests)
+                while len(self._pack_cache) > self.read_cache_max_entries:
+                    oldest=next(iter(self._pack_cache))
+                    self._pack_cache.pop(oldest,None)
+        return set(digests)
 
     def _write_pack(self, key: str, digests: set[str]) -> None:
         self.client.put_object(
@@ -88,8 +118,32 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                 "digest-bytes": str(TOKEN_DIGEST_BYTES),
             },
         )
+        if self.read_cache_enabled:
+            with self._pack_cache_lock:
+                self._pack_cache[key]=set(digests)
+                while len(self._pack_cache) > self.read_cache_max_entries:
+                    oldest=next(iter(self._pack_cache))
+                    self._pack_cache.pop(oldest,None)
 
-    def _packed_hits(self, tokens: Iterable[str]) -> set[str]:
+    def cache_stats(self) -> dict[str,int | bool]:
+        with self._pack_cache_lock:
+            return {
+                "enabled":self.read_cache_enabled,
+                "entries":len(self._pack_cache),
+                "hits":self._pack_cache_hits,
+                "misses":self._pack_cache_misses,
+            }
+
+    def clear_read_cache(self) -> None:
+        with self._pack_cache_lock:
+            self._pack_cache.clear()
+
+    def _packed_hits(
+        self,
+        tokens: Iterable[str],
+        *,
+        use_cache: bool = False,
+    ) -> set[str]:
         groups: dict[str, list[tuple[str, str]]] = {}
         for token in set(tokens):
             if not token:
@@ -102,7 +156,10 @@ class PackedR2RegistryIndex(R2RegistryIndex):
             return hits
 
         with ThreadPoolExecutor(max_workers=min(self.max_workers, len(groups))) as pool:
-            futures = {pool.submit(self._read_pack, key): key for key in groups}
+            futures = {
+                pool.submit(self._read_pack,key,use_cache=use_cache):key
+                for key in groups
+            }
             for future in as_completed(futures):
                 key = futures[future]
                 packed = future.result()
@@ -124,9 +181,14 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                     hits.add(token)
         return hits
 
-    def _existing_tokens(self, tokens: Iterable[str]) -> set[str]:
+    def _existing_tokens(
+        self,
+        tokens: Iterable[str],
+        *,
+        use_cache: bool = False,
+    ) -> set[str]:
         requested = {token for token in tokens if token}
-        packed = self._packed_hits(requested)
+        packed = self._packed_hits(requested,use_cache=use_cache)
         # Historical v1 fingerprints remain authoritative until an explicit
         # compaction migration removes them in a later, independently audited step.
         legacy = self._legacy_hits(requested - packed)
@@ -153,7 +215,7 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                 token_to_candidates.setdefault(token, set()).add(unique_token)
 
         candidate_tokens = set(token_to_candidates)
-        blocked = self._existing_tokens(candidate_tokens)
+        blocked = self._existing_tokens(candidate_tokens,use_cache=True)
         blocked.update(candidate_tokens & self._pending_tokens())
 
         collisions: set[str] = set()

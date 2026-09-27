@@ -672,6 +672,10 @@ def live_smoke_test(config: dict) -> dict:
     for key in cleanup_keys:
         index.client.delete_object(Bucket=index.bucket,Key=key)
 
+    clear_cache=getattr(index,"clear_read_cache",None)
+    if callable(clear_cache):
+        clear_cache()
+
     cleanup_stats=index.stats()
     activation_after_cleanup=index.collision_keys([activation_lead])
     pending=index.pending_rows()
