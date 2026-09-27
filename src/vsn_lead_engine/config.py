@@ -127,6 +127,28 @@ def load_config() -> dict:
             "adaptive_yield_state_max_entries must be between 100 and 5000."
         )
 
+    adaptive_history_weight=float(
+        config["runtime"].get("adaptive_yield_history_weight",0.25)
+    )
+    if adaptive_history_weight < 0 or adaptive_history_weight > 1:
+        raise ValueError(
+            "adaptive_yield_history_weight must be between 0 and 1."
+        )
+    adaptive_history_decay=float(
+        config["runtime"].get("adaptive_yield_history_decay",0.75)
+    )
+    if adaptive_history_decay < 0 or adaptive_history_decay > 1:
+        raise ValueError(
+            "adaptive_yield_history_decay must be between 0 and 1."
+        )
+    adaptive_history_max_entries=int(
+        config["runtime"].get("adaptive_yield_history_max_entries",1500)
+    )
+    if adaptive_history_max_entries < 100 or adaptive_history_max_entries > 5000:
+        raise ValueError(
+            "adaptive_yield_history_max_entries must be between 100 and 5000."
+        )
+
     health_ledger_max_events=int(
         config["runtime"].get("health_ledger_max_events",96)
     )

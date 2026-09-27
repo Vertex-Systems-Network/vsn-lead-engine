@@ -84,6 +84,14 @@ def run_health_event(
             event["adaptive_state_load_error"]=_clean_text(state["load_error"])
         if state.get("save_error"):
             event["adaptive_state_save_error"]=_clean_text(state["save_error"])
+    history=result.get("adaptive_yield_history") or {}
+    if isinstance(history,dict):
+        event["adaptive_history_loaded"]=bool(history.get("loaded",False))
+        event["adaptive_history_saved"]=bool(history.get("saved",False))
+        if history.get("load_error"):
+            event["adaptive_history_load_error"]=_clean_text(history["load_error"])
+        if history.get("save_error"):
+            event["adaptive_history_save_error"]=_clean_text(history["save_error"])
     return event
 
 
@@ -254,6 +262,8 @@ class DailyHealthLedgerStore:
             "schedule_slot","schedule_delay_minutes",
             "adaptive_state_loaded","adaptive_state_saved",
             "adaptive_state_load_error","adaptive_state_save_error",
+            "adaptive_history_loaded","adaptive_history_saved",
+            "adaptive_history_load_error","adaptive_history_save_error",
             "attempts_used","attempts_configured","workbook_created",
             "error_type","message",
         }

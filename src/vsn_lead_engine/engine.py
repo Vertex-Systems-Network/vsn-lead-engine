@@ -14,7 +14,7 @@ from .scheduler import build_shard_plan, run_cursor, yield_hint_key
 from .registry import build_registry_index, fingerprint_token, registry_mode
 from .sheets import GoogleSheetsStore
 from .sources import build_sources
-from .yield_state import DailyYieldStateStore
+from .yield_state import DailyYieldStateStore, HistoricalYieldProfileStore
 
 
 def _empty_fingerprints() -> dict[str, set[str]]:
@@ -94,6 +94,42 @@ def _yield_hint_summary(yield_hints: dict[str,dict]) -> dict:
         "discovered":sum(int(item.get("discovered",0) or 0) for item in yield_hints.values()),
         "accepted":sum(int(item.get("accepted",0) or 0) for item in yield_hints.values()),
     }
+
+
+def _merge_routing_hints(
+    daily_hints: dict[str,dict],
+    historical_hints: dict[str,dict],
+    *,
+    historical_weight: float,
+) -> dict[str,dict]:
+    """Blend weak historical priors with stronger same-day observations."""
+    weight=max(0.0,min(1.0,float(historical_weight)))
+    merged: dict[str,dict]={}
+
+    for key,item in historical_hints.items():
+        visits=max(0,int(item.get("visits",0) or 0))
+        discovered=max(0,int(item.get("discovered",0) or 0))
+        accepted=max(0,int(item.get("accepted",0) or 0))
+        scaled={
+            "visits":max(1,int(round(visits*weight))) if visits else 0,
+            "discovered":max(0,int(round(discovered*weight))),
+            "accepted":max(0,int(round(accepted*weight))),
+        }
+        scaled["accepted"]=min(scaled["accepted"],scaled["discovered"])
+        if scaled["visits"] or scaled["discovered"] or scaled["accepted"]:
+            merged[str(key)]=scaled
+
+    for key,item in daily_hints.items():
+        current=merged.setdefault(
+            str(key),
+            {"visits":0,"discovered":0,"accepted":0},
+        )
+        current["visits"]+=max(0,int(item.get("visits",0) or 0))
+        current["discovered"]+=max(0,int(item.get("discovered",0) or 0))
+        current["accepted"]+=max(0,int(item.get("accepted",0) or 0))
+        current["accepted"]=min(current["accepted"],current["discovered"])
+
+    return merged
 
 
 def _quality_summary(
@@ -668,6 +704,15 @@ def run_until_quota(
         "save_error":"",
     }
     yield_state_dirty=False
+    historical_hints={}
+    history_store=None
+    history_telemetry={
+        "enabled":False,
+        "loaded":False,
+        "saved":False,
+        "load_error":"",
+        "save_error":"",
+    }
     health_store=None
     health_telemetry={
         "enabled":False,
@@ -694,6 +739,43 @@ def run_until_quota(
 
     adaptive_enabled=bool(runtime.get("adaptive_yield_routing",True))
     persist_daily=bool(runtime.get("adaptive_yield_persist_daily",True))
+    history_enabled=bool(runtime.get("adaptive_yield_history_enabled",True))
+    history_weight=float(runtime.get("adaptive_yield_history_weight",0.25))
+    history_decay=float(runtime.get("adaptive_yield_history_decay",0.75))
+
+    if adaptive_enabled and history_enabled and registry_index is not None:
+        try:
+            history_store=HistoricalYieldProfileStore(
+                registry_index,
+                max_entries=int(
+                    runtime.get("adaptive_yield_history_max_entries",1500)
+                ),
+            )
+            loaded_history,history_meta=history_store.load()
+            historical_hints.update(loaded_history)
+            history_telemetry.update({
+                "enabled":True,
+                "loaded":history_meta.get("status")=="loaded",
+                "load_status":history_meta.get("status",""),
+                "load_entries":int(history_meta.get("entries",0) or 0),
+                "load_bytes":int(history_meta.get("bytes",0) or 0),
+                "last_completed_date":history_meta.get("last_completed_date",""),
+                "state_key":history_meta.get("key",""),
+                "weight":history_weight,
+                "decay":history_decay,
+            })
+        except Exception as exc:
+            # Historical routing is non-authoritative. Never overwrite an
+            # unknown remote profile after a failed read; continue with
+            # same-day learning only and preserve the existing object.
+            history_store=None
+            history_telemetry.update({
+                "enabled":True,
+                "load_error":f"{type(exc).__name__}: {exc}",
+                "weight":history_weight,
+                "decay":history_decay,
+            })
+
     if adaptive_enabled and persist_daily and registry_index is not None:
         try:
             yield_state_store=DailyYieldStateStore(
@@ -718,6 +800,11 @@ def run_until_quota(
 
     try:
         for cycle_index in range(max_cycles):
+            routing_hints=_merge_routing_hints(
+                yield_hints,
+                historical_hints,
+                historical_weight=history_weight,
+            ) if adaptive_enabled else yield_hints
             result=run_once(
                 config,
                 dry_run=False,
@@ -726,7 +813,7 @@ def run_until_quota(
                 store=store,
                 registry_index=registry_index,
                 enricher=enricher,
-                yield_hints=yield_hints,
+                yield_hints=routing_hints,
                 cursor_offset=cycle_index,
             )
             cycles.append(result)
@@ -767,6 +854,34 @@ def run_until_quota(
             except Exception as exc:
                 yield_state_telemetry["save_error"]=f"{type(exc).__name__}: {exc}"
 
+        if (
+            history_store is not None
+            and final_status=="complete"
+            and yield_hints
+        ):
+            try:
+                history_meta=history_store.save_completion(
+                    run_date,
+                    yield_hints,
+                    decay=history_decay,
+                )
+                history_telemetry.update({
+                    "saved":history_meta.get("status")=="saved",
+                    "save_status":history_meta.get("status",""),
+                    "save_entries":int(history_meta.get("entries",0) or 0),
+                    "save_bytes":int(history_meta.get("bytes",0) or 0),
+                    "last_completed_date":history_meta.get(
+                        "last_completed_date",
+                        history_telemetry.get("last_completed_date",""),
+                    ),
+                    "state_key":history_meta.get(
+                        "key",
+                        history_telemetry.get("state_key",""),
+                    ),
+                })
+            except Exception as exc:
+                history_telemetry["save_error"]=f"{type(exc).__name__}: {exc}"
+
         final_result={
             "status":final_status,
             "run_date":run_date,
@@ -791,6 +906,7 @@ def run_until_quota(
             "country_counts":final_country_counts,
             "adaptive_yield":_yield_hint_summary(yield_hints),
             "adaptive_yield_state":yield_state_telemetry,
+            "adaptive_yield_history":history_telemetry,
             "cycles":cycles,
         }
         if schedule:
