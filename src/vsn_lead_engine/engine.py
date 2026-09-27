@@ -143,6 +143,9 @@ def _quality_summary(
     discovered=max(0,int(discovered or 0))
     accepted=max(0,int(accepted or 0))
     duplicate_rejections=max(0,int(rejections.get("duplicate",0) or 0))
+    remote_prefilter_duplicates=max(
+        0,int(rejections.get("remote_prefilter_duplicate",0) or 0)
+    )
     missing_phone=max(0,int(rejections.get("missing_or_invalid_phone",0) or 0))
     enrichment_candidates=max(0,int(enrichment.get("candidates",0) or 0))
     live_recovered=max(0,int(enrichment.get("live_phone_recovered",0) or 0))
@@ -162,6 +165,7 @@ def _quality_summary(
         "accepted":accepted,
         "acceptance_rate_pct":round((accepted/discovered)*100,2) if discovered else 0.0,
         "duplicate_rejections":duplicate_rejections,
+        "remote_prefilter_duplicates":remote_prefilter_duplicates,
         "missing_phone_rejections":missing_phone,
         "enrichment_candidates":enrichment_candidates,
         "phones_recovered":phones_recovered,
@@ -356,6 +360,9 @@ def run_once(
     source_retry_backoff_seconds=float(runtime.get("source_retry_backoff_seconds",2))
     candidate_partition_count=max(1,int(runtime.get("candidate_partition_count",8)))
     adaptive_yield_routing=bool(runtime.get("adaptive_yield_routing",True))
+    remote_prefilter_enabled=bool(
+        runtime.get("r2_pre_enrichment_prefilter_enabled",True)
+    )
     adaptive_yield_exploration_bonus=float(
         runtime.get("adaptive_yield_exploration_bonus",0.15)
     )
@@ -457,6 +464,41 @@ def run_once(
                     continue
                 enrichment_candidates.append(lead)
 
+            remote_prefilter_candidates=0
+            remote_prefilter_duplicates=0
+            if (
+                remote_prefilter_enabled
+                and mode=="r2"
+                and enricher is not None
+                and enrichment_candidates
+            ):
+                prefilter_targets=[
+                    lead for lead in enrichment_candidates
+                    if (
+                        not normalize_phone(lead.phone,lead.country)
+                        and bool(str(lead.website or "").strip())
+                    )
+                ]
+                remote_prefilter_candidates=len(prefilter_targets)
+                if prefilter_targets:
+                    prefilter_collisions=registry_index.collision_keys(
+                        prefilter_targets
+                    )
+                    if prefilter_collisions:
+                        survivors=[]
+                        for lead in enrichment_candidates:
+                            token=fingerprint_token(
+                                "u",
+                                fingerprints(lead).unique,
+                            )
+                            if token and token in prefilter_collisions:
+                                rejections["duplicate"]+=1
+                                rejections["remote_prefilter_duplicate"]+=1
+                                remote_prefilter_duplicates+=1
+                                continue
+                            survivors.append(lead)
+                        enrichment_candidates=survivors
+
             if enricher is not None and enrichment_candidates:
                 enrichment_stats=enricher.enrich(enrichment_candidates)
                 for key,value in enrichment_stats.items():
@@ -506,6 +548,8 @@ def run_once(
                 "accepted":accepted_from_source,
                 "candidate_partition":search_geography["_candidate_partition"],
                 "candidate_partition_count":search_geography["_candidate_partition_count"],
+                "remote_prefilter_candidates":remote_prefilter_candidates,
+                "remote_prefilter_duplicates":remote_prefilter_duplicates,
                 "error":source_error,
             })
 
@@ -543,6 +587,7 @@ def run_once(
         "source_errors":source_errors,
         "source_retries":source_retries,
         "candidate_partition_count":candidate_partition_count,
+        "r2_pre_enrichment_prefilter":remote_prefilter_enabled,
         "adaptive_yield_routing":adaptive_yield_routing,
         "adaptive_yield_hints_used":len(yield_hints or {}),
         "adaptive_zero_yield_cooldown":adaptive_cooldown_enabled,
@@ -562,6 +607,9 @@ def run_once(
         "accepted_by_country":dict(accepted_by_country),
         "country_counts_before":country_counts,
         "rejections":dict(rejections),
+        "remote_prefilter_duplicates":int(
+            rejections.get("remote_prefilter_duplicate",0) or 0
+        ),
         "enrichment":dict(enrichment_totals),
         "attempts":attempts,
     }
@@ -653,6 +701,9 @@ def run_once(
             "Accepted Leads":int(result.get("accepted",0) or 0),
             "Free-Source Candidates":total_discovered,
             "Duplicate Rejections":int(rejections.get("duplicate",0)),
+            "Remote Prefilter Duplicates":int(
+                rejections.get("remote_prefilter_duplicate",0) or 0
+            ),
             "Missing-Phone Rejections":int(rejections.get("missing_or_invalid_phone",0)),
             "Shard Attempts":len(attempts),
             "Zero-Result Shards":zero_result_shards,
@@ -940,6 +991,10 @@ def run_until_quota(
                     for item in cycles
                 ]
                 or [0]
+            ),
+            "remote_prefilter_duplicates":sum(
+                int(item.get("remote_prefilter_duplicates",0) or 0)
+                for item in cycles
             ),
             "adaptive_cooldown_routes_deferred":max(
                 [
