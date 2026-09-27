@@ -75,16 +75,25 @@ CATEGORY_RULES: dict[str, CategoryRule] = {
         r"\b(?:day spa|medical spa|massage therapy|wellness spa)\b",
     ),
     "Salon": CategoryRule(
-        r"(?:hair_salon|beauty_salon|nail_salon|tanning_salon|hair_stylist|"
-        r"barber_shop|barber|threading_service|eyebrow_bar|waxing_service|beautician)",
+        r"(?:hair_salon|kids_hair_salon|beauty_salon|nail_salon|tanning_salon|"
+        r"hair_stylist|barber_shop|barber|threading_service|eyebrow_bar|"
+        r"waxing_service|waxing|beautician|eyelash_service|makeup_artist|"
+        r"hair_extensions|hair_replacement|permanent_makeup|hair_removal|"
+        r"laser_hair_removal|sugaring|blow_dry_blow_out_service|spray_tanning|"
+        r"skin_care_and_makeup|personal_or_beauty_service)",
         r"\b(?:hair salon|nail salon|beauty salon|barber shop|hair stylist|"
         r"threading service|eyebrow bar)\b",
     ),
     "Cars": CategoryRule(
         r"(?:automotive_repair|auto_repair|auto_glass_service|auto_body_shop|"
-        r"automobile_registration_service|vehicle_inspection|car_dealer|"
-        r"used_car_dealer|car_rental|car_wash|auto_parts_store|automotive_service|"
-        r"tire_dealer_and_repair|tire_shop|towing_service)",
+        r"automobile_registration_service|vehicle_inspection|car_inspection|"
+        r"car_dealer|auto_dealer|used_car_dealer|used_auto_dealer|car_rental|"
+        r"car_wash|auto_parts_store|automotive_service|tire_dealer_and_repair|"
+        r"tire_shop|towing_service|auto_detailing|truck_repair|"
+        r"auto_restoration_service|auto_customization|transmission_repair|"
+        r"brake_service_and_repair|oil_change_station|auto_electrical_repair|"
+        r"engine_repair_service|wheel_and_rim_repair|car_window_tinting|"
+        r"windshield_installation_and_repair)",
         r"\b(?:auto repair|automotive repair|car dealer|used cars?|tire shop|"
         r"tyre shop|towing service|auto body|car wash)\b",
     ),
@@ -94,7 +103,8 @@ CATEGORY_RULES: dict[str, CategoryRule] = {
         r"\b(?:motorcycle|motorbike|motor cycle|powersports)\b",
     ),
     "Insurance": CategoryRule(
-        r"(?:insurance_agency|insurance_company|insurance_broker|insurance_service)",
+        r"(?:insurance_agency|insurance_company|insurance_broker|insurance_service|"
+        r"auto_insurance|life_insurance|health_insurance|property_insurance)",
         r"\b(?:insurance|medicare insurance|assurance agency)\b",
     ),
 }
