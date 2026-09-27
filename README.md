@@ -118,6 +118,39 @@ quota events rather than increasing one-run load without bound.
 Runtime validation now rejects duplicate markets, unsupported countries,
 out-of-range latitude/longitude values and invalid bbox ordering.
 
+### P8 adaptive yield routing
+
+Multi-cycle quota events now learn which **category + metro** combinations are
+producing accepted leads and feed that information into the next cycle in the
+same GitHub Actions process.
+
+The adaptive router is deliberately in-memory only:
+
+- no new database;
+- no additional R2 writes;
+- no cross-day hidden state;
+- no paid API dependency.
+
+For each attempted category/metro shard the engine accumulates visits,
+discovered candidates and accepted leads. The scheduler uses an empirical yield
+rate plus a small exploration bonus to rank metros **inside the same country**.
+
+Important fairness rules remain unchanged:
+
+- US/Canada country interleave remains controlled by the existing country-balance
+  scheduler;
+- underfilled categories still receive the strongest category weight;
+- unseen metros receive an exploration bonus, so a previously successful metro
+  cannot permanently starve new markets;
+- cursor and partition rotation continue to move through fresh source cohorts;
+- the adaptive score is emitted per shard for auditability.
+
+Production settings:
+
+- adaptive yield routing: **enabled**;
+- exploration bonus: **0.15**;
+- learned state lifetime: one bounded quota event only.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -409,6 +442,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P5 daily workbook readiness: **07:50 PKT PRE-START CERTIFICATION ACTIVE**
 - P6 readiness recovery: **3-ATTEMPT RETRY + INCIDENT TELEMETRY ACTIVE**
 - P7 free-source breadth: **56 METROS + 16 OVERTURE PARTITIONS ACTIVE**
+- P8 adaptive yield routing: **IN-PROCESS LEARNING + EXPLORATION ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
