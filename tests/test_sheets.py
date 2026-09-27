@@ -1,4 +1,11 @@
-from vsn_lead_engine.sheets import count_current_countries, count_current_rows
+from vsn_lead_engine.sheets import (
+    GoogleSheetsStore,
+    count_current_countries,
+    count_current_rows,
+    daily_workbook_title,
+    escape_drive_query_value,
+    registry_status_blocks_dedupe,
+)
 
 
 def test_count_current_rows_excludes_needs_review():
@@ -11,9 +18,6 @@ def test_count_current_rows_handles_sparse_status_column():
     dates=[["2026-09-27"],["2026-09-27"]]
     statuses=[]
     assert count_current_rows(dates,statuses,"2026-09-27")==2
-
-
-from vsn_lead_engine.sheets import registry_status_blocks_dedupe
 
 
 def test_registry_active_and_pending_rows_block_dedupe():
@@ -41,3 +45,25 @@ def test_count_current_countries_excludes_quarantine_and_other_dates():
         "United States":1,
         "Canada":1,
     }
+
+
+def test_daily_workbook_title_uses_exact_requested_format():
+    assert daily_workbook_title(
+        "US + Canada Business Leads — ","2026-09-24"
+    )=="US + Canada Business Leads — 2026-09-24"
+
+
+def test_drive_query_escaping_is_safe_for_quotes_and_backslashes():
+    assert escape_drive_query_value("A'B\\C")=="A\\'B\\\\C"
+
+
+def test_daily_overview_uses_fixed_workbook_date_not_today_formula():
+    store=object.__new__(GoogleSheetsStore)
+    store.config={
+        "runtime":{"daily_target_per_category":1000},
+        "categories":["Category 1","Category 2"],
+    }
+    rows=store._overview_seed("2026-09-27")
+    assert rows[2]==["Tracking Date","2026-09-27"]
+    assert "$B$3" in rows[6][1]
+    assert "TODAY()" not in rows[6][1]
