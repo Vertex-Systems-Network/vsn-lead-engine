@@ -315,10 +315,17 @@ def test_live_smoke_test_reserves_detects_and_cleans(monkeypatch):
     monkeypatch.setattr(registry_module,"R2RegistryIndex",SmokeIndex)
     result=registry_module.live_smoke_test(config())
     assert result["status"]=="ok"
-    assert result["reserved"]==1
-    assert result["collision_before"]==0
-    assert result["collision_during"]==1
-    assert result["collision_after"]==0
+    assert result["layout"]=="objects-v1"
+    assert result["rollback_reserved"]==1
+    assert result["collision_before_rollback"]==0
+    assert result["collision_during_reservation"]==1
     assert result["rolled_back"]==1
+    assert result["collision_after_rollback"]==0
+    assert result["activation_reserved"]==1
+    assert result["activated"]==1
+    assert result["collision_after_activation"]==1
+    assert result["permanent_objects_during_activation"]>0
+    assert result["collision_after_cleanup"]==0
     assert result["pending_transactions"]==0
     assert result["remaining_fingerprint_objects"]==0
+    assert result["remaining_packed_objects"]==0

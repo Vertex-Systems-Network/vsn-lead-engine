@@ -594,58 +594,123 @@ def audit_sheet_registry(sheets_store, registry_index: R2RegistryIndex) -> dict:
 
 
 def live_smoke_test(config: dict) -> dict:
-    """Exercise the real R2 transaction path in an isolated temporary prefix."""
+    """Exercise rollback and permanent activation in an isolated R2 prefix."""
     smoke_id=uuid.uuid4().hex
+    smoke_prefix=(
+        f"{str(config.get('registry',{}).get('prefix','vsn-lead-ledger/v1')).strip('/')}"
+        f"/smoke/{smoke_id}"
+    )
     smoke_config={
         **config,
         "registry":{
             **config.get("registry",{}),
-            "prefix":f"{str(config.get('registry',{}).get('prefix','vsn-lead-ledger/v1')).strip('/')}/smoke/{smoke_id}",
+            "prefix":smoke_prefix,
         },
     }
     index=build_registry_index(smoke_config)
     if index is None:
         raise RuntimeError("Registry smoke requires an enabled R2 registry.")
-    lead=Lead(
+
+    rollback_lead=Lead(
         country="United States",
         category="IT & Software",
-        business_name=f"VSN Registry Smoke {smoke_id[:12]}",
+        business_name=f"VSN Registry Rollback Smoke {smoke_id[:12]}",
         phone="+12025550199",
         city="Smoke City",
         region="Smoke Region",
         source="VSN R2 Smoke",
-        source_id=f"smoke:{smoke_id}",
-        website=f"https://{smoke_id}.invalid",
+        source_id=f"smoke:rollback:{smoke_id}",
+        website=f"https://rollback-{smoke_id}.invalid",
+    )
+    activation_lead=Lead(
+        country="United States",
+        category="IT & Software",
+        business_name=f"VSN Registry Activation Smoke {smoke_id[:12]}",
+        phone="+12025550198",
+        city="Smoke City",
+        region="Smoke Region",
+        source="VSN R2 Smoke",
+        source_id=f"smoke:activation:{smoke_id}",
+        website=f"https://activation-{smoke_id}.invalid",
     )
     workbook={"id":"smoke-sheet"}
-    payload=lead_registry_payload(lead,workbook)
-    unique_token=payload["unique_token"]
-    before=index.collision_keys([lead])
-    reserved=index.reserve_pending([lead],workbook)
-    during=index.collision_keys([lead])
-    rolled_back=index.mark_retryable(reserved)
-    after=index.collision_keys([lead])
+
+    rollback_payload=lead_registry_payload(rollback_lead,workbook)
+    rollback_token=rollback_payload["unique_token"]
+    rollback_before=index.collision_keys([rollback_lead])
+    rollback_reserved=index.reserve_pending([rollback_lead],workbook)
+    rollback_during=index.collision_keys([rollback_lead])
+    rolled_back=index.mark_retryable(rollback_reserved)
+    rollback_after=index.collision_keys([rollback_lead])
+
+    activation_payload=lead_registry_payload(activation_lead,workbook)
+    activation_token=activation_payload["unique_token"]
+    activation_before=index.collision_keys([activation_lead])
+    activation_reserved=index.reserve_pending([activation_lead],workbook)
+    activated=index.activate(activation_reserved)
+    activation_after=index.collision_keys([activation_lead])
+    active_stats=index.stats()
+
+    layout=str(active_stats.get("layout","objects-v1")).strip().lower()
+    if layout=="packed-v2":
+        permanent_objects=int(active_stats.get("packed_objects",0) or 0)
+        permanent_tokens=int(active_stats.get("packed_tokens",0) or 0)
+    else:
+        permanent_objects=int(active_stats.get("fingerprint_objects",0) or 0)
+        permanent_tokens=len(activation_payload.get("fingerprints",[]) or [])
+
+    # The smoke namespace is unique to this invocation, so deleting every object
+    # below it cannot touch production Registry history.
+    paginator=index.client.get_paginator("list_objects_v2")
+    cleanup_keys=[]
+    for page in paginator.paginate(Bucket=index.bucket,Prefix=f"{smoke_prefix}/"):
+        cleanup_keys.extend(
+            str(item.get("Key",""))
+            for item in page.get("Contents",[]) or []
+            if str(item.get("Key",""))
+        )
+    for key in cleanup_keys:
+        index.client.delete_object(Bucket=index.bucket,Key=key)
+
+    cleanup_stats=index.stats()
+    activation_after_cleanup=index.collision_keys([activation_lead])
     pending=index.pending_rows()
-    stats=index.stats()
     index.close()
 
     ok=(
-        before==set()
-        and reserved=={unique_token}
-        and during=={unique_token}
+        rollback_before==set()
+        and rollback_reserved=={rollback_token}
+        and rollback_during=={rollback_token}
         and rolled_back==1
-        and after==set()
+        and rollback_after==set()
+        and activation_before==set()
+        and activation_reserved=={activation_token}
+        and activated==1
+        and activation_after=={activation_token}
+        and permanent_objects>0
+        and permanent_tokens>=len(activation_payload.get("fingerprints",[]) or [])
+        and activation_after_cleanup==set()
         and not pending
-        and int(stats.get("fingerprint_objects",0) or 0)==0
-        and int(stats.get("pending_transactions",0) or 0)==0
+        and int(cleanup_stats.get("fingerprint_objects",0) or 0)==0
+        and int(cleanup_stats.get("packed_objects",0) or 0)==0
+        and int(cleanup_stats.get("pending_transactions",0) or 0)==0
     )
     return {
         "status":"ok" if ok else "failed",
-        "reserved":len(reserved),
-        "collision_before":len(before),
-        "collision_during":len(during),
-        "collision_after":len(after),
+        "layout":layout,
+        "rollback_reserved":len(rollback_reserved),
+        "collision_before_rollback":len(rollback_before),
+        "collision_during_reservation":len(rollback_during),
         "rolled_back":rolled_back,
+        "collision_after_rollback":len(rollback_after),
+        "activation_reserved":len(activation_reserved),
+        "activated":activated,
+        "collision_after_activation":len(activation_after),
+        "permanent_objects_during_activation":permanent_objects,
+        "permanent_tokens_during_activation":permanent_tokens,
+        "cleanup_objects_deleted":len(cleanup_keys),
+        "collision_after_cleanup":len(activation_after_cleanup),
         "pending_transactions":len(pending),
-        "remaining_fingerprint_objects":int(stats.get("fingerprint_objects",0) or 0),
+        "remaining_fingerprint_objects":int(cleanup_stats.get("fingerprint_objects",0) or 0),
+        "remaining_packed_objects":int(cleanup_stats.get("packed_objects",0) or 0),
     }
