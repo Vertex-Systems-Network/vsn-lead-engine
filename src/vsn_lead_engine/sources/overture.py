@@ -173,6 +173,23 @@ class OverturePlaceSource:
         self.stac_url = stac_url
         self.candidate_limit = candidate_limit
         self._resolved_release: str | None = None
+        self._connection = None
+
+    def _get_connection(self):
+        """Lazily create one DuckDB/httpfs connection per source instance."""
+        if self._connection is None:
+            connection = duckdb.connect(database=":memory:")
+            connection.execute("INSTALL httpfs")
+            connection.execute("LOAD httpfs")
+            connection.execute("SET s3_region='us-west-2'")
+            self._connection = connection
+        return self._connection
+
+    def close(self):
+        connection = self._connection
+        self._connection = None
+        if connection is not None:
+            connection.close()
 
     def _resolve_release(self) -> str:
         if self._resolved_release:
@@ -307,16 +324,10 @@ class OverturePlaceSource:
         LIMIT ?
         """
 
-        connection = duckdb.connect(database=":memory:")
-        try:
-            connection.execute("INSTALL httpfs")
-            connection.execute("LOAD httpfs")
-            connection.execute("SET s3_region='us-west-2'")
-            cursor = connection.execute(sql, [xmin, xmax, ymin, ymax, row_limit])
-            columns = [item[0] for item in cursor.description]
-            records = [dict(zip(columns, row)) for row in cursor.fetchall()]
-        finally:
-            connection.close()
+        connection = self._get_connection()
+        cursor = connection.execute(sql, [xmin, xmax, ymin, ymax, row_limit])
+        columns = [item[0] for item in cursor.description]
+        records = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
         expected_country = COUNTRY_CODES.get(location.get("country", ""))
         leads: list[Lead] = []

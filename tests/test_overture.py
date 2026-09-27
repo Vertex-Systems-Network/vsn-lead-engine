@@ -174,3 +174,40 @@ def test_maps_url_is_search_url():
     url=OverturePlaceSource._maps_url("Example Inc","1 Main St","Phoenix","Arizona")
     assert url.startswith("https://www.google.com/maps/search/?api=1&query=")
     assert "Example+Inc" in url
+
+
+def test_duckdb_connection_is_reused_and_closed(monkeypatch):
+    class FakeConnection:
+        def __init__(self):
+            self.closed=False
+            self.commands=[]
+
+        def execute(self, command, params=None):
+            self.commands.append((command,params))
+            return self
+
+        def close(self):
+            self.closed=True
+
+    created=[]
+    def fake_connect(database):
+        conn=FakeConnection()
+        created.append(conn)
+        return conn
+
+    monkeypatch.setattr("vsn_lead_engine.sources.overture.duckdb.connect",fake_connect)
+    source=OverturePlaceSource(release="2026-09-24.0")
+    first=source._get_connection()
+    second=source._get_connection()
+
+    assert first is second
+    assert len(created)==1
+    assert [cmd for cmd,_ in first.commands[:3]]==[
+        "INSTALL httpfs",
+        "LOAD httpfs",
+        "SET s3_region='us-west-2'",
+    ]
+
+    source.close()
+    assert first.closed
+    assert source._connection is None
