@@ -97,6 +97,7 @@ def test_store_run_date_is_frozen_for_the_run():
 def test_overview_schema_includes_quality_observability_metrics():
     expected_incremental={
         "Accepted Leads",
+        "Remote Prefilter Duplicates",
         "Phones Recovered",
         "Enrichment Candidates",
         "Official-Site Phone Recoveries",
@@ -124,5 +125,6 @@ def test_daily_overview_seed_contains_quality_metrics():
     names={row[0] for row in rows if row}
     assert "Phones Recovered" in names
     assert "Accepted Leads" in names
+    assert "Remote Prefilter Duplicates" in names
     assert "Enrichment Candidates" in names
     assert "Last Acceptance Rate %" in names
