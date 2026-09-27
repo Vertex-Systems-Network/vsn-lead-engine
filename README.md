@@ -347,6 +347,36 @@ Guardrails:
 P11 health telemetry records the number of routes deferred so zero-yield
 cooldown behavior can be audited without storing lead PII.
 
+### P15 fair weighted category coverage
+
+Category urgency weights remain **3× / 2× / 1×**, but repeat slots are now
+layered instead of clumped.
+
+For example:
+
+```
+weights: A=3, B=2, C=1
+
+old: A, A, A, B, B, C
+new: A, B, C, A, B, A
+```
+
+Operational effect:
+
+- every pending category gets one pass before higher-weight categories consume
+  their repeat slots, when the shard budget is large enough;
+- categories with lower completion still receive the same total extra weight;
+- if the shard budget is smaller than the number of pending categories, the
+  existing completion sort still sends the lowest-progress categories first;
+- country interleave, metro adaptive scoring, P14 cooldown and partition
+  rotation remain unchanged;
+- max shard attempts and API budgets do not increase.
+
+With 12 equally underfilled categories and an 18-shard cycle, the first 12
+slots can now cover all 12 categories instead of clumping the first six
+three times each. P11 health telemetry records `categories_attempted` for
+live audit.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -647,6 +677,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P12 protected-main governance: **POLICY + CONTROLLER ACTIVE; LIVE ENFORCEMENT BLOCKED — GH_ADMIN_TOKEN MISSING**
 - P13 rolling historical yield prior: **CROSS-DAY COLD-START ROUTING ACTIVE**
 - P14 zero-yield cooldown: **SAME-DAY EXHAUSTION DEFERRAL ACTIVE**
+- P15 fair category weighting: **LAYERED 3×/2×/1× COVERAGE ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
