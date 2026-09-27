@@ -65,6 +65,16 @@ def load_config() -> dict:
     if int(registry.get("retry_attempts",4)) < 1:
         raise ValueError("registry.retry_attempts must be at least 1.")
 
+    registry_layout=str(registry.get("layout","objects-v1")).strip().lower()
+    if registry_layout not in {"objects-v1","packed-v2"}:
+        raise ValueError("registry.layout must be one of: objects-v1, packed-v2.")
+    if registry_layout=="packed-v2":
+        pack_shard_chars=int(registry.get("pack_shard_chars",1))
+        if pack_shard_chars not in {1,2}:
+            raise ValueError("registry.pack_shard_chars must be 1 or 2.")
+        if int(registry.get("lock_stale_seconds",180)) < 30:
+            raise ValueError("registry.lock_stale_seconds must be at least 30.")
+
     for geo in config["geographies"]:
         bbox=geo.get("bbox")
         if not isinstance(bbox,list) or len(bbox)!=4:
