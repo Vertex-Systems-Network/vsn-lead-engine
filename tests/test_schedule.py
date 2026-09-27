@@ -1,3 +1,4 @@
+from pathlib import Path
 from datetime import datetime, timezone
 
 from vsn_lead_engine.schedule import scheduled_run_window
@@ -61,3 +62,10 @@ def test_scheduled_window_rejects_before_0800_pkt():
     )
     assert result["allowed"] is False
     assert result["local_time"].startswith("2026-09-28T07:59")
+
+
+def test_github_schedule_contract_matches_pkt_hourly_window():
+    workflow=Path(".github/workflows/lead-engine.yml").read_text(encoding="utf-8")
+    assert 'cron: "0 3-18 * * *"' in workflow
+    assert "python -m vsn_lead_engine.cli run --scheduled" in workflow
+    assert 'cron: "30 3-17 * * *"' not in workflow
