@@ -10,6 +10,9 @@ def test_production_free_source_breadth_is_expanded():
     assert config["runtime"]["adaptive_yield_exploration_bonus"]==0.15
     assert config["runtime"]["adaptive_yield_persist_daily"] is True
     assert config["runtime"]["adaptive_yield_state_max_entries"]==1500
+    assert config["runtime"]["start_hour"]==8
+    assert config["runtime"]["end_hour"]==23
+    assert config["runtime"]["timezone"]=="Asia/Karachi"
     assert len(config["geographies"])>=56
     cities={geo["city"] for geo in config["geographies"]}
     assert {
