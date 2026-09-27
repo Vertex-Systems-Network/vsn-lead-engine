@@ -1,5 +1,5 @@
 import vsn_lead_engine.engine as engine
-from vsn_lead_engine.engine import _candidate_partition_geography, _search_with_retry
+from vsn_lead_engine.engine import _candidate_partition_geography, _quality_summary, _search_with_retry
 
 
 class FlakySource:
@@ -216,3 +216,63 @@ def test_candidate_partition_rotates_with_cursor_and_attempt():
     assert second["_candidate_partition"]==3
     assert next_cycle["_candidate_partition"]==3
     assert geography=={"country":"United States","region":"Texas","city":"Austin"}
+
+
+def test_quality_summary_calculates_acceptance_enrichment_and_partitions():
+    summary=_quality_summary(
+        discovered=200,
+        accepted=50,
+        rejections={"duplicate":100,"missing_or_invalid_phone":50},
+        enrichment={
+            "candidates":40,
+            "live_phone_recovered":6,
+            "common_crawl_phone_recovered":2,
+            "common_crawl_attempted":8,
+            "skipped_budget":5,
+            "errors":1,
+        },
+        attempts=[
+            {
+                "sources":[
+                    {
+                        "source":"Overture Maps Places",
+                        "candidate_partition":2,
+                    },
+                    {
+                        "source":"Overture Maps Places",
+                        "candidate_partition":3,
+                    },
+                ]
+            },
+            {
+                "sources":[
+                    {
+                        "source":"Overture Maps Places",
+                        "candidate_partition":2,
+                    }
+                ]
+            },
+        ],
+    )
+
+    assert summary["acceptance_rate_pct"]==25.0
+    assert summary["phone_recovery_rate_pct"]==20.0
+    assert summary["phones_recovered"]==8
+    assert summary["official_site_phone_recoveries"]==6
+    assert summary["common_crawl_phone_recoveries"]==2
+    assert summary["partitions_visited"]==2
+    assert summary["enrichment_budget_skips"]==5
+    assert summary["enrichment_errors"]==1
+
+
+def test_quality_summary_handles_zero_denominators():
+    summary=_quality_summary(
+        discovered=0,
+        accepted=0,
+        rejections={},
+        enrichment={},
+        attempts=[],
+    )
+    assert summary["acceptance_rate_pct"]==0.0
+    assert summary["phone_recovery_rate_pct"]==0.0
+    assert summary["partitions_visited"]==0
