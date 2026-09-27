@@ -1,2 +1,3 @@
-assistant-trigger-v1
-reason=immediate-production-verification-after-category-precision-and-registry-quarantine
+assistant-trigger-v2
+reason=user-requested-immediate-production-run
+sequence=2
