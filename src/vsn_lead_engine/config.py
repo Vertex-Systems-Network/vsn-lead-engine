@@ -46,6 +46,19 @@ def load_config() -> dict:
     max_cycles_per_run=int(config["runtime"].get("max_cycles_per_run",3))
     if max_cycles_per_run < 1:
         raise ValueError("max_cycles_per_run must be at least 1.")
+    readiness_attempts=int(
+        config["runtime"].get("workbook_readiness_attempts",3)
+    )
+    if readiness_attempts < 1 or readiness_attempts > 5:
+        raise ValueError("workbook_readiness_attempts must be between 1 and 5.")
+    readiness_delay=float(
+        config["runtime"].get("workbook_readiness_retry_delay_seconds",60)
+    )
+    if readiness_delay < 0 or readiness_delay > 180:
+        raise ValueError(
+            "workbook_readiness_retry_delay_seconds must be between 0 and 180."
+        )
+
     max_zero_progress_cycles=int(
         config["runtime"].get("max_zero_progress_cycles",max_cycles_per_run)
     )

@@ -1,7 +1,7 @@
 from __future__ import annotations
 import argparse,json,sys
 from .config import load_config
-from .engine import check_workbook_readiness, run_until_quota
+from .engine import check_workbook_readiness, recover_workbook_readiness, run_until_quota
 from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
 from .sheets import GoogleSheetsStore
 
@@ -16,6 +16,9 @@ def main() -> int:
     sub=parser.add_subparsers(dest="command",required=True)
     sub.add_parser("validate")
     sub.add_parser("workbook-ready")
+    recovery_parser=sub.add_parser("workbook-ready-recover")
+    recovery_parser.add_argument("--attempts",type=int,default=None)
+    recovery_parser.add_argument("--delay-seconds",type=float,default=None)
     run_parser=sub.add_parser("run")
     run_parser.add_argument("--dry-run",action="store_true")
     backfill_parser=sub.add_parser("registry-backfill")
@@ -40,6 +43,14 @@ def main() -> int:
     if args.command=="workbook-ready":
         print(json.dumps(check_workbook_readiness(config),indent=2,default=str))
         return 0
+    if args.command=="workbook-ready-recover":
+        result=recover_workbook_readiness(
+            config,
+            attempts=args.attempts,
+            delay_seconds=args.delay_seconds,
+        )
+        print(json.dumps(result,indent=2,default=str))
+        return 0 if result["status"] in {"ready","recovered"} else 2
     if args.command=="registry-backfill":
         store=GoogleSheetsStore(config)
         index=_registry_index(config)

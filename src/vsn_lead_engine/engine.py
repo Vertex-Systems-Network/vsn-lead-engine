@@ -146,6 +146,79 @@ def check_workbook_readiness(
     }
 
 
+def recover_workbook_readiness(
+    config: dict,
+    *,
+    run_date: str | None = None,
+    attempts: int | None = None,
+    delay_seconds: float | None = None,
+    sleep_fn=time.sleep,
+    check_fn=check_workbook_readiness,
+) -> dict:
+    """Retry dated-workbook readiness and return incident telemetry on failure."""
+    runtime=config["runtime"]
+    run_date=run_date or datetime.now(
+        ZoneInfo(runtime["timezone"])
+    ).date().isoformat()
+    attempts=max(
+        1,
+        min(
+            5,
+            int(
+                attempts
+                if attempts is not None
+                else runtime.get("workbook_readiness_attempts",3)
+            ),
+        ),
+    )
+    delay_seconds=max(
+        0.0,
+        min(
+            180.0,
+            float(
+                delay_seconds
+                if delay_seconds is not None
+                else runtime.get("workbook_readiness_retry_delay_seconds",60)
+            ),
+        ),
+    )
+
+    failures=[]
+    for attempt_number in range(1,attempts+1):
+        started_at=datetime.now(ZoneInfo(runtime["timezone"])).isoformat()
+        try:
+            result=check_fn(config,run_date=run_date)
+            result={
+                **result,
+                "status":"ready" if attempt_number==1 else "recovered",
+                "attempts_used":attempt_number,
+                "attempts_configured":attempts,
+                "retry_delay_seconds":delay_seconds,
+                "failures":failures,
+            }
+            return result
+        except Exception as exc:
+            failures.append({
+                "attempt":attempt_number,
+                "timestamp":started_at,
+                "error_type":type(exc).__name__,
+                "message":str(exc),
+            })
+            if attempt_number < attempts and delay_seconds > 0:
+                sleep_fn(delay_seconds)
+
+    return {
+        "status":"incident",
+        "run_date":run_date,
+        "attempts_used":attempts,
+        "attempts_configured":attempts,
+        "retry_delay_seconds":delay_seconds,
+        "failures":failures,
+        "last_error":failures[-1] if failures else {},
+        "quota_complete":False,
+    }
+
+
 def run_once(
     config: dict,
     dry_run: bool=False,
