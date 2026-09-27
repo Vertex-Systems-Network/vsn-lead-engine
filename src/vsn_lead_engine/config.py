@@ -5,6 +5,34 @@ import os
 from pathlib import Path
 
 
+def _validate_geographies(geographies: list[dict]) -> None:
+    allowed_countries={"United States","Canada"}
+    seen=set()
+    for geo in geographies:
+        country=str(geo.get("country","")).strip()
+        region=str(geo.get("region","")).strip()
+        city=str(geo.get("city","")).strip()
+        if country not in allowed_countries:
+            raise ValueError(f"Unsupported geography country: {country or geo}")
+        if not region or not city:
+            raise ValueError(f"Geography requires region and city: {geo}")
+        key=(country.lower(),region.lower(),city.lower())
+        if key in seen:
+            raise ValueError(f"Duplicate geography: {country} / {region} / {city}")
+        seen.add(key)
+
+        bbox=geo.get("bbox")
+        if not isinstance(bbox,list) or len(bbox)!=4:
+            raise ValueError(f"Geography is missing a 4-value bbox: {geo}")
+        xmin,ymin,xmax,ymax=[float(v) for v in bbox]
+        if not (-180 <= xmin <= 180 and -180 <= xmax <= 180):
+            raise ValueError(f"Longitude outside valid range: {bbox}")
+        if not (-90 <= ymin <= 90 and -90 <= ymax <= 90):
+            raise ValueError(f"Latitude outside valid range: {bbox}")
+        if not (xmin < xmax and ymin < ymax):
+            raise ValueError(f"Invalid bbox order: {bbox}")
+
+
 def load_config() -> dict:
     path=Path(os.getenv("VSN_RUNTIME_CONFIG","config/runtime.json"))
     with path.open("r",encoding="utf-8") as handle:
@@ -128,12 +156,6 @@ def load_config() -> dict:
         if int(registry.get("lock_stale_seconds",180)) < 30:
             raise ValueError("registry.lock_stale_seconds must be at least 30.")
 
-    for geo in config["geographies"]:
-        bbox=geo.get("bbox")
-        if not isinstance(bbox,list) or len(bbox)!=4:
-            raise ValueError(f"Geography is missing a 4-value bbox: {geo}")
-        xmin,ymin,xmax,ymax=[float(v) for v in bbox]
-        if not (xmin < xmax and ymin < ymax):
-            raise ValueError(f"Invalid bbox order: {bbox}")
+    _validate_geographies(config["geographies"])
 
     return config
