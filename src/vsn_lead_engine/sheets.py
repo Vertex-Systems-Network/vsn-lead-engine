@@ -30,12 +30,21 @@ REGISTRY_COLUMNS = [
 ]
 
 OVERVIEW_INCREMENT_METRICS = [
+    "Accepted Leads",
     "Duplicate Rejections",
     "Missing-Phone Rejections",
     "Free-Source Candidates",
     "Shard Attempts",
     "Zero-Result Shards",
     "Source Errors",
+    "Enrichment Candidates",
+    "Phones Recovered",
+    "Official-Site Phone Recoveries",
+    "Common-Crawl Phone Recoveries",
+    "Common Crawl Attempts",
+    "Enrichment Budget Skips",
+    "Enrichment Errors",
+    "Zero-Progress Cycles",
 ]
 
 
@@ -268,12 +277,21 @@ class GoogleSheetsStore:
             ["Total Actual Today","=SUM(B7:B18)"],
             ["Total Shortfall Today","=MAX(B6-B31,0)"],
             ["Status",'=IF(B31>=B6,"Complete","In Progress")'],
+            ["Accepted Leads",0],
             ["Duplicate Rejections",0],
             ["Missing-Phone Rejections",0],
             ["Free-Source Candidates",0],
             ["Shard Attempts",0],
             ["Zero-Result Shards",0],
             ["Source Errors",0],
+            ["Enrichment Candidates",0],
+            ["Phones Recovered",0],
+            ["Official-Site Phone Recoveries",0],
+            ["Common-Crawl Phone Recoveries",0],
+            ["Common Crawl Attempts",0],
+            ["Enrichment Budget Skips",0],
+            ["Enrichment Errors",0],
+            ["Zero-Progress Cycles",0],
             ["United States Leads Today",0],
             ["Canada Leads Today",0],
             ["Primary Free Source","Overture Maps Places"],
