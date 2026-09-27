@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 from .dedupe import fingerprints
 from .models import Lead
@@ -70,16 +71,19 @@ def count_current_countries(date_country_rows, status_rows, today: str) -> dict[
 
 
 def registry_status_blocks_dedupe(status: str) -> bool:
-    """Return whether a Registry row should block future discovery.
-
-    Active and PendingDaily rows block duplicates. Quarantined/rejected rows do
-    not, so a business can be rediscovered into the correct category.
-    Blank legacy status remains blocking for backward compatibility.
-    """
+    """Return whether a Registry row should block future discovery."""
     normalized = re.sub(r"[^a-z0-9]+", "", str(status or "").lower())
     if normalized in {"needsreview", "rejected", "invalid", "quarantined"}:
         return False
     return True
+
+
+def daily_workbook_title(prefix: str, date_value: str) -> str:
+    return f"{prefix}{date_value}"
+
+
+def escape_drive_query_value(value: str) -> str:
+    return str(value).replace("\\", "\\\\").replace("'", "\\'")
 
 
 class GoogleSheetsStore:
@@ -89,38 +93,149 @@ class GoogleSheetsStore:
             raise RuntimeError("GOOGLE_SERVICE_ACCOUNT_JSON is required for real writes.")
         creds = service_account.Credentials.from_service_account_info(
             json.loads(raw),
-            scopes=["https://www.googleapis.com/auth/spreadsheets"],
+            scopes=[
+                "https://www.googleapis.com/auth/spreadsheets",
+                "https://www.googleapis.com/auth/drive",
+            ],
         )
         self.sheets = build("sheets", "v4", credentials=creds, cache_discovery=False)
+        self.drive = build("drive", "v3", credentials=creds, cache_discovery=False)
         self.config = config
 
     def _today(self) -> str:
         return datetime.now(ZoneInfo(self.config["runtime"]["timezone"])).date().isoformat()
 
+    def _daily_title(self, date_value: str | None = None) -> str:
+        prefix = self.config["drive"].get(
+            "daily_title_prefix", "US + Canada Business Leads — "
+        )
+        return daily_workbook_title(prefix, date_value or self._today())
+
+    def _find_daily_workbook(self, title: str) -> dict | None:
+        folder_id = self.config["drive"]["folder_id"]
+        escaped_title = escape_drive_query_value(title)
+        escaped_folder = escape_drive_query_value(folder_id)
+        query = (
+            f"name = '{escaped_title}' and "
+            f"'{escaped_folder}' in parents and "
+            "trashed = false and "
+            "mimeType = 'application/vnd.google-apps.spreadsheet'"
+        )
+        response = self.drive.files().list(
+            q=query,
+            spaces="drive",
+            fields="files(id,name,webViewLink,createdTime)",
+            orderBy="createdTime asc",
+            pageSize=10,
+        ).execute()
+        files = response.get("files", [])
+        if not files:
+            return None
+        # Concurrency is serialized by GitHub Actions. If an old accidental
+        # duplicate exists, keep one deterministic canonical file.
+        return files[0]
+
+    def _create_daily_workbook(self, title: str) -> dict:
+        template_id = self.config["drive"]["daily_template_spreadsheet_id"]
+        folder_id = self.config["drive"]["folder_id"]
+        try:
+            created = self.drive.files().copy(
+                fileId=template_id,
+                body={"name": title, "parents": [folder_id]},
+                fields="id,name,webViewLink,createdTime",
+            ).execute()
+        except HttpError as exc:
+            status = getattr(exc.resp, "status", None)
+            if status in {403, 429}:
+                raise RuntimeError(
+                    "Today's lead workbook is missing and the Google service account "
+                    "could not create it in this My Drive folder. A user-owned daily "
+                    "workbook precreator must create the dated file first."
+                ) from exc
+            raise
+
+        self._initialize_new_daily_workbook(created["id"])
+        return created
+
+    def _initialize_new_daily_workbook(self, spreadsheet_id: str):
+        date_value = self._today()
+        metadata = self.sheets.spreadsheets().get(
+            spreadsheetId=spreadsheet_id,
+            fields="properties(title,timeZone),sheets.properties",
+        ).execute()
+        self._ensure_tabs(spreadsheet_id, metadata)
+
+        # A copied template must start clean. Preserve header rows and tab
+        # formatting while removing any old lead rows.
+        for category in self.config["categories"]:
+            self.sheets.spreadsheets().values().clear(
+                spreadsheetId=spreadsheet_id,
+                range=f"'{category}'!A2:AC",
+                body={},
+            ).execute()
+            self.sheets.spreadsheets().values().update(
+                spreadsheetId=spreadsheet_id,
+                range=f"'{category}'!A1:AC1",
+                valueInputOption="RAW",
+                body={"values": [DAILY_COLUMNS]},
+            ).execute()
+
+        self.sheets.spreadsheets().values().clear(
+            spreadsheetId=spreadsheet_id,
+            range="'Overview'!A:B",
+            body={},
+        ).execute()
+        self.sheets.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id,
+            range="'Overview'!A1",
+            valueInputOption="USER_ENTERED",
+            body={"values": self._overview_seed(date_value)},
+        ).execute()
+
     def ensure_lead_workbook(self):
-        sid = self.config["drive"]["lead_workbook_spreadsheet_id"]
+        date_value = self._today()
+        title = self._daily_title(date_value)
+        file = self._find_daily_workbook(title)
+        created = False
+        if file is None:
+            file = self._create_daily_workbook(title)
+            created = True
+
+        sid = file["id"]
         metadata = self.sheets.spreadsheets().get(
             spreadsheetId=sid,
-            fields="properties(title,timeZone),sheets.properties"
+            fields="properties(title,timeZone),sheets.properties",
         ).execute()
         self._ensure_tabs(sid, metadata)
         self._ensure_overview_metrics(sid)
-        self._refresh_overview_formulas(sid)
+        self._refresh_overview_formulas(sid, date_value)
+        self.set_overview_metrics(
+            sid,
+            {
+                "Notes": (
+                    f"Daily workbook for {date_value}. Events append to this file only; "
+                    "Master Registry remains cross-day dedupe source."
+                )
+            },
+        )
         return {
             "id": sid,
-            "name": metadata.get("properties", {}).get(
-                "title", self.config["drive"].get("lead_workbook_name", "US + Canada Business Leads — Master")
+            "name": metadata.get("properties", {}).get("title", title),
+            "webViewLink": file.get(
+                "webViewLink", f"https://docs.google.com/spreadsheets/d/{sid}/edit"
             ),
-            "webViewLink": f"https://docs.google.com/spreadsheets/d/{sid}/edit",
+            "date": date_value,
+            "created": created,
         }
 
-    def _overview_seed(self):
+    def _overview_seed(self, date_value: str | None = None):
+        date_value = date_value or self._today()
         categories = self.config["categories"]
         target = int(self.config["runtime"]["daily_target_per_category"])
         rows = [
-            ["VSN Lead Engine — Permanent US + Canada Workbook",""],
+            ["VSN Lead Engine — Daily US + Canada Workbook",""],
             ["Metric","Value"],
-            ["Tracking Date",'=TEXT(TODAY(),"yyyy-mm-dd")'],
+            ["Tracking Date",date_value],
             ["Countries","United States + Canada"],
             ["Daily Target / Category",target],
             ["Total Daily Target",target * len(categories)],
@@ -128,12 +243,12 @@ class GoogleSheetsStore:
         for category in categories:
             rows.append([
                 f"Actual — {category}",
-                f'=COUNTIFS(\'{category}\'!A:A,TEXT(TODAY(),"yyyy-mm-dd"),\'{category}\'!AA:AA,"<>Needs Review")'
+                f'=COUNTIFS(\'{category}\'!A:A,$B$3,\'{category}\'!AA:AA,"<>Needs Review")',
             ])
         for category in categories:
             rows.append([
                 f"Shortfall — {category}",
-                f'=MAX($B$5-COUNTIFS(\'{category}\'!A:A,TEXT(TODAY(),"yyyy-mm-dd"),\'{category}\'!AA:AA,"<>Needs Review"),0)'
+                f'=MAX($B$5-COUNTIFS(\'{category}\'!A:A,$B$3,\'{category}\'!AA:AA,"<>Needs Review"),0)',
             ])
         rows.extend([
             ["Total Actual Today","=SUM(B7:B18)"],
@@ -148,7 +263,7 @@ class GoogleSheetsStore:
             ["United States Leads Today",0],
             ["Canada Leads Today",0],
             ["Primary Free Source","Overture Maps Places"],
-            ["Notes","Permanent workbook mode. Daily counts use Date Added, so targets reset automatically each day."],
+            ["Notes",f"Daily workbook for {date_value}."],
         ])
         return rows
 
@@ -195,6 +310,8 @@ class GoogleSheetsStore:
                 missing.append([metric,0])
         if "Primary Free Source" not in existing:
             missing.append(["Primary Free Source","Overture Maps Places"])
+        if "Notes" not in existing:
+            missing.append(["Notes",f"Daily workbook for {self._today()}."])
         if missing:
             self.sheets.spreadsheets().values().append(
                 spreadsheetId=spreadsheet_id,
@@ -204,10 +321,14 @@ class GoogleSheetsStore:
                 body={"values":missing},
             ).execute()
 
-    def _refresh_overview_formulas(self, spreadsheet_id: str):
+    def _refresh_overview_formulas(self, spreadsheet_id: str, date_value: str | None = None):
+        date_value = date_value or self._today()
         categories = self.config["categories"]
         target = int(self.config["runtime"]["daily_target_per_category"])
-        data = []
+        data = [
+            {"range":"'Overview'!A1","values":[["VSN Lead Engine — Daily US + Canada Workbook"]]},
+            {"range":"'Overview'!B3","values":[[date_value]]},
+        ]
         actual_start = 7
         shortfall_start = actual_start + len(categories)
 
@@ -216,7 +337,7 @@ class GoogleSheetsStore:
             actual_row = actual_start + offset
             shortfall_row = shortfall_start + offset
             formula = (
-                f'=COUNTIFS(\'{escaped}\'!A:A,TEXT(TODAY(),"yyyy-mm-dd"),'
+                f'=COUNTIFS(\'{escaped}\'!A:A,$B$3,'
                 f'\'{escaped}\'!AA:AA,"<>Needs Review")'
             )
             data.append({"range":f"'Overview'!B{actual_row}","values":[[formula]]})

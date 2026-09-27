@@ -20,8 +20,19 @@ def load_config() -> dict:
         raise ValueError("Daily target must remain 1000 per category.")
     if config["runtime"]["mode"]!="free":
         raise ValueError("This branch only supports FREE mode.")
-    if not config["drive"].get("lead_workbook_spreadsheet_id"):
-        raise ValueError("Permanent lead workbook spreadsheet ID is required.")
+
+    drive=config["drive"]
+    if not drive.get("folder_id"):
+        raise ValueError("Lead Drive folder ID is required.")
+    if not drive.get("master_registry_spreadsheet_id"):
+        raise ValueError("Master Registry spreadsheet ID is required.")
+    if not drive.get("master_registry_tab"):
+        raise ValueError("Master Registry tab is required.")
+    if not drive.get("daily_title_prefix"):
+        raise ValueError("Daily workbook title prefix is required.")
+    if not drive.get("daily_template_spreadsheet_id"):
+        raise ValueError("Daily workbook template spreadsheet ID is required.")
+
     if int(config["runtime"].get("max_shard_attempts",0)) < 1:
         raise ValueError("max_shard_attempts must be at least 1.")
     if int(config["runtime"].get("batch_accept_limit",0)) < 1:
