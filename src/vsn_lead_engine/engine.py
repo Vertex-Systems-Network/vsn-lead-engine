@@ -35,13 +35,28 @@ def _search_with_retry(source, category: str, geography: dict, *, limit: int, at
     return [], last_error, retry_count
 
 
-def run_once(config: dict,dry_run: bool=False) -> dict:
+def _close_sources(sources) -> None:
+    for source in sources:
+        close = getattr(source, "close", None)
+        if callable(close):
+            close()
+
+
+def run_once(
+    config: dict,
+    dry_run: bool=False,
+    *,
+    run_date: str | None = None,
+    sources=None,
+    store: GoogleSheetsStore | None = None,
+    cursor_offset: int = 0,
+) -> dict:
     runtime=config["runtime"]
-    run_date=datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
+    run_date=run_date or datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
     if not runtime.get("enabled") and not dry_run:
         return {"status":"disabled","message":"Lead collection is disabled pending explicit user consent."}
 
-    sources=build_sources(config)
+    sources=sources or build_sources(config)
     if not sources:
         return {"status":"no-sources","message":"No compliant free discovery source is enabled."}
 
@@ -57,7 +72,7 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
         existing=_empty_fingerprints()
         workbook=None
     else:
-        store=GoogleSheetsStore(config, run_date=run_date)
+        store=store or GoogleSheetsStore(config, run_date=run_date)
         workbook=store.ensure_lead_workbook()
         recovery=store.reconcile_pending_registry()
         counts=store.category_counts(workbook["id"])
@@ -65,7 +80,7 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
         existing=store.registry_fingerprints()
 
     target=int(runtime["daily_target_per_category"])
-    cursor=run_cursor()
+    cursor=run_cursor()+int(cursor_offset)
     max_attempts=int(runtime.get("max_shard_attempts",12))
     batch_limit=int(runtime.get("batch_accept_limit",1000))
     per_shard_limit=int(runtime.get("candidate_limit_per_shard",500))
@@ -243,4 +258,68 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
         "lead_workbook":workbook,
         "counts":counts,
         "country_counts":country_counts_after,
+    }
+
+
+
+def run_until_quota(config: dict, dry_run: bool=False) -> dict:
+    """Run multiple bounded collection cycles inside one process.
+
+    Production cycles re-read live sheet/registry state each time, but reuse the
+    same Google client objects and source instances. This reduces runner startup
+    overhead while preserving quota/dedupe safety.
+    """
+    if dry_run:
+        return run_once(config, dry_run=True)
+
+    runtime=config["runtime"]
+    run_date=datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
+    max_cycles=max(1, int(runtime.get("max_cycles_per_run", 3)))
+    target=int(runtime["daily_target_per_category"])
+    sources=build_sources(config)
+    if not sources:
+        return {"status":"no-sources","message":"No compliant free discovery source is enabled."}
+    store=GoogleSheetsStore(config, run_date=run_date)
+
+    cycles=[]
+    accepted_total=0
+    final_counts={}
+    final_country_counts={}
+    final_status="ok"
+
+    try:
+        for cycle_index in range(max_cycles):
+            result=run_once(
+                config,
+                dry_run=False,
+                run_date=run_date,
+                sources=sources,
+                store=store,
+                cursor_offset=cycle_index,
+            )
+            cycles.append(result)
+            accepted_total += int(result.get("accepted", 0) or 0)
+            final_counts = result.get("counts", final_counts) or final_counts
+            final_country_counts = result.get("country_counts", final_country_counts) or final_country_counts
+            final_status = result.get("status", "ok")
+
+            if final_status in {"complete","disabled","no-sources"}:
+                break
+            if final_counts and all(int(final_counts.get(category,0)) >= target for category in config["categories"]):
+                final_status="complete"
+                break
+            if int(result.get("accepted",0) or 0) <= 0:
+                break
+    finally:
+        _close_sources(sources)
+
+    return {
+        "status": final_status,
+        "run_date": run_date,
+        "cycles_executed": len(cycles),
+        "max_cycles_per_run": max_cycles,
+        "accepted": accepted_total,
+        "counts": final_counts,
+        "country_counts": final_country_counts,
+        "cycles": cycles,
     }

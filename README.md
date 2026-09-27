@@ -95,8 +95,10 @@ Every workflow run gets an independent cursor (GitHub run number in Actions).
    and categories above 50% receive normal weight.
 3. Metro order rotates with the run cursor.
 
-A run can try up to 18 category/geography shards, while the accepted-write
-ceiling remains 1,000 leads/run.
+Each collection cycle can try up to 18 category/geography shards with a
+1,000-lead accepted ceiling. One production event can execute up to **3
+controlled cycles**, re-reading live quota state between cycles, so it can add
+up to 3,000 accepted leads without waiting for the next hourly event.
 
 ## Pipeline
 
@@ -136,6 +138,17 @@ P0 reliability controls:
 - GitHub validation and production jobs have hard execution timeouts;
 - the dated workbook is resolved before discovery begins.
 
+P1 performance controls:
+
+- PRs run the full pytest suite; production events use one runner with a
+  lightweight runtime-config preflight instead of starting a second test runner;
+- Overture reuses one DuckDB/httpfs connection across all shards/cycles in the
+  process;
+- one event can run up to 3 quota-aware cycles, stopping immediately on daily
+  completion or zero accepted progress;
+- the same source objects, Google clients and frozen run date are reused across
+  cycles while live Sheet/Registry state is re-read for safety.
+
 ## Production credential
 
 The Google service account needs access to:
@@ -152,6 +165,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - Google integration: **VERIFIED**
 - Daily dated workbook routing: **ENABLED**
 - P0 reliability hardening: **ENABLED**
+- P1 runner performance + quota cycles: **ENABLED**
 - Master Registry cross-day dedupe: **ENABLED**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

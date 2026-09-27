@@ -1,7 +1,7 @@
 from __future__ import annotations
 import argparse,json,sys
 from .config import load_config
-from .engine import run_once
+from .engine import run_until_quota
 
 def main() -> int:
     parser=argparse.ArgumentParser(prog="vsn-lead-engine")
@@ -14,7 +14,7 @@ def main() -> int:
     if args.command=="validate":
         print(json.dumps({"status":"valid","mode":config["runtime"]["mode"],"enabled":config["runtime"]["enabled"],"categories":len(config["categories"]),"daily_target_total":len(config["categories"])*int(config["runtime"]["daily_target_per_category"])},indent=2))
         return 0
-    print(json.dumps(run_once(config,dry_run=args.dry_run),indent=2,default=str))
+    print(json.dumps(run_until_quota(config,dry_run=args.dry_run),indent=2,default=str))
     return 0
 
 if __name__=="__main__":

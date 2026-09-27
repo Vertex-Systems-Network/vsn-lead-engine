@@ -43,6 +43,8 @@ def load_config() -> dict:
         raise ValueError("source_retry_attempts must be at least 1.")
     if float(config["runtime"].get("source_retry_backoff_seconds",2)) < 0:
         raise ValueError("source_retry_backoff_seconds cannot be negative.")
+    if int(config["runtime"].get("max_cycles_per_run",3)) < 1:
+        raise ValueError("max_cycles_per_run must be at least 1.")
 
     for geo in config["geographies"]:
         bbox=geo.get("bbox")
