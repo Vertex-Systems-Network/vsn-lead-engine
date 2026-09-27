@@ -272,8 +272,8 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - Daily dated workbook routing: **ENABLED**
 - P0 reliability hardening: **ENABLED**
 - P1 runner performance + quota cycles: **ENABLED**
-- P2 permanent R2 dedupe ledger: **IMPLEMENTED; migration/audit pending production cutover**
-- Master Registry cross-day dedupe: **ACTIVE UNTIL R2 CUTOVER**
+- P2 permanent R2 dedupe ledger: **R2 AUTHORITY**
+- Master Registry cross-day dedupe: **FROZEN MIGRATION SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
 - Taxonomy-first classification: **ENABLED**
