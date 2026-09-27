@@ -497,8 +497,16 @@ def build_registry_index(config: dict, client=None):
     if layout == "packed-v2":
         from .packed_registry import PackedR2RegistryIndex
 
-        return PackedR2RegistryIndex(config, client=client)
-    return R2RegistryIndex(config, client=client)
+        return (
+            PackedR2RegistryIndex(config)
+            if client is None
+            else PackedR2RegistryIndex(config, client=client)
+        )
+    return (
+        R2RegistryIndex(config)
+        if client is None
+        else R2RegistryIndex(config, client=client)
+    )
 
 
 def sheet_registry_payloads(rows: list[list]) -> list[dict]:
