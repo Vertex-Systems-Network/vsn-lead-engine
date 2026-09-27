@@ -80,20 +80,20 @@ def run_once(
         store=store or GoogleSheetsStore(config, run_date=run_date)
         registry_index=registry_index or build_registry_index(config)
         workbook=store.ensure_lead_workbook()
-        if mode=="supabase":
+        if mode=="r2":
             if registry_index is None:
-                raise RuntimeError("Supabase Registry mode requires a configured Registry index.")
-            recovery={"supabase":registry_index.reconcile_pending(store)}
+                raise RuntimeError("R2 Registry mode requires configured R2 credentials.")
+            recovery={"r2":registry_index.reconcile_pending(store)}
             existing=_empty_fingerprints()
         else:
             recovery={"sheets":store.reconcile_pending_registry()}
             existing=store.registry_fingerprints()
             if mode=="dual" and registry_index is not None:
                 try:
-                    recovery["supabase"]=registry_index.reconcile_pending(store)
+                    recovery["r2"]=registry_index.reconcile_pending(store)
                 except Exception as exc:
                     registry_shadow_errors+=1
-                    recovery["supabase_error"]=f"{type(exc).__name__}: {exc}"
+                    recovery["r2_error"]=f"{type(exc).__name__}: {exc}"
         counts=store.category_counts(workbook["id"])
         country_counts=store.daily_country_counts(workbook["id"])
 
@@ -168,7 +168,7 @@ def run_once(
             total_discovered+=len(candidates)
             accepted_from_source=0
             remote_collisions=set()
-            if mode=="supabase" and candidates:
+            if mode=="r2" and candidates:
                 remote_collisions=registry_index.collision_keys(candidates)
 
             for lead in candidates:
@@ -256,7 +256,7 @@ def run_once(
         if not leads:
             continue
 
-        if mode=="supabase":
+        if mode=="r2":
             reserved=registry_index.reserve_pending(leads,workbook)
             committed=[
                 lead for lead in leads
@@ -282,11 +282,12 @@ def run_once(
             committed_by_category[category].extend(leads)
             if mode=="dual" and registry_index is not None:
                 try:
-                    registry_index.shadow_active(leads,workbook)
+                    shadow=registry_index.shadow_active(leads,workbook)
+                    registry_shadow_errors+=int(shadow.get("conflicts",0) or 0)
                 except Exception:
                     registry_shadow_errors+=1
 
-    if mode=="supabase":
+    if mode=="r2":
         committed_total=sum(len(items) for items in committed_by_category.values())
         result["accepted"]=committed_total
         result["accepted_by_category"]={
