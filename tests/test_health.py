@@ -186,6 +186,7 @@ def test_run_health_event_builds_shortfalls_and_schedule():
             "discovered":200,
             "cycles_executed":2,
             "categories_attempted":12,
+            "source_batch_duplicates":5,
             "remote_prefilter_duplicates":7,
             "counts":{"A":1000,"B":750},
             "schedule":{
@@ -209,6 +210,7 @@ def test_run_health_event_builds_shortfalls_and_schedule():
     assert event["quota_complete"] is False
     assert event["schedule_delay_minutes"]==17
     assert event["categories_attempted"]==12
+    assert event["source_batch_duplicates"]==5
     assert event["remote_prefilter_duplicates"]==7
     assert event["adaptive_state_loaded"] is True
     assert event["adaptive_history_loaded"] is True
