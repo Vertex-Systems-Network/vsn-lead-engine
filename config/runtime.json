@@ -12,7 +12,8 @@
     "google_api_retries": 5,
     "source_retry_attempts": 3,
     "source_retry_backoff_seconds": 2,
-    "max_cycles_per_run": 3
+    "max_cycles_per_run": 3,
+    "candidate_partition_count": 8
   },
   "drive": {
     "folder_id": "1CPnHX5lXNb_wqcwk2O4bfACL4qNZ5IEh",
