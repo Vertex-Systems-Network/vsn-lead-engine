@@ -227,6 +227,7 @@ sheets
   -> registry-backfill --dry-run
   -> registry-backfill
   -> registry-audit   # missing_fingerprints must be 0
+  -> registry-migrate # one-shot check + dry-run + backfill + audit + stats
   -> dual (optional observation)
   -> r2
 ```

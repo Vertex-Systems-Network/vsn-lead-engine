@@ -16,6 +16,7 @@ def main() -> int:
     sub.add_parser("registry-stats")
     sub.add_parser("registry-check")
     sub.add_parser("registry-audit")
+    sub.add_parser("registry-migrate")
     args=parser.parse_args()
     config=load_config()
     if args.command=="validate":
@@ -62,6 +63,27 @@ def main() -> int:
             index.close()
         print(json.dumps(result,indent=2,default=str))
         return 0
+    if args.command=="registry-migrate":
+        store=GoogleSheetsStore(config)
+        index=R2RegistryIndex(config)
+        try:
+            check=index.verify()
+            dry=backfill_sheet_registry(store,index,dry_run=True)
+            backfill=backfill_sheet_registry(store,index,dry_run=False)
+            audit=audit_sheet_registry(store,index)
+            stats=index.stats()
+        finally:
+            index.close()
+        result={
+            "status":"ok" if int(audit.get("missing_fingerprints",0) or 0)==0 else "audit-failed",
+            "check":check,
+            "dry_run":dry,
+            "backfill":backfill,
+            "audit":audit,
+            "stats":stats,
+        }
+        print(json.dumps(result,indent=2,default=str))
+        return 0 if result["status"]=="ok" else 2
     print(json.dumps(run_until_quota(config,dry_run=args.dry_run),indent=2,default=str))
     return 0
 

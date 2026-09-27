@@ -1,3 +1,4 @@
+from pathlib import Path
 import io
 import json
 
@@ -292,3 +293,10 @@ def test_stats_count_only_private_ledger_objects(monkeypatch):
     assert stats["fingerprint_objects"]>=3
     assert stats["pending_transactions"]==0
     assert stats["bytes"]==0
+
+
+def test_registry_migration_cli_contract_is_available():
+    from vsn_lead_engine import cli as cli_module
+    source=Path(cli_module.__file__).read_text(encoding="utf-8")
+    assert 'sub.add_parser("registry-migrate")' in source
+    assert '"audit-failed"' in source
