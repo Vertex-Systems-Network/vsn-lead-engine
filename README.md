@@ -485,6 +485,21 @@ Correctness boundaries are explicit:
 This lowers repeated packed-object GETs during the hourly event without allowing
 stale advisory state to become commit-time dedupe authority.
 
+### P20 registry cache health telemetry
+
+Each production event now exposes aggregate packed-cache telemetry:
+
+- cache enabled state;
+- cached pack entry count;
+- advisory cache hits;
+- advisory cache misses.
+
+P11 writes only these counters into the PII-free daily health ledger. Pack keys,
+fingerprints and lead values are not persisted in health telemetry.
+
+This makes P19 measurable on real production runs without changing the cache,
+registry, source, quota or enrichment behavior.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -790,6 +805,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P17 pre-enrichment dedupe: **READ-ONLY R2 NETWORK-SAVING PREFILTER ACTIVE**
 - P18 source-batch dedupe: **LOCAL BEST-REPRESENTATIVE COLLAPSE ACTIVE**
 - P19 packed registry cache: **ADVISORY READ CACHE ACTIVE; RESERVATIONS FRESH**
+- P20 cache observability: **P11 HIT/MISS/ENTRY TELEMETRY ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
