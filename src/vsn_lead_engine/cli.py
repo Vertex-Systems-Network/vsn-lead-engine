@@ -1,7 +1,7 @@
 from __future__ import annotations
 import argparse,json,sys
 from .config import load_config
-from .engine import run_until_quota
+from .engine import check_workbook_readiness, run_until_quota
 from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
 from .sheets import GoogleSheetsStore
 
@@ -15,6 +15,7 @@ def main() -> int:
     parser=argparse.ArgumentParser(prog="vsn-lead-engine")
     sub=parser.add_subparsers(dest="command",required=True)
     sub.add_parser("validate")
+    sub.add_parser("workbook-ready")
     run_parser=sub.add_parser("run")
     run_parser.add_argument("--dry-run",action="store_true")
     backfill_parser=sub.add_parser("registry-backfill")
@@ -35,6 +36,9 @@ def main() -> int:
             "daily_target_total":len(config["categories"])*int(config["runtime"]["daily_target_per_category"]),
             "registry_mode":config["registry"]["mode"],
         },indent=2))
+        return 0
+    if args.command=="workbook-ready":
+        print(json.dumps(check_workbook_readiness(config),indent=2,default=str))
         return 0
     if args.command=="registry-backfill":
         store=GoogleSheetsStore(config)
