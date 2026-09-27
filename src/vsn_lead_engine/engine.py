@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import datetime
+import time
 from zoneinfo import ZoneInfo
 
 from .dedupe import fingerprints,is_duplicate
@@ -18,8 +19,25 @@ def _empty_fingerprints() -> dict[str, set[str]]:
     }
 
 
+def _search_with_retry(source, category: str, geography: dict, *, limit: int, attempts: int, backoff_seconds: float):
+    last_error = ""
+    retry_count = 0
+    for attempt in range(1, max(1, attempts) + 1):
+        try:
+            return source.search(category, geography, limit=limit), "", retry_count
+        except Exception as exc:
+            last_error = f"{type(exc).__name__}: {exc}"
+            if attempt >= max(1, attempts):
+                break
+            retry_count += 1
+            if backoff_seconds > 0:
+                time.sleep(backoff_seconds * (2 ** (attempt - 1)))
+    return [], last_error, retry_count
+
+
 def run_once(config: dict,dry_run: bool=False) -> dict:
     runtime=config["runtime"]
+    run_date=datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
     if not runtime.get("enabled") and not dry_run:
         return {"status":"disabled","message":"Lead collection is disabled pending explicit user consent."}
 
@@ -39,8 +57,9 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
         existing=_empty_fingerprints()
         workbook=None
     else:
-        store=GoogleSheetsStore(config)
+        store=GoogleSheetsStore(config, run_date=run_date)
         workbook=store.ensure_lead_workbook()
+        recovery=store.reconcile_pending_registry()
         counts=store.category_counts(workbook["id"])
         country_counts=store.daily_country_counts(workbook["id"])
         existing=store.registry_fingerprints()
@@ -50,6 +69,8 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
     max_attempts=int(runtime.get("max_shard_attempts",12))
     batch_limit=int(runtime.get("batch_accept_limit",1000))
     per_shard_limit=int(runtime.get("candidate_limit_per_shard",500))
+    source_retry_attempts=int(runtime.get("source_retry_attempts",3))
+    source_retry_backoff_seconds=float(runtime.get("source_retry_backoff_seconds",2))
     plan=build_shard_plan(
         config["categories"],
         config["geographies"],
@@ -69,9 +90,10 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
     attempts=[]
     total_discovered=0
     source_errors=0
+    source_retries=0
     zero_result_shards=0
     accepted_total=0
-    today=datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
+    today=run_date
 
     for shard in plan:
         if accepted_total >= batch_limit:
@@ -97,12 +119,16 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
             if remaining <= 0:
                 break
 
-            try:
-                candidates=source.search(category,geography,limit=remaining)
-                source_error=""
-            except Exception as exc:  # isolate one source/shard from the whole batch
-                candidates=[]
-                source_error=f"{type(exc).__name__}: {exc}"
+            candidates,source_error,retries=_search_with_retry(
+                source,
+                category,
+                geography,
+                limit=remaining,
+                attempts=source_retry_attempts,
+                backoff_seconds=source_retry_backoff_seconds,
+            )
+            source_retries+=retries
+            if source_error:
                 source_errors+=1
 
             shard_discovered+=len(candidates)
@@ -171,6 +197,8 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
         "shard_attempts":len(attempts),
         "zero_result_shards":zero_result_shards,
         "source_errors":source_errors,
+        "source_retries":source_retries,
+        "run_date":run_date,
         "discovered":total_discovered,
         "accepted":accepted_total,
         "accepted_by_category":{k:len(v) for k,v in accepted_by_category.items()},
@@ -181,6 +209,7 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
     }
     if dry_run:
         return {"status":"dry-run",**result}
+    result["pending_recovery"]=recovery
 
     for category in config["categories"]:
         leads=accepted_by_category.get(category,[])

@@ -4,6 +4,8 @@ from vsn_lead_engine.sheets import (
     count_current_rows,
     daily_workbook_title,
     escape_drive_query_value,
+    extract_spreadsheet_id,
+    pending_recovery_status,
     registry_status_blocks_dedupe,
 )
 
@@ -31,6 +33,8 @@ def test_registry_quarantine_rows_do_not_block_dedupe():
     assert not registry_status_blocks_dedupe("Needs Review")
     assert not registry_status_blocks_dedupe("Rejected")
     assert not registry_status_blocks_dedupe("Invalid")
+    assert not registry_status_blocks_dedupe("Retryable")
+    assert not registry_status_blocks_dedupe("WriteFailed")
 
 
 def test_count_current_countries_excludes_quarantine_and_other_dates():
@@ -67,3 +71,22 @@ def test_daily_overview_uses_fixed_workbook_date_not_today_formula():
     assert rows[2]==["Tracking Date","2026-09-27"]
     assert "$B$3" in rows[6][1]
     assert "TODAY()" not in rows[6][1]
+
+
+def test_extract_spreadsheet_id_from_registry_url():
+    assert extract_spreadsheet_id(
+        "https://docs.google.com/spreadsheets/d/abc_DEF-123/edit"
+    )=="abc_DEF-123"
+
+
+def test_pending_recovery_promotes_only_written_unique_key():
+    present={"domain:example.com","phone-name:+12025550123|example"}
+    assert pending_recovery_status("domain:example.com",present)=="Active"
+    assert pending_recovery_status("domain:missing.example",present)=="Retryable"
+    assert pending_recovery_status("",present)=="Retryable"
+
+
+def test_store_run_date_is_frozen_for_the_run():
+    store=object.__new__(GoogleSheetsStore)
+    store.run_date="2026-09-27"
+    assert store._today()=="2026-09-27"

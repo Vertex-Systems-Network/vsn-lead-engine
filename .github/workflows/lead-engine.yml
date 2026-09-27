@@ -15,7 +15,8 @@ on:
         default: true
         type: boolean
   schedule:
-    - cron: "0 3-18 * * *"
+    # Half-hour fallback. The quota supervisor runs at :00.
+    - cron: "30 3-17 * * *"
 
 permissions:
   contents: read
@@ -27,6 +28,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -39,6 +41,7 @@ jobs:
 
   run:
     needs: validate
+    timeout-minutes: 30
     if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
