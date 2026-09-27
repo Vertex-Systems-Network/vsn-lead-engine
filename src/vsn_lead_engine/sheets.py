@@ -30,12 +30,27 @@ REGISTRY_COLUMNS = [
 ]
 
 OVERVIEW_INCREMENT_METRICS = [
+    "Accepted Leads",
     "Duplicate Rejections",
     "Missing-Phone Rejections",
     "Free-Source Candidates",
     "Shard Attempts",
     "Zero-Result Shards",
     "Source Errors",
+    "Enrichment Candidates",
+    "Phones Recovered",
+    "Official-Site Phone Recoveries",
+    "Common-Crawl Phone Recoveries",
+    "Common Crawl Attempts",
+    "Enrichment Budget Skips",
+    "Enrichment Errors",
+    "Zero-Progress Cycles",
+]
+
+OVERVIEW_LATEST_METRICS = [
+    "Last Acceptance Rate %",
+    "Last Phone Recovery Rate %",
+    "Last Partitions Visited",
 ]
 
 
@@ -268,12 +283,24 @@ class GoogleSheetsStore:
             ["Total Actual Today","=SUM(B7:B18)"],
             ["Total Shortfall Today","=MAX(B6-B31,0)"],
             ["Status",'=IF(B31>=B6,"Complete","In Progress")'],
+            ["Accepted Leads",0],
             ["Duplicate Rejections",0],
             ["Missing-Phone Rejections",0],
             ["Free-Source Candidates",0],
             ["Shard Attempts",0],
             ["Zero-Result Shards",0],
             ["Source Errors",0],
+            ["Enrichment Candidates",0],
+            ["Phones Recovered",0],
+            ["Official-Site Phone Recoveries",0],
+            ["Common-Crawl Phone Recoveries",0],
+            ["Common Crawl Attempts",0],
+            ["Enrichment Budget Skips",0],
+            ["Enrichment Errors",0],
+            ["Zero-Progress Cycles",0],
+            ["Last Acceptance Rate %",0],
+            ["Last Phone Recovery Rate %",0],
+            ["Last Partitions Visited",0],
             ["United States Leads Today",0],
             ["Canada Leads Today",0],
             ["Primary Free Source","Overture Maps Places"],
@@ -319,6 +346,11 @@ class GoogleSheetsStore:
         ).execute(num_retries=self.api_retries).get("values",[])
         existing={str(row[0]).strip() for row in rows if row}
         missing=[[metric,0] for metric in OVERVIEW_INCREMENT_METRICS if metric not in existing]
+        missing.extend(
+            [metric,0]
+            for metric in OVERVIEW_LATEST_METRICS
+            if metric not in existing
+        )
         for metric in ["United States Leads Today","Canada Leads Today"]:
             if metric not in existing:
                 missing.append([metric,0])
