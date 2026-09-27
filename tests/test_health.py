@@ -194,6 +194,10 @@ def test_run_health_event_builds_shortfalls_and_schedule():
                 "loaded":True,
                 "saved":True,
             },
+            "adaptive_yield_history":{
+                "loaded":True,
+                "saved":False,
+            },
         },
         origin="native-schedule",
         timestamp="2026-09-28T08:17:00+05:00",
@@ -202,6 +206,8 @@ def test_run_health_event_builds_shortfalls_and_schedule():
     assert event["quota_complete"] is False
     assert event["schedule_delay_minutes"]==17
     assert event["adaptive_state_loaded"] is True
+    assert event["adaptive_history_loaded"] is True
+    assert event["adaptive_history_saved"] is False
 
 
 def test_readiness_health_event_keeps_failure_reason_not_workbook_identity():
