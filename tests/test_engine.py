@@ -950,3 +950,258 @@ def test_health_ledger_failure_does_not_fail_lead_run(monkeypatch):
     assert result["health_ledger"]["recorded"] is False
     assert "RuntimeError: health R2 unavailable" in result["health_ledger"]["error"]
     assert source.closed
+
+
+def test_merge_routing_hints_uses_weak_history_and_strong_daily_signal():
+    merged=engine._merge_routing_hints(
+        {
+            "a|united states|r1|us1":{
+                "visits":2,
+                "discovered":100,
+                "accepted":30,
+            }
+        },
+        {
+            "a|united states|r1|us1":{
+                "visits":8,
+                "discovered":400,
+                "accepted":80,
+            },
+            "b|canada|r2|ca1":{
+                "visits":4,
+                "discovered":200,
+                "accepted":20,
+            },
+        },
+        historical_weight=0.25,
+    )
+
+    assert merged[
+        "a|united states|r1|us1"
+    ]=={
+        "visits":4,
+        "discovered":200,
+        "accepted":50,
+    }
+    assert merged[
+        "b|canada|r2|ca1"
+    ]=={
+        "visits":1,
+        "discovered":50,
+        "accepted":5,
+    }
+
+
+def test_run_until_quota_loads_history_and_saves_once_on_completion(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    class FakeRegistry:
+        def close(self):
+            pass
+
+    registry=FakeRegistry()
+    monkeypatch.setattr(engine,"build_registry_index",lambda config:registry)
+    monkeypatch.setattr(engine,"build_contact_enricher",lambda config:None)
+    monkeypatch.setattr(engine,"DailyHealthLedgerStore",lambda *args,**kwargs:None)
+
+    history_events={"load":0,"save":[]}
+
+    class FakeHistoryStore:
+        def __init__(self,registry_index,max_entries=1500):
+            assert registry_index is registry
+            assert max_entries==1500
+
+        def load(self):
+            history_events["load"]+=1
+            return (
+                {
+                    "a|united states|r1|us1":{
+                        "visits":8,
+                        "discovered":400,
+                        "accepted":80,
+                    }
+                },
+                {
+                    "status":"loaded",
+                    "key":"history.json",
+                    "entries":1,
+                    "bytes":100,
+                    "last_completed_date":"2026-09-27",
+                },
+            )
+
+        def save_completion(self,run_date,daily_hints,decay=0.75):
+            history_events["save"].append(
+                (
+                    run_date,
+                    {
+                        key:dict(value)
+                        for key,value in daily_hints.items()
+                    },
+                    decay,
+                )
+            )
+            return {
+                "status":"saved",
+                "key":"history.json",
+                "entries":len(daily_hints),
+                "bytes":120,
+                "last_completed_date":run_date,
+            }
+
+    monkeypatch.setattr(engine,"HistoricalYieldProfileStore",FakeHistoryStore)
+
+    class FakeDailyStateStore:
+        def __init__(self,*args,**kwargs):
+            pass
+
+        def load(self,run_date):
+            return {},{
+                "status":"empty",
+                "key":f"daily/{run_date}.json",
+                "entries":0,
+                "bytes":0,
+            }
+
+        def save(self,run_date,hints):
+            return {
+                "status":"saved",
+                "key":f"daily/{run_date}.json",
+                "entries":len(hints),
+                "bytes":50,
+            }
+
+    monkeypatch.setattr(engine,"DailyYieldStateStore",FakeDailyStateStore)
+
+    snapshots=[]
+
+    def fake_run_once(config,dry_run=False,**kwargs):
+        snapshots.append({
+            key:dict(value)
+            for key,value in (kwargs.get("yield_hints") or {}).items()
+        })
+        return {
+            "status":"complete",
+            "accepted":1000,
+            "discovered":2000,
+            "counts":{"A":1000},
+            "country_counts":{"United States":1000,"Canada":0},
+            "attempts":[
+                {
+                    "category":"A",
+                    "geography":{
+                        "country":"United States",
+                        "region":"R1",
+                        "city":"US1",
+                    },
+                    "discovered":100,
+                    "accepted":25,
+                }
+            ],
+        }
+
+    monkeypatch.setattr(engine,"run_once",fake_run_once)
+
+    result=engine.run_until_quota(
+        {
+            "runtime":{
+                "timezone":"Asia/Karachi",
+                "daily_target_per_category":1000,
+                "max_cycles_per_run":3,
+                "max_zero_progress_cycles":3,
+                "adaptive_yield_routing":True,
+                "adaptive_yield_persist_daily":True,
+                "adaptive_yield_state_max_entries":1500,
+                "adaptive_yield_history_enabled":True,
+                "adaptive_yield_history_weight":0.25,
+                "adaptive_yield_history_decay":0.75,
+                "adaptive_yield_history_max_entries":1500,
+                "health_ledger_enabled":False,
+            },
+            "categories":["A"],
+        },
+        origin="native-schedule",
+    )
+
+    assert history_events["load"]==1
+    assert snapshots[0][
+        "a|united states|r1|us1"
+    ]=={
+        "visits":2,
+        "discovered":100,
+        "accepted":20,
+    }
+    assert len(history_events["save"])==1
+    assert history_events["save"][0][1][
+        "a|united states|r1|us1"
+    ]=={
+        "visits":1,
+        "discovered":100,
+        "accepted":25,
+    }
+    assert history_events["save"][0][2]==0.75
+    assert result["adaptive_yield_history"]["loaded"] is True
+    assert result["adaptive_yield_history"]["saved"] is True
+    assert source.closed
+
+
+def test_run_until_quota_history_failure_is_fail_open(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    class FakeRegistry:
+        def close(self):
+            pass
+
+    monkeypatch.setattr(engine,"build_registry_index",lambda config:FakeRegistry())
+    monkeypatch.setattr(engine,"build_contact_enricher",lambda config:None)
+    monkeypatch.setattr(engine,"DailyHealthLedgerStore",lambda *args,**kwargs:None)
+
+    class BrokenHistory:
+        def __init__(self,*args,**kwargs):
+            pass
+
+        def load(self):
+            raise ValueError("broken historical profile")
+
+    monkeypatch.setattr(engine,"HistoricalYieldProfileStore",BrokenHistory)
+
+    monkeypatch.setattr(
+        engine,
+        "run_once",
+        lambda *args,**kwargs:{
+            "status":"complete",
+            "accepted":1000,
+            "counts":{"A":1000},
+            "country_counts":{"United States":1000,"Canada":0},
+            "attempts":[],
+        },
+    )
+
+    result=engine.run_until_quota(
+        {
+            "runtime":{
+                "timezone":"Asia/Karachi",
+                "daily_target_per_category":1000,
+                "max_cycles_per_run":3,
+                "max_zero_progress_cycles":3,
+                "adaptive_yield_routing":True,
+                "adaptive_yield_persist_daily":False,
+                "adaptive_yield_history_enabled":True,
+                "adaptive_yield_history_weight":0.25,
+                "adaptive_yield_history_decay":0.75,
+                "adaptive_yield_history_max_entries":1500,
+                "health_ledger_enabled":False,
+            },
+            "categories":["A"],
+        },
+    )
+
+    assert result["status"]=="complete"
+    assert "ValueError: broken historical profile" in result[
+        "adaptive_yield_history"
+    ]["load_error"]
+    assert source.closed
