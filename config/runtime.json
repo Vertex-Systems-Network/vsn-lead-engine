@@ -13,7 +13,7 @@
     "source_retry_attempts": 3,
     "source_retry_backoff_seconds": 2,
     "max_cycles_per_run": 3,
-    "candidate_partition_count": 8,
+    "candidate_partition_count": 16,
     "max_zero_progress_cycles": 3,
     "workbook_readiness_attempts": 3,
     "workbook_readiness_retry_delay_seconds": 60
@@ -403,6 +403,270 @@
         51.9,
         -106.3,
         52.35
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "New York",
+      "city": "New York City",
+      "bbox": [
+        -74.3,
+        40.45,
+        -73.65,
+        40.95
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "California",
+      "city": "San Francisco",
+      "bbox": [
+        -122.6,
+        37.6,
+        -122.25,
+        37.9
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "California",
+      "city": "San Jose",
+      "bbox": [
+        -122.1,
+        37.15,
+        -121.7,
+        37.5
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "California",
+      "city": "Sacramento",
+      "bbox": [
+        -121.75,
+        38.35,
+        -121.2,
+        38.8
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Florida",
+      "city": "Orlando",
+      "bbox": [
+        -81.6,
+        28.3,
+        -81.15,
+        28.7
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "District of Columbia",
+      "city": "Washington",
+      "bbox": [
+        -77.25,
+        38.75,
+        -76.85,
+        39.05
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Maryland",
+      "city": "Baltimore",
+      "bbox": [
+        -76.85,
+        39.15,
+        -76.35,
+        39.5
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "North Carolina",
+      "city": "Raleigh",
+      "bbox": [
+        -78.9,
+        35.55,
+        -78.35,
+        36.05
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Pennsylvania",
+      "city": "Pittsburgh",
+      "bbox": [
+        -80.2,
+        40.25,
+        -79.75,
+        40.65
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Ohio",
+      "city": "Cleveland",
+      "bbox": [
+        -81.95,
+        41.3,
+        -81.45,
+        41.65
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Ohio",
+      "city": "Cincinnati",
+      "bbox": [
+        -84.8,
+        39,
+        -84.25,
+        39.35
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Indiana",
+      "city": "Indianapolis",
+      "bbox": [
+        -86.4,
+        39.55,
+        -85.9,
+        40.05
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Missouri",
+      "city": "Kansas City",
+      "bbox": [
+        -94.85,
+        38.8,
+        -94.3,
+        39.35
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Missouri",
+      "city": "St. Louis",
+      "bbox": [
+        -90.55,
+        38.45,
+        -90.05,
+        38.9
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Utah",
+      "city": "Salt Lake City",
+      "bbox": [
+        -112.2,
+        40.55,
+        -111.65,
+        40.9
+      ]
+    },
+    {
+      "country": "United States",
+      "region": "Louisiana",
+      "city": "New Orleans",
+      "bbox": [
+        -90.35,
+        29.8,
+        -89.8,
+        30.15
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Ontario",
+      "city": "Mississauga",
+      "bbox": [
+        -79.85,
+        43.45,
+        -79.45,
+        43.75
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Quebec",
+      "city": "Quebec City",
+      "bbox": [
+        -71.55,
+        46.65,
+        -71.05,
+        47
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "British Columbia",
+      "city": "Victoria",
+      "bbox": [
+        -123.55,
+        48.3,
+        -123.2,
+        48.6
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "British Columbia",
+      "city": "Surrey",
+      "bbox": [
+        -122.95,
+        49,
+        -122.55,
+        49.25
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Ontario",
+      "city": "London",
+      "bbox": [
+        -81.5,
+        42.8,
+        -80.95,
+        43.15
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Ontario",
+      "city": "Kitchener-Waterloo",
+      "bbox": [
+        -80.75,
+        43.3,
+        -80.3,
+        43.65
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "Saskatchewan",
+      "city": "Regina",
+      "bbox": [
+        -104.9,
+        50.3,
+        -104.4,
+        50.6
+      ]
+    },
+    {
+      "country": "Canada",
+      "region": "New Brunswick",
+      "city": "Moncton",
+      "bbox": [
+        -64.95,
+        46,
+        -64.6,
+        46.25
       ]
     }
   ],
