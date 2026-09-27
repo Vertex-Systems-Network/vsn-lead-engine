@@ -929,6 +929,13 @@ def run_until_quota(
                 int(item.get("zero_result_shards",0) or 0)
                 for item in cycles
             ),
+            "adaptive_cooldown_routes_deferred":max(
+                [
+                    int(item.get("adaptive_cooldown_routes_deferred",0) or 0)
+                    for item in cycles
+                ]
+                or [0]
+            ),
             "counts":final_counts,
             "country_counts":final_country_counts,
             "adaptive_yield":_yield_hint_summary(yield_hints),
