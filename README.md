@@ -94,6 +94,9 @@ Every workflow run gets an independent cursor (GitHub run number in Actions).
 2. Categories below 25% of target receive 3× shard weight, 25-50% receive 2×,
    and categories above 50% receive normal weight.
 3. Metro order rotates with the run cursor.
+4. Each shard also receives a rotating deterministic Overture candidate
+   partition, so repeated runs do not keep replaying the same first limited
+   cohort.
 
 Each collection cycle can try up to 18 category/geography shards with a
 1,000-lead accepted ceiling. One production event can execute up to **3
@@ -157,6 +160,17 @@ P1 performance controls:
   discovery source;
 - recovered phones still pass the normal US/Canada validation and final exact
   R2 dedupe before a lead can be accepted.
+
+P2 source-yield controls:
+
+- Overture candidates are split into **8 deterministic hash partitions**;
+- the partition advances with the GitHub run cursor and with each shard attempt;
+- the three controlled cycles in one event therefore naturally reach different
+  candidate cohorts instead of replaying one `LIMIT 500` slice;
+- source attempt telemetry records the active partition and total partition
+  count for auditability;
+- partitioning changes discovery breadth only—classification, phone validation,
+  enrichment, quota ceilings and exact R2 dedupe remain authoritative.
 
 ## P2 permanent R2 dedupe ledger
 
@@ -309,6 +323,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P2 permanent R2 dedupe ledger: **R2 AUTHORITY — LIVE**
 - P0 free-tier R2 write hardening: **PACKED-V2 ACTIVE**
 - P1 public contact enrichment: **OFFICIAL WEBSITE + BOUNDED COMMON CRAWL ACTIVE**
+- P2 rotating Overture cohorts: **8 HASH PARTITIONS ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
