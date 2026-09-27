@@ -111,6 +111,41 @@ def _quality_summary(
     }
 
 
+def check_workbook_readiness(
+    config: dict,
+    *,
+    run_date: str | None = None,
+    store: GoogleSheetsStore | None = None,
+) -> dict:
+    """Resolve and self-heal the dated workbook before lead collection starts."""
+    runtime=config["runtime"]
+    run_date=run_date or datetime.now(
+        ZoneInfo(runtime["timezone"])
+    ).date().isoformat()
+    store=store or GoogleSheetsStore(config,run_date=run_date)
+    workbook=store.ensure_lead_workbook()
+    counts=store.category_counts(workbook["id"])
+    country_counts=store.daily_country_counts(workbook["id"])
+    target=int(runtime["daily_target_per_category"])
+    quota_complete=all(
+        int(counts.get(category,0) or 0) >= target
+        for category in config["categories"]
+    )
+    return {
+        "status":"ready",
+        "run_date":run_date,
+        "workbook":{
+            "id":workbook["id"],
+            "name":workbook.get("name",""),
+            "webViewLink":workbook.get("webViewLink",""),
+            "created":bool(workbook.get("created",False)),
+        },
+        "counts":counts,
+        "country_counts":country_counts,
+        "quota_complete":quota_complete,
+    }
+
+
 def run_once(
     config: dict,
     dry_run: bool=False,
