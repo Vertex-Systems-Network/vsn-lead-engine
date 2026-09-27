@@ -1,0 +1,80 @@
+name: Main Protection Controller
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Apply/repair the repository main-branch ruleset"
+        required: true
+        default: true
+        type: boolean
+  push:
+    branches: [main]
+    paths:
+      - ".github/main-protection-ruleset.json"
+      - ".github/workflows/main-protection-controller.yml"
+      - "scripts/github_ruleset_common.py"
+      - "scripts/apply_main_protection.py"
+      - "scripts/verify_main_protection.py"
+  schedule:
+    - cron: "15 1 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vsn-lead-engine-main-protection
+  cancel-in-progress: false
+
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITHUB_ADMIN_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate policy document
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          policy=json.loads(
+              Path(".github/main-protection-ruleset.json").read_text(encoding="utf-8")
+          )
+          assert policy["name"]=="VSN Main Protection"
+          assert policy["target"]=="branch"
+          assert policy["enforcement"]=="active"
+          assert policy["conditions"]["ref_name"]["include"]==["refs/heads/main"]
+          print("Main protection policy is structurally valid.")
+          PY
+
+      - name: Detect admin credential
+        id: admin
+        shell: bash
+        run: |
+          if [ -n "$GITHUB_ADMIN_TOKEN" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::GH_ADMIN_TOKEN is not configured; live protection mutation cannot run."
+          fi
+
+      - name: Apply or self-heal live ruleset
+        if: ${{ steps.admin.outputs.ready == 'true' && (github.event_name != 'workflow_dispatch' || inputs.apply) }}
+        run: python scripts/apply_main_protection.py --confirm
+
+      - name: Verify live ruleset
+        if: ${{ steps.admin.outputs.ready == 'true' }}
+        run: python scripts/verify_main_protection.py
+
+      - name: Report unavailable live verification
+        if: ${{ steps.admin.outputs.ready != 'true' }}
+        run: python scripts/verify_main_protection.py --allow-missing-token

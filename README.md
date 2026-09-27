@@ -250,6 +250,44 @@ Health logging is non-authoritative and fail-open. A temporary R2 health-ledger
 failure is reported in run telemetry but does not block otherwise-valid lead
 collection, Google Sheet commits or packed-v2 dedupe.
 
+### P12 protected-main governance
+
+The repository now carries a versioned GitHub ruleset policy at
+`.github/main-protection-ruleset.json` plus apply/verify tooling.
+
+Target policy for `main`:
+
+- all changes must reach `main` through a pull request;
+- required status check: **validate**;
+- required status check policy: **strict / branch must be current with main**;
+- allowed merge method: **squash only**;
+- unresolved review conversations block merge;
+- stale reviews are dismissed after new reviewable pushes;
+- force pushes are blocked;
+- branch deletion is blocked;
+- linear history is required;
+- no blanket bypass actor is configured;
+- approval count remains **0** so the automated recovery PR path is not dependent
+  on a second human reviewer.
+
+The :20 quota recovery supervisor has been moved from direct-main trigger writes
+to a feature-branch + PR + CI + exact-head merge flow, so enabling the ruleset
+does not break missed-run recovery.
+
+Protection controller:
+
+```
+python scripts/apply_main_protection.py
+python scripts/apply_main_protection.py --confirm
+python scripts/verify_main_protection.py
+```
+
+`.github/workflows/main-protection-controller.yml` self-heals and verifies the
+live ruleset when repository secret `GH_ADMIN_TOKEN` is available. The token
+must have repository **Administration: write** permission. Without that secret,
+the workflow reports live mutation/verification as unavailable rather than
+claiming protection is active.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -545,6 +583,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P9 daily adaptive state: **ONE COMPACT R2 OBJECT/DAY ACTIVE**
 - P10 schedule/catch-up: **08:00–23:00 PKT NATIVE + OFFSET SUPERVISOR ACTIVE**
 - P11 daily health ledger: **READINESS + RUN + INCIDENT AUDIT ACTIVE**
+- P12 protected-main governance: **RULESET POLICY + CONTROLLER ACTIVE; LIVE ENFORCEMENT VERIFIED SEPARATELY**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
