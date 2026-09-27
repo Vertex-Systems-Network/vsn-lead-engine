@@ -172,6 +172,14 @@ def load_config() -> dict:
             "health_ledger_max_events must be between 16 and 256."
         )
 
+    overture=config.get("sources",{}).get("overture",{})
+    if overture.get("enabled",False):
+        reserve=float(overture.get("website_candidate_reserve_fraction",0.20))
+        if reserve < 0 or reserve > 0.5:
+            raise ValueError(
+                "sources.overture.website_candidate_reserve_fraction must be between 0 and 0.5."
+            )
+
     enrichment=config.get("enrichment",{})
     if enrichment.get("enabled",False):
         max_candidates=int(enrichment.get("max_candidates_per_run",160))
