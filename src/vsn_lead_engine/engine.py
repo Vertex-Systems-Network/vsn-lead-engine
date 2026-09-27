@@ -47,6 +47,22 @@ def _close_sources(sources) -> None:
             close()
 
 
+def _source_contact_mix(candidates: list) -> tuple[int,int]:
+    """Match P23 source selection semantics without validating/recovering phones."""
+    source_phone=sum(
+        1 for lead in candidates
+        if bool(str(lead.phone or "").strip())
+    )
+    website_only=sum(
+        1 for lead in candidates
+        if (
+            not str(lead.phone or "").strip()
+            and bool(str(lead.website or "").strip())
+        )
+    )
+    return source_phone,website_only
+
+
 def _lead_pre_enrichment_quality(lead) -> tuple[int,int,int]:
     phone=bool(normalize_phone(lead.phone,lead.country))
     website=bool(str(lead.website or "").strip())
@@ -517,16 +533,8 @@ def run_once(
 
             shard_discovered+=len(candidates)
             total_discovered+=len(candidates)
-            source_phone_count=sum(
-                1 for lead in candidates
-                if bool(str(lead.phone or "").strip())
-            )
-            website_only_count=sum(
-                1 for lead in candidates
-                if (
-                    not str(lead.phone or "").strip()
-                    and bool(str(lead.website or "").strip())
-                )
+            source_phone_count,website_only_count=_source_contact_mix(
+                candidates
             )
             source_phone_candidates+=source_phone_count
             website_only_candidates+=website_only_count
