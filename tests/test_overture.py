@@ -1,5 +1,6 @@
 import re
 
+from vsn_lead_engine.sources import build_sources
 from vsn_lead_engine.sources.overture import (
     CATEGORY_PATTERNS,
     OverturePlaceSource,
@@ -322,3 +323,19 @@ def test_contact_budgets_reserve_website_candidates_without_losing_total_limit()
     assert OverturePlaceSource._contact_budgets(10,0.20)==(8,2)
     assert OverturePlaceSource._contact_budgets(1,0.20)==(1,0)
     assert OverturePlaceSource._contact_budgets(10,0)==(10,0)
+
+
+def test_build_sources_passes_website_reserve_fraction():
+    sources=build_sources({
+        "sources":{
+            "overture":{
+                "enabled":True,
+                "release":"2026-09-24.0",
+                "candidate_limit":500,
+                "website_candidate_reserve_fraction":0.25,
+            },
+            "overpass":{"enabled":False},
+        }
+    })
+    assert len(sources)==1
+    assert sources[0].website_candidate_reserve_fraction==0.25
