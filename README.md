@@ -429,6 +429,39 @@ Safety model:
 Overview and P11 health telemetry expose `Remote Prefilter Duplicates` so the
 saved network work can be measured separately from total duplicate rejections.
 
+### P18 source-batch pre-enrichment dedupe
+
+Each individual source response is now collapsed locally before any official-site
+or Common Crawl enrichment.
+
+The dedupe dimensions match the existing exact lead semantics:
+
+- place ID;
+- source/provider ID;
+- normalized domain;
+- normalized phone + business name;
+- business + city + region;
+- derived unique key.
+
+When duplicate candidates exist in the same source response, the engine keeps the
+strongest representative using this preference order:
+
+1. already-valid phone;
+2. official website present;
+3. richer public contact metadata;
+4. original source order as the deterministic tie-breaker.
+
+Guardrails:
+
+- this is fully in-process and adds **zero** network/R2/Google calls;
+- it never replaces P17 cross-day R2 filtering;
+- post-enrichment exact collision checks and commit-time R2 reservation remain
+  authoritative;
+- it can be disabled with `runtime.source_batch_dedupe_enabled=false`.
+
+Overview and P11 health telemetry expose `Source-Batch Duplicates` separately
+while those rows still count toward total duplicate rejections.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -732,6 +765,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P15 fair category weighting: **LAYERED 3×/2×/1× COVERAGE ACTIVE**
 - P16 enrichment fairness: **160/EVENT + 12/CALL + COMMON CRAWL 1/CALL ACTIVE**
 - P17 pre-enrichment dedupe: **READ-ONLY R2 NETWORK-SAVING PREFILTER ACTIVE**
+- P18 source-batch dedupe: **LOCAL BEST-REPRESENTATIVE COLLAPSE ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

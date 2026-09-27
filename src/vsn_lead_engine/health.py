@@ -62,6 +62,9 @@ def run_health_event(
         "categories_attempted":max(
             0,int(result.get("categories_attempted",0) or 0)
         ),
+        "source_batch_duplicates":max(
+            0,int(result.get("source_batch_duplicates",0) or 0)
+        ),
         "remote_prefilter_duplicates":max(
             0,int(result.get("remote_prefilter_duplicates",0) or 0)
         ),
@@ -267,7 +270,8 @@ class DailyHealthLedgerStore:
         # raw lead objects or arbitrary business contact fields.
         scalar_fields={
             "event_id","timestamp","kind","origin","status","accepted","discovered",
-            "cycles","categories_attempted","remote_prefilter_duplicates",
+            "cycles","categories_attempted","source_batch_duplicates",
+            "remote_prefilter_duplicates",
             "source_errors","zero_result_shards",
             "adaptive_cooldown_routes_deferred","quota_complete",
             "schedule_slot","schedule_delay_minutes",
