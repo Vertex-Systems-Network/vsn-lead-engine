@@ -457,6 +457,34 @@ def run_once(
                     continue
                 enrichment_candidates.append(lead)
 
+            remote_prefilter_candidates=0
+            if mode=="r2" and enricher is not None and enrichment_candidates:
+                prefilter_targets=[
+                    lead for lead in enrichment_candidates
+                    if (
+                        not normalize_phone(lead.phone,lead.country)
+                        and bool(str(lead.website or "").strip())
+                    )
+                ]
+                remote_prefilter_candidates=len(prefilter_targets)
+                if prefilter_targets:
+                    prefilter_collisions=registry_index.collision_keys(
+                        prefilter_targets
+                    )
+                    if prefilter_collisions:
+                        survivors=[]
+                        for lead in enrichment_candidates:
+                            token=fingerprint_token(
+                                "u",
+                                fingerprints(lead).unique,
+                            )
+                            if token and token in prefilter_collisions:
+                                rejections["duplicate"]+=1
+                                rejections["remote_prefilter_duplicate"]+=1
+                                continue
+                            survivors.append(lead)
+                        enrichment_candidates=survivors
+
             if enricher is not None and enrichment_candidates:
                 enrichment_stats=enricher.enrich(enrichment_candidates)
                 for key,value in enrichment_stats.items():
@@ -506,6 +534,10 @@ def run_once(
                 "accepted":accepted_from_source,
                 "candidate_partition":search_geography["_candidate_partition"],
                 "candidate_partition_count":search_geography["_candidate_partition_count"],
+                "remote_prefilter_candidates":remote_prefilter_candidates,
+                "remote_prefilter_duplicates":int(
+                    rejections.get("remote_prefilter_duplicate",0)
+                ),
                 "error":source_error,
             })
 
@@ -562,6 +594,9 @@ def run_once(
         "accepted_by_country":dict(accepted_by_country),
         "country_counts_before":country_counts,
         "rejections":dict(rejections),
+        "remote_prefilter_duplicates":int(
+            rejections.get("remote_prefilter_duplicate",0) or 0
+        ),
         "enrichment":dict(enrichment_totals),
         "attempts":attempts,
     }
@@ -940,6 +975,10 @@ def run_until_quota(
                     for item in cycles
                 ]
                 or [0]
+            ),
+            "remote_prefilter_duplicates":sum(
+                int(item.get("remote_prefilter_duplicates",0) or 0)
+                for item in cycles
             ),
             "adaptive_cooldown_routes_deferred":max(
                 [
