@@ -107,7 +107,7 @@ def test_run_until_quota_reuses_process_and_stops_on_complete(monkeypatch):
     assert source.closed
 
 
-def test_run_until_quota_stops_on_zero_acceptance(monkeypatch):
+def test_run_until_quota_tries_bounded_rotated_cycles_after_zero_acceptance(monkeypatch):
     source=FakeClosableSource()
     monkeypatch.setattr(engine,"build_sources",lambda config:[source])
     monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
@@ -129,13 +129,64 @@ def test_run_until_quota_stops_on_zero_acceptance(monkeypatch):
             "timezone":"Asia/Karachi",
             "daily_target_per_category":1000,
             "max_cycles_per_run":3,
+            "max_zero_progress_cycles":3,
         },
         "categories":["A"],
     }
 
     result=engine.run_until_quota(config)
-    assert result["cycles_executed"]==1
-    assert len(calls)==1
+    assert result["cycles_executed"]==3
+    assert result["zero_progress_streak"]==3
+    assert [call["cursor_offset"] for call in calls]==[0,1,2]
+    assert source.closed
+
+
+def test_run_until_quota_zero_progress_streak_resets_after_progress(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    results=[
+        {
+            "status":"ok",
+            "accepted":0,
+            "counts":{"A":100},
+            "country_counts":{"United States":100,"Canada":0},
+        },
+        {
+            "status":"ok",
+            "accepted":10,
+            "counts":{"A":110},
+            "country_counts":{"United States":110,"Canada":0},
+        },
+        {
+            "status":"ok",
+            "accepted":0,
+            "counts":{"A":110},
+            "country_counts":{"United States":110,"Canada":0},
+        },
+    ]
+    calls=[]
+
+    def fake_run_once(config, dry_run=False, **kwargs):
+        calls.append(kwargs)
+        return results[len(calls)-1]
+
+    monkeypatch.setattr(engine,"run_once",fake_run_once)
+    config={
+        "runtime":{
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_cycles_per_run":3,
+            "max_zero_progress_cycles":2,
+        },
+        "categories":["A"],
+    }
+
+    result=engine.run_until_quota(config)
+    assert result["cycles_executed"]==3
+    assert result["accepted"]==10
+    assert result["zero_progress_streak"]==1
     assert source.closed
 
 
