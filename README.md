@@ -400,6 +400,35 @@ The existing aggregate `Enrichment Budget Skips` metric remains compatible.
 No source, timeout, worker, response-size or total event budget was increased;
 P16 redistributes the same free enrichment capacity more fairly.
 
+### P17 pre-enrichment R2 duplicate filter
+
+Website-only candidates now receive an advisory **read-only R2 collision check**
+before official-site/Common Crawl enrichment.
+
+The prefilter uses fingerprints that already exist before phone recovery:
+
+- provider/source ID;
+- normalized website domain;
+- business + city + region;
+- place ID when available.
+
+If one of those exact permanent/pending fingerprints already blocks the lead,
+the candidate is rejected as a duplicate before spending website-enrichment
+budget.
+
+Safety model:
+
+- only phone-missing candidates with an official website use the prefilter;
+- P17 performs no new R2 Class-A writes;
+- the normal post-enrichment R2 collision check still runs for survivors, so a
+  recovered phone fingerprint and any race/pending change are checked again;
+- final registry reservation remains the authoritative commit-time lock;
+- the feature can be disabled with
+  `runtime.r2_pre_enrichment_prefilter_enabled=false`.
+
+Overview and P11 health telemetry expose `Remote Prefilter Duplicates` so the
+saved network work can be measured separately from total duplicate rejections.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -702,6 +731,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P14 zero-yield cooldown: **SAME-DAY EXHAUSTION DEFERRAL ACTIVE**
 - P15 fair category weighting: **LAYERED 3×/2×/1× COVERAGE ACTIVE**
 - P16 enrichment fairness: **160/EVENT + 12/CALL + COMMON CRAWL 1/CALL ACTIVE**
+- P17 pre-enrichment dedupe: **READ-ONLY R2 NETWORK-SAVING PREFILTER ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
