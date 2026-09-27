@@ -211,3 +211,52 @@ def test_duckdb_connection_is_reused_and_closed(monkeypatch):
     source.close()
     assert first.closed
     assert source._connection is None
+
+
+def test_search_keeps_website_only_candidate_for_enrichment(monkeypatch):
+    source=OverturePlaceSource(release="2026-09-24.0")
+    columns=[
+        "id","name","basic_category","taxonomy_primary","taxonomy_hierarchy",
+        "phone","website","email","socials","address","locality",
+        "address_region","postcode","address_country","longitude","latitude",
+        "confidence","source_dataset",
+    ]
+    row=(
+        "place-1","Example Software","software_company","software_company",
+        ["services_and_business","software_company"],None,
+        "https://example.com","",[],"1 Main St","Austin","Texas","78701",
+        "US",-97.74,30.27,0.9,"example-dataset",
+    )
+
+    class FakeCursor:
+        description=[(name,) for name in columns]
+
+        def fetchall(self):
+            return [row]
+
+    class FakeConnection:
+        def __init__(self):
+            self.sql=""
+
+        def execute(self, sql, params=None):
+            self.sql=sql
+            return FakeCursor()
+
+    connection=FakeConnection()
+    monkeypatch.setattr(source,"_get_connection",lambda:connection)
+
+    leads=source.search(
+        "IT & Software",
+        {
+            "country":"United States",
+            "region":"Texas",
+            "city":"Austin",
+            "bbox":[-98.0,30.0,-97.0,31.0],
+        },
+        limit=10,
+    )
+
+    assert len(leads)==1
+    assert leads[0].phone==""
+    assert leads[0].website=="https://example.com"
+    assert "websites IS NOT NULL" in connection.sql
