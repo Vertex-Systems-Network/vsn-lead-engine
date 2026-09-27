@@ -164,6 +164,14 @@ def load_config() -> dict:
             "adaptive_zero_yield_cooldown_min_discovered must be between 1 and 5000."
         )
 
+    cooldown_min_partitions=int(
+        config["runtime"].get("adaptive_zero_yield_cooldown_min_partitions",4)
+    )
+    if cooldown_min_partitions < 1 or cooldown_min_partitions > 64:
+        raise ValueError(
+            "adaptive_zero_yield_cooldown_min_partitions must be between 1 and 64."
+        )
+
     health_ledger_max_events=int(
         config["runtime"].get("health_ledger_max_events",96)
     )

@@ -159,7 +159,8 @@ Storage model:
 
 - key: `<registry-prefix>/adaptive-yield/v1/YYYY-MM-DD.json`;
 - payload contains only category/country/region/city routing keys plus
-  `visits / discovered / accepted` counters;
+  `visits / discovered / accepted` counters and, when available, one compact
+  64-bit same-day candidate-partition mask;
 - no business name, phone, email, website or raw lead data is stored;
 - one R2 GET at event startup;
 - at most one R2 PUT at event completion;
@@ -327,6 +328,7 @@ Production cooldown threshold:
 
 - at least **2 same-day visits**;
 - at least **100 same-day discovered candidates**;
+- at least **4 distinct same-day candidate partitions** observed;
 - **0 accepted leads**.
 
 When those conditions are met, that category+metro route is deferred from the
@@ -597,6 +599,29 @@ P11 stores the PII-free event totals as
 These counters intentionally describe the **raw source contact mix**. Phone
 validity and recovered-phone success remain separate existing metrics, so an
 invalid source phone cannot be confused with a valid accepted phone.
+
+
+### P25 partition-aware zero-yield cooldown
+
+P14 cooldown now accounts for the 16 rotating Overture candidate partitions
+inside each category + metro route.
+
+A route is not hard-deferred merely because two early partitions produced no
+accepted leads. Production cooldown requires the existing zero-yield thresholds
+plus at least **4 distinct same-day partitions**.
+
+Implementation:
+
+- P9 daily adaptive state stores an optional compact 64-bit partition mask;
+- repeated observations of the same partition do not increase coverage;
+- old three-counter P9 payloads remain backward compatible;
+- the partition mask is same-day evidence only and is not promoted into the P13
+  historical routing prior;
+- P11 health telemetry exposes `adaptive_partitions_observed`;
+- the existing all-routes fallback still prevents category/country starvation.
+
+This protects unexplored source cohorts without adding source calls, shard
+attempts, paid APIs, per-lead state writes or a second daily state object.
 
 ## Primary free source
 
@@ -908,6 +933,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P22 pending-marker cache: **ADVISORY PENDING LIST/GET CACHE ACTIVE; RESERVATIONS FRESH**
 - P23 Overture contact stratification: **80% PHONE-FIRST + 20% WEBSITE EXPLORATION RESERVE ACTIVE**
 - P24 contact-mix observability: **SOURCE-PHONE + WEBSITE-ONLY FUNNEL TELEMETRY ACTIVE**
+- P25 partition-aware cooldown: **4-DISTINCT-PARTITION FLOOR ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

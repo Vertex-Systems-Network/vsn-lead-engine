@@ -255,3 +255,52 @@ def test_historical_yield_profile_caps_entries():
     loaded,_=store.load()
     assert saved["entries"]==2
     assert set(loaded)=={"b","c"}
+
+
+def test_daily_yield_state_round_trips_partition_mask():
+    registry=FakeRegistry()
+    store=DailyYieldStateStore(registry)
+    hints={
+        "a|united states|r1|city":{
+            "visits":4,
+            "discovered":300,
+            "accepted":0,
+            "partition_mask":(1 << 0) | (1 << 3) | (1 << 7),
+        }
+    }
+
+    saved=store.save("2026-09-28",hints)
+    loaded,_=store.load("2026-09-28")
+
+    assert loaded==hints
+    payload=json.loads(
+        registry.client.objects[saved["key"]]["body"].decode("utf-8")
+    )
+    assert payload["hints"]["a|united states|r1|city"]==[
+        4,
+        300,
+        0,
+        137,
+    ]
+
+
+def test_daily_yield_state_still_loads_legacy_three_counter_hint():
+    registry=FakeRegistry()
+    store=DailyYieldStateStore(registry)
+    key=store.key("2026-09-28")
+    registry.client.objects[key]={
+        "body":json.dumps({
+            "version":1,
+            "run_date":"2026-09-28",
+            "hints":{"legacy":[2,100,0]},
+        }).encode("utf-8"),
+        "content_type":"application/json",
+        "metadata":{},
+    }
+
+    loaded,_=store.load("2026-09-28")
+    assert loaded["legacy"]=={
+        "visits":2,
+        "discovered":100,
+        "accepted":0,
+    }

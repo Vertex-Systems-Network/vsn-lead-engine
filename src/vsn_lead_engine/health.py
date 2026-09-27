@@ -94,6 +94,11 @@ def run_health_event(
         event["schedule_delay_minutes"]=max(
             0,int(schedule.get("start_delay_minutes",0) or 0)
         )
+    adaptive=result.get("adaptive_yield") or {}
+    if isinstance(adaptive,dict):
+        event["adaptive_partitions_observed"]=max(
+            0,int(adaptive.get("partitions_observed",0) or 0)
+        )
     state=result.get("adaptive_yield_state") or {}
     if isinstance(state,dict):
         event["adaptive_state_loaded"]=bool(state.get("loaded",False))
@@ -313,7 +318,8 @@ class DailyHealthLedgerStore:
             "cycles","categories_attempted","source_batch_duplicates",
             "remote_prefilter_duplicates",
             "source_errors","zero_result_shards",
-            "adaptive_cooldown_routes_deferred","quota_complete",
+            "adaptive_cooldown_routes_deferred","adaptive_partitions_observed",
+            "quota_complete",
             "schedule_slot","schedule_delay_minutes",
             "adaptive_state_loaded","adaptive_state_saved",
             "adaptive_state_load_error","adaptive_state_save_error",

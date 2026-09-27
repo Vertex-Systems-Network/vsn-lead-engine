@@ -162,6 +162,16 @@ def _update_yield_hints(
         hint["accepted"]=int(hint.get("accepted",0) or 0)+max(
             0,int(attempt.get("accepted",0) or 0)
         )
+        partition_mask=max(0,int(hint.get("partition_mask",0) or 0))
+        for source in attempt.get("sources",[]) or []:
+            try:
+                partition=int(source.get("candidate_partition"))
+            except (TypeError,ValueError,AttributeError):
+                continue
+            if 0 <= partition < 64:
+                partition_mask |= 1 << partition
+        if partition_mask:
+            hint["partition_mask"]=partition_mask
 
 
 def _yield_hint_summary(yield_hints: dict[str,dict]) -> dict:
@@ -170,6 +180,10 @@ def _yield_hint_summary(yield_hints: dict[str,dict]) -> dict:
         "visits":sum(int(item.get("visits",0) or 0) for item in yield_hints.values()),
         "discovered":sum(int(item.get("discovered",0) or 0) for item in yield_hints.values()),
         "accepted":sum(int(item.get("accepted",0) or 0) for item in yield_hints.values()),
+        "partitions_observed":sum(
+            max(0,int(item.get("partition_mask",0) or 0)).bit_count()
+            for item in yield_hints.values()
+        ),
     }
 
 
@@ -455,6 +469,9 @@ def run_once(
     adaptive_cooldown_min_discovered=int(
         runtime.get("adaptive_zero_yield_cooldown_min_discovered",100)
     )
+    adaptive_cooldown_min_partitions=int(
+        runtime.get("adaptive_zero_yield_cooldown_min_partitions",4)
+    )
     plan=build_shard_plan(
         config["categories"],
         config["geographies"],
@@ -470,6 +487,7 @@ def run_once(
         cooldown_enabled=adaptive_cooldown_enabled,
         cooldown_min_visits=adaptive_cooldown_min_visits,
         cooldown_min_discovered=adaptive_cooldown_min_discovered,
+        cooldown_min_partitions=adaptive_cooldown_min_partitions,
     )
     if not plan:
         return {"status":"complete","counts":counts,"cursor":cursor}

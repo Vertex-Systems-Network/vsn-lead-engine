@@ -488,6 +488,7 @@ def test_yield_hints_accumulate_shard_history():
         "visits":2,
         "discovered":150,
         "accepted":25,
+        "partitions_observed":0,
     }
 
 
@@ -559,6 +560,7 @@ def test_run_until_quota_passes_learned_yield_to_next_cycle(monkeypatch):
         "visits":1,
         "discovered":100,
         "accepted":20,
+        "partitions_observed":0,
     }
     assert source.closed
 
@@ -1321,3 +1323,44 @@ def test_source_contact_mix_matches_p23_raw_contact_semantics():
 
     assert source_phone==2
     assert website_only==1
+
+
+def test_yield_hints_accumulate_distinct_partition_mask():
+    hints={}
+    _update_yield_hints(
+        hints,
+        [
+            {
+                "category":"IT & Software",
+                "geography":{
+                    "country":"United States",
+                    "region":"Texas",
+                    "city":"Austin",
+                },
+                "discovered":100,
+                "accepted":0,
+                "sources":[
+                    {"candidate_partition":2},
+                    {"candidate_partition":2},
+                ],
+            },
+            {
+                "category":"IT & Software",
+                "geography":{
+                    "country":"United States",
+                    "region":"Texas",
+                    "city":"Austin",
+                },
+                "discovered":80,
+                "accepted":0,
+                "sources":[
+                    {"candidate_partition":5},
+                ],
+            },
+        ],
+    )
+
+    hint=hints["it & software|united states|texas|austin"]
+    assert hint["partition_mask"]==(1 << 2) | (1 << 5)
+    assert hint["partition_mask"].bit_count()==2
+    assert _yield_hint_summary(hints)["partitions_observed"]==2
