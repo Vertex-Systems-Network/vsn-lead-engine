@@ -288,6 +288,36 @@ must have repository **Administration: write** permission. Without that secret,
 the workflow fails explicitly and live `main` remains unprotected rather than
 claiming protection is active.
 
+### P13 rolling historical yield prior
+
+The first quota run of a new day no longer has to start fully cold. A compact
+cross-day routing profile is stored at:
+
+```
+<registry-prefix>/adaptive-yield/v2/history.json
+```
+
+The profile contains only category/country/region/city routing keys plus
+aggregate `visits / discovered / accepted` counters. No lead name, phone,
+email, website or raw record is stored.
+
+Behavior:
+
+- one small history GET at event startup;
+- historical counters are used with **0.25 prior weight**;
+- same-day P9 observations are added at full weight and therefore dominate as
+  the current day accumulates evidence;
+- country interleave, category completion weighting, exploration bonus and exact
+  R2 dedupe remain unchanged;
+- previous history decays by **0.75** when a new completed day is learned;
+- the rolling profile is capped at **1,500 entries**;
+- the profile writes only when the daily quota reaches `complete`;
+- the same completion date cannot write the historical profile twice;
+- load/save errors fail open and are visible in P11 health telemetry.
+
+This provides a useful 08:00 routing prior while preventing old source behavior
+from permanently dominating new-day discovery.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -355,10 +385,12 @@ GitHub event / schedule
 
 ## Reliability and schedule
 
-The quota supervisor is the primary hourly controller at **:00** from 08:00
-through 23:00 Asia/Karachi. GitHub Actions keeps a staggered **:30 fallback**
-from 08:30 through 22:30, avoiding same-minute duplicate triggers while retaining
-an independent recovery path.
+GitHub Actions is the primary hourly controller at **:00** from 08:00 through
+23:00 Asia/Karachi. The separate recovery supervisor runs at **:20** and checks
+the live dated workbook before acting. It creates a protected-main-compatible
+recovery PR only when the native run is missing/failed or the live quota still
+has a shortfall. It does not create a competing trigger while the native run is
+queued or in progress.
 
 P0 reliability controls:
 
@@ -584,6 +616,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P10 schedule/catch-up: **08:00–23:00 PKT NATIVE + OFFSET SUPERVISOR ACTIVE**
 - P11 daily health ledger: **READINESS + RUN + INCIDENT AUDIT ACTIVE**
 - P12 protected-main governance: **POLICY + CONTROLLER ACTIVE; LIVE ENFORCEMENT BLOCKED — GH_ADMIN_TOKEN MISSING**
+- P13 rolling historical yield prior: **CROSS-DAY COLD-START ROUTING ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
