@@ -6,6 +6,7 @@ import time
 from zoneinfo import ZoneInfo
 
 from .dedupe import fingerprints,is_duplicate
+from .enrichment import build_contact_enricher
 from .normalize import normalize_phone
 from .scheduler import build_shard_plan, run_cursor
 from .registry import build_registry_index, fingerprint_token, registry_mode
@@ -51,6 +52,7 @@ def run_once(
     sources=None,
     store: GoogleSheetsStore | None = None,
     registry_index=None,
+    enricher=None,
     cursor_offset: int = 0,
 ) -> dict:
     runtime=config["runtime"]
@@ -125,6 +127,7 @@ def run_once(
     source_errors=0
     source_retries=0
     zero_result_shards=0
+    enrichment_totals=defaultdict(int)
     accepted_total=0
     today=run_date
 
@@ -167,11 +170,28 @@ def run_once(
             shard_discovered+=len(candidates)
             total_discovered+=len(candidates)
             accepted_from_source=0
-            remote_collisions=set()
-            if mode=="r2" and candidates:
-                remote_collisions=registry_index.collision_keys(candidates)
 
+            # Cheap in-process duplicate checks happen before any website fetch.
+            # Permanent R2 collision checks happen after enrichment so a recovered
+            # phone participates in the final exact fingerprint decision.
+            enrichment_candidates=[]
             for lead in candidates:
+                pre_fp=fingerprints(lead)
+                if is_duplicate(pre_fp,local):
+                    rejections["duplicate"]+=1
+                    continue
+                enrichment_candidates.append(lead)
+
+            if enricher is not None and enrichment_candidates:
+                enrichment_stats=enricher.enrich(enrichment_candidates)
+                for key,value in enrichment_stats.items():
+                    enrichment_totals[key]+=int(value or 0)
+
+            remote_collisions=set()
+            if mode=="r2" and enrichment_candidates:
+                remote_collisions=registry_index.collision_keys(enrichment_candidates)
+
+            for lead in enrichment_candidates:
                 phone=normalize_phone(lead.phone,lead.country)
                 if not phone:
                     rejections["missing_or_invalid_phone"]+=1
@@ -244,6 +264,7 @@ def run_once(
         "accepted_by_country":dict(accepted_by_country),
         "country_counts_before":country_counts,
         "rejections":dict(rejections),
+        "enrichment":dict(enrichment_totals),
         "attempts":attempts,
     }
     if dry_run:
@@ -320,6 +341,10 @@ def run_once(
             "Shard Attempts":len(attempts),
             "Zero-Result Shards":zero_result_shards,
             "Source Errors":source_errors,
+            "Phones Recovered":(
+                int(enrichment_totals.get("live_phone_recovered",0))
+                + int(enrichment_totals.get("common_crawl_phone_recovered",0))
+            ),
         }
     )
     return {
@@ -351,6 +376,7 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
         return {"status":"no-sources","message":"No compliant free discovery source is enabled."}
     store=GoogleSheetsStore(config, run_date=run_date)
     registry_index=build_registry_index(config)
+    enricher=build_contact_enricher(config)
 
     cycles=[]
     accepted_total=0
@@ -367,6 +393,7 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
                 sources=sources,
                 store=store,
                 registry_index=registry_index,
+                enricher=enricher,
                 cursor_offset=cycle_index,
             )
             cycles.append(result)
@@ -386,6 +413,10 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
         _close_sources(sources)
         if registry_index is not None:
             close=getattr(registry_index,"close",None)
+            if callable(close):
+                close()
+        if enricher is not None:
+            close=getattr(enricher,"close",None)
             if callable(close):
                 close()
 

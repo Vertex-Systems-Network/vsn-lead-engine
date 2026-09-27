@@ -110,6 +110,7 @@ GitHub event / schedule
  -> Overture Places discovery
  -> country/category priority scheduler
  -> taxonomy-first classification
+ -> official website / bounded Common Crawl contact enrichment
  -> normalize phone
  -> Registry dedupe (Sheets migration source; R2 permanent ledger)
  -> Registry PendingDaily
@@ -147,7 +148,15 @@ P1 performance controls:
 - one event can run up to 3 quota-aware cycles, stopping immediately on daily
   completion or zero accepted progress;
 - the same source objects, Google clients and frozen run date are reused across
-  cycles while live Sheet/Registry state is re-read for safety.
+  cycles while live Sheet/Registry state is re-read for safety;
+- Overture website-only businesses are retained as enrichment candidates instead
+  of being discarded at SQL selection time;
+- official website enrichment is capped by per-run candidate budget, worker
+  count, response bytes, page count and timeout;
+- Common Crawl is a small serial archival fallback only, never a broad parallel
+  discovery source;
+- recovered phones still pass the normal US/Canada validation and final exact
+  R2 dedupe before a lead can be accepted.
 
 ## P2 permanent R2 dedupe ledger
 
@@ -299,6 +308,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P1 runner performance + quota cycles: **ENABLED**
 - P2 permanent R2 dedupe ledger: **R2 AUTHORITY — LIVE**
 - P0 free-tier R2 write hardening: **PACKED-V2 ACTIVE**
+- P1 public contact enrichment: **OFFICIAL WEBSITE + BOUNDED COMMON CRAWL ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

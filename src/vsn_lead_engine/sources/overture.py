@@ -200,7 +200,7 @@ class OverturePlaceSource:
             response = requests.get(
                 self.stac_url,
                 timeout=20,
-                headers={"User-Agent": "VSN-Lead-Engine/0.2.1"},
+                headers={"User-Agent": "VSN-Lead-Engine/0.7"},
             )
             response.raise_for_status()
             payload = response.json()
@@ -313,8 +313,10 @@ class OverturePlaceSource:
         WHERE
             bbox.xmin BETWEEN ? AND ?
             AND bbox.ymin BETWEEN ? AND ?
-            AND phones IS NOT NULL
-            AND len(phones) > 0
+            AND (
+                (phones IS NOT NULL AND len(phones) > 0)
+                OR (websites IS NOT NULL AND len(websites) > 0)
+            )
             AND names.primary IS NOT NULL
             AND (
                 operating_status IS NULL
@@ -338,7 +340,8 @@ class OverturePlaceSource:
 
             name = str(record.get("name") or "").strip()
             phone = str(record.get("phone") or "").strip()
-            if not name or not phone:
+            website = str(record.get("website") or "").strip()
+            if not name or (not phone and not website):
                 continue
 
             reason = category_match_reason(
@@ -375,7 +378,7 @@ class OverturePlaceSource:
                     postal_code=str(record.get("postcode") or ""),
                     latitude=float(record["latitude"]) if record.get("latitude") is not None else None,
                     longitude=float(record["longitude"]) if record.get("longitude") is not None else None,
-                    website=str(record.get("website") or ""),
+                    website=website,
                     email=str(record.get("email") or ""),
                     source_url="https://explore.overturemaps.org/",
                     instagram=socials["instagram"],

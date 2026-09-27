@@ -28,3 +28,41 @@ for a self-hosted or otherwise approved endpoint.
 
 This keeps the scheduled engine from overusing a public service intended for
 small/fair-use workloads.
+
+
+## Official website contact enrichment — production P1
+
+When Overture has a business website but no usable phone, the engine may inspect
+the publicly accessible official website before rejecting the candidate.
+
+Controls:
+
+- only the Overture-listed official website is used as the starting domain;
+- private, loopback, link-local and other non-public network targets are rejected;
+- redirects are revalidated before following;
+- `robots.txt` is respected when available;
+- at most a small configured number of same-site pages are inspected;
+- response bytes, timeouts, concurrency and total candidates are hard-capped;
+- recovered phone numbers must still pass the same US/Canada phone validation;
+- enrichment does not bypass taxonomy classification or permanent R2 dedupe.
+
+The engine records the enrichment method in the lead notes when public contact
+fields are recovered.
+
+## Common Crawl — bounded archival fallback
+
+Common Crawl is used only as a fallback for the same official business domain
+when the live site does not yield a valid phone. It is not used as a broad
+business-discovery or search engine.
+
+The CDXJ collection is resolved dynamically from Common Crawl's collection
+metadata. Index calls are serial and rate-limited, with a small per-run lookup
+budget. Only bounded HTML WARC records are fetched with HTTP Range requests, and
+the isolated archive result still has to pass normal phone validation and R2
+dedupe before acceptance.
+
+References:
+
+- https://commoncrawl.org/cdxj-index
+- https://commoncrawl.org/get-started
+- https://commoncrawl.org/faq
