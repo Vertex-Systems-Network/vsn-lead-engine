@@ -15,6 +15,9 @@ def build_sources(config: dict):
                 release=str(overture.get("release", "latest")),
                 stac_url=str(overture.get("stac_url", "https://stac.overturemaps.org/catalog.json")),
                 candidate_limit=int(overture.get("candidate_limit", 500)),
+                website_candidate_reserve_fraction=float(
+                    overture.get("website_candidate_reserve_fraction", 0.20)
+                ),
             )
         )
 
