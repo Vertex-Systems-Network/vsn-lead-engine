@@ -12,6 +12,7 @@ from .scheduler import build_shard_plan, run_cursor, yield_hint_key
 from .registry import build_registry_index, fingerprint_token, registry_mode
 from .sheets import GoogleSheetsStore
 from .sources import build_sources
+from .yield_state import DailyYieldStateStore
 
 
 def _empty_fingerprints() -> dict[str, set[str]]:
@@ -650,6 +651,39 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
     final_status="ok"
     zero_progress_streak=0
     yield_hints={}
+    yield_state_store=None
+    yield_state_telemetry={
+        "enabled":False,
+        "loaded":False,
+        "saved":False,
+        "load_error":"",
+        "save_error":"",
+    }
+    yield_state_dirty=False
+
+    adaptive_enabled=bool(runtime.get("adaptive_yield_routing",True))
+    persist_daily=bool(runtime.get("adaptive_yield_persist_daily",True))
+    if adaptive_enabled and persist_daily and registry_index is not None:
+        try:
+            yield_state_store=DailyYieldStateStore(
+                registry_index,
+                max_entries=int(runtime.get("adaptive_yield_state_max_entries",1500)),
+            )
+            loaded_hints,load_meta=yield_state_store.load(run_date)
+            yield_hints.update(loaded_hints)
+            yield_state_telemetry.update({
+                "enabled":True,
+                "loaded":load_meta.get("status")=="loaded",
+                "load_status":load_meta.get("status",""),
+                "load_entries":int(load_meta.get("entries",0) or 0),
+                "load_bytes":int(load_meta.get("bytes",0) or 0),
+                "state_key":load_meta.get("key",""),
+            })
+        except Exception as exc:
+            yield_state_telemetry.update({
+                "enabled":True,
+                "load_error":f"{type(exc).__name__}: {exc}",
+            })
 
     try:
         for cycle_index in range(max_cycles):
@@ -665,7 +699,10 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
                 cursor_offset=cycle_index,
             )
             cycles.append(result)
-            _update_yield_hints(yield_hints,result.get("attempts",[]) or [])
+            cycle_attempts=result.get("attempts",[]) or []
+            if cycle_attempts:
+                _update_yield_hints(yield_hints,cycle_attempts)
+                yield_state_dirty=True
             accepted_total += int(result.get("accepted", 0) or 0)
             final_counts = result.get("counts", final_counts) or final_counts
             final_country_counts = result.get("country_counts", final_country_counts) or final_country_counts
@@ -683,6 +720,21 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
                     break
             else:
                 zero_progress_streak = 0
+
+        if yield_state_store is not None and yield_state_dirty:
+            try:
+                save_meta=yield_state_store.save(run_date,yield_hints)
+                yield_state_telemetry.update({
+                    "saved":True,
+                    "save_entries":int(save_meta.get("entries",0) or 0),
+                    "save_bytes":int(save_meta.get("bytes",0) or 0),
+                    "state_key":save_meta.get(
+                        "key",
+                        yield_state_telemetry.get("state_key",""),
+                    ),
+                })
+            except Exception as exc:
+                yield_state_telemetry["save_error"]=f"{type(exc).__name__}: {exc}"
     finally:
         _close_sources(sources)
         if registry_index is not None:
@@ -705,5 +757,6 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
         "counts": final_counts,
         "country_counts": final_country_counts,
         "adaptive_yield":_yield_hint_summary(yield_hints),
+        "adaptive_yield_state":yield_state_telemetry,
         "cycles": cycles,
     }
