@@ -560,3 +560,269 @@ def test_run_until_quota_passes_learned_yield_to_next_cycle(monkeypatch):
         "accepted":20,
     }
     assert source.closed
+
+
+def test_run_until_quota_loads_and_saves_daily_yield_state_once(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    class FakeRegistry:
+        def close(self):
+            pass
+
+    registry=FakeRegistry()
+    monkeypatch.setattr(engine,"build_registry_index",lambda config:registry)
+    monkeypatch.setattr(engine,"build_contact_enricher",lambda config:None)
+
+    state_events={"loads":0,"saves":[]}
+
+    class FakeStateStore:
+        def __init__(self, registry_index, max_entries=1500):
+            assert registry_index is registry
+            assert max_entries==1500
+
+        def load(self, run_date):
+            state_events["loads"]+=1
+            return (
+                {
+                    "a|united states|r1|us1":{
+                        "visits":2,
+                        "discovered":100,
+                        "accepted":20,
+                    }
+                },
+                {
+                    "status":"loaded",
+                    "key":f"state/{run_date}.json",
+                    "entries":1,
+                    "bytes":100,
+                },
+            )
+
+        def save(self, run_date, hints):
+            state_events["saves"].append((run_date,{
+                key:dict(value) for key,value in hints.items()
+            }))
+            return {
+                "status":"saved",
+                "key":f"state/{run_date}.json",
+                "entries":len(hints),
+                "bytes":120,
+            }
+
+    monkeypatch.setattr(engine,"DailyYieldStateStore",FakeStateStore)
+
+    snapshots=[]
+    results=[
+        {
+            "status":"ok",
+            "accepted":10,
+            "counts":{"A":10},
+            "country_counts":{"United States":10,"Canada":0},
+            "attempts":[
+                {
+                    "category":"A",
+                    "geography":{
+                        "country":"United States",
+                        "region":"R1",
+                        "city":"US1",
+                    },
+                    "discovered":50,
+                    "accepted":10,
+                }
+            ],
+        },
+        {
+            "status":"complete",
+            "accepted":990,
+            "counts":{"A":1000},
+            "country_counts":{"United States":1000,"Canada":0},
+            "attempts":[],
+        },
+    ]
+
+    def fake_run_once(config,dry_run=False,**kwargs):
+        snapshots.append({
+            key:dict(value)
+            for key,value in (kwargs.get("yield_hints") or {}).items()
+        })
+        return results[len(snapshots)-1]
+
+    monkeypatch.setattr(engine,"run_once",fake_run_once)
+    result=engine.run_until_quota({
+        "runtime":{
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_cycles_per_run":3,
+            "max_zero_progress_cycles":3,
+            "adaptive_yield_routing":True,
+            "adaptive_yield_persist_daily":True,
+            "adaptive_yield_state_max_entries":1500,
+        },
+        "categories":["A"],
+    })
+
+    assert state_events["loads"]==1
+    assert len(state_events["saves"])==1
+    assert snapshots[0][
+        "a|united states|r1|us1"
+    ]=={
+        "visits":2,
+        "discovered":100,
+        "accepted":20,
+    }
+    assert snapshots[1][
+        "a|united states|r1|us1"
+    ]=={
+        "visits":3,
+        "discovered":150,
+        "accepted":30,
+    }
+    saved=state_events["saves"][0][1][
+        "a|united states|r1|us1"
+    ]
+    assert saved=={
+        "visits":3,
+        "discovered":150,
+        "accepted":30,
+    }
+    assert result["adaptive_yield_state"]["loaded"] is True
+    assert result["adaptive_yield_state"]["saved"] is True
+    assert source.closed
+
+
+def test_run_until_quota_does_not_write_yield_state_without_attempts(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    class FakeRegistry:
+        def close(self):
+            pass
+
+    monkeypatch.setattr(engine,"build_registry_index",lambda config:FakeRegistry())
+    monkeypatch.setattr(engine,"build_contact_enricher",lambda config:None)
+
+    class FakeStateStore:
+        saved=0
+
+        def __init__(self, registry_index, max_entries=1500):
+            pass
+
+        def load(self, run_date):
+            return {},{
+                "status":"empty",
+                "key":f"state/{run_date}.json",
+                "entries":0,
+                "bytes":0,
+            }
+
+        def save(self, run_date, hints):
+            type(self).saved+=1
+            return {"status":"saved","entries":len(hints),"bytes":1}
+
+    monkeypatch.setattr(engine,"DailyYieldStateStore",FakeStateStore)
+    monkeypatch.setattr(
+        engine,
+        "run_once",
+        lambda *args,**kwargs:{
+            "status":"complete",
+            "accepted":0,
+            "counts":{"A":1000},
+            "country_counts":{"United States":500,"Canada":500},
+            "attempts":[],
+        },
+    )
+
+    result=engine.run_until_quota({
+        "runtime":{
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_cycles_per_run":3,
+            "max_zero_progress_cycles":3,
+            "adaptive_yield_routing":True,
+            "adaptive_yield_persist_daily":True,
+            "adaptive_yield_state_max_entries":1500,
+        },
+        "categories":["A"],
+    })
+
+    assert FakeStateStore.saved==0
+    assert result["adaptive_yield_state"]["saved"] is False
+    assert source.closed
+
+
+def test_run_until_quota_yield_state_load_failure_is_fail_open(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    class FakeRegistry:
+        def close(self):
+            pass
+
+    monkeypatch.setattr(engine,"build_registry_index",lambda config:FakeRegistry())
+    monkeypatch.setattr(engine,"build_contact_enricher",lambda config:None)
+
+    class FailingLoadStateStore:
+        saved=0
+
+        def __init__(self, registry_index, max_entries=1500):
+            pass
+
+        def load(self, run_date):
+            raise ValueError("corrupt adaptive state")
+
+        def save(self, run_date, hints):
+            type(self).saved+=1
+            return {
+                "status":"saved",
+                "key":f"state/{run_date}.json",
+                "entries":len(hints),
+                "bytes":80,
+            }
+
+    monkeypatch.setattr(engine,"DailyYieldStateStore",FailingLoadStateStore)
+    monkeypatch.setattr(
+        engine,
+        "run_once",
+        lambda *args,**kwargs:{
+            "status":"complete",
+            "accepted":1000,
+            "counts":{"A":1000},
+            "country_counts":{"United States":1000,"Canada":0},
+            "attempts":[
+                {
+                    "category":"A",
+                    "geography":{
+                        "country":"United States",
+                        "region":"R1",
+                        "city":"US1",
+                    },
+                    "discovered":100,
+                    "accepted":50,
+                }
+            ],
+        },
+    )
+
+    result=engine.run_until_quota({
+        "runtime":{
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_cycles_per_run":3,
+            "max_zero_progress_cycles":3,
+            "adaptive_yield_routing":True,
+            "adaptive_yield_persist_daily":True,
+            "adaptive_yield_state_max_entries":1500,
+        },
+        "categories":["A"],
+    })
+
+    assert "ValueError: corrupt adaptive state" in result[
+        "adaptive_yield_state"
+    ]["load_error"]
+    assert FailingLoadStateStore.saved==1
+    assert result["accepted"]==1000
+    assert source.closed

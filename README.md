@@ -148,8 +148,39 @@ Important fairness rules remain unchanged:
 Production settings:
 
 - adaptive yield routing: **enabled**;
-- exploration bonus: **0.15**;
-- learned state lifetime: one bounded quota event only.
+- exploration bonus: **0.15**.
+
+### P9 compact daily adaptive state
+
+Adaptive routing now keeps its small aggregate state across hourly quota events
+for the same Asia/Karachi date.
+
+Storage model:
+
+- key: `<registry-prefix>/adaptive-yield/v1/YYYY-MM-DD.json`;
+- payload contains only category/country/region/city routing keys plus
+  `visits / discovered / accepted` counters;
+- no business name, phone, email, website or raw lead data is stored;
+- one R2 GET at event startup;
+- at most one R2 PUT at event completion;
+- if the quota is already complete or no shard was attempted, no state PUT is
+  performed;
+- the next date uses a different object key, so learning resets naturally each
+  day;
+- production state is capped at **1,500 routing entries**.
+
+The existing GitHub Actions concurrency group serializes runs on `main`, so
+scheduled and assistant-triggered production events do not update the same daily
+state concurrently.
+
+Adaptive state is non-authoritative optimization data. A missing, malformed or
+temporarily unreadable state object fails open: lead collection continues with
+fresh in-process learning and telemetry records the state error. If actual shard
+work then succeeds, the final single save self-heals the daily state object.
+
+At the normal 08:00–23:00 hourly schedule this adds at most roughly one compact
+Class-A state write per productive event, instead of per-lead or per-shard
+writes.
 
 ## Primary free source
 
@@ -436,13 +467,14 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P2 permanent R2 dedupe ledger: **R2 AUTHORITY — LIVE**
 - P0 free-tier R2 write hardening: **PACKED-V2 ACTIVE**
 - P1 public contact enrichment: **OFFICIAL WEBSITE + BOUNDED COMMON CRAWL ACTIVE**
-- P2 rotating Overture cohorts: **8 HASH PARTITIONS ACTIVE**
+- P2 rotating Overture cohorts: **16 HASH PARTITIONS ACTIVE**
 - P3 partition-aware zero-progress retry: **3 BOUNDED CYCLES ACTIVE**
 - P4 quality observability: **FUNNEL + ENRICHMENT METRICS ACTIVE**
 - P5 daily workbook readiness: **07:50 PKT PRE-START CERTIFICATION ACTIVE**
 - P6 readiness recovery: **3-ATTEMPT RETRY + INCIDENT TELEMETRY ACTIVE**
 - P7 free-source breadth: **56 METROS + 16 OVERTURE PARTITIONS ACTIVE**
 - P8 adaptive yield routing: **IN-PROCESS LEARNING + EXPLORATION ACTIVE**
+- P9 daily adaptive state: **ONE COMPACT R2 OBJECT/DAY ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

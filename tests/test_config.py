@@ -8,6 +8,8 @@ def test_production_free_source_breadth_is_expanded():
     assert config["runtime"]["candidate_partition_count"]==16
     assert config["runtime"]["adaptive_yield_routing"] is True
     assert config["runtime"]["adaptive_yield_exploration_bonus"]==0.15
+    assert config["runtime"]["adaptive_yield_persist_daily"] is True
+    assert config["runtime"]["adaptive_yield_state_max_entries"]==1500
     assert len(config["geographies"])>=56
     cities={geo["city"] for geo in config["geographies"]}
     assert {

@@ -104,6 +104,13 @@ def load_config() -> dict:
         raise ValueError(
             "adaptive_yield_exploration_bonus must be between 0 and 1."
         )
+    adaptive_state_max_entries=int(
+        config["runtime"].get("adaptive_yield_state_max_entries",1500)
+    )
+    if adaptive_state_max_entries < 100 or adaptive_state_max_entries > 5000:
+        raise ValueError(
+            "adaptive_yield_state_max_entries must be between 100 and 5000."
+        )
 
     enrichment=config.get("enrichment",{})
     if enrichment.get("enabled",False):
