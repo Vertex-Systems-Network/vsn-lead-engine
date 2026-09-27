@@ -47,6 +47,12 @@ OVERVIEW_INCREMENT_METRICS = [
     "Zero-Progress Cycles",
 ]
 
+OVERVIEW_LATEST_METRICS = [
+    "Last Acceptance Rate %",
+    "Last Phone Recovery Rate %",
+    "Last Partitions Visited",
+]
+
 
 def count_current_rows(date_rows, status_rows, today: str) -> int:
     """Count today's usable leads, excluding rows quarantined for review."""
@@ -292,6 +298,9 @@ class GoogleSheetsStore:
             ["Enrichment Budget Skips",0],
             ["Enrichment Errors",0],
             ["Zero-Progress Cycles",0],
+            ["Last Acceptance Rate %",0],
+            ["Last Phone Recovery Rate %",0],
+            ["Last Partitions Visited",0],
             ["United States Leads Today",0],
             ["Canada Leads Today",0],
             ["Primary Free Source","Overture Maps Places"],
@@ -337,6 +346,11 @@ class GoogleSheetsStore:
         ).execute(num_retries=self.api_retries).get("values",[])
         existing={str(row[0]).strip() for row in rows if row}
         missing=[[metric,0] for metric in OVERVIEW_INCREMENT_METRICS if metric not in existing]
+        missing.extend(
+            [metric,0]
+            for metric in OVERVIEW_LATEST_METRICS
+            if metric not in existing
+        )
         for metric in ["United States Leads Today","Canada Leads Today"]:
             if metric not in existing:
                 missing.append([metric,0])
