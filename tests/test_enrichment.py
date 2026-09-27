@@ -3,8 +3,10 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import vsn_lead_engine.enrichment as enrichment
+from vsn_lead_engine.dedupe import fingerprints
 from vsn_lead_engine.engine import run_once
 from vsn_lead_engine.models import Lead
+from vsn_lead_engine.registry import fingerprint_token
 from vsn_lead_engine.normalize import normalize_phone
 
 
@@ -291,3 +293,173 @@ def test_common_crawl_per_call_cap_spreads_global_budget_across_calls(monkeypatc
     assert third["common_crawl_attempted"]==0
     assert third["common_crawl_skipped_event_budget"]==1
     assert worker._common_attempted==2
+
+
+class TwoWebsiteOnlySource:
+    name="Website Only Pair"
+
+    def search(self,category,geography,limit):
+        return [
+            Lead(
+                country="United States",
+                category=category,
+                business_name="Historical Duplicate LLC",
+                phone="",
+                city=geography["city"],
+                region=geography["region"],
+                source=self.name,
+                source_id="website-only:duplicate",
+                website="https://duplicate.example",
+            ),
+            Lead(
+                country="United States",
+                category=category,
+                business_name="Fresh Recovery LLC",
+                phone="",
+                city=geography["city"],
+                region=geography["region"],
+                source=self.name,
+                source_id="website-only:fresh",
+                website="https://fresh.example",
+            ),
+        ]
+
+
+class RecordingEnricher:
+    def __init__(self):
+        self.received=[]
+
+    def enrich(self,leads):
+        self.received.append([lead.source_id for lead in leads])
+        for item in leads:
+            item.phone="+12025550199"
+        return {
+            "candidates":len(leads),
+            "live_attempted":len(leads),
+            "live_changed":len(leads),
+            "live_phone_recovered":len(leads),
+        }
+
+
+class PrefilterRegistry:
+    def __init__(self):
+        self.calls=[]
+
+    def collision_keys(self,leads):
+        leads=list(leads)
+        self.calls.append([lead.source_id for lead in leads])
+        if len(self.calls)==1:
+            duplicate=leads[0]
+            return {
+                fingerprint_token(
+                    "u",
+                    fingerprints(duplicate).unique,
+                )
+            }
+        return set()
+
+
+def test_r2_prefilter_drops_known_duplicate_before_network_enrichment(monkeypatch):
+    monkeypatch.setattr(
+        "vsn_lead_engine.engine.run_cursor",
+        lambda:0,
+    )
+    cfg={
+        "runtime":{
+            "enabled":True,
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_shard_attempts":1,
+            "batch_accept_limit":10,
+            "candidate_limit_per_shard":10,
+            "source_retry_attempts":1,
+            "source_retry_backoff_seconds":0,
+            "r2_pre_enrichment_prefilter_enabled":True,
+        },
+        "categories":["IT & Software"],
+        "geographies":[
+            {
+                "country":"United States",
+                "region":"Texas",
+                "city":"Austin",
+                "bbox":[-98.0,30.0,-97.0,31.0],
+            }
+        ],
+        "registry":{"mode":"r2"},
+    }
+    registry=PrefilterRegistry()
+    enricher=RecordingEnricher()
+
+    result=run_once(
+        cfg,
+        dry_run=True,
+        run_date="2026-09-28",
+        sources=[TwoWebsiteOnlySource()],
+        registry_index=registry,
+        enricher=enricher,
+    )
+
+    assert registry.calls==[
+        ["website-only:duplicate","website-only:fresh"],
+        ["website-only:fresh"],
+    ]
+    assert enricher.received==[["website-only:fresh"]]
+    assert result["accepted"]==1
+    assert result["rejections"]["duplicate"]==1
+    assert result["remote_prefilter_duplicates"]==1
+    assert result["quality"]["remote_prefilter_duplicates"]==1
+    assert result["attempts"][0]["sources"][0][
+        "remote_prefilter_candidates"
+    ]==2
+    assert result["attempts"][0]["sources"][0][
+        "remote_prefilter_duplicates"
+    ]==1
+
+
+def test_r2_prefilter_can_be_disabled(monkeypatch):
+    monkeypatch.setattr(
+        "vsn_lead_engine.engine.run_cursor",
+        lambda:0,
+    )
+    cfg={
+        "runtime":{
+            "enabled":True,
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_shard_attempts":1,
+            "batch_accept_limit":10,
+            "candidate_limit_per_shard":10,
+            "source_retry_attempts":1,
+            "source_retry_backoff_seconds":0,
+            "r2_pre_enrichment_prefilter_enabled":False,
+        },
+        "categories":["IT & Software"],
+        "geographies":[
+            {
+                "country":"United States",
+                "region":"Texas",
+                "city":"Austin",
+                "bbox":[-98.0,30.0,-97.0,31.0],
+            }
+        ],
+        "registry":{"mode":"r2"},
+    }
+    registry=PrefilterRegistry()
+    enricher=RecordingEnricher()
+
+    result=run_once(
+        cfg,
+        dry_run=True,
+        run_date="2026-09-28",
+        sources=[TwoWebsiteOnlySource()],
+        registry_index=registry,
+        enricher=enricher,
+    )
+
+    # Only the normal post-enrichment collision check runs.
+    assert len(registry.calls)==1
+    assert enricher.received==[[
+        "website-only:duplicate",
+        "website-only:fresh",
+    ]]
+    assert result["r2_pre_enrichment_prefilter"] is False
