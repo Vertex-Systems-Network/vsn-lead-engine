@@ -577,6 +577,27 @@ The reserve fraction is configurable as
 `sources.overture.website_candidate_reserve_fraction` and production uses
 **0.20**.
 
+### P24 source contact-mix telemetry
+
+P23's selected cohort is now measurable without adding any source request.
+
+For every source attempt the engine records:
+
+- candidates that arrived with a source-provided phone value;
+- candidates that arrived without a phone but with an official website.
+
+The same counters are aggregated across cycles and persisted as:
+
+- `Source Phone Candidates`;
+- `Website-Only Candidates`.
+
+P11 stores the PII-free event totals as
+`source_phone_candidates` and `website_only_candidates`.
+
+These counters intentionally describe the **raw source contact mix**. Phone
+validity and recovered-phone success remain separate existing metrics, so an
+invalid source phone cannot be confused with a valid accepted phone.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -886,6 +907,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P21 legacy fallback cache: **ADVISORY OBJECTS-V1 HEAD CACHE ACTIVE; RESERVATIONS FRESH**
 - P22 pending-marker cache: **ADVISORY PENDING LIST/GET CACHE ACTIVE; RESERVATIONS FRESH**
 - P23 Overture contact stratification: **80% PHONE-FIRST + 20% WEBSITE EXPLORATION RESERVE ACTIVE**
+- P24 contact-mix observability: **SOURCE-PHONE + WEBSITE-ONLY FUNNEL TELEMETRY ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
