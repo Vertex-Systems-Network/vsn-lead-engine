@@ -185,6 +185,7 @@ def test_run_health_event_builds_shortfalls_and_schedule():
             "accepted":50,
             "discovered":200,
             "cycles_executed":2,
+            "categories_attempted":12,
             "counts":{"A":1000,"B":750},
             "schedule":{
                 "slot":"2026-09-28T08:00",
@@ -206,6 +207,7 @@ def test_run_health_event_builds_shortfalls_and_schedule():
     assert event["shortfalls"]=={"B":250}
     assert event["quota_complete"] is False
     assert event["schedule_delay_minutes"]==17
+    assert event["categories_attempted"]==12
     assert event["adaptive_state_loaded"] is True
     assert event["adaptive_history_loaded"] is True
     assert event["adaptive_history_saved"] is False
