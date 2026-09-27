@@ -517,9 +517,10 @@ def run_once(
             total_discovered+=len(candidates)
             accepted_from_source=0
 
-            # Cheap in-process duplicate checks happen before any website fetch.
-            # Permanent R2 collision checks happen after enrichment so a recovered
-            # phone participates in the final exact fingerprint decision.
+            # Cheap local and same-response duplicate checks happen before any
+            # website fetch. P17 may also read-filter stable R2 fingerprints before
+            # enrichment, while the final R2 collision check still runs afterward
+            # so any recovered phone participates in the exact decision.
             enrichment_candidates=[]
             for lead in candidates:
                 pre_fp=fingerprints(lead)
