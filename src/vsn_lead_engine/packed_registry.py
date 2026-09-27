@@ -36,17 +36,23 @@ class PackedR2RegistryIndex(R2RegistryIndex):
         self.pack_shard_chars = max(1, min(2, int(settings.get("pack_shard_chars", 1))))
         self.lock_stale_seconds = max(30, int(settings.get("lock_stale_seconds", 180)))
         self.read_cache_enabled = bool(settings.get("read_cache_enabled", True))
+        self.pending_read_cache_enabled = bool(
+            settings.get("pending_read_cache_enabled", True)
+        )
         self.read_cache_max_entries = max(
             16,
             min(1024, int(settings.get("read_cache_max_entries", 128))),
         )
         self._pack_cache: dict[str,set[str]] = {}
         self._legacy_cache: dict[str,bool] = {}
+        self._pending_cache: set[str] | None = None
         self._pack_cache_lock = threading.Lock()
         self._pack_cache_hits = 0
         self._pack_cache_misses = 0
         self._legacy_cache_hits = 0
         self._legacy_cache_misses = 0
+        self._pending_cache_hits = 0
+        self._pending_cache_misses = 0
         self.legacy_read_cache_max_entries = max(
             64,
             min(20000, int(settings.get("legacy_read_cache_max_entries", 4096))),
@@ -59,6 +65,7 @@ class PackedR2RegistryIndex(R2RegistryIndex):
             "layout": self.LAYOUT,
             "pack_shard_chars": self.pack_shard_chars,
             "read_cache_enabled": self.read_cache_enabled,
+            "pending_read_cache_enabled": self.pending_read_cache_enabled,
             "read_cache_max_entries": self.read_cache_max_entries,
             "legacy_read_cache_max_entries": self.legacy_read_cache_max_entries,
         }
@@ -143,12 +150,21 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                 "legacy_entries":len(self._legacy_cache),
                 "legacy_hits":self._legacy_cache_hits,
                 "legacy_misses":self._legacy_cache_misses,
+                "pending_enabled":self.pending_read_cache_enabled,
+                "pending_entries":len(self._pending_cache or set()),
+                "pending_hits":self._pending_cache_hits,
+                "pending_misses":self._pending_cache_misses,
             }
 
     def clear_read_cache(self) -> None:
         with self._pack_cache_lock:
             self._pack_cache.clear()
             self._legacy_cache.clear()
+            self._pending_cache=None
+
+    def _invalidate_pending_cache(self) -> None:
+        with self._pack_cache_lock:
+            self._pending_cache=None
 
     def _packed_hits(
         self,
@@ -246,14 +262,37 @@ class PackedR2RegistryIndex(R2RegistryIndex):
         )
         return packed | legacy
 
-    def _pending_tokens(self, *, exclude_batch_ids: set[str] | None = None) -> set[str]:
+    def _pending_tokens(
+        self,
+        *,
+        exclude_batch_ids: set[str] | None = None,
+        use_cache: bool = False,
+    ) -> set[str]:
         excluded = exclude_batch_ids or set()
+        cacheable=(
+            use_cache
+            and self.read_cache_enabled
+            and self.pending_read_cache_enabled
+            and not excluded
+        )
+
+        if cacheable:
+            with self._pack_cache_lock:
+                if self._pending_cache is not None:
+                    self._pending_cache_hits += 1
+                    return set(self._pending_cache)
+
         tokens: set[str] = set()
         for batch in self.pending_rows():
             if str(batch.get("batch_id", "")) in excluded:
                 continue
             for row in batch.get("rows", []) or []:
                 tokens.update(row.get("fingerprints", []) or [])
+
+        if cacheable:
+            with self._pack_cache_lock:
+                self._pending_cache_misses += 1
+                self._pending_cache=set(tokens)
         return tokens
 
     def collision_keys(self, leads: Iterable[Lead]) -> set[str]:
@@ -268,7 +307,9 @@ class PackedR2RegistryIndex(R2RegistryIndex):
 
         candidate_tokens = set(token_to_candidates)
         blocked = self._existing_tokens(candidate_tokens,use_cache=True)
-        blocked.update(candidate_tokens & self._pending_tokens())
+        blocked.update(
+            candidate_tokens & self._pending_tokens(use_cache=True)
+        )
 
         collisions: set[str] = set()
         for token in blocked:
@@ -389,6 +430,7 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                 Body=json.dumps(marker, separators=(",", ":")).encode("utf-8"),
                 ContentType="application/json",
             )
+            self._invalidate_pending_cache()
 
             reserved = {row["unique_token"] for row in accepted_rows}
             for token in reserved:
@@ -496,6 +538,7 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                 self._batch_by_token.pop(token, None)
             return changed
         finally:
+            self._invalidate_pending_cache()
             self._release_lock(lock_owner)
 
     def mark_retryable(self, unique_tokens: Iterable[str]) -> int:
@@ -557,11 +600,13 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                 self._batch_by_token.pop(token, None)
             return changed
         finally:
+            self._invalidate_pending_cache()
             self._release_lock(lock_owner)
 
     def reconcile_pending(self, sheets_store) -> dict[str, int]:
         batches = self.pending_rows()
         if not batches:
+            self._invalidate_pending_cache()
             return {
                 "batches": 0,
                 "checked": 0,
@@ -641,6 +686,7 @@ class PackedR2RegistryIndex(R2RegistryIndex):
             activated += len(keep)
             rolled_back += len(rollback)
 
+        self._invalidate_pending_cache()
         return {
             "batches": len(batches),
             "checked": checked,

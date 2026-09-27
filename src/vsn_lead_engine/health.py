@@ -125,6 +125,18 @@ def run_health_event(
         event["registry_legacy_cache_misses"]=max(
             0,int(cache.get("legacy_misses",0) or 0)
         )
+        event["registry_pending_cache_enabled"]=bool(
+            cache.get("pending_enabled",False)
+        )
+        event["registry_pending_cache_entries"]=max(
+            0,int(cache.get("pending_entries",0) or 0)
+        )
+        event["registry_pending_cache_hits"]=max(
+            0,int(cache.get("pending_hits",0) or 0)
+        )
+        event["registry_pending_cache_misses"]=max(
+            0,int(cache.get("pending_misses",0) or 0)
+        )
     return event
 
 
@@ -303,7 +315,9 @@ class DailyHealthLedgerStore:
             "registry_cache_enabled","registry_cache_entries",
             "registry_cache_hits","registry_cache_misses",
             "registry_legacy_cache_entries","registry_legacy_cache_hits",
-            "registry_legacy_cache_misses",
+            "registry_legacy_cache_misses","registry_pending_cache_enabled",
+            "registry_pending_cache_entries","registry_pending_cache_hits",
+            "registry_pending_cache_misses",
             "attempts_used","attempts_configured","workbook_created",
             "error_type","message",
         }
