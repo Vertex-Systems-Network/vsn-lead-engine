@@ -49,8 +49,7 @@ class DailyYieldStateStore:
         except (TypeError, ValueError):
             return None
 
-        if accepted > discovered and discovered > 0:
-            accepted = discovered
+        accepted = min(accepted, discovered)
         return {
             "visits": visits,
             "discovered": discovered,
