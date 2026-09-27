@@ -13,7 +13,8 @@
     "source_retry_attempts": 3,
     "source_retry_backoff_seconds": 2,
     "max_cycles_per_run": 3,
-    "candidate_partition_count": 8
+    "candidate_partition_count": 8,
+    "max_zero_progress_cycles": 3
   },
   "drive": {
     "folder_id": "1CPnHX5lXNb_wqcwk2O4bfACL4qNZ5IEh",
