@@ -775,6 +775,18 @@ def run_until_quota(
             "max_zero_progress_cycles":max_zero_progress_cycles,
             "zero_progress_streak":zero_progress_streak,
             "accepted":accepted_total,
+            "discovered":sum(
+                int(item.get("discovered",0) or 0)
+                for item in cycles
+            ),
+            "source_errors":sum(
+                int(item.get("source_errors",0) or 0)
+                for item in cycles
+            ),
+            "zero_result_shards":sum(
+                int(item.get("zero_result_shards",0) or 0)
+                for item in cycles
+            ),
             "counts":final_counts,
             "country_counts":final_country_counts,
             "adaptive_yield":_yield_hint_summary(yield_hints),
