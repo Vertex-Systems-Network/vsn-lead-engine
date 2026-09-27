@@ -149,7 +149,7 @@ P1 performance controls:
 - Overture reuses one DuckDB/httpfs connection across all shards/cycles in the
   process;
 - one event can run up to 3 quota-aware cycles, stopping immediately on daily
-  completion or zero accepted progress;
+  completion while bounded zero-progress cycles may continue into rotated cohorts;
 - the same source objects, Google clients and frozen run date are reused across
   cycles while live Sheet/Registry state is re-read for safety;
 - Overture website-only businesses are retained as enrichment candidates instead
@@ -176,6 +176,20 @@ P2 source-yield controls:
   rotated cohorts still get a chance;
 - production currently allows all 3 controlled cycles before a zero-progress
   stop, while an already-complete daily quota still exits immediately.
+
+P4 quality observability:
+
+- the Overview tab now persists accepted-lead, discovery, duplicate, invalid-phone,
+  enrichment-candidate, phone-recovery, Common Crawl, budget-skip and enrichment-error
+  counters;
+- the previously emitted `Phones Recovered` metric is now part of the workbook schema
+  instead of being silently ignored;
+- every active cycle emits a structured `quality` object in Actions JSON with
+  acceptance rate, phone-recovery rate and unique candidate partitions visited;
+- Overview keeps latest-cycle acceptance/recovery percentages plus partition count;
+- existing dated workbooks self-heal missing P4 metric rows through
+  `_ensure_overview_metrics`, while newly created daily workbooks receive them from
+  the seed schema automatically.
 
 ## P2 permanent R2 dedupe ledger
 
@@ -330,6 +344,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P1 public contact enrichment: **OFFICIAL WEBSITE + BOUNDED COMMON CRAWL ACTIVE**
 - P2 rotating Overture cohorts: **8 HASH PARTITIONS ACTIVE**
 - P3 partition-aware zero-progress retry: **3 BOUNDED CYCLES ACTIVE**
+- P4 quality observability: **FUNNEL + ENRICHMENT METRICS ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
