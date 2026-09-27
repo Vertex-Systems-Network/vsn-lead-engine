@@ -232,3 +232,13 @@ def test_readiness_health_event_keeps_failure_reason_not_workbook_identity():
     assert event["failures"][0]["error_type"]=="TimeoutError"
     assert "sensitive-sheet-id" not in encoded
     assert "daily workbook" not in encoded
+
+
+def test_health_cli_contract_is_available():
+    from pathlib import Path
+    from vsn_lead_engine import cli as cli_module
+
+    source=Path(cli_module.__file__).read_text(encoding="utf-8")
+    assert 'sub.add_parser("health-show")' in source
+    assert 'sub.add_parser("health-incident")' in source
+    assert '"--record-health"' in source
