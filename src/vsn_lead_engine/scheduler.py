@@ -65,13 +65,60 @@ def _adaptive_yield_score(
     return empirical + exploration
 
 
+def _same_day_route_is_cooldown(
+    hint: dict | None,
+    *,
+    min_visits: int,
+    min_discovered: int,
+) -> bool:
+    if not hint:
+        return False
+    visits=max(0,int(hint.get("visits",0) or 0))
+    discovered=max(0,int(hint.get("discovered",0) or 0))
+    accepted=max(0,int(hint.get("accepted",0) or 0))
+    return (
+        visits >= max(1,int(min_visits))
+        and discovered >= max(1,int(min_discovered))
+        and accepted == 0
+    )
+
+
+def _effective_cooldown_keys(
+    items: list[tuple[int,dict]],
+    *,
+    category: str,
+    daily_yield_hints: dict[str,dict] | None,
+    min_visits: int,
+    min_discovered: int,
+) -> set[str]:
+    """Cooldown zero-yield routes only when alternatives remain available."""
+    if not daily_yield_hints or not items:
+        return set()
+    cooled={
+        yield_hint_key(category,geo)
+        for _rank,geo in items
+        if _same_day_route_is_cooldown(
+            daily_yield_hints.get(yield_hint_key(category,geo)),
+            min_visits=min_visits,
+            min_discovered=min_discovered,
+        )
+    }
+    # Never starve a category/country. If every route is exhausted-looking,
+    # fall back to score ordering and allow another rotated pass.
+    return cooled if 0 < len(cooled) < len(items) else set()
+
+
 def _adaptive_country_geographies(
     balanced_geographies: list[dict],
     *,
     category: str,
     yield_hints: dict[str, dict] | None,
+    daily_yield_hints: dict[str, dict] | None,
     exploration_bonus: float,
-) -> dict[str,list[dict]]:
+    cooldown_enabled: bool,
+    cooldown_min_visits: int,
+    cooldown_min_discovered: int,
+) -> tuple[dict[str,list[dict]],set[str]]:
     """Rank metros inside each country without changing country interleave."""
     groups: dict[str,list[tuple[int,dict]]] = defaultdict(list)
     for rank, geography in enumerate(balanced_geographies):
@@ -79,22 +126,38 @@ def _adaptive_country_geographies(
         groups[country].append((rank,geography))
 
     result={}
+    applied_cooldowns=set()
     for country, items in groups.items():
-        if not yield_hints:
+        cooled=(
+            _effective_cooldown_keys(
+                items,
+                category=category,
+                daily_yield_hints=daily_yield_hints,
+                min_visits=cooldown_min_visits,
+                min_discovered=cooldown_min_discovered,
+            )
+            if cooldown_enabled else set()
+        )
+        applied_cooldowns.update(cooled)
+        if not yield_hints and not cooled:
             result[country]=[geo for _rank,geo in items]
             continue
+        eligible=[
+            item for item in items
+            if yield_hint_key(category,item[1]) not in cooled
+        ] or items
         ranked=sorted(
-            items,
+            eligible,
             key=lambda item: (
                 -_adaptive_yield_score(
-                    yield_hints.get(yield_hint_key(category,item[1])),
+                    (yield_hints or {}).get(yield_hint_key(category,item[1])),
                     exploration_bonus=exploration_bonus,
                 ),
                 item[0],
             ),
         )
         result[country]=[geo for _rank,geo in ranked]
-    return result
+    return result,applied_cooldowns
 
 
 def _balanced_geographies(
@@ -164,8 +227,12 @@ def build_shard_plan(
     max_attempts: int,
     country_counts: dict[str, int] | None = None,
     yield_hints: dict[str, dict] | None = None,
+    daily_yield_hints: dict[str, dict] | None = None,
     adaptive_enabled: bool = True,
     exploration_bonus: float = 0.15,
+    cooldown_enabled: bool = True,
+    cooldown_min_visits: int = 2,
+    cooldown_min_discovered: int = 100,
 ) -> list[dict]:
     """Build a progress-weighted, country-balanced rotating shard plan.
 
@@ -214,14 +281,21 @@ def build_shard_plan(
         return []
 
     adaptive_groups={}
+    cooldown_keys_by_category={}
     if adaptive_enabled:
         for category in pending:
-            adaptive_groups[category]=_adaptive_country_geographies(
+            groups,cooldowns=_adaptive_country_geographies(
                 balanced_geographies,
                 category=category,
                 yield_hints=yield_hints,
+                daily_yield_hints=daily_yield_hints,
                 exploration_bonus=exploration_bonus,
+                cooldown_enabled=cooldown_enabled,
+                cooldown_min_visits=cooldown_min_visits,
+                cooldown_min_discovered=cooldown_min_discovered,
             )
+            adaptive_groups[category]=groups
+            cooldown_keys_by_category[category]=cooldowns
 
     positions=defaultdict(int)
     plan: list[dict] = []
@@ -242,6 +316,9 @@ def build_shard_plan(
                     (yield_hints or {}).get(yield_hint_key(category,geography)),
                     exploration_bonus=exploration_bonus,
                 )
+        route_key=yield_hint_key(category,geography)
+        deferred_keys=cooldown_keys_by_category.get(category,set())
+        cooldown_applied=route_key in deferred_keys
 
         plan.append(
             {
@@ -255,6 +332,8 @@ def build_shard_plan(
                     round(float(adaptive_score),6)
                     if adaptive_score is not None else None
                 ),
+                "adaptive_cooldown":cooldown_applied,
+                "adaptive_cooldown_deferred_count":len(deferred_keys),
             }
         )
     return plan

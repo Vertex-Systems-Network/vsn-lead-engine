@@ -318,6 +318,35 @@ Behavior:
 This provides a useful 08:00 routing prior while preventing old source behavior
 from permanently dominating new-day discovery.
 
+### P14 same-day zero-yield route cooldown
+
+The fixed shard budget now avoids repeatedly spending slots on category+metro
+routes that have already produced enough same-day evidence of exhaustion.
+
+Production cooldown threshold:
+
+- at least **2 same-day visits**;
+- at least **100 same-day discovered candidates**;
+- **0 accepted leads**.
+
+When those conditions are met, that category+metro route is deferred from the
+current plan if another metro in the same country/category remains available.
+
+Guardrails:
+
+- only **same-day P9 evidence** may trigger cooldown; P13 historical priors can
+  influence ranking but can never hard-defer a route;
+- if every metro for a country/category meets the cooldown threshold, the
+  scheduler automatically falls back and re-enables all of them;
+- any route with at least one accepted lead remains eligible;
+- US/Canada country interleave and underfilled-category weighting stay
+  authoritative;
+- the exploration bonus remains active for unseen routes;
+- max shard attempts, cycles, candidate limits and API budgets are unchanged.
+
+P11 health telemetry records the number of routes deferred so zero-yield
+cooldown behavior can be audited without storing lead PII.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -617,6 +646,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P11 daily health ledger: **READINESS + RUN + INCIDENT AUDIT ACTIVE**
 - P12 protected-main governance: **POLICY + CONTROLLER ACTIVE; LIVE ENFORCEMENT BLOCKED — GH_ADMIN_TOKEN MISSING**
 - P13 rolling historical yield prior: **CROSS-DAY COLD-START ROUTING ACTIVE**
+- P14 zero-yield cooldown: **SAME-DAY EXHAUSTION DEFERRAL ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

@@ -300,6 +300,7 @@ def run_once(
     registry_index=None,
     enricher=None,
     yield_hints: dict[str,dict] | None = None,
+    daily_yield_hints: dict[str,dict] | None = None,
     cursor_offset: int = 0,
 ) -> dict:
     runtime=config["runtime"]
@@ -358,6 +359,15 @@ def run_once(
     adaptive_yield_exploration_bonus=float(
         runtime.get("adaptive_yield_exploration_bonus",0.15)
     )
+    adaptive_cooldown_enabled=bool(
+        runtime.get("adaptive_zero_yield_cooldown_enabled",True)
+    )
+    adaptive_cooldown_min_visits=int(
+        runtime.get("adaptive_zero_yield_cooldown_min_visits",2)
+    )
+    adaptive_cooldown_min_discovered=int(
+        runtime.get("adaptive_zero_yield_cooldown_min_discovered",100)
+    )
     plan=build_shard_plan(
         config["categories"],
         config["geographies"],
@@ -367,8 +377,12 @@ def run_once(
         max_attempts=max_attempts,
         country_counts=country_counts,
         yield_hints=yield_hints,
+        daily_yield_hints=daily_yield_hints,
         adaptive_enabled=adaptive_yield_routing,
         exploration_bonus=adaptive_yield_exploration_bonus,
+        cooldown_enabled=adaptive_cooldown_enabled,
+        cooldown_min_visits=adaptive_cooldown_min_visits,
+        cooldown_min_discovered=adaptive_cooldown_min_discovered,
     )
     if not plan:
         return {"status":"complete","counts":counts,"cursor":cursor}
@@ -510,6 +524,10 @@ def run_once(
             "accepted":accepted_total-shard_accepted_before,
             "priority_weight":shard.get("priority_weight",1),
             "adaptive_yield_score":shard.get("adaptive_yield_score"),
+            "adaptive_cooldown":bool(shard.get("adaptive_cooldown",False)),
+            "adaptive_cooldown_deferred_count":int(
+                shard.get("adaptive_cooldown_deferred_count",0) or 0
+            ),
             "sources":source_attempts,
         })
 
@@ -522,6 +540,14 @@ def run_once(
         "candidate_partition_count":candidate_partition_count,
         "adaptive_yield_routing":adaptive_yield_routing,
         "adaptive_yield_hints_used":len(yield_hints or {}),
+        "adaptive_zero_yield_cooldown":adaptive_cooldown_enabled,
+        "adaptive_cooldown_routes_deferred":max(
+            [
+                int(item.get("adaptive_cooldown_deferred_count",0) or 0)
+                for item in attempts
+            ]
+            or [0]
+        ),
         "registry_mode":mode,
         "registry_shadow_errors":registry_shadow_errors,
         "run_date":run_date,
@@ -814,6 +840,7 @@ def run_until_quota(
                 registry_index=registry_index,
                 enricher=enricher,
                 yield_hints=routing_hints,
+                daily_yield_hints=yield_hints,
                 cursor_offset=cycle_index,
             )
             cycles.append(result)
@@ -901,6 +928,13 @@ def run_until_quota(
             "zero_result_shards":sum(
                 int(item.get("zero_result_shards",0) or 0)
                 for item in cycles
+            ),
+            "adaptive_cooldown_routes_deferred":max(
+                [
+                    int(item.get("adaptive_cooldown_routes_deferred",0) or 0)
+                    for item in cycles
+                ]
+                or [0]
             ),
             "counts":final_counts,
             "country_counts":final_country_counts,

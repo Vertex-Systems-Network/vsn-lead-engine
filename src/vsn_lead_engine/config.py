@@ -149,6 +149,21 @@ def load_config() -> dict:
             "adaptive_yield_history_max_entries must be between 100 and 5000."
         )
 
+    cooldown_min_visits=int(
+        config["runtime"].get("adaptive_zero_yield_cooldown_min_visits",2)
+    )
+    if cooldown_min_visits < 1 or cooldown_min_visits > 10:
+        raise ValueError(
+            "adaptive_zero_yield_cooldown_min_visits must be between 1 and 10."
+        )
+    cooldown_min_discovered=int(
+        config["runtime"].get("adaptive_zero_yield_cooldown_min_discovered",100)
+    )
+    if cooldown_min_discovered < 1 or cooldown_min_discovered > 5000:
+        raise ValueError(
+            "adaptive_zero_yield_cooldown_min_discovered must be between 1 and 5000."
+        )
+
     health_ledger_max_events=int(
         config["runtime"].get("health_ledger_max_events",96)
     )
