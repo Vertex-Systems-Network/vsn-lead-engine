@@ -9,6 +9,7 @@ from .health import (
     health_event_id,
     incident_health_event,
     readiness_health_event,
+    run_health_event,
 )
 from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
 from .schedule import scheduled_run_window
@@ -58,12 +59,23 @@ def _run_with_incident_capture(
     schedule: dict | None = None,
 ) -> tuple[int,dict]:
     try:
-        return 0,run_until_quota(
+        result=run_until_quota(
             config,
             dry_run=False,
             origin=origin,
             schedule=schedule,
         )
+        if (
+            bool(config["runtime"].get("health_ledger_enabled",True))
+            and "health_ledger" not in result
+        ):
+            run_date=result.get("run_date") or _run_date(config)
+            result["health_ledger"]=_health_append(
+                config,
+                run_date,
+                run_health_event(result,origin=origin),
+            )
+        return 0,result
     except Exception as exc:
         run_date=_run_date(config)
         health=_health_append(
@@ -230,10 +242,18 @@ def main() -> int:
     if args.scheduled and not args.dry_run:
         gate=scheduled_run_window(config)
         if not gate["allowed"]:
-            print(json.dumps({
+            result={
                 "status":"scheduled-window-skipped",
+                "run_date":gate["run_date"],
                 "schedule":gate,
-            },indent=2,default=str))
+            }
+            if bool(config["runtime"].get("health_ledger_enabled",True)):
+                result["health_ledger"]=_health_append(
+                    config,
+                    gate["run_date"],
+                    run_health_event(result,origin="native-schedule"),
+                )
+            print(json.dumps(result,indent=2,default=str))
             return 0
         code,result=_run_with_incident_capture(
             config,
