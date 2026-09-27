@@ -210,6 +210,46 @@ adaptive state, catch-up is idempotent with respect to quota: the next healthy
 run resumes the remaining category shortfall rather than replaying a fixed
 hourly batch.
 
+### P11 daily incident / health ledger
+
+Operational health is persisted in one compact date-scoped R2 object:
+
+```
+<registry-prefix>/health/v1/YYYY-MM-DD.json
+```
+
+The ledger records operational metadata only:
+
+- 07:50 readiness status and recovery attempts;
+- native scheduled runs;
+- :20 recovery-trigger runs;
+- manual real runs;
+- blocked runs such as a missing Google credential;
+- accepted/discovered totals, cycles and category counts/shortfalls;
+- schedule delay and same-day catch-up slot;
+- adaptive-state load/save health;
+- sanitized exception type/message;
+- first quota-completion timestamp.
+
+It does **not** accept raw lead payloads. The serializer uses an explicit
+allow-list, so business names, phones, emails, websites and arbitrary lead
+objects are dropped even if a caller accidentally supplies them.
+
+Production cap: **96 events/day**. Replayed GitHub run IDs are de-duplicated,
+so a workflow rerun cannot create duplicate audit events for the same
+run-attempt identity.
+
+Useful audit command:
+
+```
+python -m vsn_lead_engine.cli health-show
+python -m vsn_lead_engine.cli health-show --date 2026-09-28
+```
+
+Health logging is non-authoritative and fail-open. A temporary R2 health-ledger
+failure is reported in run telemetry but does not block otherwise-valid lead
+collection, Google Sheet commits or packed-v2 dedupe.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -504,6 +544,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P8 adaptive yield routing: **IN-PROCESS LEARNING + EXPLORATION ACTIVE**
 - P9 daily adaptive state: **ONE COMPACT R2 OBJECT/DAY ACTIVE**
 - P10 schedule/catch-up: **08:00–23:00 PKT NATIVE + OFFSET SUPERVISOR ACTIVE**
+- P11 daily health ledger: **READINESS + RUN + INCIDENT AUDIT ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

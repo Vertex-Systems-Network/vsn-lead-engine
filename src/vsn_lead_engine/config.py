@@ -127,6 +127,14 @@ def load_config() -> dict:
             "adaptive_yield_state_max_entries must be between 100 and 5000."
         )
 
+    health_ledger_max_events=int(
+        config["runtime"].get("health_ledger_max_events",96)
+    )
+    if health_ledger_max_events < 16 or health_ledger_max_events > 256:
+        raise ValueError(
+            "health_ledger_max_events must be between 16 and 256."
+        )
+
     enrichment=config.get("enrichment",{})
     if enrichment.get("enabled",False):
         if int(enrichment.get("max_candidates_per_run",160)) < 1:

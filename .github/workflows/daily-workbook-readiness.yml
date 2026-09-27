@@ -18,6 +18,10 @@ jobs:
     timeout-minutes: 10
     env:
       GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -36,7 +40,8 @@ jobs:
           set -o pipefail
           python -m vsn_lead_engine.cli workbook-ready-recover \
             --attempts 3 \
-            --delay-seconds 60 | tee readiness-result.json
+            --delay-seconds 60 \
+            --record-health | tee readiness-result.json
 
       - name: Publish readiness telemetry
         if: always()
