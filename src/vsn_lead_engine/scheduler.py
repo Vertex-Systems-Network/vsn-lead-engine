@@ -142,10 +142,13 @@ def _adaptive_country_geographies(
         if not yield_hints and not cooled:
             result[country]=[geo for _rank,geo in items]
             continue
+        eligible=[
+            item for item in items
+            if yield_hint_key(category,item[1]) not in cooled
+        ] or items
         ranked=sorted(
-            items,
+            eligible,
             key=lambda item: (
-                yield_hint_key(category,item[1]) in cooled,
                 -_adaptive_yield_score(
                     (yield_hints or {}).get(yield_hint_key(category,item[1])),
                     exploration_bonus=exploration_bonus,
@@ -314,7 +317,8 @@ def build_shard_plan(
                     exploration_bonus=exploration_bonus,
                 )
         route_key=yield_hint_key(category,geography)
-        cooldown_applied=route_key in cooldown_keys_by_category.get(category,set())
+        deferred_keys=cooldown_keys_by_category.get(category,set())
+        cooldown_applied=route_key in deferred_keys
 
         plan.append(
             {
@@ -329,6 +333,7 @@ def build_shard_plan(
                     if adaptive_score is not None else None
                 ),
                 "adaptive_cooldown":cooldown_applied,
+                "adaptive_cooldown_deferred_count":len(deferred_keys),
             }
         )
     return plan
