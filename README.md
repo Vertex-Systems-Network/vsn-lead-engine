@@ -57,6 +57,29 @@ on every event.
 Historical workbooks use a fixed Tracking Date cell instead of `TODAY()`, so a
 September 27 workbook continues showing September 27 counts when opened later.
 
+### Daily workbook readiness certification
+
+A dedicated GitHub workflow runs at **07:50 Asia/Karachi** every day, before the
+08:00 primary quota window:
+
+1. validate runtime configuration;
+2. require the Google service-account credential;
+3. resolve the exact current-date workbook;
+4. if missing, attempt the normal clean-template copy;
+5. self-heal Overview/category tabs and P4 metric rows;
+6. read category/country counts and report whether the daily quota is already complete.
+
+The same check is available manually as:
+
+```
+python -m vsn_lead_engine.cli workbook-ready
+```
+
+If My Drive ownership prevents service-account creation and the user-owned
+precreator has not produced the file yet, this readiness workflow fails
+explicitly before lead collection instead of discovering the problem inside the
+quota run.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -345,6 +368,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P2 rotating Overture cohorts: **8 HASH PARTITIONS ACTIVE**
 - P3 partition-aware zero-progress retry: **3 BOUNDED CYCLES ACTIVE**
 - P4 quality observability: **FUNNEL + ENRICHMENT METRICS ACTIVE**
+- P5 daily workbook readiness: **07:50 PKT PRE-START CERTIFICATION ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
