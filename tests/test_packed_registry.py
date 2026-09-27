@@ -29,6 +29,7 @@ class FakePaginator:
         self.client = client
 
     def paginate(self, Bucket, Prefix):
+        self.client.list_counts[Prefix] = self.client.list_counts.get(Prefix, 0) + 1
         contents = [
             {"Key": key, "Size": len(value["body"])}
             for key, value in sorted(self.client.objects.items())
@@ -42,6 +43,7 @@ class FakeS3:
         self.objects = {}
         self.get_counts = {}
         self.head_counts = {}
+        self.list_counts = {}
 
     def head_bucket(self, Bucket):
         return {}
@@ -447,3 +449,83 @@ def test_packed_import_rows_clears_legacy_advisory_cache(monkeypatch):
     assert index.import_rows([payload])["imported"]==1
     assert index.cache_stats()["legacy_entries"] == 0
     assert index.collision_keys([lead]) == {payload["unique_token"]}
+
+
+def _pending_list_count(fake):
+    return sum(
+        count
+        for prefix,count in fake.list_counts.items()
+        if "/pending/" in prefix
+    )
+
+
+def test_advisory_collision_checks_reuse_pending_scan_cache(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+    index=PackedR2RegistryIndex(config(),client=fake)
+    lead=make_lead()
+
+    before=_pending_list_count(fake)
+    assert index.collision_keys([lead]) == set()
+    after_first=_pending_list_count(fake)
+    assert index.collision_keys([lead]) == set()
+    after_second=_pending_list_count(fake)
+
+    assert after_first > before
+    assert after_second == after_first
+    stats=index.cache_stats()
+    assert stats["pending_enabled"] is True
+    assert stats["pending_hits"] > 0
+    assert stats["pending_misses"] > 0
+
+
+def test_pending_advisory_cache_stale_miss_cannot_bypass_reservation(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+    lead=make_lead()
+
+    reader=PackedR2RegistryIndex(config(),client=fake)
+    assert reader.collision_keys([lead]) == set()
+
+    writer=PackedR2RegistryIndex(config(),client=fake)
+    reserved=writer.reserve_pending([lead],{"id":"sheet123"})
+    assert reserved
+
+    # Reader advisory cache is intentionally stale and does not see writer's marker.
+    assert reader.collision_keys([lead]) == set()
+
+    # Commit-time reservation always performs a fresh pending scan under lock.
+    assert reader.reserve_pending([lead],{"id":"sheet456"}) == set()
+
+
+def test_own_reservation_invalidates_pending_advisory_cache(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+    index=PackedR2RegistryIndex(config(),client=fake)
+    lead=make_lead()
+    payload=lead_registry_payload(lead,{"id":"sheet123"})
+
+    assert index.collision_keys([lead]) == set()
+    first_lists=_pending_list_count(fake)
+    reserved=index.reserve_pending([lead],{"id":"sheet123"})
+    assert reserved=={payload["unique_token"]}
+
+    assert index.collision_keys([lead]) == {payload["unique_token"]}
+    assert _pending_list_count(fake) > first_lists
+
+
+def test_pending_cache_can_be_disabled_without_changing_dedupe(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+    cfg=config()
+    cfg["registry"]["pending_read_cache_enabled"]=False
+    index=PackedR2RegistryIndex(cfg,client=fake)
+    lead=make_lead()
+
+    assert index.collision_keys([lead]) == set()
+    first_lists=_pending_list_count(fake)
+    assert index.collision_keys([lead]) == set()
+    second_lists=_pending_list_count(fake)
+
+    assert second_lists > first_lists
+    assert index.cache_stats()["pending_enabled"] is False
