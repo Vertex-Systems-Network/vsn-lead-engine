@@ -424,6 +424,9 @@ def run_once(
     remote_prefilter_enabled=bool(
         runtime.get("r2_pre_enrichment_prefilter_enabled",True)
     )
+    source_batch_dedupe_enabled=bool(
+        runtime.get("source_batch_dedupe_enabled",True)
+    )
     adaptive_yield_exploration_bonus=float(
         runtime.get("adaptive_yield_exploration_bonus",0.15)
     )
@@ -525,9 +528,12 @@ def run_once(
                     continue
                 enrichment_candidates.append(lead)
 
-            enrichment_candidates,source_batch_duplicates=_dedupe_source_batch(
-                enrichment_candidates
-            )
+            source_batch_duplicates=0
+            if source_batch_dedupe_enabled:
+                (
+                    enrichment_candidates,
+                    source_batch_duplicates,
+                )=_dedupe_source_batch(enrichment_candidates)
             if source_batch_duplicates:
                 rejections["duplicate"]+=source_batch_duplicates
                 rejections["source_batch_duplicate"]+=source_batch_duplicates
@@ -656,6 +662,7 @@ def run_once(
         "source_errors":source_errors,
         "source_retries":source_retries,
         "candidate_partition_count":candidate_partition_count,
+        "source_batch_dedupe":source_batch_dedupe_enabled,
         "r2_pre_enrichment_prefilter":remote_prefilter_enabled,
         "adaptive_yield_routing":adaptive_yield_routing,
         "adaptive_yield_hints_used":len(yield_hints or {}),
