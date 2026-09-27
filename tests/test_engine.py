@@ -1,5 +1,5 @@
 import vsn_lead_engine.engine as engine
-from vsn_lead_engine.engine import _candidate_partition_geography, _dedupe_source_batch, _quality_summary, _search_with_retry, _update_yield_hints, _yield_hint_summary, check_workbook_readiness, recover_workbook_readiness
+from vsn_lead_engine.engine import _candidate_partition_geography, _dedupe_source_batch, _quality_summary, _search_with_retry, _source_contact_mix, _update_yield_hints, _yield_hint_summary, check_workbook_readiness, recover_workbook_readiness
 from vsn_lead_engine.models import Lead
 
 
@@ -1293,3 +1293,31 @@ def test_source_batch_dedupe_keeps_distinct_entities():
 
     assert dropped==0
     assert kept==[first,second]
+
+
+def test_source_contact_mix_matches_p23_raw_contact_semantics():
+    candidates=[
+        _batch_lead(
+            business_name="Phone And Website",
+            source_id="source:phone",
+            phone="+1 202 555 0101",
+            website="https://phone.example",
+        ),
+        _batch_lead(
+            business_name="Website Only",
+            source_id="source:website",
+            phone="",
+            website="https://website.example",
+        ),
+        _batch_lead(
+            business_name="Raw Invalid Phone Still Source Phone",
+            source_id="source:invalid",
+            phone="not-a-valid-phone",
+            website="https://invalid.example",
+        ),
+    ]
+
+    source_phone,website_only=_source_contact_mix(candidates)
+
+    assert source_phone==2
+    assert website_only==1

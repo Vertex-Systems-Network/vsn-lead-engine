@@ -47,6 +47,22 @@ def _close_sources(sources) -> None:
             close()
 
 
+def _source_contact_mix(candidates: list) -> tuple[int,int]:
+    """Match P23 source selection semantics without validating/recovering phones."""
+    source_phone=sum(
+        1 for lead in candidates
+        if bool(str(lead.phone or "").strip())
+    )
+    website_only=sum(
+        1 for lead in candidates
+        if (
+            not str(lead.phone or "").strip()
+            and bool(str(lead.website or "").strip())
+        )
+    )
+    return source_phone,website_only
+
+
 def _lead_pre_enrichment_quality(lead) -> tuple[int,int,int]:
     phone=bool(normalize_phone(lead.phone,lead.country))
     website=bool(str(lead.website or "").strip())
@@ -464,6 +480,8 @@ def run_once(
     rejections=defaultdict(int)
     attempts=[]
     total_discovered=0
+    source_phone_candidates=0
+    website_only_candidates=0
     source_errors=0
     source_retries=0
     zero_result_shards=0
@@ -515,6 +533,11 @@ def run_once(
 
             shard_discovered+=len(candidates)
             total_discovered+=len(candidates)
+            source_phone_count,website_only_count=_source_contact_mix(
+                candidates
+            )
+            source_phone_candidates+=source_phone_count
+            website_only_candidates+=website_only_count
             accepted_from_source=0
 
             # Cheap local and same-response duplicate checks happen before any
@@ -620,6 +643,8 @@ def run_once(
             source_attempts.append({
                 "source":source.name,
                 "discovered":len(candidates),
+                "source_phone_candidates":source_phone_count,
+                "website_only_candidates":website_only_count,
                 "accepted":accepted_from_source,
                 "candidate_partition":search_geography["_candidate_partition"],
                 "candidate_partition_count":search_geography["_candidate_partition_count"],
@@ -688,6 +713,8 @@ def run_once(
         "registry_read_cache":registry_read_cache,
         "run_date":run_date,
         "discovered":total_discovered,
+        "source_phone_candidates":source_phone_candidates,
+        "website_only_candidates":website_only_candidates,
         "accepted":accepted_total,
         "accepted_by_category":{k:len(v) for k,v in accepted_by_category.items()},
         "accepted_by_country":dict(accepted_by_country),
@@ -789,6 +816,8 @@ def run_once(
         {
             "Accepted Leads":int(result.get("accepted",0) or 0),
             "Free-Source Candidates":total_discovered,
+            "Source Phone Candidates":source_phone_candidates,
+            "Website-Only Candidates":website_only_candidates,
             "Duplicate Rejections":int(rejections.get("duplicate",0)),
             "Source-Batch Duplicates":int(
                 rejections.get("source_batch_duplicate",0) or 0
@@ -1067,6 +1096,14 @@ def run_until_quota(
             "accepted":accepted_total,
             "discovered":sum(
                 int(item.get("discovered",0) or 0)
+                for item in cycles
+            ),
+            "source_phone_candidates":sum(
+                int(item.get("source_phone_candidates",0) or 0)
+                for item in cycles
+            ),
+            "website_only_candidates":sum(
+                int(item.get("website_only_candidates",0) or 0)
                 for item in cycles
             ),
             "source_errors":sum(

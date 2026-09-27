@@ -99,6 +99,8 @@ def test_overview_schema_includes_quality_observability_metrics():
         "Accepted Leads",
         "Source-Batch Duplicates",
         "Remote Prefilter Duplicates",
+        "Source Phone Candidates",
+        "Website-Only Candidates",
         "Phones Recovered",
         "Enrichment Candidates",
         "Official-Site Phone Recoveries",
@@ -128,5 +130,7 @@ def test_daily_overview_seed_contains_quality_metrics():
     assert "Accepted Leads" in names
     assert "Source-Batch Duplicates" in names
     assert "Remote Prefilter Duplicates" in names
+    assert "Source Phone Candidates" in names
+    assert "Website-Only Candidates" in names
     assert "Enrichment Candidates" in names
     assert "Last Acceptance Rate %" in names
