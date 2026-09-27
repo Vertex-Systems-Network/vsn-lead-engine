@@ -1,5 +1,5 @@
 import vsn_lead_engine.engine as engine
-from vsn_lead_engine.engine import _candidate_partition_geography, _quality_summary, _search_with_retry, check_workbook_readiness
+from vsn_lead_engine.engine import _candidate_partition_geography, _quality_summary, _search_with_retry, check_workbook_readiness, recover_workbook_readiness
 
 
 class FlakySource:
@@ -339,3 +339,109 @@ def test_workbook_readiness_marks_complete_only_when_all_categories_hit_target()
         store=FakeStore(),
     )
     assert result["quota_complete"] is True
+
+
+def test_workbook_readiness_recovery_succeeds_after_transient_failure():
+    calls=[]
+    sleeps=[]
+
+    def fake_check(config,run_date=None):
+        calls.append(run_date)
+        if len(calls)==1:
+            raise RuntimeError("temporary Google API failure")
+        return {
+            "status":"ready",
+            "run_date":run_date,
+            "workbook":{"id":"sheet-1","name":"daily","created":False},
+            "counts":{"A":0},
+            "country_counts":{"United States":0,"Canada":0},
+            "quota_complete":False,
+        }
+
+    result=recover_workbook_readiness(
+        {
+            "runtime":{
+                "timezone":"Asia/Karachi",
+                "daily_target_per_category":1000,
+            },
+            "categories":["A"],
+        },
+        run_date="2026-09-28",
+        attempts=3,
+        delay_seconds=5,
+        sleep_fn=sleeps.append,
+        check_fn=fake_check,
+    )
+
+    assert result["status"]=="recovered"
+    assert result["attempts_used"]==2
+    assert result["attempts_configured"]==3
+    assert len(result["failures"])==1
+    assert result["failures"][0]["error_type"]=="RuntimeError"
+    assert calls==["2026-09-28","2026-09-28"]
+    assert sleeps==[5]
+
+
+def test_workbook_readiness_recovery_returns_incident_after_bound_exhausted():
+    sleeps=[]
+
+    def always_fail(config,run_date=None):
+        raise PermissionError("service account cannot create dated workbook")
+
+    result=recover_workbook_readiness(
+        {
+            "runtime":{
+                "timezone":"Asia/Karachi",
+                "daily_target_per_category":1000,
+            },
+            "categories":["A"],
+        },
+        run_date="2026-09-28",
+        attempts=3,
+        delay_seconds=2,
+        sleep_fn=sleeps.append,
+        check_fn=always_fail,
+    )
+
+    assert result["status"]=="incident"
+    assert result["attempts_used"]==3
+    assert len(result["failures"])==3
+    assert result["last_error"]["error_type"]=="PermissionError"
+    assert "cannot create" in result["last_error"]["message"]
+    assert result["quota_complete"] is False
+    assert sleeps==[2,2]
+
+
+def test_workbook_readiness_recovery_first_attempt_reports_ready_without_sleep():
+    sleeps=[]
+
+    def ready(config,run_date=None):
+        return {
+            "status":"ready",
+            "run_date":run_date,
+            "workbook":{"id":"sheet-1","name":"daily","created":False},
+            "counts":{"A":1000},
+            "country_counts":{"United States":500,"Canada":500},
+            "quota_complete":True,
+        }
+
+    result=recover_workbook_readiness(
+        {
+            "runtime":{
+                "timezone":"Asia/Karachi",
+                "daily_target_per_category":1000,
+            },
+            "categories":["A"],
+        },
+        run_date="2026-09-28",
+        attempts=3,
+        delay_seconds=60,
+        sleep_fn=sleeps.append,
+        check_fn=ready,
+    )
+
+    assert result["status"]=="ready"
+    assert result["attempts_used"]==1
+    assert result["failures"]==[]
+    assert result["quota_complete"] is True
+    assert sleeps==[]
