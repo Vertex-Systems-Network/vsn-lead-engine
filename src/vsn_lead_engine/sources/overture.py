@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from urllib.parse import quote_plus
 
 import duckdb
@@ -8,25 +9,144 @@ import requests
 
 from ..models import Lead
 
+
+@dataclass(frozen=True)
+class CategoryRule:
+    taxonomy_pattern: str
+    name_fallback_pattern: str = ""
+
+
+# Taxonomy-first classification.
+#
+# Patterns are matched against complete taxonomy tokens (primary, basic and
+# hierarchy entries), not arbitrary substrings. A name fallback is allowed only
+# when Overture has no taxonomy at all for the place and only for distinctive
+# business terms.
+CATEGORY_RULES: dict[str, CategoryRule] = {
+    "AI & Automation": CategoryRule(
+        r"(?:automation_service|home_automation|information_technology_company|"
+        r"software_development|software_company|robotics_company|"
+        r"artificial_intelligence_company|machine_learning_company)"
+    ),
+    "Medical & Clinics": CategoryRule(
+        r"(?:health_care|medical_center|medical_clinic|.*_clinic|doctors_office|"
+        r".*_doctor|physician|dentist|dental_clinic|hospital|pharmacy|"
+        r"chiropractor|optometrist|physical_therapist|dermatology|pediatrician|"
+        r"urgent_care|mental_health_clinic)",
+        r"\b(?:medical|clinic|dental|dentist|doctor|physician|hospital|pharmacy|"
+        r"chiropractic|optometry|dermatology|urgent care)\b",
+    ),
+    "Property & Real Estate": CategoryRule(
+        r"(?:real_estate_agency|real_estate_agent|commercial_real_estate_agency|"
+        r"property_management|property_management_company|real_estate_developer|"
+        r"apartment_rental_agency|real_estate_consultant)",
+        r"\b(?:real estate|realty|realtor|property management)\b",
+    ),
+    "Business & Consulting": CategoryRule(
+        r"(?:business_management_consultant|management_consultant|"
+        r"business_consultant|consulting_service|accounting_firm|"
+        r"bookkeeping_service|law_firm|legal_service)",
+        r"\b(?:business consulting|management consulting|consultants?)\b",
+    ),
+    "IT & Software": CategoryRule(
+        r"(?:software_development|software_company|information_technology_company|"
+        r"computer_support_and_services|computer_repair_service|computer_consultant|"
+        r"it_consulting|web_designer|website_designer|electronics_repair)",
+        r"\b(?:software|information technology|IT services?|web development|"
+        r"website design|computer support)\b",
+    ),
+    "Media & Creative": CategoryRule(
+        r"(?:marketing_agency|advertising_agency|graphic_designer|"
+        r"video_production_service|photographer|photography_service|"
+        r"public_relations_firm|printing_service|media_company|creative_agency)",
+        r"\b(?:marketing agency|advertising agency|graphic design|"
+        r"video production|public relations|creative agency)\b",
+    ),
+    "Other Website-Critical": CategoryRule(
+        r"(?:architect|architecture_firm|general_contractor|construction_company|"
+        r"plumber|plumbing_service|electrician|electrical_service|roofing_contractor|"
+        r"hvac_contractor|landscaper|landscaping_service|fitness_center|"
+        r"education_center|home_service)",
+        r"\b(?:contractor|plumbing|electrician|roofing|hvac|landscaping|architect)\b",
+    ),
+    "Spa": CategoryRule(
+        r"(?:spa|day_spa|medical_spa|massage_service|massage_therapist|"
+        r"wellness_center|wellness_spa)",
+        r"\b(?:day spa|medical spa|massage therapy|wellness spa)\b",
+    ),
+    "Salon": CategoryRule(
+        r"(?:hair_salon|beauty_salon|nail_salon|tanning_salon|hair_stylist|"
+        r"barber_shop|barber|threading_service|eyebrow_bar|waxing_service|beautician)",
+        r"\b(?:hair salon|nail salon|beauty salon|barber shop|hair stylist|"
+        r"threading service|eyebrow bar)\b",
+    ),
+    "Cars": CategoryRule(
+        r"(?:automotive_repair|auto_repair|auto_glass_service|auto_body_shop|"
+        r"automobile_registration_service|vehicle_inspection|car_dealer|"
+        r"used_car_dealer|car_rental|car_wash|auto_parts_store|automotive_service|"
+        r"tire_dealer_and_repair|tire_shop|towing_service)",
+        r"\b(?:auto repair|automotive repair|car dealer|used cars?|tire shop|"
+        r"tyre shop|towing service|auto body|car wash)\b",
+    ),
+    "Motorbikes": CategoryRule(
+        r"(?:motorcycle_repair|motorcycle_dealer|motorcycle_manufacturer|"
+        r"motorcycle_rental|motorcycle_parts_store|scooter_dealer)",
+        r"\b(?:motorcycle|motorbike|motor cycle|powersports)\b",
+    ),
+    "Insurance": CategoryRule(
+        r"(?:insurance_agency|insurance_company|insurance_broker|insurance_service)",
+        r"\b(?:insurance|medicare insurance|assurance agency)\b",
+    ),
+}
+
+# Backward-compatible export used by earlier tests/integrations. These patterns
+# now represent complete taxonomy tokens rather than loose substring searches.
 CATEGORY_PATTERNS: dict[str, str] = {
-    "AI & Automation": r"artificial_intelligence|artificial intelligence|automation|robotic|machine_learning|machine learning|ai_consult|ai consulting",
-    "Medical & Clinics": r"health_care|medical|clinic|doctor|physician|dentist|dental|hospital|chiropract|optometr|therapy|pharmacy",
-    "Property & Real Estate": r"real_estate|real estate|estate_agent|property_management|property management|realty|realtor",
-    "Business & Consulting": r"consult|business_service|management_service|professional_service|accounting|bookkeeping|legal_service|lawyer|attorney",
-    "IT & Software": r"software|computer|information_technology|information technology|it_service|web_development|web development|technology_service|electronics_repair",
-    "Media & Creative": r"advertis|marketing|graphic_design|graphic design|media|photograph|video_production|video production|creative|public_relations|printing",
-    "Other Website-Critical": r"architect|contractor|construction|plumb|electric|roof|hvac|landscap|lawyer|accounting|fitness|education|home_service",
-    "Spa": r"spa|massage|wellness",
-    "Salon": r"salon|hairdresser|hair_salon|barber|nail|beauty",
-    "Cars": r"automotive|car_dealer|car dealer|car_repair|car repair|auto_repair|vehicle_repair|tire|tyre",
-    "Motorbikes": r"motorcycle|motorbike|scooter_dealer|motorcycle_repair",
-    "Insurance": r"insurance",
+    category: rule.taxonomy_pattern for category, rule in CATEGORY_RULES.items()
 }
 
 COUNTRY_CODES = {
     "United States": "US",
     "Canada": "CA",
 }
+
+
+def _taxonomy_tokens(primary: str = "", basic: str = "", hierarchy=None) -> list[str]:
+    tokens: list[str] = []
+    for raw in [primary, basic, *(hierarchy or [])]:
+        value = str(raw or "").strip().lower()
+        if value and value not in tokens:
+            tokens.append(value)
+    return tokens
+
+
+def category_match_reason(
+    category: str,
+    *,
+    primary: str = "",
+    basic: str = "",
+    hierarchy=None,
+    name: str = "",
+) -> str | None:
+    rule = CATEGORY_RULES.get(category)
+    if not rule:
+        return None
+
+    tokens = _taxonomy_tokens(primary, basic, hierarchy)
+    taxonomy_re = re.compile(rf"^(?:{rule.taxonomy_pattern})$", re.IGNORECASE)
+    for token in tokens:
+        if taxonomy_re.fullmatch(token):
+            return f"taxonomy:{token}"
+
+    # A business-name fallback is intentionally allowed only when Overture
+    # supplies no taxonomy token. This prevents a name like "Pet Salon" or
+    # "BeautyAllure Dermatology" from overriding a conflicting taxonomy.
+    if not tokens and rule.name_fallback_pattern:
+        match = re.search(rule.name_fallback_pattern, name or "", re.IGNORECASE)
+        if match:
+            return f"name_fallback:{match.group(0).lower()}"
+
+    return None
 
 
 class OverturePlaceSource:
@@ -53,7 +173,7 @@ class OverturePlaceSource:
             response = requests.get(
                 self.stac_url,
                 timeout=20,
-                headers={"User-Agent": "VSN-Lead-Engine/0.2"},
+                headers={"User-Agent": "VSN-Lead-Engine/0.2.1"},
             )
             response.raise_for_status()
             payload = response.json()
@@ -94,10 +214,39 @@ class OverturePlaceSource:
         query = ", ".join(p for p in [name, address, city, region] if p)
         return f"https://www.google.com/maps/search/?api=1&query={quote_plus(query)}" if query else ""
 
+    @staticmethod
+    def _sql_category_clause(category: str) -> str:
+        rule = CATEGORY_RULES[category]
+        taxonomy_pattern = rule.taxonomy_pattern
+        # taxonomy_blob is pipe-delimited so (^|\|) and (\||$) force whole
+        # taxonomy-token matches. This prevents "tire" from matching
+        # "retirement_home".
+        taxonomy_clause = (
+            "regexp_matches("
+            "lower(concat_ws('|', coalesce(taxonomy.primary, ''), "
+            "coalesce(basic_category, ''), "
+            "coalesce(array_to_string(taxonomy.hierarchy, '|'), ''))), "
+            f"'(^|\\|)(?:{taxonomy_pattern})(\\||$)'"
+            ")"
+        )
+        if not rule.name_fallback_pattern:
+            return taxonomy_clause
+
+        fallback = rule.name_fallback_pattern.replace("'", "''")
+        no_taxonomy = (
+            "length(trim(replace(concat_ws('|', coalesce(taxonomy.primary, ''), "
+            "coalesce(basic_category, ''), "
+            "coalesce(array_to_string(taxonomy.hierarchy, '|'), '')), '|', ''))) = 0"
+        )
+        return (
+            f"({taxonomy_clause} OR "
+            f"({no_taxonomy} AND regexp_matches(lower(names.primary), '{fallback}')))"
+        )
+
     def search(self, category: str, location: dict, limit: int | None = None) -> list[Lead]:
-        pattern = CATEGORY_PATTERNS.get(category)
+        rule = CATEGORY_RULES.get(category)
         bbox = location.get("bbox")
-        if not pattern or not isinstance(bbox, list) or len(bbox) != 4:
+        if not rule or not isinstance(bbox, list) or len(bbox) != 4:
             return []
 
         xmin, ymin, xmax, ymax = [float(v) for v in bbox]
@@ -107,8 +256,8 @@ class OverturePlaceSource:
             f"s3://overturemaps-us-west-2/release/{release}/"
             "theme=places/type=place/*"
         )
+        category_clause = self._sql_category_clause(category)
 
-        # Pattern is repository-controlled, not user input.
         sql = f"""
         SELECT
             id,
@@ -144,12 +293,7 @@ class OverturePlaceSource:
                 operating_status IS NULL
                 OR CAST(operating_status AS VARCHAR) <> 'permanently_closed'
             )
-            AND (
-                regexp_matches(lower(coalesce(taxonomy.primary, '')), '{pattern}')
-                OR regexp_matches(lower(coalesce(CAST(taxonomy.hierarchy AS VARCHAR), '')), '{pattern}')
-                OR regexp_matches(lower(coalesce(basic_category, '')), '{pattern}')
-                OR regexp_matches(lower(coalesce(names.primary, '')), '{pattern}')
-            )
+            AND {category_clause}
         LIMIT ?
         """
 
@@ -174,6 +318,18 @@ class OverturePlaceSource:
             name = str(record.get("name") or "").strip()
             phone = str(record.get("phone") or "").strip()
             if not name or not phone:
+                continue
+
+            reason = category_match_reason(
+                category,
+                primary=str(record.get("taxonomy_primary") or ""),
+                basic=str(record.get("basic_category") or ""),
+                hierarchy=record.get("taxonomy_hierarchy") or [],
+                name=name,
+            )
+            if not reason:
+                # Defense in depth: even if SQL/provider behavior changes, a
+                # record must pass the Python classifier before becoming a lead.
                 continue
 
             socials = self._social_fields(record.get("socials"))
@@ -209,7 +365,8 @@ class OverturePlaceSource:
                     google_maps_url=self._maps_url(name, address, city, region),
                     notes=(
                         f"Overture Maps Foundation Places; release {release}; "
-                        f"provider dataset {dataset}; taxonomy {taxonomy}"
+                        f"provider dataset {dataset}; taxonomy {taxonomy}; "
+                        f"classification {reason}"
                     ),
                 )
             )
