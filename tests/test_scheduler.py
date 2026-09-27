@@ -330,3 +330,47 @@ def test_route_with_any_acceptance_is_not_cooled():
         cooldown_enabled=True,
     )
     assert plan[0]["adaptive_cooldown_deferred_count"]==0
+
+
+def test_weighted_scheduler_covers_all_pending_categories_before_repeats():
+    categories=[f"C{index}" for index in range(12)]
+    plan=build_shard_plan(
+        categories,
+        GEOS,
+        {category:0 for category in categories},
+        1000,
+        cursor=0,
+        max_attempts=18,
+        country_counts={"United States":0,"Canada":0},
+    )
+
+    first_pass=[item["category"] for item in plan[:12]]
+    assert len(first_pass)==12
+    assert set(first_pass)==set(categories)
+    assert len(set(item["category"] for item in plan))==12
+
+
+def test_weight_layers_preserve_three_two_one_priority_without_clumping():
+    plan=build_shard_plan(
+        ["A","B","C"],
+        GEOS,
+        {"A":10,"B":300,"C":800},
+        1000,
+        cursor=0,
+        max_attempts=6,
+    )
+    assert [item["category"] for item in plan]==[
+        "A","B","C","A","B","A"
+    ]
+
+
+def test_fair_weighting_keeps_lowest_progress_first_when_slots_are_tight():
+    plan=build_shard_plan(
+        ["A","B","C"],
+        GEOS,
+        {"A":700,"B":10,"C":300},
+        1000,
+        cursor=0,
+        max_attempts=2,
+    )
+    assert [item["category"] for item in plan]==["B","C"]
