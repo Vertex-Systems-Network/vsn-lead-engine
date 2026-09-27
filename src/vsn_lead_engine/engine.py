@@ -397,6 +397,13 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
     runtime=config["runtime"]
     run_date=datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
     max_cycles=max(1, int(runtime.get("max_cycles_per_run", 3)))
+    max_zero_progress_cycles=max(
+        1,
+        min(
+            max_cycles,
+            int(runtime.get("max_zero_progress_cycles", max_cycles)),
+        ),
+    )
     target=int(runtime["daily_target_per_category"])
     sources=build_sources(config)
     if not sources:
@@ -410,6 +417,7 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
     final_counts={}
     final_country_counts={}
     final_status="ok"
+    zero_progress_streak=0
 
     try:
         for cycle_index in range(max_cycles):
@@ -434,8 +442,13 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
             if final_counts and all(int(final_counts.get(category,0)) >= target for category in config["categories"]):
                 final_status="complete"
                 break
+
             if int(result.get("accepted",0) or 0) <= 0:
-                break
+                zero_progress_streak += 1
+                if zero_progress_streak >= max_zero_progress_cycles:
+                    break
+            else:
+                zero_progress_streak = 0
     finally:
         _close_sources(sources)
         if registry_index is not None:
@@ -452,6 +465,8 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
         "run_date": run_date,
         "cycles_executed": len(cycles),
         "max_cycles_per_run": max_cycles,
+        "max_zero_progress_cycles": max_zero_progress_cycles,
+        "zero_progress_streak": zero_progress_streak,
         "accepted": accepted_total,
         "counts": final_counts,
         "country_counts": final_country_counts,
