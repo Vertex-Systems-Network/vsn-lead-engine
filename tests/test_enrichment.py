@@ -213,3 +213,81 @@ def test_run_once_accepts_phone_recovered_before_final_phone_gate(monkeypatch):
     assert result["accepted"] == 1
     assert result["rejections"].get("missing_or_invalid_phone", 0) == 0
     assert result["enrichment"]["live_phone_recovered"] == 1
+
+
+def test_enrichment_per_call_cap_preserves_budget_for_later_shards(monkeypatch):
+    cfg=config()
+    cfg["enrichment"]["max_candidates_per_run"]=4
+    cfg["enrichment"]["max_candidates_per_call"]=1
+    cfg["enrichment"]["common_crawl"]["enabled"]=False
+    worker=enrichment.ContactEnricher(cfg)
+
+    monkeypatch.setattr(
+        worker,
+        "_live_enrich",
+        lambda item:{
+            "attempted":True,
+            "changed":False,
+            "phone":False,
+            "error":"",
+        },
+    )
+
+    first=worker.enrich([
+        lead(category="A",source_id="a1",website="https://a1.example"),
+        lead(category="A",source_id="a2",website="https://a2.example"),
+        lead(category="A",source_id="a3",website="https://a3.example"),
+    ])
+    second=worker.enrich([
+        lead(category="B",source_id="b1",website="https://b1.example"),
+        lead(category="B",source_id="b2",website="https://b2.example"),
+    ])
+
+    assert first["candidates"]==1
+    assert first["skipped_call_budget"]==2
+    assert first["skipped_event_budget"]==0
+    assert second["candidates"]==1
+    assert second["skipped_call_budget"]==1
+    assert second["skipped_event_budget"]==0
+    assert worker._attempted==2
+
+
+def test_common_crawl_per_call_cap_spreads_global_budget_across_calls(monkeypatch):
+    cfg=config()
+    cfg["enrichment"]["max_candidates_per_run"]=6
+    cfg["enrichment"]["max_candidates_per_call"]=3
+    cfg["enrichment"]["common_crawl"]["max_lookups_per_run"]=2
+    cfg["enrichment"]["common_crawl"]["max_lookups_per_call"]=1
+    worker=enrichment.ContactEnricher(cfg)
+
+    monkeypatch.setattr(
+        worker,
+        "_live_enrich",
+        lambda item:{
+            "attempted":True,
+            "changed":False,
+            "phone":False,
+            "error":"",
+        },
+    )
+    monkeypatch.setattr(worker,"_common_enrich",lambda item:False)
+
+    first=worker.enrich([
+        lead(category="A",source_id="a1",website="https://a1.example"),
+        lead(category="A",source_id="a2",website="https://a2.example"),
+    ])
+    second=worker.enrich([
+        lead(category="B",source_id="b1",website="https://b1.example"),
+        lead(category="B",source_id="b2",website="https://b2.example"),
+    ])
+    third=worker.enrich([
+        lead(category="C",source_id="c1",website="https://c1.example"),
+    ])
+
+    assert first["common_crawl_attempted"]==1
+    assert first["common_crawl_skipped_call_budget"]==1
+    assert second["common_crawl_attempted"]==1
+    assert second["common_crawl_skipped_call_budget"]==1
+    assert third["common_crawl_attempted"]==0
+    assert third["common_crawl_skipped_event_budget"]==1
+    assert worker._common_attempted==2
