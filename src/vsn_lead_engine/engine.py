@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from .dedupe import fingerprints,is_duplicate
 from .enrichment import build_contact_enricher
 from .normalize import normalize_phone
-from .scheduler import build_shard_plan, run_cursor
+from .scheduler import build_shard_plan, run_cursor, yield_hint_key
 from .registry import build_registry_index, fingerprint_token, registry_mode
 from .sheets import GoogleSheetsStore
 from .sources import build_sources
@@ -58,6 +58,38 @@ def _candidate_partition_geography(
         **geography,
         "_candidate_partition_count":count,
         "_candidate_partition":partition,
+    }
+
+
+def _update_yield_hints(
+    yield_hints: dict[str,dict],
+    attempts: list[dict],
+) -> None:
+    for attempt in attempts or []:
+        category=str(attempt.get("category","")).strip()
+        geography=attempt.get("geography") or {}
+        if not category or not geography:
+            continue
+        key=yield_hint_key(category,geography)
+        hint=yield_hints.setdefault(
+            key,
+            {"visits":0,"discovered":0,"accepted":0},
+        )
+        hint["visits"]=int(hint.get("visits",0) or 0)+1
+        hint["discovered"]=int(hint.get("discovered",0) or 0)+max(
+            0,int(attempt.get("discovered",0) or 0)
+        )
+        hint["accepted"]=int(hint.get("accepted",0) or 0)+max(
+            0,int(attempt.get("accepted",0) or 0)
+        )
+
+
+def _yield_hint_summary(yield_hints: dict[str,dict]) -> dict:
+    return {
+        "markets_observed":len(yield_hints),
+        "visits":sum(int(item.get("visits",0) or 0) for item in yield_hints.values()),
+        "discovered":sum(int(item.get("discovered",0) or 0) for item in yield_hints.values()),
+        "accepted":sum(int(item.get("accepted",0) or 0) for item in yield_hints.values()),
     }
 
 
@@ -228,6 +260,7 @@ def run_once(
     store: GoogleSheetsStore | None = None,
     registry_index=None,
     enricher=None,
+    yield_hints: dict[str,dict] | None = None,
     cursor_offset: int = 0,
 ) -> dict:
     runtime=config["runtime"]
@@ -282,6 +315,10 @@ def run_once(
     source_retry_attempts=int(runtime.get("source_retry_attempts",3))
     source_retry_backoff_seconds=float(runtime.get("source_retry_backoff_seconds",2))
     candidate_partition_count=max(1,int(runtime.get("candidate_partition_count",8)))
+    adaptive_yield_routing=bool(runtime.get("adaptive_yield_routing",True))
+    adaptive_yield_exploration_bonus=float(
+        runtime.get("adaptive_yield_exploration_bonus",0.15)
+    )
     plan=build_shard_plan(
         config["categories"],
         config["geographies"],
@@ -290,6 +327,9 @@ def run_once(
         cursor=cursor,
         max_attempts=max_attempts,
         country_counts=country_counts,
+        yield_hints=yield_hints,
+        adaptive_enabled=adaptive_yield_routing,
+        exploration_bonus=adaptive_yield_exploration_bonus,
     )
     if not plan:
         return {"status":"complete","counts":counts,"cursor":cursor}
@@ -430,6 +470,7 @@ def run_once(
             "discovered":shard_discovered,
             "accepted":accepted_total-shard_accepted_before,
             "priority_weight":shard.get("priority_weight",1),
+            "adaptive_yield_score":shard.get("adaptive_yield_score"),
             "sources":source_attempts,
         })
 
@@ -440,6 +481,8 @@ def run_once(
         "source_errors":source_errors,
         "source_retries":source_retries,
         "candidate_partition_count":candidate_partition_count,
+        "adaptive_yield_routing":adaptive_yield_routing,
+        "adaptive_yield_hints_used":len(yield_hints or {}),
         "registry_mode":mode,
         "registry_shadow_errors":registry_shadow_errors,
         "run_date":run_date,
@@ -606,6 +649,7 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
     final_country_counts={}
     final_status="ok"
     zero_progress_streak=0
+    yield_hints={}
 
     try:
         for cycle_index in range(max_cycles):
@@ -617,9 +661,11 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
                 store=store,
                 registry_index=registry_index,
                 enricher=enricher,
+                yield_hints=yield_hints,
                 cursor_offset=cycle_index,
             )
             cycles.append(result)
+            _update_yield_hints(yield_hints,result.get("attempts",[]) or [])
             accepted_total += int(result.get("accepted", 0) or 0)
             final_counts = result.get("counts", final_counts) or final_counts
             final_country_counts = result.get("country_counts", final_country_counts) or final_country_counts
@@ -658,5 +704,6 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
         "accepted": accepted_total,
         "counts": final_counts,
         "country_counts": final_country_counts,
+        "adaptive_yield":_yield_hint_summary(yield_hints),
         "cycles": cycles,
     }
