@@ -2,7 +2,7 @@ from __future__ import annotations
 import argparse,json,sys
 from .config import load_config
 from .engine import run_until_quota
-from .registry import R2RegistryIndex, audit_sheet_registry, backfill_sheet_registry
+from .registry import R2RegistryIndex, audit_sheet_registry, backfill_sheet_registry, live_smoke_test
 from .sheets import GoogleSheetsStore
 
 def main() -> int:
@@ -17,6 +17,7 @@ def main() -> int:
     sub.add_parser("registry-check")
     sub.add_parser("registry-audit")
     sub.add_parser("registry-migrate")
+    sub.add_parser("registry-smoke")
     args=parser.parse_args()
     config=load_config()
     if args.command=="validate":
@@ -63,6 +64,10 @@ def main() -> int:
             index.close()
         print(json.dumps(result,indent=2,default=str))
         return 0
+    if args.command=="registry-smoke":
+        result=live_smoke_test(config)
+        print(json.dumps(result,indent=2,default=str))
+        return 0 if result["status"]=="ok" else 2
     if args.command=="registry-migrate":
         store=GoogleSheetsStore(config)
         index=R2RegistryIndex(config)

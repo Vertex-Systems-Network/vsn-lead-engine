@@ -574,3 +574,60 @@ def backfill_sheet_registry(
 def audit_sheet_registry(sheets_store, registry_index: R2RegistryIndex) -> dict:
     rows = sheet_registry_payloads(sheets_store._registry_rows())
     return registry_index.audit_rows(rows)
+
+
+
+def live_smoke_test(config: dict) -> dict:
+    """Exercise the real R2 transaction path in an isolated temporary prefix."""
+    smoke_id=uuid.uuid4().hex
+    smoke_config={
+        **config,
+        "registry":{
+            **config.get("registry",{}),
+            "prefix":f"{str(config.get('registry',{}).get('prefix','vsn-lead-ledger/v1')).strip('/')}/smoke/{smoke_id}",
+        },
+    }
+    index=R2RegistryIndex(smoke_config)
+    lead=Lead(
+        country="United States",
+        category="IT & Software",
+        business_name=f"VSN Registry Smoke {smoke_id[:12]}",
+        phone="+12025550199",
+        city="Smoke City",
+        region="Smoke Region",
+        source="VSN R2 Smoke",
+        source_id=f"smoke:{smoke_id}",
+        website=f"https://{smoke_id}.invalid",
+    )
+    workbook={"id":"smoke-sheet"}
+    payload=lead_registry_payload(lead,workbook)
+    unique_token=payload["unique_token"]
+    before=index.collision_keys([lead])
+    reserved=index.reserve_pending([lead],workbook)
+    during=index.collision_keys([lead])
+    rolled_back=index.mark_retryable(reserved)
+    after=index.collision_keys([lead])
+    pending=index.pending_rows()
+    stats=index.stats()
+    index.close()
+
+    ok=(
+        before==set()
+        and reserved=={unique_token}
+        and during=={unique_token}
+        and rolled_back==1
+        and after==set()
+        and not pending
+        and int(stats.get("fingerprint_objects",0) or 0)==0
+        and int(stats.get("pending_transactions",0) or 0)==0
+    )
+    return {
+        "status":"ok" if ok else "failed",
+        "reserved":len(reserved),
+        "collision_before":len(before),
+        "collision_during":len(during),
+        "collision_after":len(after),
+        "rolled_back":rolled_back,
+        "pending_transactions":len(pending),
+        "remaining_fingerprint_objects":int(stats.get("fingerprint_objects",0) or 0),
+    }

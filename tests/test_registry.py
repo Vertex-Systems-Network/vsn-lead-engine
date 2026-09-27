@@ -300,3 +300,25 @@ def test_registry_migration_cli_contract_is_available():
     source=Path(cli_module.__file__).read_text(encoding="utf-8")
     assert 'sub.add_parser("registry-migrate")' in source
     assert '"audit-failed"' in source
+
+
+def test_live_smoke_test_reserves_detects_and_cleans(monkeypatch):
+    from vsn_lead_engine import registry as registry_module
+
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+
+    class SmokeIndex(R2RegistryIndex):
+        def __init__(self, config):
+            super().__init__(config,client=fake)
+
+    monkeypatch.setattr(registry_module,"R2RegistryIndex",SmokeIndex)
+    result=registry_module.live_smoke_test(config())
+    assert result["status"]=="ok"
+    assert result["reserved"]==1
+    assert result["collision_before"]==0
+    assert result["collision_during"]==1
+    assert result["collision_after"]==0
+    assert result["rolled_back"]==1
+    assert result["pending_transactions"]==0
+    assert result["remaining_fingerprint_objects"]==0
