@@ -490,6 +490,14 @@ class R2RegistryIndex:
 def build_registry_index(config: dict, client=None):
     if not r2_registry_enabled(config):
         return None
+
+    layout = str(
+        config.get("registry", {}).get("layout", "objects-v1")
+    ).strip().lower()
+    if layout == "packed-v2":
+        from .packed_registry import PackedR2RegistryIndex
+
+        return PackedR2RegistryIndex(config, client=client)
     return R2RegistryIndex(config, client=client)
 
 
@@ -587,7 +595,9 @@ def live_smoke_test(config: dict) -> dict:
             "prefix":f"{str(config.get('registry',{}).get('prefix','vsn-lead-ledger/v1')).strip('/')}/smoke/{smoke_id}",
         },
     }
-    index=R2RegistryIndex(smoke_config)
+    index=build_registry_index(smoke_config)
+    if index is None:
+        raise RuntimeError("Registry smoke requires an enabled R2 registry.")
     lead=Lead(
         country="United States",
         category="IT & Software",
