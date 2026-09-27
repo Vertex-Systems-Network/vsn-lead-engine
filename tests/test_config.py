@@ -6,6 +6,8 @@ from vsn_lead_engine.config import _validate_geographies, load_config
 def test_production_free_source_breadth_is_expanded():
     config=load_config()
     assert config["runtime"]["candidate_partition_count"]==16
+    assert config["runtime"]["adaptive_yield_routing"] is True
+    assert config["runtime"]["adaptive_yield_exploration_bonus"]==0.15
     assert len(config["geographies"])>=56
     cities={geo["city"] for geo in config["geographies"]}
     assert {
