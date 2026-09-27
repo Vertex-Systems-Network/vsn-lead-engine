@@ -46,7 +46,7 @@ Event behavior:
 3. if it is missing, attempt to copy the configured clean daily template into
    the same folder using that exact title;
 4. initialize/repair `Overview` plus the 12 category tabs;
-5. keep the Master Registry separate as the cross-day dedupe source.
+5. keep the legacy Master Registry as a frozen migration/audit snapshot; R2 is the permanent cross-day dedupe authority.
 
 Because the configured destination is a user-owned **My Drive** folder, Google
 service accounts may be refused permission to create/own a new file even when
@@ -129,10 +129,10 @@ P0 reliability controls:
 
 - one Asia/Karachi `run_date` is frozen at process start and reused for the
   workbook, rows and counters;
-- every real run reconciles stale Master Registry `PendingDaily` rows before
-  building dedupe state;
-- a pending Registry row becomes `Active` if its Unique Key exists in the
-  referenced daily workbook, otherwise it becomes non-blocking `Retryable`;
+- in R2 authority mode, every real run reconciles only compact R2 `pending/`
+  transaction markers before discovery;
+- written pending leads keep their permanent R2 fingerprints, while missing
+  writes roll back only the fingerprint objects owned by that reservation;
 - Google Drive/Sheets calls use bounded API retries;
 - source queries use bounded exponential retry/backoff;
 - GitHub validation and production jobs have hard execution timeouts;
@@ -159,9 +159,11 @@ this business?"
 Registry modes in `config/runtime.json`:
 
 - `sheets` — current Google Master Registry is the authority.
-- `dual` — Google Registry remains authority and accepted rows shadow into R2.
-- `r2` — R2 is the permanent cross-day dedupe authority; Google Master
-  Registry stops growing while dated daily workbooks continue normally.
+- `dual` — migration-observation mode: Google Registry remains authority and
+  accepted rows shadow into R2.
+- `r2` — **current production mode**: R2 is the permanent cross-day dedupe
+  authority; Google Master Registry is frozen while dated daily workbooks
+  continue normally.
 
 ### Exact duplicate dimensions
 
@@ -230,7 +232,7 @@ sheets
   -> registry-migrate # one-shot check + dry-run + backfill + audit + stats
   -> registry-smoke   # isolated live reserve/collision/rollback cleanup
   -> dual
-  -> r2
+  -> r2  # CURRENT PRODUCTION AUTHORITY
 ```
 
 The backfill imports only blocking Google Registry rows. `NeedsReview`,
@@ -262,7 +264,7 @@ because deleting them would allow old businesses to re-enter as duplicates.
 The Google service account needs access to:
 
 - the configured lead folder / dated workbook
-- the Master Registry
+- the legacy Master Registry only for migration/audit maintenance
 
 Google Sheets API and Google Drive API must remain enabled. The JSON key is
 stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
@@ -274,10 +276,29 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - Daily dated workbook routing: **ENABLED**
 - P0 reliability hardening: **ENABLED**
 - P1 runner performance + quota cycles: **ENABLED**
-- P2 permanent R2 dedupe ledger: **DUAL MODE; FINAL LIVE TRANSACTION SMOKE PENDING**
-- Master Registry cross-day dedupe: **CURRENT AUTHORITY DURING FINAL CUTOVER CERTIFICATION**
+- P2 permanent R2 dedupe ledger: **R2 AUTHORITY — LIVE**
+- Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
 - Taxonomy-first classification: **ENABLED**
 - Public community Overpass production use: **DISABLED**
 - Paid discovery APIs: **DISABLED**
+
+
+## Final R2 cutover certification
+
+Final production cutover evidence:
+
+- historical backfill: **12,815 blocking rows**;
+- exact permanent fingerprints: **47,849 / 47,849 present**;
+- historical collisions during idempotent re-import: **0**;
+- missing historical fingerprints: **0**;
+- pending historical transactions: **0**;
+- isolated live transaction smoke: reserve **1**, collision-during **1**,
+  rollback **1**, collision-after **0**;
+- smoke cleanup: pending transactions **0**, leftover smoke fingerprints **0**.
+
+After this certification, `registry.mode = r2`. New accepted leads no longer
+append to the legacy Google Master Registry. Full lead records continue to be
+written only to their dated Google workbooks; R2 keeps permanent hashed
+cross-day dedupe fingerprints.
