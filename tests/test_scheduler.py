@@ -207,9 +207,10 @@ def test_same_day_zero_yield_route_is_deferred_when_alternative_exists():
     }
     daily={
         "a|united states|r1|us1":{
-            "visits":2,
+            "visits":4,
             "discovered":120,
             "accepted":0,
+            "partition_mask":15,
         },
     }
 
@@ -273,14 +274,16 @@ def test_historical_zero_yield_alone_never_triggers_cooldown():
 def test_all_same_day_routes_cooling_falls_back_without_starvation():
     daily={
         "a|united states|r1|us1":{
-            "visits":2,
+            "visits":4,
             "discovered":150,
             "accepted":0,
+            "partition_mask":15,
         },
         "a|united states|r2|us2":{
-            "visits":3,
+            "visits":4,
             "discovered":200,
             "accepted":0,
+            "partition_mask":15,
         },
     }
     plan=build_shard_plan(
@@ -374,3 +377,61 @@ def test_fair_weighting_keeps_lowest_progress_first_when_slots_are_tight():
         max_attempts=2,
     )
     assert [item["category"] for item in plan]==["B","C"]
+
+
+def test_zero_yield_route_is_not_cooled_before_partition_floor():
+    daily={
+        "a|united states|r1|us1":{
+            "visits":4,
+            "discovered":300,
+            "accepted":0,
+            "partition_mask":3,
+        },
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=2,
+        country_counts={"United States":0,"Canada":1000},
+        yield_hints=daily,
+        daily_yield_hints=daily,
+        adaptive_enabled=True,
+        cooldown_enabled=True,
+        cooldown_min_visits=2,
+        cooldown_min_discovered=100,
+        cooldown_min_partitions=4,
+    )
+    assert plan[0]["geography"]["city"]=="US2"
+    assert all(item["adaptive_cooldown_deferred_count"]==0 for item in plan)
+
+
+def test_zero_yield_route_cools_after_four_distinct_partitions():
+    daily={
+        "a|united states|r1|us1":{
+            "visits":4,
+            "discovered":300,
+            "accepted":0,
+            "partition_mask":15,
+        },
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=2,
+        country_counts={"United States":0,"Canada":1000},
+        yield_hints=daily,
+        daily_yield_hints=daily,
+        adaptive_enabled=True,
+        cooldown_enabled=True,
+        cooldown_min_visits=2,
+        cooldown_min_discovered=100,
+        cooldown_min_partitions=4,
+    )
+    assert plan[0]["geography"]["city"]=="US2"
+    assert all(item["adaptive_cooldown_deferred_count"]==1 for item in plan)
