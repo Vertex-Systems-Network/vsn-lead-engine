@@ -207,6 +207,9 @@ def test_run_health_event_builds_shortfalls_and_schedule():
                 "entries":24,
                 "hits":37,
                 "misses":11,
+                "legacy_entries":73,
+                "legacy_hits":91,
+                "legacy_misses":29,
             },
         },
         origin="native-schedule",
@@ -226,6 +229,9 @@ def test_run_health_event_builds_shortfalls_and_schedule():
     assert event["registry_cache_entries"]==24
     assert event["registry_cache_hits"]==37
     assert event["registry_cache_misses"]==11
+    assert event["registry_legacy_cache_entries"]==73
+    assert event["registry_legacy_cache_hits"]==91
+    assert event["registry_legacy_cache_misses"]==29
 
 
 def test_readiness_health_event_keeps_failure_reason_not_workbook_identity():
