@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import os
 from collections import defaultdict
 from datetime import UTC, datetime
@@ -32,11 +33,78 @@ def _category_weight(count: int, target: int) -> int:
     return 1
 
 
+def yield_hint_key(category: str, geography: dict) -> str:
+    return "|".join(
+        [
+            str(category).strip(),
+            str(geography.get("country","")).strip(),
+            str(geography.get("region","")).strip(),
+            str(geography.get("city","")).strip(),
+        ]
+    ).lower()
+
+
+def _adaptive_yield_score(
+    hint: dict | None,
+    *,
+    exploration_bonus: float,
+) -> float:
+    """Smoothed score that rewards yield while preserving exploration."""
+    bonus=max(0.0,min(1.0,float(exploration_bonus)))
+    if not hint:
+        return bonus
+
+    visits=max(0,int(hint.get("visits",0) or 0))
+    discovered=max(0,int(hint.get("discovered",0) or 0))
+    accepted=max(0,int(hint.get("accepted",0) or 0))
+    if visits <= 0:
+        return bonus
+
+    empirical=(accepted / discovered) if discovered else 0.0
+    exploration=bonus / math.sqrt(visits + 1)
+    return empirical + exploration
+
+
+def _adaptive_country_geographies(
+    balanced_geographies: list[dict],
+    *,
+    category: str,
+    yield_hints: dict[str, dict] | None,
+    exploration_bonus: float,
+) -> dict[str,list[dict]]:
+    """Rank metros inside each country without changing country interleave."""
+    groups: dict[str,list[tuple[int,dict]]] = defaultdict(list)
+    for rank, geography in enumerate(balanced_geographies):
+        country=str(geography.get("country","")).strip()
+        groups[country].append((rank,geography))
+
+    result={}
+    for country, items in groups.items():
+        if not yield_hints:
+            result[country]=[geo for _rank,geo in items]
+            continue
+        ranked=sorted(
+            items,
+            key=lambda item: (
+                -_adaptive_yield_score(
+                    yield_hints.get(yield_hint_key(category,item[1])),
+                    exploration_bonus=exploration_bonus,
+                ),
+                item[0],
+            ),
+        )
+        result[country]=[geo for _rank,geo in ranked]
+    return result
+
+
 def _balanced_geographies(
     geographies: list[dict],
     *,
     cursor: int,
     country_counts: dict[str, int] | None = None,
+    yield_hints: dict[str, dict] | None = None,
+    adaptive_enabled: bool = True,
+    exploration_bonus: float = 0.15,
 ) -> list[dict]:
     """Interleave countries and put the underrepresented country first."""
     groups: dict[str, list[dict]] = defaultdict(list)
@@ -108,7 +176,9 @@ def build_shard_plan(
     - >=50% complete categories receive normal weight;
     - countries are interleaved, with the country having fewer usable leads
       scheduled first;
-    - cursor rotation prevents repeatedly hitting the same metro.
+    - cursor rotation prevents repeatedly hitting the same metro;
+    - optional in-memory yield hints reorder metros inside each country/category
+      while leaving the country sequence unchanged.
     """
     category_list = list(categories)
     geography_list = list(geographies)
@@ -143,10 +213,36 @@ def build_shard_plan(
     if not balanced_geographies:
         return []
 
+    adaptive_groups={}
+    if adaptive_enabled:
+        for category in pending:
+            adaptive_groups[category]=_adaptive_country_geographies(
+                balanced_geographies,
+                category=category,
+                yield_hints=yield_hints,
+                exploration_bonus=exploration_bonus,
+            )
+
+    positions=defaultdict(int)
     plan: list[dict] = []
     for attempt in range(max_attempts):
         category = weighted_categories[attempt % len(weighted_categories)]
-        geography = balanced_geographies[attempt % len(balanced_geographies)]
+        base_geography = balanced_geographies[attempt % len(balanced_geographies)]
+        country=str(base_geography.get("country","")).strip()
+        geography=base_geography
+        adaptive_score=None
+
+        if adaptive_enabled:
+            candidates=adaptive_groups.get(category,{}).get(country,[])
+            if candidates:
+                position=positions[(category,country)] % len(candidates)
+                geography=candidates[position]
+                positions[(category,country)] += 1
+                adaptive_score=_adaptive_yield_score(
+                    (yield_hints or {}).get(yield_hint_key(category,geography)),
+                    exploration_bonus=exploration_bonus,
+                )
+
         plan.append(
             {
                 "attempt": attempt + 1,
@@ -154,6 +250,10 @@ def build_shard_plan(
                 "geography": geography,
                 "priority_weight": _category_weight(
                     int(counts.get(category, 0)), target
+                ),
+                "adaptive_yield_score":(
+                    round(float(adaptive_score),6)
+                    if adaptive_score is not None else None
                 ),
             }
         )
