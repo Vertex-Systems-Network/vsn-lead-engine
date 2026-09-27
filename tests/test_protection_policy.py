@@ -1,5 +1,10 @@
+import copy
+import sys
 import json
 from pathlib import Path
+
+sys.path.insert(0,str(Path("scripts").resolve()))
+import github_ruleset_common as ruleset_common
 
 
 def policy():
@@ -65,3 +70,36 @@ def test_recovery_trigger_remains_pr_compatible():
     workflow=Path(".github/workflows/lead-engine.yml").read_text(encoding="utf-8")
     assert 'paths:\n      - ".github/lead-run-trigger"' in workflow
     assert "github.event_name == 'push'" in workflow
+
+
+def test_ruleset_comparator_ignores_github_server_added_pull_request_defaults():
+    expected=policy()
+    actual=copy.deepcopy(expected)
+    pull=next(
+        item for item in actual["rules"]
+        if item["type"]=="pull_request"
+    )["parameters"]
+    pull.update({
+        "required_reviewers":[],
+        "dismissal_restriction":{
+            "enabled":False,
+            "allowed_actors":[],
+        },
+        "require_extra_approval_for_unattributed_changes":True,
+    })
+
+    assert ruleset_common.policy_diff(expected,actual)=={}
+
+
+def test_ruleset_comparator_still_detects_real_required_check_drift():
+    expected=policy()
+    actual=copy.deepcopy(expected)
+    checks=next(
+        item for item in actual["rules"]
+        if item["type"]=="required_status_checks"
+    )["parameters"]
+    checks["required_status_checks"]=[{"context":"wrong-check"}]
+
+    drift=ruleset_common.policy_diff(expected,actual)
+    assert "rules" in drift
+    assert drift["rules"]["expected"] != drift["rules"]["actual"]
