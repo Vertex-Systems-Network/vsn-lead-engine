@@ -57,18 +57,24 @@ This specifically prevents errors such as `retirement_home` matching the
 Cars keyword `tire`, or a dermatology business entering Salon only because
 its name contains `Beauty`.
 
-## Anti-stall shard scheduler
+## Country-balanced priority scheduler
 
 Discovery does not derive geography from accepted lead count.
 
 Every workflow run gets an independent cursor (GitHub run number in Actions).
-The cursor rotates:
+The scheduler now combines three controls:
 
-1. tied pending categories;
-2. metro geographies;
-3. up to 12 category/geography shard attempts per run.
+1. **Country balancing:** US and Canada metros are interleaved. The country with
+   fewer usable leads today is scheduled first, so Canada cannot remain stuck
+   behind a long US-only geography list.
+2. **Progress weighting:** categories below 25% of target receive 3× shard
+   weight, categories from 25-50% receive 2×, and categories above 50% receive
+   normal weight.
+3. **Rotation:** metro order changes with the run cursor so an empty shard does
+   not repeat forever.
 
-A zero-result query therefore cannot pin future runs to the same shard.
+A run can try up to 18 category/geography shards, while the accepted-write
+ceiling remains 1,000 leads/run.
 
 ## Permanent workbook model
 
@@ -81,7 +87,8 @@ Lead data is written into one user-owned permanent Google Sheet:
 - daily counts use the current `Asia/Karachi` date
 - the service account does not create daily spreadsheet files
 
-Overview also tracks shard attempts, zero-result shards and source errors.
+Overview tracks shard attempts, zero-result shards, source errors, and live
+United States / Canada usable-lead totals.
 
 ## Pipeline
 
@@ -130,7 +137,7 @@ python -m vsn_lead_engine.cli run --dry-run
 - Google integration: **VERIFIED**
 - Permanent workbook: **CONFIGURED**
 - Overture Places source: **ENABLED**
-- Independent shard rotation: **ENABLED**
+- Country-balanced priority scheduling: **ENABLED**
 - Taxonomy-first classification: **ENABLED**
 - Public community Overpass production use: **DISABLED**
 - Paid discovery APIs: **DISABLED**

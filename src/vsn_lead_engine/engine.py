@@ -27,14 +27,22 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
     if not sources:
         return {"status":"no-sources","message":"No compliant free discovery source is enabled."}
 
+    countries=list(dict.fromkeys(
+        str(geo.get("country","")).strip()
+        for geo in config["geographies"]
+        if str(geo.get("country","")).strip()
+    ))
+
     if dry_run:
         counts={c:0 for c in config["categories"]}
+        country_counts={country:0 for country in countries}
         existing=_empty_fingerprints()
         workbook=None
     else:
         store=GoogleSheetsStore(config)
         workbook=store.ensure_lead_workbook()
         counts=store.category_counts(workbook["id"])
+        country_counts=store.daily_country_counts(workbook["id"])
         existing=store.registry_fingerprints()
 
     target=int(runtime["daily_target_per_category"])
@@ -49,12 +57,14 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
         target,
         cursor=cursor,
         max_attempts=max_attempts,
+        country_counts=country_counts,
     )
     if not plan:
         return {"status":"complete","counts":counts,"cursor":cursor}
 
     local={k:set(v) for k,v in existing.items()}
     accepted_by_category=defaultdict(list)
+    accepted_by_country=defaultdict(int)
     rejections=defaultdict(int)
     attempts=[]
     total_discovered=0
@@ -112,6 +122,7 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
                     continue
 
                 accepted_by_category[category].append(lead)
+                accepted_by_country[lead.country]+=1
                 accepted_total+=1
                 accepted_from_source+=1
 
@@ -151,6 +162,7 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
             },
             "discovered":shard_discovered,
             "accepted":accepted_total-shard_accepted_before,
+            "priority_weight":shard.get("priority_weight",1),
             "sources":source_attempts,
         })
 
@@ -162,6 +174,8 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
         "discovered":total_discovered,
         "accepted":accepted_total,
         "accepted_by_category":{k:len(v) for k,v in accepted_by_category.items()},
+        "accepted_by_country":dict(accepted_by_country),
+        "country_counts_before":country_counts,
         "rejections":dict(rejections),
         "attempts":attempts,
     }
@@ -174,6 +188,14 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
             store.commit_leads(workbook,leads)
 
     counts=store.category_counts(workbook["id"])
+    country_counts_after=store.daily_country_counts(workbook["id"])
+    store.set_overview_metrics(
+        workbook["id"],
+        {
+            "United States Leads Today":country_counts_after.get("United States",0),
+            "Canada Leads Today":country_counts_after.get("Canada",0),
+        }
+    )
     store.update_overview(
         workbook["id"],
         counts,
@@ -186,4 +208,10 @@ def run_once(config: dict,dry_run: bool=False) -> dict:
             "Source Errors":source_errors,
         }
     )
-    return {"status":"ok",**result,"lead_workbook":workbook,"counts":counts}
+    return {
+        "status":"ok",
+        **result,
+        "lead_workbook":workbook,
+        "counts":counts,
+        "country_counts":country_counts_after,
+    }

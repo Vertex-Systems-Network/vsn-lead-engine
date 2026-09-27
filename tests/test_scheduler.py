@@ -1,11 +1,14 @@
+from collections import Counter
+
 from vsn_lead_engine.scheduler import build_shard_plan
 
 
 CATEGORIES=["A","B","C"]
 GEOS=[
-    {"country":"United States","region":"R1","city":"C1","bbox":[0,0,1,1]},
-    {"country":"United States","region":"R2","city":"C2","bbox":[1,1,2,2]},
-    {"country":"Canada","region":"R3","city":"C3","bbox":[2,2,3,3]},
+    {"country":"United States","region":"R1","city":"US1","bbox":[0,0,1,1]},
+    {"country":"United States","region":"R2","city":"US2","bbox":[1,1,2,2]},
+    {"country":"Canada","region":"R3","city":"CA1","bbox":[2,2,3,3]},
+    {"country":"Canada","region":"R4","city":"CA2","bbox":[3,3,4,4]},
 ]
 
 
@@ -48,3 +51,45 @@ def test_lower_progress_category_is_prioritized():
         max_attempts=3,
     )
     assert plan[0]["category"] == "B"
+
+
+def test_underrepresented_country_is_scheduled_first_and_interleaved():
+    plan=build_shard_plan(
+        CATEGORIES,
+        GEOS,
+        {"A":10,"B":20,"C":30},
+        1000,
+        cursor=7,
+        max_attempts=4,
+        country_counts={"United States":2876,"Canada":0},
+    )
+    countries=[item["geography"]["country"] for item in plan]
+    assert countries[0]=="Canada"
+    assert countries[:4]==["Canada","United States","Canada","United States"]
+
+
+def test_low_completion_categories_receive_more_shard_slots():
+    plan=build_shard_plan(
+        CATEGORIES,
+        GEOS,
+        {"A":10,"B":300,"C":800},
+        1000,
+        cursor=2,
+        max_attempts=6,
+        country_counts={"United States":10,"Canada":10},
+    )
+    counts=Counter(item["category"] for item in plan)
+    assert counts["A"] >= counts["B"] >= counts["C"]
+    assert counts["A"] >= 3
+
+
+def test_priority_weight_is_exposed_for_audit():
+    plan=build_shard_plan(
+        CATEGORIES,
+        GEOS,
+        {"A":10,"B":300,"C":800},
+        1000,
+        cursor=1,
+        max_attempts=3,
+    )
+    assert plan[0]["priority_weight"]==3
