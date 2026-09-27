@@ -97,6 +97,13 @@ def load_config() -> dict:
     candidate_partition_count=int(config["runtime"].get("candidate_partition_count",8))
     if candidate_partition_count < 1 or candidate_partition_count > 64:
         raise ValueError("candidate_partition_count must be between 1 and 64.")
+    adaptive_bonus=float(
+        config["runtime"].get("adaptive_yield_exploration_bonus",0.15)
+    )
+    if adaptive_bonus < 0 or adaptive_bonus > 1:
+        raise ValueError(
+            "adaptive_yield_exploration_bonus must be between 0 and 1."
+        )
 
     enrichment=config.get("enrichment",{})
     if enrichment.get("enabled",False):

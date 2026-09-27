@@ -93,3 +93,100 @@ def test_priority_weight_is_exposed_for_audit():
         max_attempts=3,
     )
     assert plan[0]["priority_weight"]==3
+
+
+def test_adaptive_yield_prefers_good_metro_within_country_only():
+    hints={
+        "a|united states|r1|us1":{
+            "visits":1,
+            "discovered":100,
+            "accepted":0,
+        },
+        "a|united states|r2|us2":{
+            "visits":1,
+            "discovered":100,
+            "accepted":40,
+        },
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=4,
+        country_counts={"United States":0,"Canada":0},
+        yield_hints=hints,
+        adaptive_enabled=True,
+        exploration_bonus=0.15,
+    )
+
+    countries=[item["geography"]["country"] for item in plan]
+    assert countries==["United States","Canada","United States","Canada"]
+    us_cities=[
+        item["geography"]["city"]
+        for item in plan
+        if item["geography"]["country"]=="United States"
+    ]
+    assert us_cities==["US2","US1"]
+    assert plan[0]["adaptive_yield_score"] > 0.15
+
+
+def test_adaptive_yield_explores_unseen_before_known_zero_yield_metro():
+    hints={
+        "a|united states|r1|us1":{
+            "visits":1,
+            "discovered":100,
+            "accepted":0,
+        },
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=2,
+        country_counts={"United States":0,"Canada":1000},
+        yield_hints=hints,
+        adaptive_enabled=True,
+        exploration_bonus=0.15,
+    )
+
+    assert plan[0]["geography"]["country"]=="United States"
+    assert plan[0]["geography"]["city"]=="US2"
+    assert plan[0]["adaptive_yield_score"]==0.15
+
+
+def test_adaptive_disabled_preserves_rotated_base_order():
+    hints={
+        "a|united states|r2|us2":{
+            "visits":1,
+            "discovered":100,
+            "accepted":100,
+        },
+    }
+    adaptive=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=1,
+        yield_hints=hints,
+        adaptive_enabled=True,
+    )
+    baseline=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=1,
+        yield_hints=hints,
+        adaptive_enabled=False,
+    )
+
+    assert adaptive[0]["geography"]["city"]=="US2"
+    assert baseline[0]["geography"]["city"]=="US1"
+    assert baseline[0]["adaptive_yield_score"] is None
