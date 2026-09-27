@@ -102,9 +102,6 @@ def _balanced_geographies(
     *,
     cursor: int,
     country_counts: dict[str, int] | None = None,
-    yield_hints: dict[str, dict] | None = None,
-    adaptive_enabled: bool = True,
-    exploration_bonus: float = 0.15,
 ) -> list[dict]:
     """Interleave countries and put the underrepresented country first."""
     groups: dict[str, list[dict]] = defaultdict(list)
@@ -166,6 +163,9 @@ def build_shard_plan(
     cursor: int,
     max_attempts: int,
     country_counts: dict[str, int] | None = None,
+    yield_hints: dict[str, dict] | None = None,
+    adaptive_enabled: bool = True,
+    exploration_bonus: float = 0.15,
 ) -> list[dict]:
     """Build a progress-weighted, country-balanced rotating shard plan.
 
