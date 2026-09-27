@@ -22,7 +22,11 @@
     "adaptive_yield_persist_daily": true,
     "adaptive_yield_state_max_entries": 1500,
     "health_ledger_enabled": true,
-    "health_ledger_max_events": 96
+    "health_ledger_max_events": 96,
+    "adaptive_yield_history_enabled": true,
+    "adaptive_yield_history_weight": 0.25,
+    "adaptive_yield_history_decay": 0.75,
+    "adaptive_yield_history_max_entries": 1500
   },
   "drive": {
     "folder_id": "1CPnHX5lXNb_wqcwk2O4bfACL4qNZ5IEh",
