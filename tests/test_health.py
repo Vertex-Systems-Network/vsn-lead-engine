@@ -202,6 +202,12 @@ def test_run_health_event_builds_shortfalls_and_schedule():
                 "saved":False,
             },
             "adaptive_cooldown_routes_deferred":3,
+            "registry_read_cache":{
+                "enabled":True,
+                "entries":24,
+                "hits":37,
+                "misses":11,
+            },
         },
         origin="native-schedule",
         timestamp="2026-09-28T08:17:00+05:00",
@@ -216,6 +222,10 @@ def test_run_health_event_builds_shortfalls_and_schedule():
     assert event["adaptive_history_loaded"] is True
     assert event["adaptive_history_saved"] is False
     assert event["adaptive_cooldown_routes_deferred"]==3
+    assert event["registry_cache_enabled"] is True
+    assert event["registry_cache_entries"]==24
+    assert event["registry_cache_hits"]==37
+    assert event["registry_cache_misses"]==11
 
 
 def test_readiness_health_event_keeps_failure_reason_not_workbook_identity():

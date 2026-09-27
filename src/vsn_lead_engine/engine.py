@@ -651,6 +651,14 @@ def run_once(
             "sources":source_attempts,
         })
 
+    registry_read_cache={}
+    cache_stats=getattr(registry_index,"cache_stats",None)
+    if callable(cache_stats):
+        try:
+            registry_read_cache=dict(cache_stats())
+        except Exception:
+            registry_read_cache={}
+
     result={
         "cursor":cursor,
         "shard_attempts":len(attempts),
@@ -677,6 +685,7 @@ def run_once(
         ),
         "registry_mode":mode,
         "registry_shadow_errors":registry_shadow_errors,
+        "registry_read_cache":registry_read_cache,
         "run_date":run_date,
         "discovered":total_discovered,
         "accepted":accepted_total,
@@ -1095,6 +1104,10 @@ def run_until_quota(
             "adaptive_yield":_yield_hint_summary(yield_hints),
             "adaptive_yield_state":yield_state_telemetry,
             "adaptive_yield_history":history_telemetry,
+            "registry_read_cache":(
+                dict(cycles[-1].get("registry_read_cache",{}) or {})
+                if cycles else {}
+            ),
             "cycles":cycles,
         }
         if schedule:
