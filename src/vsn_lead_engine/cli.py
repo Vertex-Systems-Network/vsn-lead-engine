@@ -6,6 +6,7 @@ from .config import load_config
 from .engine import check_workbook_readiness, recover_workbook_readiness, run_until_quota
 from .health import (
     DailyHealthLedgerStore,
+    health_event_id,
     incident_health_event,
     readiness_health_event,
 )
@@ -104,6 +105,10 @@ def main() -> int:
     sub.add_parser("registry-smoke")
     health_parser=sub.add_parser("health-show")
     health_parser.add_argument("--date",default=None)
+    incident_parser=sub.add_parser("health-incident")
+    incident_parser.add_argument("--origin",required=True)
+    incident_parser.add_argument("--error-type",required=True)
+    incident_parser.add_argument("--message",required=True)
     args=parser.parse_args()
     config=load_config()
     if args.command=="validate":
@@ -192,6 +197,24 @@ def main() -> int:
         }
         print(json.dumps(result,indent=2,default=str))
         return 0 if result["status"]=="ok" else 2
+    if args.command=="health-incident":
+        run_date=_run_date(config)
+        result=_health_append(
+            config,
+            run_date,
+            {
+                "event_id":health_event_id("incident",args.origin),
+                "timestamp":datetime.now(ZoneInfo(config["runtime"]["timezone"])).isoformat(),
+                "kind":"incident",
+                "origin":args.origin,
+                "status":"failed",
+                "error_type":args.error_type,
+                "message":args.message,
+                "quota_complete":False,
+            },
+        )
+        print(json.dumps(result,indent=2,default=str))
+        return 0 if result.get("recorded") else 2
     if args.command=="health-show":
         run_date=args.date or _run_date(config)
         index=_registry_index(config)
