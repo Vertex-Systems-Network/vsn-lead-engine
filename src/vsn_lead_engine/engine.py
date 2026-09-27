@@ -47,6 +47,67 @@ def _close_sources(sources) -> None:
             close()
 
 
+def _lead_pre_enrichment_quality(lead) -> tuple[int,int,int]:
+    phone=bool(normalize_phone(lead.phone,lead.country))
+    website=bool(str(lead.website or "").strip())
+    contact_fields=[
+        lead.email,
+        lead.instagram,
+        lead.facebook,
+        lead.linkedin,
+        lead.twitter,
+        lead.tiktok,
+        lead.contact_person,
+        lead.source_url,
+        lead.street_address,
+    ]
+    richness=sum(1 for value in contact_fields if str(value or "").strip())
+    return int(phone),int(website),richness
+
+
+def _dedupe_source_batch(candidates: list) -> tuple[list,int]:
+    """Collapse exact same-response duplicates before any network enrichment."""
+    if len(candidates) < 2:
+        return list(candidates),0
+
+    ranked=sorted(
+        enumerate(candidates),
+        key=lambda item: (
+            *_lead_pre_enrichment_quality(item[1]),
+            -item[0],
+        ),
+        reverse=True,
+    )
+    seen=_empty_fingerprints()
+    kept_indices=set()
+    duplicate_count=0
+
+    for index,lead in ranked:
+        fp=fingerprints(lead)
+        if is_duplicate(fp,seen):
+            duplicate_count+=1
+            continue
+        kept_indices.add(index)
+        if fp.place_id:
+            seen["place_id"].add(fp.place_id)
+        if fp.source_id:
+            seen["source_id"].add(fp.source_id)
+        if fp.domain:
+            seen["domain"].add(fp.domain)
+        if fp.phone_name:
+            seen["phone_name"].add(fp.phone_name)
+        if fp.business_location:
+            seen["business_location"].add(fp.business_location)
+        if fp.unique:
+            seen["unique"].add(fp.unique)
+
+    return [
+        lead
+        for index,lead in enumerate(candidates)
+        if index in kept_indices
+    ],duplicate_count
+
+
 def _candidate_partition_geography(
     geography: dict,
     *,
@@ -464,6 +525,13 @@ def run_once(
                     continue
                 enrichment_candidates.append(lead)
 
+            enrichment_candidates,source_batch_duplicates=_dedupe_source_batch(
+                enrichment_candidates
+            )
+            if source_batch_duplicates:
+                rejections["duplicate"]+=source_batch_duplicates
+                rejections["source_batch_duplicate"]+=source_batch_duplicates
+
             remote_prefilter_candidates=0
             remote_prefilter_duplicates=0
             if (
@@ -548,6 +616,7 @@ def run_once(
                 "accepted":accepted_from_source,
                 "candidate_partition":search_geography["_candidate_partition"],
                 "candidate_partition_count":search_geography["_candidate_partition_count"],
+                "source_batch_duplicates":source_batch_duplicates,
                 "remote_prefilter_candidates":remote_prefilter_candidates,
                 "remote_prefilter_duplicates":remote_prefilter_duplicates,
                 "error":source_error,
@@ -607,6 +676,9 @@ def run_once(
         "accepted_by_country":dict(accepted_by_country),
         "country_counts_before":country_counts,
         "rejections":dict(rejections),
+        "source_batch_duplicates":int(
+            rejections.get("source_batch_duplicate",0) or 0
+        ),
         "remote_prefilter_duplicates":int(
             rejections.get("remote_prefilter_duplicate",0) or 0
         ),
@@ -991,6 +1063,10 @@ def run_until_quota(
                     for item in cycles
                 ]
                 or [0]
+            ),
+            "source_batch_duplicates":sum(
+                int(item.get("source_batch_duplicates",0) or 0)
+                for item in cycles
             ),
             "remote_prefilter_duplicates":sum(
                 int(item.get("remote_prefilter_duplicates",0) or 0)
