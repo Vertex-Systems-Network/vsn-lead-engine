@@ -283,10 +283,10 @@ python scripts/verify_main_protection.py
 ```
 
 `.github/workflows/main-protection-controller.yml` self-heals and verifies the
-live ruleset when repository secret `GH_ADMIN_TOKEN` is available. The token
-must have repository **Administration: write** permission. Without that secret,
-the workflow fails explicitly and live `main` remains unprotected rather than
-claiming protection is active.
+live ruleset using repository secret `GH_ADMIN_TOKEN`, which has repository
+**Administration: write** permission. Live repository ruleset
+`VSN Main Protection` is now active on `main`; the controller continues to
+run on policy/controller changes and the daily drift schedule.
 
 ### P13 rolling historical yield prior
 
@@ -797,7 +797,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P9 daily adaptive state: **ONE COMPACT R2 OBJECT/DAY ACTIVE**
 - P10 schedule/catch-up: **08:00–23:00 PKT NATIVE + OFFSET SUPERVISOR ACTIVE**
 - P11 daily health ledger: **READINESS + RUN + INCIDENT AUDIT ACTIVE**
-- P12 protected-main governance: **POLICY + CONTROLLER ACTIVE; LIVE ENFORCEMENT BLOCKED — GH_ADMIN_TOKEN MISSING**
+- P12 protected-main governance: **LIVE RULESET ACTIVE — PR + STRICT VALIDATE + SQUASH-ONLY**
 - P13 rolling historical yield prior: **CROSS-DAY COLD-START ROUTING ACTIVE**
 - P14 zero-yield cooldown: **SAME-DAY EXHAUSTION DEFERRAL ACTIVE**
 - P15 fair category weighting: **LAYERED 3×/2×/1× COVERAGE ACTIVE**
