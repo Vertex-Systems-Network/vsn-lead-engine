@@ -462,6 +462,29 @@ Guardrails:
 Overview and P11 health telemetry expose `Source-Batch Duplicates` separately
 while those rows still count toward total duplicate rejections.
 
+### P19 packed-v2 advisory read cache
+
+Repeated P17/final collision checks now reuse packed-v2 shard reads inside the
+same registry-index lifetime.
+
+Production settings:
+
+- advisory packed-read cache: **enabled**;
+- max cached pack objects: **128**.
+
+Correctness boundaries are explicit:
+
+- `collision_keys()` may reuse cached packed reads;
+- `reserve_pending()` always uses fresh packed reads under the registry lock;
+- pack merge/write paths use fresh reads before writing;
+- audit paths remain fresh by default;
+- own pack writes refresh the cache immediately;
+- smoke namespace cleanup explicitly clears the advisory cache before verifying
+  post-cleanup collisions.
+
+This lowers repeated packed-object GETs during the hourly event without allowing
+stale advisory state to become commit-time dedupe authority.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -766,6 +789,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P16 enrichment fairness: **160/EVENT + 12/CALL + COMMON CRAWL 1/CALL ACTIVE**
 - P17 pre-enrichment dedupe: **READ-ONLY R2 NETWORK-SAVING PREFILTER ACTIVE**
 - P18 source-batch dedupe: **LOCAL BEST-REPRESENTATIVE COLLAPSE ACTIVE**
+- P19 packed registry cache: **ADVISORY READ CACHE ACTIVE; RESERVATIONS FRESH**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
