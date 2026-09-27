@@ -10,6 +10,10 @@ def test_production_free_source_breadth_is_expanded():
     assert config["runtime"]["adaptive_yield_exploration_bonus"]==0.15
     assert config["runtime"]["adaptive_yield_persist_daily"] is True
     assert config["runtime"]["adaptive_yield_state_max_entries"]==1500
+    assert config["runtime"]["adaptive_yield_history_enabled"] is True
+    assert config["runtime"]["adaptive_yield_history_weight"]==0.25
+    assert config["runtime"]["adaptive_yield_history_decay"]==0.75
+    assert config["runtime"]["adaptive_yield_history_max_entries"]==1500
     assert config["runtime"]["health_ledger_enabled"] is True
     assert config["runtime"]["health_ledger_max_events"]==96
     assert config["runtime"]["start_hour"]==8
