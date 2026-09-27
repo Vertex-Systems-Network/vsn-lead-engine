@@ -17,7 +17,7 @@ without collecting or writing leads.
 - 1,000 accepted unique phone-qualified leads/category/day
 - 12,000/day target
 - Registry-first writes
-- Cross-day dedupe through the Master Registry
+- Cross-day dedupe through a pluggable Registry backend
 - FREE discovery mode: no paid Places/search API
 
 The 12,000/day figure is a target, not a guarantee; output depends on source
@@ -111,7 +111,7 @@ GitHub event / schedule
  -> country/category priority scheduler
  -> taxonomy-first classification
  -> normalize phone
- -> Master Registry dedupe
+ -> Registry dedupe (Sheets now; Supabase-ready)
  -> Registry PendingDaily
  -> dated workbook append
  -> Registry Active
@@ -149,6 +149,53 @@ P1 performance controls:
 - the same source objects, Google clients and frozen run date are reused across
   cycles while live Sheet/Registry state is re-read for safety.
 
+## P2 scalable Registry foundation
+
+Registry backend selection is explicit in `config/runtime.json`:
+
+- `sheets` — current production authority; no Supabase secrets required.
+- `dual` — Google Sheet Registry remains authoritative while accepted rows
+  shadow into Supabase. Shadow failure is observable but does not stop lead
+  delivery.
+- `supabase` — scalable Supabase/Postgres Registry becomes the dedupe and
+  reservation authority; dated Google Sheets remain the user-facing daily
+  output.
+
+The database path preserves the existing Registry-first transaction:
+
+1. batch collision check across source ID, place ID, domain, phone+name,
+   business+location and unique key;
+2. reserve new rows as `PendingDaily`;
+3. append only reserved leads to the dated Google workbook;
+4. promote successful writes to `Active`;
+5. convert stale missing writes to non-blocking `Retryable`.
+
+The SQL blueprint is `db/supabase_registry_schema.sql`. It enables RLS,
+revokes table/function access from `anon` and `authenticated`, uses
+`SECURITY INVOKER` RPC functions, and grants only `service_role` the server
+operations required by the GitHub runner. Unique indexes apply only to
+`Active` and `PendingDaily` rows, so quarantined/retryable records do not
+poison future dedupe.
+
+A zero-downtime cutover is:
+
+```
+sheets
+  -> create dedicated Supabase project/schema
+  -> registry-backfill --dry-run
+  -> registry-backfill
+  -> dual
+  -> compare counts/collisions
+  -> supabase
+```
+
+Server-only GitHub secrets required for `dual` or `supabase`:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+The service-role key must never be exposed in a browser or public client.
+
 ## Production credential
 
 The Google service account needs access to:
@@ -166,6 +213,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - Daily dated workbook routing: **ENABLED**
 - P0 reliability hardening: **ENABLED**
 - P1 runner performance + quota cycles: **ENABLED**
+- P2 scalable Registry foundation: **READY; live DB cutover pending dedicated project**
 - Master Registry cross-day dedupe: **ENABLED**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

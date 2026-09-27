@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 from .dedupe import fingerprints,is_duplicate
 from .normalize import normalize_phone
 from .scheduler import build_shard_plan, run_cursor
+from .registry import build_registry_index, registry_mode
 from .sheets import GoogleSheetsStore
 from .sources import build_sources
 
@@ -49,6 +50,7 @@ def run_once(
     run_date: str | None = None,
     sources=None,
     store: GoogleSheetsStore | None = None,
+    registry_index=None,
     cursor_offset: int = 0,
 ) -> dict:
     runtime=config["runtime"]
@@ -66,18 +68,34 @@ def run_once(
         if str(geo.get("country","")).strip()
     ))
 
+    mode=registry_mode(config)
+    registry_shadow_errors=0
     if dry_run:
         counts={c:0 for c in config["categories"]}
         country_counts={country:0 for country in countries}
         existing=_empty_fingerprints()
         workbook=None
+        recovery={}
     else:
         store=store or GoogleSheetsStore(config, run_date=run_date)
+        registry_index=registry_index or build_registry_index(config)
         workbook=store.ensure_lead_workbook()
-        recovery=store.reconcile_pending_registry()
+        if mode=="supabase":
+            if registry_index is None:
+                raise RuntimeError("Supabase Registry mode requires a configured Registry index.")
+            recovery={"supabase":registry_index.reconcile_pending(store)}
+            existing=_empty_fingerprints()
+        else:
+            recovery={"sheets":store.reconcile_pending_registry()}
+            existing=store.registry_fingerprints()
+            if mode=="dual" and registry_index is not None:
+                try:
+                    recovery["supabase"]=registry_index.reconcile_pending(store)
+                except Exception as exc:
+                    registry_shadow_errors+=1
+                    recovery["supabase_error"]=f"{type(exc).__name__}: {exc}"
         counts=store.category_counts(workbook["id"])
         country_counts=store.daily_country_counts(workbook["id"])
-        existing=store.registry_fingerprints()
 
     target=int(runtime["daily_target_per_category"])
     cursor=run_cursor()+int(cursor_offset)
@@ -149,6 +167,9 @@ def run_once(
             shard_discovered+=len(candidates)
             total_discovered+=len(candidates)
             accepted_from_source=0
+            remote_collisions=set()
+            if mode=="supabase" and candidates:
+                remote_collisions=registry_index.collision_keys(candidates)
 
             for lead in candidates:
                 phone=normalize_phone(lead.phone,lead.country)
@@ -158,7 +179,7 @@ def run_once(
                 lead.phone=phone
                 lead.date_added=today
                 fp=fingerprints(lead)
-                if is_duplicate(fp,local):
+                if is_duplicate(fp,local) or fp.unique in remote_collisions:
                     rejections["duplicate"]+=1
                     continue
 
@@ -213,6 +234,8 @@ def run_once(
         "zero_result_shards":zero_result_shards,
         "source_errors":source_errors,
         "source_retries":source_retries,
+        "registry_mode":mode,
+        "registry_shadow_errors":registry_shadow_errors,
         "run_date":run_date,
         "discovered":total_discovered,
         "accepted":accepted_total,
@@ -226,10 +249,52 @@ def run_once(
         return {"status":"dry-run",**result}
     result["pending_recovery"]=recovery
 
+    committed_by_category=defaultdict(list)
     for category in config["categories"]:
         leads=accepted_by_category.get(category,[])
-        if leads:
+        if not leads:
+            continue
+
+        if mode=="supabase":
+            reserved=registry_index.reserve_pending(leads,workbook)
+            committed=[
+                lead for lead in leads
+                if fingerprints(lead).unique.lower() in reserved
+            ]
+            conflicts=len(leads)-len(committed)
+            if conflicts:
+                rejections["duplicate"]+=conflicts
+            if committed:
+                keys={fingerprints(lead).unique.lower() for lead in committed}
+                try:
+                    store.append_daily_leads(workbook,committed)
+                except Exception:
+                    registry_index.mark_retryable(keys)
+                    raise
+                registry_index.activate(keys)
+                committed_by_category[category].extend(committed)
+        else:
             store.commit_leads(workbook,leads)
+            committed_by_category[category].extend(leads)
+            if mode=="dual" and registry_index is not None:
+                try:
+                    registry_index.shadow_active(leads,workbook)
+                except Exception:
+                    registry_shadow_errors+=1
+
+    if mode=="supabase":
+        committed_total=sum(len(items) for items in committed_by_category.values())
+        result["accepted"]=committed_total
+        result["accepted_by_category"]={
+            category:len(items) for category,items in committed_by_category.items()
+        }
+        committed_country=defaultdict(int)
+        for items in committed_by_category.values():
+            for lead in items:
+                committed_country[lead.country]+=1
+        result["accepted_by_country"]=dict(committed_country)
+        result["rejections"]=dict(rejections)
+    result["registry_shadow_errors"]=registry_shadow_errors
 
     counts=store.category_counts(workbook["id"])
     country_counts_after=store.daily_country_counts(workbook["id"])
@@ -280,6 +345,7 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
     if not sources:
         return {"status":"no-sources","message":"No compliant free discovery source is enabled."}
     store=GoogleSheetsStore(config, run_date=run_date)
+    registry_index=build_registry_index(config)
 
     cycles=[]
     accepted_total=0
@@ -295,6 +361,7 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
                 run_date=run_date,
                 sources=sources,
                 store=store,
+                registry_index=registry_index,
                 cursor_offset=cycle_index,
             )
             cycles.append(result)
@@ -312,6 +379,10 @@ def run_until_quota(config: dict, dry_run: bool=False) -> dict:
                 break
     finally:
         _close_sources(sources)
+        if registry_index is not None:
+            close=getattr(registry_index,"close",None)
+            if callable(close):
+                close()
 
     return {
         "status": final_status,

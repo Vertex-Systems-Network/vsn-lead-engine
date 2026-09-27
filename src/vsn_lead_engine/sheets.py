@@ -608,7 +608,40 @@ class GoogleSheetsStore:
             out = chr(65 + rem) + out
         return out
 
+    def _daily_rows(self, leads: list[Lead]) -> list[list]:
+        rows = []
+        for lead in leads:
+            fp = fingerprints(lead)
+            score = score_lead(lead)
+            rows.append([
+                lead.date_added,lead.country,lead.category,lead.business_name,lead.phone,lead.email,
+                lead.website,lead.website_status,lead.instagram,lead.facebook,lead.linkedin,lead.twitter,
+                lead.tiktok,lead.google_maps_url,lead.street_address,lead.city,
+                lead.region,lead.postal_code,lead.latitude if lead.latitude is not None else "",
+                lead.longitude if lead.longitude is not None else "","",
+                lead.rating if lead.rating is not None else "",
+                lead.reviews if lead.reviews is not None else "",
+                lead.contact_person,score,pitch(lead),"New",fp.unique,
+                f"{lead.notes}; Primary source: {lead.source}; Source ID: {lead.source_id}"
+            ])
+        return rows
+
+    def append_daily_leads(self, workbook: dict, leads: list[Lead]):
+        if not leads:
+            return
+        category = leads[0].category
+        if any(lead.category != category for lead in leads):
+            raise ValueError("A daily append batch must contain a single category.")
+        self.sheets.spreadsheets().values().append(
+            spreadsheetId=workbook["id"],
+            range=f"'{category}'!A:AC",
+            valueInputOption="RAW",
+            insertDataOption="INSERT_ROWS",
+            body={"values":self._daily_rows(leads)}
+        ).execute(num_retries=self.api_retries)
+
     def commit_leads(self, workbook: dict, leads: list[Lead]):
+        """Commit using the legacy Google Sheet Registry authority."""
         if not leads:
             return
         category = leads[0].category
@@ -618,7 +651,6 @@ class GoogleSheetsStore:
         registry_id = self.config["drive"]["master_registry_spreadsheet_id"]
         registry_tab = self.config["drive"]["master_registry_tab"]
         registry_rows = []
-        daily_rows = []
 
         for lead in leads:
             fp = fingerprints(lead)
@@ -648,19 +680,6 @@ class GoogleSheetsStore:
                 fp.business_location,
             ])
 
-            score = score_lead(lead)
-            daily_rows.append([
-                lead.date_added,lead.country,lead.category,lead.business_name,lead.phone,lead.email,
-                lead.website,lead.website_status,lead.instagram,lead.facebook,lead.linkedin,lead.twitter,
-                lead.tiktok,lead.google_maps_url,lead.street_address,lead.city,
-                lead.region,lead.postal_code,lead.latitude if lead.latitude is not None else "",
-                lead.longitude if lead.longitude is not None else "","",
-                lead.rating if lead.rating is not None else "",
-                lead.reviews if lead.reviews is not None else "",
-                lead.contact_person,score,pitch(lead),"New",fp.unique,
-                f"{lead.notes}; Primary source: {lead.source}; Source ID: {lead.source_id}"
-            ])
-
         registry_append = self.sheets.spreadsheets().values().append(
             spreadsheetId=registry_id,
             range=f"'{registry_tab}'!A:V",
@@ -675,13 +694,7 @@ class GoogleSheetsStore:
             raise RuntimeError(f"Could not resolve appended registry rows from: {updated_range}")
         start_row, end_row = int(match.group(1)), int(match.group(2))
 
-        self.sheets.spreadsheets().values().append(
-            spreadsheetId=workbook["id"],
-            range=f"'{category}'!A:AC",
-            valueInputOption="RAW",
-            insertDataOption="INSERT_ROWS",
-            body={"values":daily_rows}
-        ).execute(num_retries=self.api_retries)
+        self.append_daily_leads(workbook, leads)
 
         status_letter = self._column_letter(REGISTRY_COLUMNS.index("Status"))
         self.sheets.spreadsheets().values().update(
