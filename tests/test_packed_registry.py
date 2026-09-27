@@ -41,11 +41,13 @@ class FakeS3:
     def __init__(self):
         self.objects = {}
         self.get_counts = {}
+        self.head_counts = {}
 
     def head_bucket(self, Bucket):
         return {}
 
     def head_object(self, Bucket, Key):
+        self.head_counts[Key] = self.head_counts.get(Key, 0) + 1
         if Key not in self.objects:
             raise client_error(404, "NoSuchKey", "HeadObject")
         return {"Metadata": dict(self.objects[Key]["metadata"])}
@@ -377,3 +379,71 @@ def test_clear_read_cache_forces_next_advisory_refresh(monkeypatch):
     assert reader.cache_stats()["entries"] == 0
     assert reader.collision_keys([lead])
     assert _packed_get_count(fake) > first_reads
+
+
+def _legacy_head_count(fake):
+    return sum(
+        count
+        for key,count in fake.head_counts.items()
+        if "/fp/" in key
+    )
+
+
+def test_advisory_collision_checks_reuse_legacy_v1_head_cache(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+    legacy=R2RegistryIndex(config("objects-v1"),client=fake)
+    lead=make_lead()
+    payload=lead_registry_payload(lead,{"id":"sheet123"})
+    assert legacy.import_rows([payload])["imported"]==1
+
+    reader=PackedR2RegistryIndex(config(),client=fake)
+    before=_legacy_head_count(fake)
+    first=reader.collision_keys([lead])
+    after_first=_legacy_head_count(fake)
+    second=reader.collision_keys([lead])
+    after_second=_legacy_head_count(fake)
+
+    assert first=={payload["unique_token"]}
+    assert second==first
+    assert after_first > before
+    assert after_second == after_first
+    stats=reader.cache_stats()
+    assert stats["legacy_entries"] > 0
+    assert stats["legacy_hits"] > 0
+    assert stats["legacy_misses"] > 0
+
+
+def test_reserve_pending_uses_fresh_legacy_heads_despite_stale_negative_cache(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+    lead=make_lead()
+
+    reader=PackedR2RegistryIndex(config(),client=fake)
+    assert reader.collision_keys([lead]) == set()
+    assert reader.cache_stats()["legacy_entries"] > 0
+
+    legacy=R2RegistryIndex(config("objects-v1"),client=fake)
+    payload=lead_registry_payload(lead,{"id":"sheet123"})
+    assert legacy.import_rows([payload])["imported"]==1
+
+    # Advisory cache is intentionally stale for this event.
+    assert reader.collision_keys([lead]) == set()
+
+    # Reservation path bypasses advisory caches and must still block the lead.
+    assert reader.reserve_pending([lead],{"id":"sheet456"}) == set()
+
+
+def test_packed_import_rows_clears_legacy_advisory_cache(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+    index=PackedR2RegistryIndex(config(),client=fake)
+    lead=make_lead()
+    payload=lead_registry_payload(lead,{"id":"sheet123"})
+
+    assert index.collision_keys([lead]) == set()
+    assert index.cache_stats()["legacy_entries"] > 0
+
+    assert index.import_rows([payload])["imported"]==1
+    assert index.cache_stats()["legacy_entries"] == 0
+    assert index.collision_keys([lead]) == {payload["unique_token"]}
