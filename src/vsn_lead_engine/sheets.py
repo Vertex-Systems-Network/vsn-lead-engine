@@ -32,6 +32,7 @@ REGISTRY_COLUMNS = [
 OVERVIEW_INCREMENT_METRICS = [
     "Accepted Leads",
     "Duplicate Rejections",
+    "Source-Batch Duplicates",
     "Remote Prefilter Duplicates",
     "Missing-Phone Rejections",
     "Free-Source Candidates",
@@ -286,6 +287,7 @@ class GoogleSheetsStore:
             ["Status",'=IF(B31>=B6,"Complete","In Progress")'],
             ["Accepted Leads",0],
             ["Duplicate Rejections",0],
+            ["Source-Batch Duplicates",0],
             ["Remote Prefilter Duplicates",0],
             ["Missing-Phone Rejections",0],
             ["Free-Source Candidates",0],
