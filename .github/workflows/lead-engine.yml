@@ -15,7 +15,7 @@ on:
         default: true
         type: boolean
   schedule:
-    - cron: "30 3-17 * * *"
+    - cron: "0 3-18 * * *"
 
 permissions:
   contents: read
@@ -81,7 +81,7 @@ jobs:
         if: ${{ github.event_name == 'schedule' && steps.google.outputs.ready == 'true' }}
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-        run: python -m vsn_lead_engine.cli run
+        run: python -m vsn_lead_engine.cli run --scheduled
       - name: Assistant-triggered real run
         if: ${{ github.event_name == 'push' && steps.google.outputs.ready == 'true' }}
         env:
