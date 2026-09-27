@@ -58,6 +58,12 @@ def run_health_event(
         "status":_clean_text(result.get("status","unknown"),80),
         "accepted":max(0,int(result.get("accepted",0) or 0)),
         "discovered":max(0,int(result.get("discovered",0) or 0)),
+        "source_phone_candidates":max(
+            0,int(result.get("source_phone_candidates",0) or 0)
+        ),
+        "website_only_candidates":max(
+            0,int(result.get("website_only_candidates",0) or 0)
+        ),
         "cycles":max(0,int(result.get("cycles_executed",0) or 0)),
         "categories_attempted":max(
             0,int(result.get("categories_attempted",0) or 0)
@@ -303,6 +309,7 @@ class DailyHealthLedgerStore:
         # raw lead objects or arbitrary business contact fields.
         scalar_fields={
             "event_id","timestamp","kind","origin","status","accepted","discovered",
+            "source_phone_candidates","website_only_candidates",
             "cycles","categories_attempted","source_batch_duplicates",
             "remote_prefilter_duplicates",
             "source_errors","zero_result_shards",
