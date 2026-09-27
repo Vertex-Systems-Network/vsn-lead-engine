@@ -33,28 +33,41 @@ class DailyYieldStateStore:
 
     @staticmethod
     def _normalize_hint(raw) -> dict[str, int] | None:
+        has_partition_mask=False
+        partition_raw=0
         if isinstance(raw, dict):
             values = (
                 raw.get("visits", 0),
                 raw.get("discovered", 0),
                 raw.get("accepted", 0),
             )
-        elif isinstance(raw, (list, tuple)) and len(raw) == 3:
-            values = raw
+            if "partition_mask" in raw:
+                has_partition_mask=True
+                partition_raw=raw.get("partition_mask",0)
+        elif isinstance(raw, (list, tuple)) and len(raw) in {3,4}:
+            values = raw[:3]
+            if len(raw)==4:
+                has_partition_mask=True
+                partition_raw=raw[3]
         else:
             return None
 
         try:
             visits, discovered, accepted = [max(0, int(value or 0)) for value in values]
+            partition_mask=max(0,int(partition_raw or 0))
         except (TypeError, ValueError):
             return None
 
         accepted = min(accepted, discovered)
-        return {
+        result={
             "visits": visits,
             "discovered": discovered,
             "accepted": accepted,
         }
+        if has_partition_mask:
+            # Runtime partitions are capped at 64, so retain only the lower 64 bits.
+            result["partition_mask"]=partition_mask & ((1 << 64) - 1)
+        return result
 
     def load(self, run_date: str) -> tuple[dict[str, dict], dict]:
         key = self.key(run_date)
@@ -106,16 +119,14 @@ class DailyYieldStateStore:
             normalized = self._normalize_hint(hints[key_name])
             if normalized is None:
                 continue
-            entries.append(
-                (
-                    str(key_name),
-                    [
-                        normalized["visits"],
-                        normalized["discovered"],
-                        normalized["accepted"],
-                    ],
-                )
-            )
+            values=[
+                normalized["visits"],
+                normalized["discovered"],
+                normalized["accepted"],
+            ]
+            if "partition_mask" in normalized:
+                values.append(normalized["partition_mask"])
+            entries.append((str(key_name),values))
 
         # Keep the most observed state if a future configuration ever exceeds the
         # compact state ceiling.
