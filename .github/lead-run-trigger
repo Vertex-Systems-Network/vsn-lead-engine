@@ -1,3 +1,4 @@
-assistant-trigger-v11
-reason=verify-compact-registry-no-regression
-sequence=11
+assistant-trigger-v12
+reason=verify-r2-authority-cutover
+sequence=12
+date=2026-09-27
