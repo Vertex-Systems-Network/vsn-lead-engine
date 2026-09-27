@@ -182,6 +182,34 @@ At the normal 08:00–23:00 hourly schedule this adds at most roughly one compac
 Class-A state write per productive event, instead of per-lead or per-shard
 writes.
 
+### P10 schedule alignment and missed-run recovery
+
+The repo-native GitHub Actions cadence is now aligned to the configured
+Asia/Karachi production window:
+
+- primary cron: **03:00–18:00 UTC**;
+- local equivalent: **08:00–23:00 PKT**;
+- cadence: **hourly at minute 00**;
+- scheduled workflow executions call `run --scheduled`.
+
+Scheduled runs pass through a local-time gate before collection. A delayed run
+that still lands inside the configured 08:00–23:59 PKT window is allowed to
+continue and simply fills the **current live shortfall**. If an old scheduled
+event is delayed beyond the production window or into the next date, it exits
+cleanly instead of accidentally starting collection against the wrong dated
+workbook.
+
+The separate quota supervisor is intentionally offset after the native run. It
+checks the live dated workbook later in the hour and only creates an
+assistant-trigger commit when quota is still short. This turns the supervisor
+into a missed-run / failed-run recovery path instead of a second primary
+scheduler.
+
+Because every real run re-reads current Sheet counts, R2 dedupe and same-day
+adaptive state, catch-up is idempotent with respect to quota: the next healthy
+run resumes the remaining category shortfall rather than replaying a fixed
+hourly batch.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -475,6 +503,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P7 free-source breadth: **56 METROS + 16 OVERTURE PARTITIONS ACTIVE**
 - P8 adaptive yield routing: **IN-PROCESS LEARNING + EXPLORATION ACTIVE**
 - P9 daily adaptive state: **ONE COMPACT R2 OBJECT/DAY ACTIVE**
+- P10 schedule/catch-up: **08:00–23:00 PKT NATIVE + OFFSET SUPERVISOR ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

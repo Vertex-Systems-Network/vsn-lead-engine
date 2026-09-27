@@ -3,6 +3,7 @@ import argparse,json,sys
 from .config import load_config
 from .engine import check_workbook_readiness, recover_workbook_readiness, run_until_quota
 from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
+from .schedule import scheduled_run_window
 from .sheets import GoogleSheetsStore
 
 def _registry_index(config: dict):
@@ -21,6 +22,7 @@ def main() -> int:
     recovery_parser.add_argument("--delay-seconds",type=float,default=None)
     run_parser=sub.add_parser("run")
     run_parser.add_argument("--dry-run",action="store_true")
+    run_parser.add_argument("--scheduled",action="store_true")
     backfill_parser=sub.add_parser("registry-backfill")
     backfill_parser.add_argument("--dry-run",action="store_true")
     sub.add_parser("registry-stats")
@@ -110,6 +112,19 @@ def main() -> int:
         }
         print(json.dumps(result,indent=2,default=str))
         return 0 if result["status"]=="ok" else 2
+    if args.scheduled and not args.dry_run:
+        gate=scheduled_run_window(config)
+        if not gate["allowed"]:
+            print(json.dumps({
+                "status":"scheduled-window-skipped",
+                "schedule":gate,
+            },indent=2,default=str))
+            return 0
+        result=run_until_quota(config,dry_run=False)
+        result["schedule"]=gate
+        print(json.dumps(result,indent=2,default=str))
+        return 0
+
     print(json.dumps(run_until_quota(config,dry_run=args.dry_run),indent=2,default=str))
     return 0
 

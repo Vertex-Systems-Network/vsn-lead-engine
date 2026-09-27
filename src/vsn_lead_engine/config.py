@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 def _validate_geographies(geographies: list[dict]) -> None:
@@ -48,6 +49,20 @@ def load_config() -> dict:
         raise ValueError("Daily target must remain 1000 per category.")
     if config["runtime"]["mode"]!="free":
         raise ValueError("This branch only supports FREE mode.")
+
+    timezone=str(config["runtime"].get("timezone","")).strip()
+    try:
+        ZoneInfo(timezone)
+    except (ZoneInfoNotFoundError, ValueError):
+        raise ValueError(f"Invalid runtime timezone: {timezone!r}") from None
+    start_hour=int(config["runtime"].get("start_hour",8))
+    end_hour=int(config["runtime"].get("end_hour",23))
+    if start_hour < 0 or start_hour > 23:
+        raise ValueError("runtime.start_hour must be between 0 and 23.")
+    if end_hour < 0 or end_hour > 23:
+        raise ValueError("runtime.end_hour must be between 0 and 23.")
+    if start_hour > end_hour:
+        raise ValueError("runtime.start_hour cannot be after runtime.end_hour.")
 
     drive=config["drive"]
     if not drive.get("folder_id"):
