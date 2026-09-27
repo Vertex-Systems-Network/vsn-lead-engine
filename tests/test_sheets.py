@@ -1,5 +1,7 @@
 from vsn_lead_engine.sheets import (
     GoogleSheetsStore,
+    OVERVIEW_INCREMENT_METRICS,
+    OVERVIEW_LATEST_METRICS,
     count_current_countries,
     count_current_rows,
     daily_workbook_title,
@@ -90,3 +92,37 @@ def test_store_run_date_is_frozen_for_the_run():
     store=object.__new__(GoogleSheetsStore)
     store.run_date="2026-09-27"
     assert store._today()=="2026-09-27"
+
+
+def test_overview_schema_includes_quality_observability_metrics():
+    expected_incremental={
+        "Accepted Leads",
+        "Phones Recovered",
+        "Enrichment Candidates",
+        "Official-Site Phone Recoveries",
+        "Common-Crawl Phone Recoveries",
+        "Common Crawl Attempts",
+        "Enrichment Budget Skips",
+        "Enrichment Errors",
+        "Zero-Progress Cycles",
+    }
+    assert expected_incremental.issubset(set(OVERVIEW_INCREMENT_METRICS))
+    assert set(OVERVIEW_LATEST_METRICS)=={
+        "Last Acceptance Rate %",
+        "Last Phone Recovery Rate %",
+        "Last Partitions Visited",
+    }
+
+
+def test_daily_overview_seed_contains_quality_metrics():
+    store=object.__new__(GoogleSheetsStore)
+    store.config={
+        "runtime":{"daily_target_per_category":1000},
+        "categories":["Category 1","Category 2"],
+    }
+    rows=store._overview_seed("2026-09-27")
+    names={row[0] for row in rows if row}
+    assert "Phones Recovered" in names
+    assert "Accepted Leads" in names
+    assert "Enrichment Candidates" in names
+    assert "Last Acceptance Rate %" in names
