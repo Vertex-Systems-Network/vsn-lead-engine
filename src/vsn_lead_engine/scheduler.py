@@ -33,6 +33,25 @@ def _category_weight(count: int, target: int) -> int:
     return 1
 
 
+def _fair_weighted_categories(
+    categories: list[str],
+    counts: dict[str,int],
+    target: int,
+) -> list[str]:
+    """Layer weights so every pending category gets one pass before repeats."""
+    weights={
+        category:_category_weight(int(counts.get(category,0)),target)
+        for category in categories
+    }
+    max_weight=max(weights.values(),default=0)
+    sequence=[]
+    for layer in range(max_weight):
+        for category in categories:
+            if weights[category] > layer:
+                sequence.append(category)
+    return sequence
+
+
 def yield_hint_key(category: str, geography: dict) -> str:
     return "|".join(
         [
@@ -241,6 +260,8 @@ def build_shard_plan(
     - <25% complete categories receive 3x shard weight;
     - 25-50% complete categories receive 2x weight;
     - >=50% complete categories receive normal weight;
+    - weights are layered so every pending category gets one pass before
+      higher-weight categories consume their repeat slots;
     - countries are interleaved, with the country having fewer usable leads
       scheduled first;
     - cursor rotation prevents repeatedly hitting the same metro;
@@ -266,11 +287,11 @@ def build_shard_plan(
         )
     )
 
-    weighted_categories: list[str] = []
-    for category in pending:
-        weighted_categories.extend(
-            [category] * _category_weight(int(counts.get(category, 0)), target)
-        )
+    weighted_categories=_fair_weighted_categories(
+        pending,
+        counts,
+        target,
+    )
 
     balanced_geographies = _balanced_geographies(
         geography_list,
