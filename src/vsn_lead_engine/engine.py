@@ -780,6 +780,9 @@ def run_once(
             "Accepted Leads":int(result.get("accepted",0) or 0),
             "Free-Source Candidates":total_discovered,
             "Duplicate Rejections":int(rejections.get("duplicate",0)),
+            "Source-Batch Duplicates":int(
+                rejections.get("source_batch_duplicate",0) or 0
+            ),
             "Remote Prefilter Duplicates":int(
                 rejections.get("remote_prefilter_duplicate",0) or 0
             ),
