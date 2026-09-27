@@ -61,6 +61,56 @@ def _candidate_partition_geography(
     }
 
 
+def _quality_summary(
+    *,
+    discovered: int,
+    accepted: int,
+    rejections: dict,
+    enrichment: dict,
+    attempts: list[dict],
+) -> dict:
+    discovered=max(0,int(discovered or 0))
+    accepted=max(0,int(accepted or 0))
+    duplicate_rejections=max(0,int(rejections.get("duplicate",0) or 0))
+    missing_phone=max(0,int(rejections.get("missing_or_invalid_phone",0) or 0))
+    enrichment_candidates=max(0,int(enrichment.get("candidates",0) or 0))
+    live_recovered=max(0,int(enrichment.get("live_phone_recovered",0) or 0))
+    common_recovered=max(0,int(enrichment.get("common_crawl_phone_recovered",0) or 0))
+    phones_recovered=live_recovered+common_recovered
+    partitions={
+        (
+            str(source_attempt.get("source","")),
+            int(source_attempt["candidate_partition"]),
+        )
+        for attempt in attempts or []
+        for source_attempt in attempt.get("sources",[]) or []
+        if source_attempt.get("candidate_partition") is not None
+    }
+    return {
+        "discovered":discovered,
+        "accepted":accepted,
+        "acceptance_rate_pct":round((accepted/discovered)*100,2) if discovered else 0.0,
+        "duplicate_rejections":duplicate_rejections,
+        "missing_phone_rejections":missing_phone,
+        "enrichment_candidates":enrichment_candidates,
+        "phones_recovered":phones_recovered,
+        "official_site_phone_recoveries":live_recovered,
+        "common_crawl_phone_recoveries":common_recovered,
+        "phone_recovery_rate_pct":(
+            round((phones_recovered/enrichment_candidates)*100,2)
+            if enrichment_candidates else 0.0
+        ),
+        "common_crawl_attempts":max(
+            0,int(enrichment.get("common_crawl_attempted",0) or 0)
+        ),
+        "enrichment_budget_skips":max(
+            0,int(enrichment.get("skipped_budget",0) or 0)
+        ),
+        "enrichment_errors":max(0,int(enrichment.get("errors",0) or 0)),
+        "partitions_visited":len(partitions),
+    }
+
+
 def run_once(
     config: dict,
     dry_run: bool=False,
@@ -294,6 +344,13 @@ def run_once(
         "enrichment":dict(enrichment_totals),
         "attempts":attempts,
     }
+    result["quality"]=_quality_summary(
+        discovered=total_discovered,
+        accepted=accepted_total,
+        rejections=dict(rejections),
+        enrichment=dict(enrichment_totals),
+        attempts=attempts,
+    )
     if dry_run:
         return {"status":"dry-run",**result}
     result["pending_recovery"]=recovery
@@ -348,6 +405,13 @@ def run_once(
         result["accepted_by_country"]=dict(committed_country)
         result["rejections"]=dict(rejections)
     result["registry_shadow_errors"]=registry_shadow_errors
+    result["quality"]=_quality_summary(
+        discovered=total_discovered,
+        accepted=int(result.get("accepted",0) or 0),
+        rejections=dict(rejections),
+        enrichment=dict(enrichment_totals),
+        attempts=attempts,
+    )
 
     counts=store.category_counts(workbook["id"])
     country_counts_after=store.daily_country_counts(workbook["id"])
@@ -356,22 +420,38 @@ def run_once(
         {
             "United States Leads Today":country_counts_after.get("United States",0),
             "Canada Leads Today":country_counts_after.get("Canada",0),
+            "Last Acceptance Rate %":result["quality"]["acceptance_rate_pct"],
+            "Last Phone Recovery Rate %":result["quality"]["phone_recovery_rate_pct"],
+            "Last Partitions Visited":result["quality"]["partitions_visited"],
         }
     )
     store.update_overview(
         workbook["id"],
         counts,
         {
+            "Accepted Leads":int(result.get("accepted",0) or 0),
             "Free-Source Candidates":total_discovered,
             "Duplicate Rejections":int(rejections.get("duplicate",0)),
             "Missing-Phone Rejections":int(rejections.get("missing_or_invalid_phone",0)),
             "Shard Attempts":len(attempts),
             "Zero-Result Shards":zero_result_shards,
             "Source Errors":source_errors,
-            "Phones Recovered":(
-                int(enrichment_totals.get("live_phone_recovered",0))
-                + int(enrichment_totals.get("common_crawl_phone_recovered",0))
+            "Enrichment Candidates":int(enrichment_totals.get("candidates",0) or 0),
+            "Phones Recovered":result["quality"]["phones_recovered"],
+            "Official-Site Phone Recoveries":int(
+                enrichment_totals.get("live_phone_recovered",0) or 0
             ),
+            "Common-Crawl Phone Recoveries":int(
+                enrichment_totals.get("common_crawl_phone_recovered",0) or 0
+            ),
+            "Common Crawl Attempts":int(
+                enrichment_totals.get("common_crawl_attempted",0) or 0
+            ),
+            "Enrichment Budget Skips":int(
+                enrichment_totals.get("skipped_budget",0) or 0
+            ),
+            "Enrichment Errors":int(enrichment_totals.get("errors",0) or 0),
+            "Zero-Progress Cycles":1 if int(result.get("accepted",0) or 0)<=0 else 0,
         }
     )
     return {
