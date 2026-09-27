@@ -63,6 +63,9 @@ def run_health_event(
         "zero_result_shards":max(
             0,int(result.get("zero_result_shards",0) or 0)
         ),
+        "adaptive_cooldown_routes_deferred":max(
+            0,int(result.get("adaptive_cooldown_routes_deferred",0) or 0)
+        ),
         "counts":counts,
         "shortfalls":shortfalls,
         "quota_complete":bool(
@@ -258,7 +261,8 @@ class DailyHealthLedgerStore:
         # raw lead objects or arbitrary business contact fields.
         scalar_fields={
             "event_id","timestamp","kind","origin","status","accepted","discovered",
-            "cycles","source_errors","zero_result_shards","quota_complete",
+            "cycles","source_errors","zero_result_shards",
+            "adaptive_cooldown_routes_deferred","quota_complete",
             "schedule_slot","schedule_delay_minutes",
             "adaptive_state_loaded","adaptive_state_saved",
             "adaptive_state_load_error","adaptive_state_save_error",
