@@ -38,6 +38,18 @@ OVERVIEW_INCREMENT_METRICS = [
 ]
 
 
+def count_current_rows(date_rows, status_rows, today: str) -> int:
+    """Count today's usable leads, excluding rows quarantined for review."""
+    total = 0
+    max_rows = max(len(date_rows), len(status_rows))
+    for index in range(max_rows):
+        date_value = date_rows[index][0] if index < len(date_rows) and date_rows[index] else ""
+        status_value = status_rows[index][0] if index < len(status_rows) and status_rows[index] else ""
+        if str(date_value).strip() == today and str(status_value).strip().lower() != "needs review":
+            total += 1
+    return total
+
+
 class GoogleSheetsStore:
     def __init__(self, config: dict):
         raw = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
@@ -61,6 +73,7 @@ class GoogleSheetsStore:
         ).execute()
         self._ensure_tabs(sid, metadata)
         self._ensure_overview_metrics(sid)
+        self._refresh_overview_formulas(sid)
         return {
             "id": sid,
             "name": metadata.get("properties", {}).get(
@@ -83,12 +96,12 @@ class GoogleSheetsStore:
         for category in categories:
             rows.append([
                 f"Actual — {category}",
-                f'=COUNTIF(\'{category}\'!A:A,TEXT(TODAY(),"yyyy-mm-dd"))'
+                f'=COUNTIFS(\'{category}\'!A:A,TEXT(TODAY(),"yyyy-mm-dd"),\'{category}\'!AA:AA,"<>Needs Review")'
             ])
         for category in categories:
             rows.append([
                 f"Shortfall — {category}",
-                f'=MAX($B$5-COUNTIF(\'{category}\'!A:A,TEXT(TODAY(),"yyyy-mm-dd")),0)'
+                f'=MAX($B$5-COUNTIFS(\'{category}\'!A:A,TEXT(TODAY(),"yyyy-mm-dd"),\'{category}\'!AA:AA,"<>Needs Review"),0)'
             ])
         rows.extend([
             ["Total Actual Today","=SUM(B7:B18)"],
@@ -154,9 +167,50 @@ class GoogleSheetsStore:
                 body={"values":missing},
             ).execute()
 
+    def _refresh_overview_formulas(self, spreadsheet_id: str):
+        categories = self.config["categories"]
+        target = int(self.config["runtime"]["daily_target_per_category"])
+        data = []
+        actual_start = 7
+        shortfall_start = actual_start + len(categories)
+
+        for offset, category in enumerate(categories):
+            escaped = category.replace("'", "''")
+            actual_row = actual_start + offset
+            shortfall_row = shortfall_start + offset
+            formula = (
+                f'=COUNTIFS(\'{escaped}\'!A:A,TEXT(TODAY(),"yyyy-mm-dd"),'
+                f'\'{escaped}\'!AA:AA,"<>Needs Review")'
+            )
+            data.append({"range":f"'Overview'!B{actual_row}","values":[[formula]]})
+            data.append({
+                "range":f"'Overview'!B{shortfall_row}",
+                "values":[[f"=MAX($B$5-B{actual_row},0)"]],
+            })
+
+        total_actual_row = shortfall_start + len(categories)
+        total_shortfall_row = total_actual_row + 1
+        data.extend([
+            {
+                "range":f"'Overview'!B{total_actual_row}",
+                "values":[[f"=SUM(B{actual_start}:B{actual_start+len(categories)-1})"]],
+            },
+            {
+                "range":f"'Overview'!B{total_shortfall_row}",
+                "values":[[f"=MAX({target*len(categories)}-B{total_actual_row},0)"]],
+            },
+        ])
+        self.sheets.spreadsheets().values().batchUpdate(
+            spreadsheetId=spreadsheet_id,
+            body={"valueInputOption":"USER_ENTERED","data":data},
+        ).execute()
+
     def category_counts(self, spreadsheet_id: str) -> dict[str,int]:
         today = self._today()
-        ranges = [f"'{category}'!A2:A" for category in self.config["categories"]]
+        ranges = []
+        for category in self.config["categories"]:
+            ranges.extend([f"'{category}'!A2:A", f"'{category}'!AA2:AA"])
+
         response = self.sheets.spreadsheets().values().batchGet(
             spreadsheetId=spreadsheet_id,
             ranges=ranges,
@@ -164,14 +218,12 @@ class GoogleSheetsStore:
         ).execute()
         value_ranges = response.get("valueRanges", [])
         counts = {}
-        for category, value_range in zip(self.config["categories"], value_ranges):
-            values = value_range.get("values", [])
-            counts[category] = sum(
-                1 for row in values
-                if row and str(row[0]).strip() == today
-            )
-        for category in self.config["categories"][len(value_ranges):]:
-            counts[category] = 0
+        for index, category in enumerate(self.config["categories"]):
+            date_index = index * 2
+            status_index = date_index + 1
+            date_rows = value_ranges[date_index].get("values", []) if date_index < len(value_ranges) else []
+            status_rows = value_ranges[status_index].get("values", []) if status_index < len(value_ranges) else []
+            counts[category] = count_current_rows(date_rows, status_rows, today)
         return counts
 
     def _registry_rows(self):
