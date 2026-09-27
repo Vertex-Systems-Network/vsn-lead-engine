@@ -170,7 +170,12 @@ P2 source-yield controls:
 - source attempt telemetry records the active partition and total partition
   count for auditability;
 - partitioning changes discovery breadth only—classification, phone validation,
-  enrichment, quota ceilings and exact R2 dedupe remain authoritative.
+  enrichment, quota ceilings and exact R2 dedupe remain authoritative;
+- a zero-yield partition no longer stops the event immediately: the runner can
+  continue through the configured bounded zero-progress cycle budget so the next
+  rotated cohorts still get a chance;
+- production currently allows all 3 controlled cycles before a zero-progress
+  stop, while an already-complete daily quota still exits immediately.
 
 ## P2 permanent R2 dedupe ledger
 
@@ -324,6 +329,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P0 free-tier R2 write hardening: **PACKED-V2 ACTIVE**
 - P1 public contact enrichment: **OFFICIAL WEBSITE + BOUNDED COMMON CRAWL ACTIVE**
 - P2 rotating Overture cohorts: **8 HASH PARTITIONS ACTIVE**
+- P3 partition-aware zero-progress retry: **3 BOUNDED CYCLES ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
