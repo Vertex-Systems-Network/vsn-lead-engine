@@ -1,5 +1,6 @@
 import re
 
+from vsn_lead_engine.sources import build_sources
 from vsn_lead_engine.sources.overture import (
     CATEGORY_PATTERNS,
     OverturePlaceSource,
@@ -260,6 +261,9 @@ def test_search_keeps_website_only_candidate_for_enrichment(monkeypatch):
     assert leads[0].phone==""
     assert leads[0].website=="https://example.com"
     assert "websites IS NOT NULL" in connection.sql
+    assert "row_number() OVER" in connection.sql
+    assert "PARTITION BY has_phone" in connection.sql
+    assert "contact_rank <= ?" in connection.sql
 
 
 def test_search_applies_hash_partition_to_duckdb_query(monkeypatch):
@@ -311,4 +315,27 @@ def test_search_applies_hash_partition_to_duckdb_query(monkeypatch):
 
     assert len(leads)==1
     assert "(hash(id) % ?) = ?" in connection.sql
-    assert connection.params[-3:]==[8,3,10]
+    assert connection.params[-5:]==[8,3,8,2,10]
+
+
+def test_contact_budgets_reserve_website_candidates_without_losing_total_limit():
+    assert OverturePlaceSource._contact_budgets(500,0.20)==(400,100)
+    assert OverturePlaceSource._contact_budgets(10,0.20)==(8,2)
+    assert OverturePlaceSource._contact_budgets(1,0.20)==(1,0)
+    assert OverturePlaceSource._contact_budgets(10,0)==(10,0)
+
+
+def test_build_sources_passes_website_reserve_fraction():
+    sources=build_sources({
+        "sources":{
+            "overture":{
+                "enabled":True,
+                "release":"2026-09-24.0",
+                "candidate_limit":500,
+                "website_candidate_reserve_fraction":0.25,
+            },
+            "overpass":{"enabled":False},
+        }
+    })
+    assert len(sources)==1
+    assert sources[0].website_candidate_reserve_fraction==0.25

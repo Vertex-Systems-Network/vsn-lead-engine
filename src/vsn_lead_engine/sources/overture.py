@@ -168,10 +168,15 @@ class OverturePlaceSource:
         release: str = "latest",
         stac_url: str = "https://stac.overturemaps.org/catalog.json",
         candidate_limit: int = 500,
+        website_candidate_reserve_fraction: float = 0.20,
     ):
         self.release = release
         self.stac_url = stac_url
         self.candidate_limit = candidate_limit
+        self.website_candidate_reserve_fraction = max(
+            0.0,
+            min(0.5, float(website_candidate_reserve_fraction)),
+        )
         self._resolved_release: str | None = None
         self._connection = None
 
@@ -200,7 +205,7 @@ class OverturePlaceSource:
             response = requests.get(
                 self.stac_url,
                 timeout=20,
-                headers={"User-Agent": "VSN-Lead-Engine/0.28"},
+                headers={"User-Agent": "VSN-Lead-Engine/0.29"},
             )
             response.raise_for_status()
             payload = response.json()
@@ -242,6 +247,19 @@ class OverturePlaceSource:
         return f"https://www.google.com/maps/search/?api=1&query={quote_plus(query)}" if query else ""
 
     @staticmethod
+    def _contact_budgets(
+        row_limit: int,
+        website_reserve_fraction: float,
+    ) -> tuple[int,int]:
+        row_limit=max(1,int(row_limit))
+        fraction=max(0.0,min(0.5,float(website_reserve_fraction)))
+        if row_limit <= 1 or fraction <= 0:
+            return row_limit,0
+        website_budget=max(1,int(round(row_limit*fraction)))
+        website_budget=min(row_limit-1,website_budget)
+        return row_limit-website_budget,website_budget
+
+    @staticmethod
     def _sql_category_clause(category: str) -> str:
         rule = CATEGORY_RULES[category]
         taxonomy_pattern = rule.taxonomy_pattern
@@ -278,6 +296,10 @@ class OverturePlaceSource:
 
         xmin, ymin, xmax, ymax = [float(v) for v in bbox]
         row_limit = max(1, min(int(limit or self.candidate_limit), self.candidate_limit))
+        phone_budget,website_budget=self._contact_budgets(
+            row_limit,
+            self.website_candidate_reserve_fraction,
+        )
         partition_count=max(1,min(64,int(location.get("_candidate_partition_count",1))))
         partition=int(location.get("_candidate_partition",0)) % partition_count
         release = self._resolve_release()
@@ -293,44 +315,85 @@ class OverturePlaceSource:
         )
 
         sql = f"""
+        WITH base AS (
+            SELECT
+                id,
+                names.primary AS name,
+                basic_category,
+                taxonomy.primary AS taxonomy_primary,
+                taxonomy.hierarchy AS taxonomy_hierarchy,
+                phones[1] AS phone,
+                websites[1] AS website,
+                emails[1] AS email,
+                socials,
+                addresses[1].freeform AS address,
+                addresses[1].locality AS locality,
+                addresses[1].region AS address_region,
+                addresses[1].postcode AS postcode,
+                addresses[1].country AS address_country,
+                bbox.xmin AS longitude,
+                bbox.ymin AS latitude,
+                confidence,
+                sources[1].dataset AS source_dataset,
+                (phones IS NOT NULL AND len(phones) > 0) AS has_phone,
+                (websites IS NOT NULL AND len(websites) > 0) AS has_website
+            FROM read_parquet(
+                '{path}',
+                filename=true,
+                hive_partitioning=1
+            )
+            WHERE
+                bbox.xmin BETWEEN ? AND ?
+                AND bbox.ymin BETWEEN ? AND ?
+                {partition_clause}
+                AND (
+                    (phones IS NOT NULL AND len(phones) > 0)
+                    OR (websites IS NOT NULL AND len(websites) > 0)
+                )
+                AND names.primary IS NOT NULL
+                AND (
+                    operating_status IS NULL
+                    OR CAST(operating_status AS VARCHAR) <> 'permanently_closed'
+                )
+                AND {category_clause}
+        ),
+        ranked AS (
+            SELECT
+                *,
+                row_number() OVER (
+                    PARTITION BY has_phone
+                    ORDER BY hash(id)
+                ) AS contact_rank
+            FROM base
+        )
         SELECT
             id,
-            names.primary AS name,
+            name,
             basic_category,
-            taxonomy.primary AS taxonomy_primary,
-            taxonomy.hierarchy AS taxonomy_hierarchy,
-            phones[1] AS phone,
-            websites[1] AS website,
-            emails[1] AS email,
+            taxonomy_primary,
+            taxonomy_hierarchy,
+            phone,
+            website,
+            email,
             socials,
-            addresses[1].freeform AS address,
-            addresses[1].locality AS locality,
-            addresses[1].region AS address_region,
-            addresses[1].postcode AS postcode,
-            addresses[1].country AS address_country,
-            bbox.xmin AS longitude,
-            bbox.ymin AS latitude,
+            address,
+            locality,
+            address_region,
+            postcode,
+            address_country,
+            longitude,
+            latitude,
             confidence,
-            sources[1].dataset AS source_dataset
-        FROM read_parquet(
-            '{path}',
-            filename=true,
-            hive_partitioning=1
-        )
-        WHERE
-            bbox.xmin BETWEEN ? AND ?
-            AND bbox.ymin BETWEEN ? AND ?
-            {partition_clause}
-            AND (
-                (phones IS NOT NULL AND len(phones) > 0)
-                OR (websites IS NOT NULL AND len(websites) > 0)
-            )
-            AND names.primary IS NOT NULL
-            AND (
-                operating_status IS NULL
-                OR CAST(operating_status AS VARCHAR) <> 'permanently_closed'
-            )
-            AND {category_clause}
+            source_dataset
+        FROM ranked
+        ORDER BY
+            CASE
+                WHEN has_phone AND contact_rank <= ? THEN 0
+                WHEN NOT has_phone AND has_website AND contact_rank <= ? THEN 1
+                ELSE 2
+            END,
+            CASE WHEN has_phone THEN 0 ELSE 1 END,
+            contact_rank
         LIMIT ?
         """
 
@@ -338,7 +401,7 @@ class OverturePlaceSource:
         params=[xmin,xmax,ymin,ymax]
         if partition_count > 1:
             params.extend([partition_count,partition])
-        params.append(row_limit)
+        params.extend([phone_budget,website_budget,row_limit])
         cursor = connection.execute(sql, params)
         columns = [item[0] for item in cursor.description]
         records = [dict(zip(columns, row)) for row in cursor.fetchall()]

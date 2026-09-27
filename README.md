@@ -546,6 +546,37 @@ P11 health telemetry records pending cache enabled state, token entries, hits
 and misses. This reduces repeated R2 LIST/GET work without allowing stale
 pending state to become commit-time dedupe authority.
 
+### P23 contact-stratified Overture cohorts
+
+The fixed Overture shard budget remains **500 candidates**, but candidate
+selection now prefers direct-phone businesses while reserving part of the same
+cohort for website-only enrichment candidates.
+
+Production split:
+
+- **80% phone-first preferred band**;
+- **20% website-only exploration reserve**.
+
+The reserve is a preference, not unused capacity: when either contact band does
+not contain enough candidates, the remaining ranked rows can still fill the
+existing shard limit.
+
+Guardrails:
+
+- the existing 16 deterministic Overture hash partitions remain authoritative;
+- ranking inside each phone/non-phone contact band is deterministic by
+  `hash(id)`;
+- taxonomy-first classification, country filtering, permanently-closed
+  filtering and the Python defense-in-depth classifier remain unchanged;
+- website-only candidates still pass P16 bounded enrichment;
+- direct phones and recovered phones still pass normal phone validation and
+  exact R2 dedupe;
+- no extra source query, paid API, shard attempt or candidate budget is added.
+
+The reserve fraction is configurable as
+`sources.overture.website_candidate_reserve_fraction` and production uses
+**0.20**.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -854,6 +885,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P20 cache observability: **P11 HIT/MISS/ENTRY TELEMETRY ACTIVE**
 - P21 legacy fallback cache: **ADVISORY OBJECTS-V1 HEAD CACHE ACTIVE; RESERVATIONS FRESH**
 - P22 pending-marker cache: **ADVISORY PENDING LIST/GET CACHE ACTIVE; RESERVATIONS FRESH**
+- P23 Overture contact stratification: **80% PHONE-FIRST + 20% WEBSITE EXPLORATION RESERVE ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
