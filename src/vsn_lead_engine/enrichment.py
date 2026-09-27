@@ -246,7 +246,7 @@ class ContactEnricher:
         self._budget_lock = threading.Lock()
         self._session_lock = threading.Lock()
         self._robots_lock = threading.Lock()
-        self._common_lock = threading.Lock()
+        self._common_lock = threading.RLock()
         self._sessions: list[requests.Session] = []
         self._local = threading.local()
         self._robots_cache: dict[str, robotparser.RobotFileParser | None] = {}
