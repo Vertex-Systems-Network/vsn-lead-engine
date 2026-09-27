@@ -529,6 +529,7 @@ class PackedR2RegistryIndex(R2RegistryIndex):
             self._invalidate_pending_cache()
             return changed
         finally:
+            self._invalidate_pending_cache()
             self._release_lock(lock_owner)
 
     def mark_retryable(self, unique_tokens: Iterable[str]) -> int:
@@ -591,11 +592,13 @@ class PackedR2RegistryIndex(R2RegistryIndex):
             self._invalidate_pending_cache()
             return changed
         finally:
+            self._invalidate_pending_cache()
             self._release_lock(lock_owner)
 
     def reconcile_pending(self, sheets_store) -> dict[str, int]:
         batches = self.pending_rows()
         if not batches:
+            self._invalidate_pending_cache()
             return {
                 "batches": 0,
                 "checked": 0,
