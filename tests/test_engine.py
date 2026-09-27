@@ -1,5 +1,6 @@
 import vsn_lead_engine.engine as engine
-from vsn_lead_engine.engine import _candidate_partition_geography, _quality_summary, _search_with_retry, _update_yield_hints, _yield_hint_summary, check_workbook_readiness, recover_workbook_readiness
+from vsn_lead_engine.engine import _candidate_partition_geography, _dedupe_source_batch, _quality_summary, _search_with_retry, _update_yield_hints, _yield_hint_summary, check_workbook_readiness, recover_workbook_readiness
+from vsn_lead_engine.models import Lead
 
 
 class FlakySource:
@@ -1205,3 +1206,90 @@ def test_run_until_quota_history_failure_is_fail_open(monkeypatch):
         "adaptive_yield_history"
     ]["load_error"]
     assert source.closed
+
+
+def _batch_lead(**changes):
+    data={
+        "country":"United States",
+        "category":"IT & Software",
+        "business_name":"Example Systems",
+        "phone":"",
+        "city":"Austin",
+        "region":"Texas",
+        "source":"Test Source",
+        "source_id":"source:example",
+        "website":"https://example.com",
+    }
+    data.update(changes)
+    return Lead(**data)
+
+
+def test_source_batch_dedupe_prefers_valid_phone_representative():
+    weak=_batch_lead(phone="",email="",source_url="")
+    strong=_batch_lead(
+        phone="+12025550199",
+        email="hello@example.com",
+        source_url="https://source.example/item",
+    )
+
+    kept,dropped=_dedupe_source_batch([weak,strong])
+
+    assert dropped==1
+    assert kept==[strong]
+
+
+def test_source_batch_dedupe_prefers_website_when_phone_missing():
+    weak=_batch_lead(
+        source_id="",
+        website="",
+    )
+    strong=_batch_lead(
+        source_id="",
+        website="https://example.com",
+    )
+
+    kept,dropped=_dedupe_source_batch([weak,strong])
+
+    assert dropped==1
+    assert kept==[strong]
+
+
+def test_source_batch_dedupe_preserves_original_order_for_equal_quality():
+    first=_batch_lead(
+        business_name="Alpha",
+        source_id="source:a",
+        website="https://a.example",
+    )
+    duplicate=_batch_lead(
+        business_name="Alpha",
+        source_id="source:a",
+        website="https://a.example",
+    )
+    unique=_batch_lead(
+        business_name="Beta",
+        source_id="source:b",
+        website="https://b.example",
+    )
+
+    kept,dropped=_dedupe_source_batch([first,duplicate,unique])
+
+    assert dropped==1
+    assert kept==[first,unique]
+
+
+def test_source_batch_dedupe_keeps_distinct_entities():
+    first=_batch_lead(
+        business_name="Alpha",
+        source_id="source:a",
+        website="https://a.example",
+    )
+    second=_batch_lead(
+        business_name="Beta",
+        source_id="source:b",
+        website="https://b.example",
+    )
+
+    kept,dropped=_dedupe_source_batch([first,second])
+
+    assert dropped==0
+    assert kept==[first,second]
