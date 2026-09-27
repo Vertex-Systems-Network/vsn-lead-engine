@@ -46,7 +46,7 @@ jobs:
         run: |
           action="$(head -n 1 .github/registry-maintenance-trigger | tr -d '\r\n ' | tr '[:upper:]' '[:lower:]')"
           case "$action" in
-            check|dry-backfill|backfill|audit|stats|migrate) ;;
+            check|dry-backfill|backfill|audit|stats|migrate|smoke) ;;
             *) echo "::error::Unsupported registry maintenance action: $action"; exit 2 ;;
           esac
           echo "value=$action" >> "$GITHUB_OUTPUT"
@@ -68,3 +68,6 @@ jobs:
       - name: Full R2 migration and exact audit
         if: ${{ steps.action.outputs.value == 'migrate' }}
         run: python -m vsn_lead_engine.cli registry-migrate
+      - name: Live isolated R2 transaction smoke test
+        if: ${{ steps.action.outputs.value == 'smoke' }}
+        run: python -m vsn_lead_engine.cli registry-smoke

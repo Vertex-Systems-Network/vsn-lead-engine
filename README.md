@@ -228,7 +228,8 @@ sheets
   -> registry-backfill
   -> registry-audit   # missing_fingerprints must be 0
   -> registry-migrate # one-shot check + dry-run + backfill + audit + stats
-  -> dual (optional observation)
+  -> registry-smoke   # isolated live reserve/collision/rollback cleanup
+  -> dual
   -> r2
 ```
 
@@ -273,8 +274,8 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - Daily dated workbook routing: **ENABLED**
 - P0 reliability hardening: **ENABLED**
 - P1 runner performance + quota cycles: **ENABLED**
-- P2 permanent R2 dedupe ledger: **R2 AUTHORITY**
-- Master Registry cross-day dedupe: **FROZEN MIGRATION SNAPSHOT**
+- P2 permanent R2 dedupe ledger: **DUAL MODE; FINAL LIVE TRANSACTION SMOKE PENDING**
+- Master Registry cross-day dedupe: **CURRENT AUTHORITY DURING FINAL CUTOVER CERTIFICATION**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
 - Taxonomy-first classification: **ENABLED**
