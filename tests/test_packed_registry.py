@@ -40,6 +40,7 @@ class FakePaginator:
 class FakeS3:
     def __init__(self):
         self.objects = {}
+        self.get_counts = {}
 
     def head_bucket(self, Bucket):
         return {}
@@ -76,6 +77,7 @@ class FakeS3:
         return {}
 
     def get_object(self, Bucket, Key):
+        self.get_counts[Key] = self.get_counts.get(Key, 0) + 1
         if Key not in self.objects:
             raise client_error(404, "NoSuchKey", "GetObject")
         return {"Body": io.BytesIO(self.objects[Key]["body"])}
@@ -302,3 +304,76 @@ def test_live_smoke_activates_and_cleans_packed_layout(monkeypatch):
     assert result["collision_after_cleanup"] == 0
     assert result["remaining_fingerprint_objects"] == 0
     assert result["remaining_packed_objects"] == 0
+
+
+def _packed_get_count(fake):
+    return sum(
+        count
+        for key,count in fake.get_counts.items()
+        if "/packs/v2/" in key
+    )
+
+
+def test_advisory_collision_checks_reuse_packed_read_cache(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+
+    writer=PackedR2RegistryIndex(config(),client=fake)
+    lead=make_lead()
+    reserved=writer.reserve_pending([lead],{"id":"sheet123"})
+    writer.activate(reserved)
+
+    reader=PackedR2RegistryIndex(config(),client=fake)
+    before=_packed_get_count(fake)
+    first=reader.collision_keys([lead])
+    after_first=_packed_get_count(fake)
+    second=reader.collision_keys([lead])
+    after_second=_packed_get_count(fake)
+
+    assert first
+    assert second==first
+    assert after_first > before
+    assert after_second == after_first
+    stats=reader.cache_stats()
+    assert stats["entries"] > 0
+    assert stats["hits"] > 0
+    assert stats["misses"] > 0
+
+
+def test_reserve_pending_uses_fresh_reads_even_when_advisory_cache_is_stale(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+    lead=make_lead()
+
+    reader=PackedR2RegistryIndex(config(),client=fake)
+    assert reader.collision_keys([lead]) == set()
+    assert reader.cache_stats()["entries"] > 0
+
+    writer=PackedR2RegistryIndex(config(),client=fake)
+    reserved=writer.reserve_pending([lead],{"id":"sheet123"})
+    assert reserved
+    assert writer.activate(reserved) == 1
+
+    # Reader still has a stale advisory miss cached.
+    assert reader.collision_keys([lead]) == set()
+
+    # Commit-time reservation must ignore advisory cache and read fresh packs.
+    assert reader.reserve_pending([lead],{"id":"sheet456"}) == set()
+
+
+def test_clear_read_cache_forces_next_advisory_refresh(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+    lead=make_lead()
+
+    writer=PackedR2RegistryIndex(config(),client=fake)
+    reserved=writer.reserve_pending([lead],{"id":"sheet123"})
+    writer.activate(reserved)
+
+    reader=PackedR2RegistryIndex(config(),client=fake)
+    assert reader.collision_keys([lead])
+    first_reads=_packed_get_count(fake)
+    reader.clear_read_cache()
+    assert reader.cache_stats()["entries"] == 0
+    assert reader.collision_keys([lead])
+    assert _packed_get_count(fake) > first_reads
