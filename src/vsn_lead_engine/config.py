@@ -246,6 +246,13 @@ def load_config() -> dict:
             raise ValueError(
                 "registry.read_cache_max_entries must be between 16 and 1024."
             )
+        legacy_cache_max=int(
+            registry.get("legacy_read_cache_max_entries",4096)
+        )
+        if legacy_cache_max < 64 or legacy_cache_max > 20000:
+            raise ValueError(
+                "registry.legacy_read_cache_max_entries must be between 64 and 20000."
+            )
 
     _validate_geographies(config["geographies"])
 
