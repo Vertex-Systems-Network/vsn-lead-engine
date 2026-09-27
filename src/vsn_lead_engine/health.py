@@ -104,6 +104,18 @@ def run_health_event(
             event["adaptive_history_load_error"]=_clean_text(history["load_error"])
         if history.get("save_error"):
             event["adaptive_history_save_error"]=_clean_text(history["save_error"])
+    cache=result.get("registry_read_cache") or {}
+    if isinstance(cache,dict):
+        event["registry_cache_enabled"]=bool(cache.get("enabled",False))
+        event["registry_cache_entries"]=max(
+            0,int(cache.get("entries",0) or 0)
+        )
+        event["registry_cache_hits"]=max(
+            0,int(cache.get("hits",0) or 0)
+        )
+        event["registry_cache_misses"]=max(
+            0,int(cache.get("misses",0) or 0)
+        )
     return event
 
 
@@ -279,6 +291,8 @@ class DailyHealthLedgerStore:
             "adaptive_state_load_error","adaptive_state_save_error",
             "adaptive_history_loaded","adaptive_history_saved",
             "adaptive_history_load_error","adaptive_history_save_error",
+            "registry_cache_enabled","registry_cache_entries",
+            "registry_cache_hits","registry_cache_misses",
             "attempts_used","attempts_configured","workbook_created",
             "error_type","message",
         }
