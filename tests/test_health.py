@@ -195,6 +195,9 @@ def test_run_health_event_builds_shortfalls_and_schedule():
                 "slot":"2026-09-28T08:00",
                 "start_delay_minutes":17,
             },
+            "adaptive_yield":{
+                "partitions_observed":18,
+            },
             "adaptive_yield_state":{
                 "loaded":True,
                 "saved":True,
@@ -229,6 +232,7 @@ def test_run_health_event_builds_shortfalls_and_schedule():
     assert event["categories_attempted"]==12
     assert event["source_batch_duplicates"]==5
     assert event["remote_prefilter_duplicates"]==7
+    assert event["adaptive_partitions_observed"]==18
     assert event["adaptive_state_loaded"] is True
     assert event["adaptive_history_loaded"] is True
     assert event["adaptive_history_saved"] is False
