@@ -1,5 +1,5 @@
 import vsn_lead_engine.engine as engine
-from vsn_lead_engine.engine import _search_with_retry
+from vsn_lead_engine.engine import _candidate_partition_geography, _search_with_retry
 
 
 class FlakySource:
@@ -137,3 +137,31 @@ def test_run_until_quota_stops_on_zero_acceptance(monkeypatch):
     assert result["cycles_executed"]==1
     assert len(calls)==1
     assert source.closed
+
+
+def test_candidate_partition_rotates_with_cursor_and_attempt():
+    geography={"country":"United States","region":"Texas","city":"Austin"}
+    first=_candidate_partition_geography(
+        geography,
+        cursor=10,
+        attempt=1,
+        partition_count=8,
+    )
+    second=_candidate_partition_geography(
+        geography,
+        cursor=10,
+        attempt=2,
+        partition_count=8,
+    )
+    next_cycle=_candidate_partition_geography(
+        geography,
+        cursor=11,
+        attempt=1,
+        partition_count=8,
+    )
+
+    assert first["_candidate_partition_count"]==8
+    assert first["_candidate_partition"]==2
+    assert second["_candidate_partition"]==3
+    assert next_cycle["_candidate_partition"]==3
+    assert geography=={"country":"United States","region":"Texas","city":"Austin"}

@@ -200,7 +200,7 @@ class OverturePlaceSource:
             response = requests.get(
                 self.stac_url,
                 timeout=20,
-                headers={"User-Agent": "VSN-Lead-Engine/0.7"},
+                headers={"User-Agent": "VSN-Lead-Engine/0.8"},
             )
             response.raise_for_status()
             payload = response.json()
@@ -278,12 +278,19 @@ class OverturePlaceSource:
 
         xmin, ymin, xmax, ymax = [float(v) for v in bbox]
         row_limit = max(1, min(int(limit or self.candidate_limit), self.candidate_limit))
+        partition_count=max(1,min(64,int(location.get("_candidate_partition_count",1))))
+        partition=int(location.get("_candidate_partition",0)) % partition_count
         release = self._resolve_release()
         path = (
             f"s3://overturemaps-us-west-2/release/{release}/"
             "theme=places/type=place/*"
         )
         category_clause = self._sql_category_clause(category)
+        partition_clause=(
+            "AND (hash(id) % ?) = ?"
+            if partition_count > 1
+            else ""
+        )
 
         sql = f"""
         SELECT
@@ -313,6 +320,7 @@ class OverturePlaceSource:
         WHERE
             bbox.xmin BETWEEN ? AND ?
             AND bbox.ymin BETWEEN ? AND ?
+            {partition_clause}
             AND (
                 (phones IS NOT NULL AND len(phones) > 0)
                 OR (websites IS NOT NULL AND len(websites) > 0)
@@ -327,7 +335,11 @@ class OverturePlaceSource:
         """
 
         connection = self._get_connection()
-        cursor = connection.execute(sql, [xmin, xmax, ymin, ymax, row_limit])
+        params=[xmin,xmax,ymin,ymax]
+        if partition_count > 1:
+            params.extend([partition_count,partition])
+        params.append(row_limit)
+        cursor = connection.execute(sql, params)
         columns = [item[0] for item in cursor.description]
         records = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
