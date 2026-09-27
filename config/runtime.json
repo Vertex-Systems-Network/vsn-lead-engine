@@ -712,7 +712,9 @@
       "index_url": "https://index.commoncrawl.org",
       "data_url": "https://data.commoncrawl.org",
       "max_record_bytes": 1000000,
-      "max_decompressed_bytes": 4000000
-    }
+      "max_decompressed_bytes": 4000000,
+      "max_lookups_per_call": 1
+    },
+    "max_candidates_per_call": 12
   }
 }
