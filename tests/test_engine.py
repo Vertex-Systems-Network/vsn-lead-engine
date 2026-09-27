@@ -560,6 +560,7 @@ def test_run_until_quota_passes_learned_yield_to_next_cycle(monkeypatch):
         "visits":1,
         "discovered":100,
         "accepted":20,
+        "partitions_observed":0,
     }
     assert source.closed
 
