@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import os
 import re
 from collections import defaultdict
@@ -13,6 +14,7 @@ from .normalize import normalize_domain, normalize_name, normalize_phone
 
 
 BLOCKING_STATUSES = {"active", "pendingdaily"}
+TOKEN_DIGEST_BYTES = 12  # 96-bit BLAKE2 digest; compact with negligible collision risk.
 
 
 def registry_mode(config: dict) -> str:
@@ -23,51 +25,79 @@ def supabase_registry_enabled(config: dict) -> bool:
     return registry_mode(config) in {"dual", "supabase"}
 
 
-def _nullable(value: str) -> str | None:
-    value = str(value or "").strip()
-    return value or None
+def fingerprint_token(kind: str, value: str) -> str:
+    normalized = str(value or "").strip().lower()
+    if not normalized:
+        return ""
+    digest = hashlib.blake2b(
+        f"{kind}\0{normalized}".encode("utf-8"),
+        digest_size=TOKEN_DIGEST_BYTES,
+    ).hexdigest()
+    return f"{kind}:{digest}"
+
+
+def fingerprint_tokens_from_values(
+    *,
+    unique_key: str,
+    google_place_id: str = "",
+    source_id: str = "",
+    normalized_domain: str = "",
+    phone_name_key: str = "",
+    business_location_key: str = "",
+) -> list[str]:
+    values = [
+        ("u", unique_key),
+        ("p", google_place_id),
+        ("s", source_id),
+        ("d", normalized_domain),
+        ("n", phone_name_key),
+        ("l", business_location_key),
+    ]
+    return sorted(
+        token for kind, value in values
+        if (token := fingerprint_token(kind, value))
+    )
+
+
+def lead_fingerprint_tokens(lead: Lead) -> list[str]:
+    fp = fingerprints(lead)
+    return fingerprint_tokens_from_values(
+        unique_key=fp.unique,
+        google_place_id=fp.place_id,
+        source_id=fp.source_id,
+        normalized_domain=fp.domain,
+        phone_name_key=fp.phone_name,
+        business_location_key=fp.business_location,
+    )
+
+
+def country_code(country: str) -> str:
+    normalized = str(country or "").strip().lower()
+    if normalized in {"united states", "united states of america", "usa", "us"}:
+        return "US"
+    if normalized in {"canada", "ca"}:
+        return "CA"
+    return str(country or "").strip()[:2].upper()
 
 
 def lead_registry_payload(lead: Lead, workbook: dict) -> dict:
     fp = fingerprints(lead)
-    normalized_phone = normalize_phone(lead.phone, lead.country)
     return {
         "first_added": lead.date_added,
         "category": lead.category,
-        "country": lead.country,
-        "city": lead.city,
-        "business_name": lead.business_name,
-        "website": lead.website,
-        "normalized_domain": _nullable(normalize_domain(lead.website)),
-        "phone": lead.phone,
-        "normalized_phone": normalized_phone,
-        "phone_name_key": _nullable(fp.phone_name),
-        "business_location_key": _nullable(fp.business_location),
-        "unique_key": fp.unique,
-        "daily_sheet": workbook.get("name", ""),
-        "daily_sheet_url": workbook.get(
-            "webViewLink",
-            f'https://docs.google.com/spreadsheets/d/{workbook.get("id", "")}/edit',
-        ),
+        "country_code": country_code(lead.country),
+        "unique_token": fingerprint_token("u", fp.unique),
+        "fingerprints": lead_fingerprint_tokens(lead),
+        "daily_sheet_id": str(workbook.get("id", "")).strip(),
         "status": "PendingDaily",
-        "region": lead.region,
-        "postal_code": lead.postal_code,
-        "google_place_id": _nullable(fp.place_id),
-        "source": lead.source,
-        "source_id": _nullable(fp.source_id),
-        "verification_sources": f"{lead.source}; Source ID: {lead.source_id}",
     }
 
 
 def collision_payload(lead: Lead) -> dict:
     fp = fingerprints(lead)
     return {
-        "candidate_unique_key": fp.unique,
-        "google_place_id": _nullable(fp.place_id),
-        "source_id": _nullable(fp.source_id),
-        "normalized_domain": _nullable(fp.domain),
-        "phone_name_key": _nullable(fp.phone_name),
-        "business_location_key": _nullable(fp.business_location),
+        "candidate_unique_token": fingerprint_token("u", fp.unique),
+        "fingerprints": lead_fingerprint_tokens(lead),
     }
 
 
@@ -77,7 +107,7 @@ def extract_sheet_id(value: str) -> str:
 
 
 class SupabaseRegistryIndex:
-    """Private service-role client for the scalable Registry backend."""
+    """Private service-role client for the compact scalable Registry backend."""
 
     def __init__(self, config: dict, session=None):
         settings = config.get("registry", {})
@@ -131,9 +161,9 @@ class SupabaseRegistryIndex:
         for chunk in self._chunks(rows, self.batch_size):
             data = self._rpc("vsn_lead_registry_collisions", {"p_rows": chunk}) or []
             for row in data:
-                key = str(row.get("candidate_unique_key", "")).strip().lower()
-                if key:
-                    result.add(key)
+                token = str(row.get("candidate_unique_token", "")).strip().lower()
+                if token:
+                    result.add(token)
         return result
 
     def reserve_pending(self, leads: Iterable[Lead], workbook: dict) -> set[str]:
@@ -142,24 +172,32 @@ class SupabaseRegistryIndex:
         for chunk in self._chunks(rows, self.batch_size):
             data = self._rpc("vsn_lead_registry_reserve", {"p_rows": chunk}) or []
             for row in data:
-                key = str(row.get("unique_key", "")).strip().lower()
-                if key:
-                    inserted.add(key)
+                token = str(row.get("unique_token", "")).strip().lower()
+                if token:
+                    inserted.add(token)
         return inserted
 
-    def activate(self, unique_keys: Iterable[str]) -> int:
-        keys = sorted({str(key).strip().lower() for key in unique_keys if str(key).strip()})
+    def activate(self, unique_tokens: Iterable[str]) -> int:
+        tokens = sorted({
+            str(token).strip().lower()
+            for token in unique_tokens
+            if str(token).strip()
+        })
         changed = 0
-        for chunk in self._chunks(keys, self.batch_size):
-            result = self._rpc("vsn_lead_registry_activate", {"p_keys": chunk})
+        for chunk in self._chunks(tokens, self.batch_size):
+            result = self._rpc("vsn_lead_registry_activate", {"p_tokens": chunk})
             changed += int(result or 0)
         return changed
 
-    def mark_retryable(self, unique_keys: Iterable[str]) -> int:
-        keys = sorted({str(key).strip().lower() for key in unique_keys if str(key).strip()})
+    def mark_retryable(self, unique_tokens: Iterable[str]) -> int:
+        tokens = sorted({
+            str(token).strip().lower()
+            for token in unique_tokens
+            if str(token).strip()
+        })
         changed = 0
-        for chunk in self._chunks(keys, self.batch_size):
-            result = self._rpc("vsn_lead_registry_mark_retryable", {"p_keys": chunk})
+        for chunk in self._chunks(tokens, self.batch_size):
+            result = self._rpc("vsn_lead_registry_mark_retryable", {"p_tokens": chunk})
             changed += int(result or 0)
         return changed
 
@@ -180,6 +218,33 @@ class SupabaseRegistryIndex:
         data = self._rpc("vsn_lead_registry_pending", {}) or []
         return [row for row in data if isinstance(row, dict)]
 
+    def stats(self) -> dict:
+        data = self._rpc("vsn_lead_registry_stats", {}) or {}
+        if isinstance(data, list):
+            return data[0] if data else {}
+        return data if isinstance(data, dict) else {}
+
+    def capacity_report(self, *, daily_leads: int, database_budget_mb: int) -> dict:
+        stats = self.stats()
+        total_rows = int(stats.get("total_rows", 0) or 0)
+        relation_bytes = int(stats.get("total_bytes", 0) or 0)
+        database_bytes = int(stats.get("database_bytes", 0) or 0)
+        budget_bytes = int(database_budget_mb) * 1024 * 1024
+        bytes_per_row = relation_bytes / total_rows if total_rows else 0.0
+        projected_daily_bytes = bytes_per_row * int(daily_leads)
+        remaining_bytes = max(0, budget_bytes - database_bytes)
+        days = (
+            remaining_bytes / projected_daily_bytes
+            if projected_daily_bytes > 0 else None
+        )
+        return {
+            **stats,
+            "database_budget_mb": int(database_budget_mb),
+            "bytes_per_registry_row": round(bytes_per_row, 2),
+            "projected_daily_registry_bytes": round(projected_daily_bytes, 2),
+            "estimated_headroom_days": round(days, 1) if days is not None else None,
+        }
+
     def reconcile_pending(self, sheets_store) -> dict[str, int]:
         pending = self.pending_rows()
         if not pending:
@@ -188,19 +253,19 @@ class SupabaseRegistryIndex:
         grouped: dict[tuple[str, str], list[dict]] = defaultdict(list)
         direct_retry: list[dict] = []
         for row in pending:
-            sheet_id = extract_sheet_id(row.get("daily_sheet_url", ""))
+            sheet_id = str(row.get("daily_sheet_id", "")).strip()
             category = str(row.get("category", "")).strip()
-            unique_key = str(row.get("unique_key", "")).strip().lower()
-            if not sheet_id or not category or not unique_key:
+            unique_token = str(row.get("unique_token", "")).strip().lower()
+            if not sheet_id or not category or not unique_token:
                 direct_retry.append(row)
                 continue
             grouped[(sheet_id, category)].append(row)
 
-        activate_keys: set[str] = set()
-        retryable_keys: set[str] = {
-            str(row.get("unique_key", "")).strip().lower()
+        activate_tokens: set[str] = set()
+        retryable_tokens: set[str] = {
+            str(row.get("unique_token", "")).strip().lower()
             for row in direct_retry
-            if str(row.get("unique_key", "")).strip()
+            if str(row.get("unique_token", "")).strip()
         }
         unresolved = 0
 
@@ -216,19 +281,19 @@ class SupabaseRegistryIndex:
                 continue
 
             present = {
-                str(item[0]).strip().lower()
+                fingerprint_token("u", str(item[0]).strip())
                 for item in values
                 if item and str(item[0]).strip()
             }
             for row in rows:
-                key = str(row.get("unique_key", "")).strip().lower()
-                if key in present:
-                    activate_keys.add(key)
+                token = str(row.get("unique_token", "")).strip().lower()
+                if token in present:
+                    activate_tokens.add(token)
                 else:
-                    retryable_keys.add(key)
+                    retryable_tokens.add(token)
 
-        activated = self.activate(activate_keys) if activate_keys else 0
-        retryable = self.mark_retryable(retryable_keys) if retryable_keys else 0
+        activated = self.activate(activate_tokens) if activate_tokens else 0
+        retryable = self.mark_retryable(retryable_tokens) if retryable_tokens else 0
         return {
             "checked": len(pending),
             "activated": activated,
@@ -243,7 +308,6 @@ def build_registry_index(config: dict, session=None):
     return SupabaseRegistryIndex(config, session=session)
 
 
-
 def sheet_registry_payloads(rows: list[list]) -> list[dict]:
     if not rows:
         return []
@@ -255,67 +319,63 @@ def sheet_registry_payloads(rows: list[list]) -> list[dict]:
         return str(row[position]).strip() if position is not None and position < len(row) else ""
 
     result = []
-    allowed_statuses = {
-        "PendingDaily","Active","NeedsReview","Retryable",
-        "Rejected","Invalid","Quarantined",
-    }
     for row in rows[1:]:
-        unique_key = cell(row, "Unique Key").lower()
-        if not unique_key:
+        raw_unique = cell(row, "Unique Key").lower()
+        if not raw_unique:
             continue
-        country = cell(row, "Country")
-        name = cell(row, "Business Name")
-        phone = normalize_phone(cell(row, "Phone"), country)
+
         raw_status = cell(row, "Status")
         normalized_status = re.sub(r"[^a-z0-9]+", "", raw_status.lower())
-        status_map = {
-            "pendingdaily":"PendingDaily",
-            "active":"Active",
-            "needsreview":"NeedsReview",
-            "retryable":"Retryable",
-            "writefailed":"Retryable",
-            "rejected":"Rejected",
-            "invalid":"Invalid",
-            "quarantined":"Quarantined",
-        }
-        status = status_map.get(normalized_status, "Active")
-        if status not in allowed_statuses:
-            status = "Active"
+        # Only blocking rows belong in the permanent compact dedupe index.
+        if normalized_status not in {"", "active", "pendingdaily"}:
+            continue
+        status = "PendingDaily" if normalized_status == "pendingdaily" else "Active"
+
+        country = cell(row, "Country")
+        name = cell(row, "Business Name")
+        normalized_phone = normalize_phone(cell(row, "Phone"), country)
+        phone_name_key = (
+            f"{normalized_phone}|{normalize_name(name)}"
+            if normalized_phone and name else ""
+        )
         verification = cell(row, "Verification Sources")
         source_match = re.search(r"Source ID:\s*([^;|]+)", verification, re.I)
         source_id = source_match.group(1).strip().lower() if source_match else ""
+        daily_sheet_id = extract_sheet_id(cell(row, "Daily Sheet URL"))
+
+        tokens = fingerprint_tokens_from_values(
+            unique_key=raw_unique,
+            google_place_id=cell(row, "Google Place ID").lower(),
+            source_id=source_id,
+            normalized_domain=(
+                cell(row, "Normalized Domain")
+                or normalize_domain(cell(row, "Website"))
+            ),
+            phone_name_key=phone_name_key,
+            business_location_key=cell(row, "Business+City+State Key"),
+        )
         result.append({
             "first_added": cell(row, "First Added"),
             "category": cell(row, "Category") or cell(row, "Field"),
-            "country": country,
-            "city": cell(row, "City"),
-            "business_name": name,
-            "website": cell(row, "Website"),
-            "normalized_domain": _nullable(
-                cell(row, "Normalized Domain") or normalize_domain(cell(row, "Website"))
-            ),
-            "phone": cell(row, "Phone"),
-            "normalized_phone": phone,
-            "phone_name_key": _nullable(
-                f"{phone}|{normalize_name(name)}" if phone and name else ""
-            ),
-            "business_location_key": _nullable(cell(row, "Business+City+State Key")),
-            "unique_key": unique_key,
-            "daily_sheet": cell(row, "Daily Sheet"),
-            "daily_sheet_url": cell(row, "Daily Sheet URL"),
+            "country_code": country_code(country),
+            "unique_token": fingerprint_token("u", raw_unique),
+            "fingerprints": tokens,
+            "daily_sheet_id": daily_sheet_id,
             "status": status,
-            "region": cell(row, "State/Province"),
-            "postal_code": cell(row, "ZIP/Postal Code"),
-            "google_place_id": _nullable(cell(row, "Google Place ID").lower()),
-            "source": cell(row, "Primary Source"),
-            "source_id": _nullable(source_id),
-            "verification_sources": verification,
         })
     return result
 
 
-def backfill_sheet_registry(sheets_store, registry_index: SupabaseRegistryIndex, *, dry_run: bool=False) -> dict:
-    payloads = sheet_registry_payloads(sheets_store._registry_rows())
+def backfill_sheet_registry(
+    sheets_store,
+    registry_index: SupabaseRegistryIndex,
+    *,
+    dry_run: bool=False,
+) -> dict:
+    rows = sheets_store._registry_rows()
+    payloads = sheet_registry_payloads(rows)
+    source_rows = max(0, len(rows) - 1)
+    skipped_nonblocking = source_rows - len(payloads)
     status_counts: dict[str, int] = {}
     for row in payloads:
         status = row["status"]
@@ -323,13 +383,17 @@ def backfill_sheet_registry(sheets_store, registry_index: SupabaseRegistryIndex,
     if dry_run:
         return {
             "status": "dry-run",
+            "source_rows": source_rows,
             "rows": len(payloads),
+            "skipped_nonblocking": skipped_nonblocking,
             "status_counts": status_counts,
         }
     inserted = registry_index.import_rows(payloads)
     return {
         "status": "ok",
+        "source_rows": source_rows,
         "rows": len(payloads),
         "inserted": inserted,
+        "skipped_nonblocking": skipped_nonblocking,
         "status_counts": status_counts,
     }

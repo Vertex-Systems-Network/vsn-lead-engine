@@ -58,6 +58,12 @@ def load_config() -> dict:
         raise ValueError("registry.supabase_url_env is required.")
     if not registry.get("supabase_service_role_key_env"):
         raise ValueError("registry.supabase_service_role_key_env is required.")
+    if int(registry.get("database_size_budget_mb",500)) < 100:
+        raise ValueError("registry.database_size_budget_mb must be at least 100.")
+    warn=float(registry.get("warn_at_percent",70))
+    critical=float(registry.get("critical_at_percent",85))
+    if not (0 < warn < critical < 100):
+        raise ValueError("Registry storage thresholds must satisfy 0 < warn < critical < 100.")
 
     for geo in config["geographies"]:
         bbox=geo.get("bbox")

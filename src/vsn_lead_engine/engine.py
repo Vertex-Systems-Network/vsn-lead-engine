@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from .dedupe import fingerprints,is_duplicate
 from .normalize import normalize_phone
 from .scheduler import build_shard_plan, run_cursor
-from .registry import build_registry_index, registry_mode
+from .registry import build_registry_index, fingerprint_token, registry_mode
 from .sheets import GoogleSheetsStore
 from .sources import build_sources
 
@@ -179,7 +179,8 @@ def run_once(
                 lead.phone=phone
                 lead.date_added=today
                 fp=fingerprints(lead)
-                if is_duplicate(fp,local) or fp.unique in remote_collisions:
+                remote_unique_token=fingerprint_token("u",fp.unique)
+                if is_duplicate(fp,local) or remote_unique_token in remote_collisions:
                     rejections["duplicate"]+=1
                     continue
 
@@ -259,13 +260,16 @@ def run_once(
             reserved=registry_index.reserve_pending(leads,workbook)
             committed=[
                 lead for lead in leads
-                if fingerprints(lead).unique.lower() in reserved
+                if fingerprint_token("u",fingerprints(lead).unique) in reserved
             ]
             conflicts=len(leads)-len(committed)
             if conflicts:
                 rejections["duplicate"]+=conflicts
             if committed:
-                keys={fingerprints(lead).unique.lower() for lead in committed}
+                keys={
+                    fingerprint_token("u",fingerprints(lead).unique)
+                    for lead in committed
+                }
                 try:
                     store.append_daily_leads(workbook,committed)
                 except Exception:

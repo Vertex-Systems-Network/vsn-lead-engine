@@ -407,6 +407,9 @@
     "supabase_url_env": "SUPABASE_URL",
     "supabase_service_role_key_env": "SUPABASE_SERVICE_ROLE_KEY",
     "request_timeout_seconds": 30,
-    "batch_size": 500
+    "batch_size": 500,
+    "database_size_budget_mb": 500,
+    "warn_at_percent": 70,
+    "critical_at_percent": 85
   }
 }

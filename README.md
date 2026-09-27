@@ -163,19 +163,67 @@ Registry backend selection is explicit in `config/runtime.json`:
 
 The database path preserves the existing Registry-first transaction:
 
-1. batch collision check across source ID, place ID, domain, phone+name,
-   business+location and unique key;
-2. reserve new rows as `PendingDaily`;
-3. append only reserved leads to the dated Google workbook;
-4. promote successful writes to `Active`;
-5. convert stale missing writes to non-blocking `Retryable`.
+1. normalize the same six duplicate dimensions already used in production:
+   source ID, place ID, domain, phone+name, business+location and unique key;
+2. convert every non-empty value to a type-separated **96-bit BLAKE2
+   fingerprint** before it leaves the runner;
+3. batch collision-check compact fingerprint arrays;
+4. reserve new rows as `PendingDaily`;
+5. append only reserved leads to the dated Google workbook;
+6. promote successful writes to `Active`;
+7. convert stale missing writes to non-blocking `Retryable`.
+
+The scalable Registry intentionally does **not** duplicate full business names,
+phone numbers, websites, emails, addresses or social profiles. Those remain in
+the dated Google Sheets. Postgres stores only first-seen date, category,
+two-letter country code, the compact dedupe fingerprints, daily Sheet ID and
+transaction status.
 
 The SQL blueprint is `db/supabase_registry_schema.sql`. It enables RLS,
 revokes table/function access from `anon` and `authenticated`, uses
 `SECURITY INVOKER` RPC functions, and grants only `service_role` the server
-operations required by the GitHub runner. Unique indexes apply only to
-`Active` and `PendingDaily` rows, so quarantined/retryable records do not
-poison future dedupe.
+operations required by the GitHub runner. A single partial GIN fingerprint
+index replaces multiple raw-value indexes. Reservation uses a transaction-level
+advisory lock so concurrent workers cannot reserve two different leads that
+share a secondary fingerprint.
+
+### Duplicate policy
+
+A candidate is rejected when **any** blocking Registry row matches one of:
+
+- provider/source ID;
+- Google place ID when present;
+- normalized domain;
+- normalized phone + normalized business name;
+- normalized business + city + region;
+- canonical Unique Key.
+
+Only `Active` and `PendingDaily` rows block rediscovery. `NeedsReview`,
+`Retryable`, `Rejected`, `Invalid` and quarantined rows are non-blocking
+in the current Google Registry. The compact database backfill imports only
+blocking rows, so known bad/quarantined records do not consume permanent
+database space or poison future dedupe.
+
+### Storage budgeting
+
+Supabase Free currently has a 500 MB database-size limit. New projects also
+consume platform/schema space before lead rows are added, so Free is treated as
+a migration/test tier rather than assumed infinite production storage.
+
+The compact Registry exposes `registry-stats`, which reports table bytes,
+index bytes, total relation bytes and total database bytes. It calculates
+measured bytes/Registry row and estimates remaining days at the configured
+12,000 leads/day rate. Runtime defaults:
+
+- database budget: 500 MB;
+- warning threshold: 70%;
+- critical threshold: 85%.
+
+The engine will not discard blocking historical fingerprints merely to save
+space, because that would allow old businesses to re-enter as duplicates.
+When measured Free-tier headroom becomes too small, the correct options are to
+upgrade database capacity or move the compact exact-fingerprint ledger to a
+larger backend; daily Google Sheets remain unaffected.
 
 A zero-downtime cutover is:
 
@@ -213,7 +261,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - Daily dated workbook routing: **ENABLED**
 - P0 reliability hardening: **ENABLED**
 - P1 runner performance + quota cycles: **ENABLED**
-- P2 scalable Registry foundation: **READY; live DB cutover pending dedicated project**
+- P2 scalable Registry foundation: **READY; compact-hash model prepared, live DB cutover pending dedicated project**
 - Master Registry cross-day dedupe: **ENABLED**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
