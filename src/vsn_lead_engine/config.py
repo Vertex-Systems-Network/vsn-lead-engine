@@ -45,6 +45,9 @@ def load_config() -> dict:
         raise ValueError("source_retry_backoff_seconds cannot be negative.")
     if int(config["runtime"].get("max_cycles_per_run",3)) < 1:
         raise ValueError("max_cycles_per_run must be at least 1.")
+    candidate_partition_count=int(config["runtime"].get("candidate_partition_count",8))
+    if candidate_partition_count < 1 or candidate_partition_count > 64:
+        raise ValueError("candidate_partition_count must be between 1 and 64.")
 
     enrichment=config.get("enrichment",{})
     if enrichment.get("enabled",False):
