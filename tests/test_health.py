@@ -242,3 +242,18 @@ def test_health_cli_contract_is_available():
     assert 'sub.add_parser("health-show")' in source
     assert 'sub.add_parser("health-incident")' in source
     assert '"--record-health"' in source
+
+
+def test_health_workflow_contract_records_readiness_and_blocked_runs():
+    from pathlib import Path
+
+    readiness=Path(".github/workflows/daily-workbook-readiness.yml").read_text(
+        encoding="utf-8"
+    )
+    lead=Path(".github/workflows/lead-engine.yml").read_text(encoding="utf-8")
+
+    assert "--record-health" in readiness
+    assert "R2_ACCOUNT_ID" in readiness
+    assert "VSN_RUN_ORIGIN: recovery-push" in lead
+    assert "health-incident" in lead
+    assert "MissingGoogleCredential" in lead
