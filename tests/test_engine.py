@@ -826,3 +826,127 @@ def test_run_until_quota_yield_state_load_failure_is_fail_open(monkeypatch):
     assert FailingLoadStateStore.saved==1
     assert result["accepted"]==1000
     assert source.closed
+
+
+def test_run_until_quota_records_daily_health_event_fail_open(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    class FakeRegistry:
+        def close(self):
+            pass
+
+    registry=FakeRegistry()
+    monkeypatch.setattr(engine,"build_registry_index",lambda config:registry)
+    monkeypatch.setattr(engine,"build_contact_enricher",lambda config:None)
+
+    events=[]
+
+    class FakeHealthStore:
+        def __init__(self,registry_index,max_events=96):
+            assert registry_index is registry
+            assert max_events==96
+
+        def append(self,run_date,event):
+            events.append((run_date,dict(event)))
+            return {
+                "status":"appended",
+                "key":f"health/{run_date}.json",
+                "events":1,
+                "bytes":120,
+            }
+
+    monkeypatch.setattr(engine,"DailyHealthLedgerStore",FakeHealthStore)
+    monkeypatch.setattr(
+        engine,
+        "run_once",
+        lambda *args,**kwargs:{
+            "status":"complete",
+            "accepted":1000,
+            "discovered":2500,
+            "counts":{"A":1000},
+            "country_counts":{"United States":1000,"Canada":0},
+            "attempts":[],
+        },
+    )
+
+    result=engine.run_until_quota(
+        {
+            "runtime":{
+                "timezone":"Asia/Karachi",
+                "daily_target_per_category":1000,
+                "max_cycles_per_run":3,
+                "max_zero_progress_cycles":3,
+                "adaptive_yield_routing":False,
+                "adaptive_yield_persist_daily":False,
+                "health_ledger_enabled":True,
+                "health_ledger_max_events":96,
+            },
+            "categories":["A"],
+        },
+        origin="recovery-push",
+    )
+
+    assert len(events)==1
+    assert events[0][1]["origin"]=="recovery-push"
+    assert events[0][1]["quota_complete"] is True
+    assert result["health_ledger"]["recorded"] is True
+    assert result["health_ledger"]["write_status"]=="appended"
+    assert source.closed
+
+
+def test_health_ledger_failure_does_not_fail_lead_run(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    class FakeRegistry:
+        def close(self):
+            pass
+
+    monkeypatch.setattr(engine,"build_registry_index",lambda config:FakeRegistry())
+    monkeypatch.setattr(engine,"build_contact_enricher",lambda config:None)
+
+    class FailingHealthStore:
+        def __init__(self,registry_index,max_events=96):
+            pass
+
+        def append(self,run_date,event):
+            raise RuntimeError("health R2 unavailable")
+
+    monkeypatch.setattr(engine,"DailyHealthLedgerStore",FailingHealthStore)
+    monkeypatch.setattr(
+        engine,
+        "run_once",
+        lambda *args,**kwargs:{
+            "status":"complete",
+            "accepted":1000,
+            "counts":{"A":1000},
+            "country_counts":{"United States":1000,"Canada":0},
+            "attempts":[],
+        },
+    )
+
+    result=engine.run_until_quota(
+        {
+            "runtime":{
+                "timezone":"Asia/Karachi",
+                "daily_target_per_category":1000,
+                "max_cycles_per_run":3,
+                "max_zero_progress_cycles":3,
+                "adaptive_yield_routing":False,
+                "adaptive_yield_persist_daily":False,
+                "health_ledger_enabled":True,
+                "health_ledger_max_events":96,
+            },
+            "categories":["A"],
+        },
+        origin="native-schedule",
+    )
+
+    assert result["status"]=="complete"
+    assert result["accepted"]==1000
+    assert result["health_ledger"]["recorded"] is False
+    assert "RuntimeError: health R2 unavailable" in result["health_ledger"]["error"]
+    assert source.closed
