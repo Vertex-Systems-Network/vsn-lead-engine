@@ -43,8 +43,16 @@ def load_config() -> dict:
         raise ValueError("source_retry_attempts must be at least 1.")
     if float(config["runtime"].get("source_retry_backoff_seconds",2)) < 0:
         raise ValueError("source_retry_backoff_seconds cannot be negative.")
-    if int(config["runtime"].get("max_cycles_per_run",3)) < 1:
+    max_cycles_per_run=int(config["runtime"].get("max_cycles_per_run",3))
+    if max_cycles_per_run < 1:
         raise ValueError("max_cycles_per_run must be at least 1.")
+    max_zero_progress_cycles=int(
+        config["runtime"].get("max_zero_progress_cycles",max_cycles_per_run)
+    )
+    if max_zero_progress_cycles < 1 or max_zero_progress_cycles > max_cycles_per_run:
+        raise ValueError(
+            "max_zero_progress_cycles must be between 1 and max_cycles_per_run."
+        )
     candidate_partition_count=int(config["runtime"].get("candidate_partition_count",8))
     if candidate_partition_count < 1 or candidate_partition_count > 64:
         raise ValueError("candidate_partition_count must be between 1 and 64.")
