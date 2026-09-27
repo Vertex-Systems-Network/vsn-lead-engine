@@ -765,6 +765,10 @@ def run_until_quota(
                 "decay":history_decay,
             })
         except Exception as exc:
+            # Historical routing is non-authoritative. Never overwrite an
+            # unknown remote profile after a failed read; continue with
+            # same-day learning only and preserve the existing object.
+            history_store=None
             history_telemetry.update({
                 "enabled":True,
                 "load_error":f"{type(exc).__name__}: {exc}",
