@@ -89,15 +89,19 @@ def _same_day_route_is_cooldown(
     *,
     min_visits: int,
     min_discovered: int,
+    min_partitions: int,
 ) -> bool:
     if not hint:
         return False
     visits=max(0,int(hint.get("visits",0) or 0))
     discovered=max(0,int(hint.get("discovered",0) or 0))
     accepted=max(0,int(hint.get("accepted",0) or 0))
+    partition_mask=max(0,int(hint.get("partition_mask",0) or 0))
+    partitions_observed=partition_mask.bit_count()
     return (
         visits >= max(1,int(min_visits))
         and discovered >= max(1,int(min_discovered))
+        and partitions_observed >= max(1,int(min_partitions))
         and accepted == 0
     )
 
@@ -109,6 +113,7 @@ def _effective_cooldown_keys(
     daily_yield_hints: dict[str,dict] | None,
     min_visits: int,
     min_discovered: int,
+    min_partitions: int,
 ) -> set[str]:
     """Cooldown zero-yield routes only when alternatives remain available."""
     if not daily_yield_hints or not items:
@@ -120,6 +125,7 @@ def _effective_cooldown_keys(
             daily_yield_hints.get(yield_hint_key(category,geo)),
             min_visits=min_visits,
             min_discovered=min_discovered,
+            min_partitions=min_partitions,
         )
     }
     # Never starve a category/country. If every route is exhausted-looking,
@@ -137,6 +143,7 @@ def _adaptive_country_geographies(
     cooldown_enabled: bool,
     cooldown_min_visits: int,
     cooldown_min_discovered: int,
+    cooldown_min_partitions: int,
 ) -> tuple[dict[str,list[dict]],set[str]]:
     """Rank metros inside each country without changing country interleave."""
     groups: dict[str,list[tuple[int,dict]]] = defaultdict(list)
@@ -154,6 +161,7 @@ def _adaptive_country_geographies(
                 daily_yield_hints=daily_yield_hints,
                 min_visits=cooldown_min_visits,
                 min_discovered=cooldown_min_discovered,
+                min_partitions=cooldown_min_partitions,
             )
             if cooldown_enabled else set()
         )
@@ -252,6 +260,7 @@ def build_shard_plan(
     cooldown_enabled: bool = True,
     cooldown_min_visits: int = 2,
     cooldown_min_discovered: int = 100,
+    cooldown_min_partitions: int = 4,
 ) -> list[dict]:
     """Build a progress-weighted, country-balanced rotating shard plan.
 
@@ -314,6 +323,7 @@ def build_shard_plan(
                 cooldown_enabled=cooldown_enabled,
                 cooldown_min_visits=cooldown_min_visits,
                 cooldown_min_discovered=cooldown_min_discovered,
+                cooldown_min_partitions=cooldown_min_partitions,
             )
             adaptive_groups[category]=groups
             cooldown_keys_by_category[category]=cooldowns
