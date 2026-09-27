@@ -16,7 +16,9 @@
     "candidate_partition_count": 16,
     "max_zero_progress_cycles": 3,
     "workbook_readiness_attempts": 3,
-    "workbook_readiness_retry_delay_seconds": 60
+    "workbook_readiness_retry_delay_seconds": 60,
+    "adaptive_yield_routing": true,
+    "adaptive_yield_exploration_bonus": 0.15
   },
   "drive": {
     "folder_id": "1CPnHX5lXNb_wqcwk2O4bfACL4qNZ5IEh",
