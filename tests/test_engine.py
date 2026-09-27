@@ -1,5 +1,5 @@
 import vsn_lead_engine.engine as engine
-from vsn_lead_engine.engine import _candidate_partition_geography, _quality_summary, _search_with_retry
+from vsn_lead_engine.engine import _candidate_partition_geography, _quality_summary, _search_with_retry, check_workbook_readiness
 
 
 class FlakySource:
@@ -276,3 +276,66 @@ def test_quality_summary_handles_zero_denominators():
     assert summary["acceptance_rate_pct"]==0.0
     assert summary["phone_recovery_rate_pct"]==0.0
     assert summary["partitions_visited"]==0
+
+
+def test_workbook_readiness_resolves_counts_and_quota_state():
+    class FakeStore:
+        def ensure_lead_workbook(self):
+            return {
+                "id":"sheet-123",
+                "name":"US + Canada Business Leads — 2026-09-28",
+                "webViewLink":"https://docs.google.com/spreadsheets/d/sheet-123/edit",
+                "created":True,
+            }
+
+        def category_counts(self, spreadsheet_id):
+            assert spreadsheet_id=="sheet-123"
+            return {"A":1000,"B":999}
+
+        def daily_country_counts(self, spreadsheet_id):
+            assert spreadsheet_id=="sheet-123"
+            return {"United States":1200,"Canada":799}
+
+    result=check_workbook_readiness(
+        {
+            "runtime":{
+                "timezone":"Asia/Karachi",
+                "daily_target_per_category":1000,
+            },
+            "categories":["A","B"],
+        },
+        run_date="2026-09-28",
+        store=FakeStore(),
+    )
+
+    assert result["status"]=="ready"
+    assert result["run_date"]=="2026-09-28"
+    assert result["workbook"]["created"] is True
+    assert result["counts"]=={"A":1000,"B":999}
+    assert result["country_counts"]["Canada"]==799
+    assert result["quota_complete"] is False
+
+
+def test_workbook_readiness_marks_complete_only_when_all_categories_hit_target():
+    class FakeStore:
+        def ensure_lead_workbook(self):
+            return {"id":"sheet-456","name":"daily","created":False}
+
+        def category_counts(self, spreadsheet_id):
+            return {"A":1000,"B":1001}
+
+        def daily_country_counts(self, spreadsheet_id):
+            return {"United States":1000,"Canada":1001}
+
+    result=check_workbook_readiness(
+        {
+            "runtime":{
+                "timezone":"Asia/Karachi",
+                "daily_target_per_category":1000,
+            },
+            "categories":["A","B"],
+        },
+        run_date="2026-09-28",
+        store=FakeStore(),
+    )
+    assert result["quota_complete"] is True
