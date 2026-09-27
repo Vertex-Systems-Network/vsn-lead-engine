@@ -3,7 +3,7 @@ import json
 
 from botocore.exceptions import ClientError
 
-from vsn_lead_engine.yield_state import DailyYieldStateStore
+from vsn_lead_engine.yield_state import DailyYieldStateStore, HistoricalYieldProfileStore
 
 
 def client_error(status, code, operation):
@@ -150,3 +150,108 @@ def test_daily_yield_state_normalizes_invalid_counters():
         }
     }
     assert meta["entries"] == 1
+
+
+def test_historical_yield_profile_missing_is_empty():
+    store=HistoricalYieldProfileStore(FakeRegistry())
+    hints,meta=store.load()
+    assert hints=={}
+    assert meta["status"]=="empty"
+    assert meta["last_completed_date"]==""
+    assert meta["key"].endswith("/adaptive-yield/v2/history.json")
+
+
+def test_historical_yield_profile_saves_completion_with_decay():
+    registry=FakeRegistry()
+    store=HistoricalYieldProfileStore(registry)
+    store._loaded_hints={
+        "a|united states|r1|city":{
+            "visits":4,
+            "discovered":200,
+            "accepted":40,
+        }
+    }
+    store._last_completed_date="2026-09-27"
+
+    saved=store.save_completion(
+        "2026-09-28",
+        {
+            "a|united states|r1|city":{
+                "visits":2,
+                "discovered":100,
+                "accepted":30,
+            },
+            "b|canada|r2|city":{
+                "visits":1,
+                "discovered":50,
+                "accepted":10,
+            },
+        },
+        decay=0.75,
+    )
+
+    assert saved["status"]=="saved"
+    loaded,meta=store.load()
+    assert meta["last_completed_date"]=="2026-09-28"
+    assert loaded[
+        "a|united states|r1|city"
+    ]=={
+        "visits":5,
+        "discovered":250,
+        "accepted":60,
+    }
+    assert loaded[
+        "b|canada|r2|city"
+    ]=={
+        "visits":1,
+        "discovered":50,
+        "accepted":10,
+    }
+
+
+def test_historical_yield_profile_writes_only_once_per_completed_date():
+    registry=FakeRegistry()
+    store=HistoricalYieldProfileStore(registry)
+    store.load()
+    first=store.save_completion(
+        "2026-09-28",
+        {
+            "a":{
+                "visits":1,
+                "discovered":10,
+                "accepted":2,
+            }
+        },
+    )
+    object_count=len(registry.client.objects)
+    second=store.save_completion(
+        "2026-09-28",
+        {
+            "a":{
+                "visits":2,
+                "discovered":20,
+                "accepted":4,
+            }
+        },
+    )
+
+    assert first["status"]=="saved"
+    assert second["status"]=="already-completed"
+    assert len(registry.client.objects)==object_count
+
+
+def test_historical_yield_profile_caps_entries():
+    registry=FakeRegistry()
+    store=HistoricalYieldProfileStore(registry,max_entries=2)
+    store.load()
+    saved=store.save_completion(
+        "2026-09-28",
+        {
+            "a":{"visits":1,"discovered":10,"accepted":1},
+            "b":{"visits":5,"discovered":50,"accepted":10},
+            "c":{"visits":3,"discovered":30,"accepted":8},
+        },
+    )
+    loaded,_=store.load()
+    assert saved["entries"]==2
+    assert set(loaded)=={"b","c"}
