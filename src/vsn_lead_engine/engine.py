@@ -44,6 +44,23 @@ def _close_sources(sources) -> None:
             close()
 
 
+def _candidate_partition_geography(
+    geography: dict,
+    *,
+    cursor: int,
+    attempt: int,
+    partition_count: int,
+) -> dict:
+    """Attach a deterministic rotating source cohort to one shard search."""
+    count=max(1,int(partition_count))
+    partition=(int(cursor)+max(0,int(attempt)-1)) % count
+    return {
+        **geography,
+        "_candidate_partition_count":count,
+        "_candidate_partition":partition,
+    }
+
+
 def run_once(
     config: dict,
     dry_run: bool=False,
@@ -106,6 +123,7 @@ def run_once(
     per_shard_limit=int(runtime.get("candidate_limit_per_shard",500))
     source_retry_attempts=int(runtime.get("source_retry_attempts",3))
     source_retry_backoff_seconds=float(runtime.get("source_retry_backoff_seconds",2))
+    candidate_partition_count=max(1,int(runtime.get("candidate_partition_count",8)))
     plan=build_shard_plan(
         config["categories"],
         config["geographies"],
@@ -155,10 +173,16 @@ def run_once(
             if remaining <= 0:
                 break
 
+            search_geography=_candidate_partition_geography(
+                geography,
+                cursor=cursor,
+                attempt=shard["attempt"],
+                partition_count=candidate_partition_count,
+            )
             candidates,source_error,retries=_search_with_retry(
                 source,
                 category,
-                geography,
+                search_geography,
                 limit=remaining,
                 attempts=source_retry_attempts,
                 backoff_seconds=source_retry_backoff_seconds,
@@ -229,6 +253,8 @@ def run_once(
                 "source":source.name,
                 "discovered":len(candidates),
                 "accepted":accepted_from_source,
+                "candidate_partition":search_geography["_candidate_partition"],
+                "candidate_partition_count":search_geography["_candidate_partition_count"],
                 "error":source_error,
             })
 
@@ -255,6 +281,7 @@ def run_once(
         "zero_result_shards":zero_result_shards,
         "source_errors":source_errors,
         "source_retries":source_retries,
+        "candidate_partition_count":candidate_partition_count,
         "registry_mode":mode,
         "registry_shadow_errors":registry_shadow_errors,
         "run_date":run_date,
