@@ -36,6 +36,9 @@ class PackedR2RegistryIndex(R2RegistryIndex):
         self.pack_shard_chars = max(1, min(2, int(settings.get("pack_shard_chars", 1))))
         self.lock_stale_seconds = max(30, int(settings.get("lock_stale_seconds", 180)))
         self.read_cache_enabled = bool(settings.get("read_cache_enabled", True))
+        self.pending_read_cache_enabled = bool(
+            settings.get("pending_read_cache_enabled", True)
+        )
         self.read_cache_max_entries = max(
             16,
             min(1024, int(settings.get("read_cache_max_entries", 128))),
@@ -62,6 +65,7 @@ class PackedR2RegistryIndex(R2RegistryIndex):
             "layout": self.LAYOUT,
             "pack_shard_chars": self.pack_shard_chars,
             "read_cache_enabled": self.read_cache_enabled,
+            "pending_read_cache_enabled": self.pending_read_cache_enabled,
             "read_cache_max_entries": self.read_cache_max_entries,
             "legacy_read_cache_max_entries": self.legacy_read_cache_max_entries,
         }
@@ -146,6 +150,7 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                 "legacy_entries":len(self._legacy_cache),
                 "legacy_hits":self._legacy_cache_hits,
                 "legacy_misses":self._legacy_cache_misses,
+                "pending_enabled":self.pending_read_cache_enabled,
                 "pending_entries":len(self._pending_cache or set()),
                 "pending_hits":self._pending_cache_hits,
                 "pending_misses":self._pending_cache_misses,
@@ -264,7 +269,12 @@ class PackedR2RegistryIndex(R2RegistryIndex):
         use_cache: bool = False,
     ) -> set[str]:
         excluded = exclude_batch_ids or set()
-        cacheable=use_cache and self.read_cache_enabled and not excluded
+        cacheable=(
+            use_cache
+            and self.read_cache_enabled
+            and self.pending_read_cache_enabled
+            and not excluded
+        )
 
         if cacheable:
             with self._pack_cache_lock:
