@@ -50,6 +50,25 @@ def count_current_rows(date_rows, status_rows, today: str) -> int:
     return total
 
 
+def count_current_countries(date_country_rows, status_rows, today: str) -> dict[str, int]:
+    """Count today's usable leads by country."""
+    counts: dict[str, int] = {}
+    max_rows = max(len(date_country_rows), len(status_rows))
+    for index in range(max_rows):
+        row = date_country_rows[index] if index < len(date_country_rows) else []
+        date_value = row[0] if len(row) > 0 else ""
+        country_value = row[1] if len(row) > 1 else ""
+        status_value = status_rows[index][0] if index < len(status_rows) and status_rows[index] else ""
+        if str(date_value).strip() != today:
+            continue
+        if str(status_value).strip().lower() == "needs review":
+            continue
+        country = str(country_value).strip()
+        if country:
+            counts[country] = counts.get(country, 0) + 1
+    return counts
+
+
 def registry_status_blocks_dedupe(status: str) -> bool:
     """Return whether a Registry row should block future discovery.
 
@@ -126,6 +145,8 @@ class GoogleSheetsStore:
             ["Shard Attempts",0],
             ["Zero-Result Shards",0],
             ["Source Errors",0],
+            ["United States Leads Today",0],
+            ["Canada Leads Today",0],
             ["Primary Free Source","Overture Maps Places"],
             ["Notes","Permanent workbook mode. Daily counts use Date Added, so targets reset automatically each day."],
         ])
@@ -169,6 +190,9 @@ class GoogleSheetsStore:
         ).execute().get("values",[])
         existing={str(row[0]).strip() for row in rows if row}
         missing=[[metric,0] for metric in OVERVIEW_INCREMENT_METRICS if metric not in existing]
+        for metric in ["United States Leads Today","Canada Leads Today"]:
+            if metric not in existing:
+                missing.append([metric,0])
         if "Primary Free Source" not in existing:
             missing.append(["Primary Free Source","Overture Maps Places"])
         if missing:
@@ -238,6 +262,41 @@ class GoogleSheetsStore:
             status_rows = value_ranges[status_index].get("values", []) if status_index < len(value_ranges) else []
             counts[category] = count_current_rows(date_rows, status_rows, today)
         return counts
+
+    def daily_country_counts(self, spreadsheet_id: str) -> dict[str, int]:
+        today = self._today()
+        ranges = []
+        for category in self.config["categories"]:
+            ranges.extend([f"'{category}'!A2:B", f"'{category}'!AA2:AA"])
+
+        response = self.sheets.spreadsheets().values().batchGet(
+            spreadsheetId=spreadsheet_id,
+            ranges=ranges,
+            valueRenderOption="UNFORMATTED_VALUE",
+        ).execute()
+        value_ranges = response.get("valueRanges", [])
+        result: dict[str, int] = {}
+
+        for index, _category in enumerate(self.config["categories"]):
+            date_country_index = index * 2
+            status_index = date_country_index + 1
+            date_country_rows = (
+                value_ranges[date_country_index].get("values", [])
+                if date_country_index < len(value_ranges)
+                else []
+            )
+            status_rows = (
+                value_ranges[status_index].get("values", [])
+                if status_index < len(value_ranges)
+                else []
+            )
+            counts = count_current_countries(date_country_rows, status_rows, today)
+            for country, count in counts.items():
+                result[country] = result.get(country, 0) + count
+
+        for country in ["United States", "Canada"]:
+            result.setdefault(country, 0)
+        return result
 
     def _registry_rows(self):
         sid = self.config["drive"]["master_registry_spreadsheet_id"]
@@ -391,6 +450,31 @@ class GoogleSheetsStore:
             valueInputOption="RAW",
             body={"values":[["Active"] for _ in leads]}
         ).execute()
+
+    def set_overview_metrics(self, workbook_id: str, values: dict[str, int | str]):
+        rows = self.sheets.spreadsheets().values().get(
+            spreadsheetId=workbook_id,
+            range="'Overview'!A1:B100"
+        ).execute().get("values", [])
+        metric_rows = {
+            str(row[0]).strip(): row_number
+            for row_number, row in enumerate(rows, start=1)
+            if row and str(row[0]).strip()
+        }
+        data = []
+        for metric, value in values.items():
+            row_number = metric_rows.get(metric)
+            if row_number is None:
+                continue
+            data.append({
+                "range":f"'Overview'!B{row_number}",
+                "values":[[value]],
+            })
+        if data:
+            self.sheets.spreadsheets().values().batchUpdate(
+                spreadsheetId=workbook_id,
+                body={"valueInputOption":"RAW","data":data},
+            ).execute()
 
     def update_overview(self, workbook_id: str, counts: dict[str,int], increments: dict[str,int]):
         rows = self.sheets.spreadsheets().values().get(
