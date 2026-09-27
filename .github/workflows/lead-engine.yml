@@ -99,4 +99,15 @@ jobs:
         run: python -m vsn_lead_engine.cli run
       - name: Real run blocked safely
         if: ${{ (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) && steps.google.outputs.ready != 'true' }}
-        run: echo "Google credential unavailable. No writes were attempted."
+        shell: bash
+        run: |
+          origin="manual"
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            origin="native-schedule"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            origin="recovery-push"
+          fi
+          python -m vsn_lead_engine.cli health-incident \
+            --origin "$origin" \
+            --error-type "MissingGoogleCredential" \
+            --message "GOOGLE_SERVICE_ACCOUNT_JSON unavailable; no lead writes attempted."
