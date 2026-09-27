@@ -377,6 +377,29 @@ slots can now cover all 12 categories instead of clumping the first six
 three times each. P11 health telemetry records `categories_attempted` for
 live audit.
 
+### P16 fair enrichment budget distribution
+
+The official-website enrichment budget remains fixed at **160 candidates per
+event**, but one shard call can now consume at most **12** of those candidates.
+This prevents early category/metro shards from exhausting the entire free
+network budget before P15's first-pass category coverage reaches later
+categories.
+
+Common Crawl keeps the existing **8 lookups/event** ceiling and adds a
+**1 lookup/call** cap.
+
+Budget accounting distinguishes:
+
+- event-budget skips;
+- per-call fairness skips;
+- Common Crawl event-budget skips;
+- Common Crawl per-call skips.
+
+The existing aggregate `Enrichment Budget Skips` metric remains compatible.
+
+No source, timeout, worker, response-size or total event budget was increased;
+P16 redistributes the same free enrichment capacity more fairly.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -678,6 +701,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P13 rolling historical yield prior: **CROSS-DAY COLD-START ROUTING ACTIVE**
 - P14 zero-yield cooldown: **SAME-DAY EXHAUSTION DEFERRAL ACTIVE**
 - P15 fair category weighting: **LAYERED 3×/2×/1× COVERAGE ACTIVE**
+- P16 enrichment fairness: **160/EVENT + 12/CALL + COMMON CRAWL 1/CALL ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

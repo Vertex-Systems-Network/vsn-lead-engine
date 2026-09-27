@@ -22,6 +22,10 @@ def test_production_free_source_breadth_is_expanded():
     assert config["runtime"]["start_hour"]==8
     assert config["runtime"]["end_hour"]==23
     assert config["runtime"]["timezone"]=="Asia/Karachi"
+    assert config["enrichment"]["max_candidates_per_run"]==160
+    assert config["enrichment"]["max_candidates_per_call"]==12
+    assert config["enrichment"]["common_crawl"]["max_lookups_per_run"]==8
+    assert config["enrichment"]["common_crawl"]["max_lookups_per_call"]==1
     assert len(config["geographies"])>=56
     cities={geo["city"] for geo in config["geographies"]}
     assert {

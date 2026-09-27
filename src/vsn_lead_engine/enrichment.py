@@ -208,6 +208,13 @@ class ContactEnricher:
         common = settings.get("common_crawl", {})
         self.enabled = bool(settings.get("enabled", False))
         self.max_candidates = max(0, int(settings.get("max_candidates_per_run", 160)))
+        self.max_candidates_per_call = max(
+            1,
+            min(
+                self.max_candidates or 1,
+                int(settings.get("max_candidates_per_call", 12)),
+            ),
+        )
         self.workers = max(1, min(16, int(settings.get("workers", 8))))
         self.timeout = max(1.0, float(settings.get("request_timeout_seconds", 6)))
         self.max_pages = max(1, min(3, int(settings.get("max_pages_per_site", 2))))
@@ -218,11 +225,18 @@ class ContactEnricher:
         self.user_agent = str(
             settings.get(
                 "user_agent",
-                "VSN-Lead-Engine/0.21 (+https://vertexsystemsnetwork.com/)",
+                "VSN-Lead-Engine/0.22 (+https://vertexsystemsnetwork.com/)",
             )
         ).strip()
         self.common_enabled = bool(common.get("enabled", False))
         self.common_max_lookups = max(0, int(common.get("max_lookups_per_run", 8)))
+        self.common_max_lookups_per_call = max(
+            1,
+            min(
+                self.common_max_lookups or 1,
+                int(common.get("max_lookups_per_call", 1)),
+            ),
+        )
         self.common_min_interval = max(
             1.0, float(common.get("min_interval_seconds", 2.5))
         )
@@ -632,6 +646,10 @@ class ContactEnricher:
             "common_crawl_changed": 0,
             "common_crawl_phone_recovered": 0,
             "skipped_budget": 0,
+            "skipped_event_budget": 0,
+            "skipped_call_budget": 0,
+            "common_crawl_skipped_event_budget": 0,
+            "common_crawl_skipped_call_budget": 0,
             "errors": 0,
         }
         if not self.enabled or not leads or self.max_candidates <= 0:
@@ -643,7 +661,12 @@ class ContactEnricher:
                 continue
             if not _normalize_site_url(lead.website):
                 continue
+            if len(targets) >= self.max_candidates_per_call:
+                stats["skipped_call_budget"] += 1
+                stats["skipped_budget"] += 1
+                continue
             if not self._take_candidate_budget():
+                stats["skipped_event_budget"] += 1
                 stats["skipped_budget"] += 1
                 continue
             targets.append(lead)
@@ -677,9 +700,16 @@ class ContactEnricher:
         if not self.common_enabled or self.common_max_lookups <= 0:
             return stats
 
-        for lead in failed_live:
-            if not self._take_common_budget():
+        common_used_this_call=0
+        for index,lead in enumerate(failed_live):
+            remaining=len(failed_live)-index
+            if common_used_this_call >= self.common_max_lookups_per_call:
+                stats["common_crawl_skipped_call_budget"] += remaining
                 break
+            if not self._take_common_budget():
+                stats["common_crawl_skipped_event_budget"] += remaining
+                break
+            common_used_this_call += 1
             stats["common_crawl_attempted"] += 1
             before = normalize_phone(lead.phone, lead.country)
             try:
