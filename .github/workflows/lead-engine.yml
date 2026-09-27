@@ -3,6 +3,10 @@ name: Lead Engine
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - ".github/lead-run-trigger"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -35,7 +39,7 @@ jobs:
 
   run:
     needs: validate
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -62,6 +66,11 @@ jobs:
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: python -m vsn_lead_engine.cli run
+      - name: Assistant-triggered real run
+        if: ${{ github.event_name == 'push' && steps.google.outputs.ready == 'true' }}
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: python -m vsn_lead_engine.cli run
       - name: Manual dry run
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
         run: python -m vsn_lead_engine.cli run --dry-run
@@ -71,5 +80,5 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: python -m vsn_lead_engine.cli run
       - name: Real run blocked safely
-        if: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) && steps.google.outputs.ready != 'true' }}
+        if: ${{ (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) && steps.google.outputs.ready != 'true' }}
         run: echo "Lead collection is approved, but Google credential is not configured yet. No writes were attempted."
