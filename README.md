@@ -99,6 +99,25 @@ Behavior:
 - missing or invalid telemetry is itself treated as an incident;
 - no lead discovery, enrichment, quota write or R2 mutation occurs in this recovery path.
 
+### P7 free-source breadth expansion
+
+The free Overture discovery surface now covers **56 configured US/Canada metro
+markets** and **16 deterministic candidate partitions**.
+
+Major additions include New York City, San Francisco, San Jose, Sacramento,
+Orlando, Washington DC, Baltimore, Raleigh, Pittsburgh, Cleveland, Cincinnati,
+Indianapolis, Kansas City, St. Louis, Salt Lake City, New Orleans, Mississauga,
+Quebec City, Victoria, Surrey, London (Ontario), Kitchener-Waterloo, Regina and
+Moncton.
+
+This increases the available free candidate pool without changing the 1,000
+accepted leads/category/day ceiling. Scheduler rotation still limits each cycle
+to its configured shard budget, so broader coverage is consumed over repeated
+quota events rather than increasing one-run load without bound.
+
+Runtime validation now rejects duplicate markets, unsupported countries,
+out-of-range latitude/longitude values and invalid bbox ordering.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -203,9 +222,9 @@ P1 performance controls:
 - recovered phones still pass the normal US/Canada validation and final exact
   R2 dedupe before a lead can be accepted.
 
-P2 source-yield controls:
+P2/P7 source-yield controls:
 
-- Overture candidates are split into **8 deterministic hash partitions**;
+- Overture candidates are split into **16 deterministic hash partitions**;
 - the partition advances with the GitHub run cursor and with each shard attempt;
 - the three controlled cycles in one event therefore naturally reach different
   candidate cohorts instead of replaying one `LIMIT 500` slice;
@@ -389,6 +408,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P4 quality observability: **FUNNEL + ENRICHMENT METRICS ACTIVE**
 - P5 daily workbook readiness: **07:50 PKT PRE-START CERTIFICATION ACTIVE**
 - P6 readiness recovery: **3-ATTEMPT RETRY + INCIDENT TELEMETRY ACTIVE**
+- P7 free-source breadth: **56 METROS + 16 OVERTURE PARTITIONS ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
