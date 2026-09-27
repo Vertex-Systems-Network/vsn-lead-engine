@@ -2,7 +2,7 @@ from __future__ import annotations
 import argparse,json,sys
 from .config import load_config
 from .engine import run_until_quota
-from .registry import SupabaseRegistryIndex, backfill_sheet_registry
+from .registry import R2RegistryIndex, audit_sheet_registry, backfill_sheet_registry
 from .sheets import GoogleSheetsStore
 
 def main() -> int:
@@ -14,6 +14,8 @@ def main() -> int:
     backfill_parser=sub.add_parser("registry-backfill")
     backfill_parser.add_argument("--dry-run",action="store_true")
     sub.add_parser("registry-stats")
+    sub.add_parser("registry-check")
+    sub.add_parser("registry-audit")
     args=parser.parse_args()
     config=load_config()
     if args.command=="validate":
@@ -28,7 +30,7 @@ def main() -> int:
         return 0
     if args.command=="registry-backfill":
         store=GoogleSheetsStore(config)
-        index=SupabaseRegistryIndex(config)
+        index=R2RegistryIndex(config)
         try:
             result=backfill_sheet_registry(store,index,dry_run=args.dry_run)
         finally:
@@ -36,12 +38,26 @@ def main() -> int:
         print(json.dumps(result,indent=2,default=str))
         return 0
     if args.command=="registry-stats":
-        index=SupabaseRegistryIndex(config)
+        index=R2RegistryIndex(config)
         try:
-            result=index.capacity_report(
-                daily_leads=len(config["categories"])*int(config["runtime"]["daily_target_per_category"]),
-                database_budget_mb=int(config["registry"].get("database_size_budget_mb",500)),
-            )
+            result=index.stats()
+        finally:
+            index.close()
+        print(json.dumps(result,indent=2,default=str))
+        return 0
+    if args.command=="registry-check":
+        index=R2RegistryIndex(config)
+        try:
+            result=index.verify()
+        finally:
+            index.close()
+        print(json.dumps(result,indent=2,default=str))
+        return 0
+    if args.command=="registry-audit":
+        store=GoogleSheetsStore(config)
+        index=R2RegistryIndex(config)
+        try:
+            result=audit_sheet_registry(store,index)
         finally:
             index.close()
         print(json.dumps(result,indent=2,default=str))

@@ -15,7 +15,6 @@ on:
         default: true
         type: boolean
   schedule:
-    # Half-hour fallback. The quota supervisor runs at :00.
     - cron: "30 3-17 * * *"
 
 permissions:
@@ -42,8 +41,13 @@ jobs:
 
   run:
     if: ${{ github.event_name != 'pull_request' }}
-    timeout-minutes: 30
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -53,7 +57,7 @@ jobs:
       - run: python -m pip install -e .
       - name: Runtime config preflight
         run: python -m vsn_lead_engine.cli validate
-      - name: Credential preflight
+      - name: Google credential preflight
         id: google
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
@@ -61,10 +65,17 @@ jobs:
         run: |
           if [ -n "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
-            echo "Google credential preflight: ready"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::GOOGLE_SERVICE_ACCOUNT_JSON is not configured; real lead run skipped safely."
+            echo "::notice::Google credential missing; real lead run skipped safely."
+          fi
+      - name: R2 registry preflight
+        if: ${{ github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
+        shell: bash
+        run: |
+          mode="$(python -c 'import json; print(json.load(open("config/runtime.json"))["registry"]["mode"])')"
+          if [ "$mode" != "sheets" ]; then
+            python -m vsn_lead_engine.cli registry-check
           fi
       - name: Scheduled real run
         if: ${{ github.event_name == 'schedule' && steps.google.outputs.ready == 'true' }}
@@ -86,4 +97,4 @@ jobs:
         run: python -m vsn_lead_engine.cli run
       - name: Real run blocked safely
         if: ${{ (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) && steps.google.outputs.ready != 'true' }}
-        run: echo "Lead collection is approved, but Google credential is not configured yet. No writes were attempted."
+        run: echo "Google credential unavailable. No writes were attempted."

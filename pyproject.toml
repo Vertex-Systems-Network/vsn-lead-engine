@@ -4,10 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vsn-lead-engine"
-version = "0.4.1"
+version = "0.5.0"
 description = "Zero-paid-API US + Canada business lead engine"
 requires-python = ">=3.11"
 dependencies = [
+  "boto3>=1.37,<2",
   "duckdb>=1.5.5,<2",
   "google-api-python-client>=2.149,<3",
   "google-auth>=2.35,<3",

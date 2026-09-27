@@ -1,28 +1,32 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import re
-from collections import defaultdict
+import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from typing import Iterable
 
-import requests
+import boto3
+from botocore.config import Config
+from botocore.exceptions import ClientError
 
 from .dedupe import fingerprints
 from .models import Lead
 from .normalize import normalize_domain, normalize_name, normalize_phone
 
 
-BLOCKING_STATUSES = {"active", "pendingdaily"}
-TOKEN_DIGEST_BYTES = 12  # 96-bit BLAKE2 digest; compact with negligible collision risk.
+TOKEN_DIGEST_BYTES = 12  # 96-bit BLAKE2. R2 object keys never contain raw lead PII.
 
 
 def registry_mode(config: dict) -> str:
     return str(config.get("registry", {}).get("mode", "sheets")).strip().lower()
 
 
-def supabase_registry_enabled(config: dict) -> bool:
-    return registry_mode(config) in {"dual", "supabase"}
+def r2_registry_enabled(config: dict) -> bool:
+    return registry_mode(config) in {"dual", "r2"}
 
 
 def fingerprint_token(kind: str, value: str) -> str:
@@ -45,18 +49,23 @@ def fingerprint_tokens_from_values(
     phone_name_key: str = "",
     business_location_key: str = "",
 ) -> list[str]:
+    # Unique Key is derived from place/domain/phone-name/biz-location, so storing
+    # another permanent object for it would duplicate one of these dimensions.
     values = [
-        ("u", unique_key),
         ("p", google_place_id),
         ("s", source_id),
         ("d", normalized_domain),
         ("n", phone_name_key),
         ("l", business_location_key),
     ]
-    return sorted(
+    tokens = sorted(
         token for kind, value in values
         if (token := fingerprint_token(kind, value))
     )
+    # Defensive fallback for malformed legacy rows lacking all normal dimensions.
+    if not tokens and unique_key:
+        tokens.append(fingerprint_token("u", unique_key))
+    return tokens
 
 
 def lead_fingerprint_tokens(lead: Lead) -> list[str]:
@@ -71,33 +80,13 @@ def lead_fingerprint_tokens(lead: Lead) -> list[str]:
     )
 
 
-def country_code(country: str) -> str:
-    normalized = str(country or "").strip().lower()
-    if normalized in {"united states", "united states of america", "usa", "us"}:
-        return "US"
-    if normalized in {"canada", "ca"}:
-        return "CA"
-    return str(country or "").strip()[:2].upper()
-
-
 def lead_registry_payload(lead: Lead, workbook: dict) -> dict:
     fp = fingerprints(lead)
     return {
-        "first_added": lead.date_added,
-        "category": lead.category,
-        "country_code": country_code(lead.country),
         "unique_token": fingerprint_token("u", fp.unique),
         "fingerprints": lead_fingerprint_tokens(lead),
         "daily_sheet_id": str(workbook.get("id", "")).strip(),
-        "status": "PendingDaily",
-    }
-
-
-def collision_payload(lead: Lead) -> dict:
-    fp = fingerprints(lead)
-    return {
-        "candidate_unique_token": fingerprint_token("u", fp.unique),
-        "fingerprints": lead_fingerprint_tokens(lead),
+        "category": lead.category,
     }
 
 
@@ -106,174 +95,305 @@ def extract_sheet_id(value: str) -> str:
     return match.group(1) if match else ""
 
 
-class SupabaseRegistryIndex:
-    """Private service-role client for the compact scalable Registry backend."""
+class R2RegistryIndex:
+    """Exact permanent dedupe ledger backed by private Cloudflare R2 objects."""
 
-    def __init__(self, config: dict, session=None):
+    def __init__(self, config: dict, client=None):
         settings = config.get("registry", {})
-        url_env = str(settings.get("supabase_url_env", "SUPABASE_URL"))
-        key_env = str(
-            settings.get(
-                "supabase_service_role_key_env",
-                "SUPABASE_SERVICE_ROLE_KEY",
-            )
-        )
-        self.url = os.getenv(url_env, "").strip().rstrip("/")
-        self.key = os.getenv(key_env, "").strip()
-        if not self.url or not self.key:
+        self.prefix = str(settings.get("prefix", "vsn-lead-ledger/v1")).strip("/")
+        self.max_workers = max(4, int(settings.get("max_workers", 32)))
+        self.retry_attempts = max(1, int(settings.get("retry_attempts", 4)))
+        self._batch_by_token: dict[str, str] = {}
+
+        account_env = str(settings.get("account_id_env", "R2_ACCOUNT_ID"))
+        access_env = str(settings.get("access_key_id_env", "R2_ACCESS_KEY_ID"))
+        secret_env = str(settings.get("secret_access_key_env", "R2_SECRET_ACCESS_KEY"))
+        bucket_env = str(settings.get("bucket_env", "R2_BUCKET"))
+
+        account_id = os.getenv(account_env, "").strip()
+        access_key = os.getenv(access_env, "").strip()
+        secret_key = os.getenv(secret_env, "").strip()
+        self.bucket = os.getenv(bucket_env, "").strip()
+
+        if not all([account_id, access_key, secret_key, self.bucket]):
             raise RuntimeError(
-                f"Supabase Registry requires GitHub secrets {url_env} and {key_env}."
+                "R2 Registry requires GitHub secrets "
+                f"{account_env}, {access_env}, {secret_env}, and {bucket_env}."
             )
-        self.timeout = float(settings.get("request_timeout_seconds", 30))
-        self.batch_size = max(1, int(settings.get("batch_size", 500)))
-        self.session = session or requests.Session()
-        self.headers = {
-            "apikey": self.key,
-            "Authorization": f"Bearer {self.key}",
-            "Content-Type": "application/json",
-        }
+
+        self.client = client or boto3.client(
+            "s3",
+            endpoint_url=f"https://{account_id}.r2.cloudflarestorage.com",
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+            region_name="auto",
+            config=Config(
+                retries={"max_attempts": self.retry_attempts, "mode": "standard"},
+                max_pool_connections=max(64, self.max_workers * 2),
+                connect_timeout=10,
+                read_timeout=30,
+            ),
+        )
 
     def close(self):
-        close = getattr(self.session, "close", None)
+        close = getattr(self.client, "close", None)
         if callable(close):
             close()
 
-    def _rpc(self, function: str, payload: dict):
-        response = self.session.post(
-            f"{self.url}/rest/v1/rpc/{function}",
-            headers=self.headers,
-            json=payload,
-            timeout=self.timeout,
-        )
-        response.raise_for_status()
-        if not response.content:
-            return None
-        return response.json()
+    def verify(self) -> dict:
+        self.client.head_bucket(Bucket=self.bucket)
+        return {"status": "ready", "bucket": self.bucket, "prefix": self.prefix}
 
     @staticmethod
-    def _chunks(items: list, size: int):
-        for start in range(0, len(items), size):
-            yield items[start:start + size]
+    def _error_status(exc: ClientError) -> int:
+        return int(exc.response.get("ResponseMetadata", {}).get("HTTPStatusCode", 0) or 0)
+
+    @staticmethod
+    def _error_code(exc: ClientError) -> str:
+        return str(exc.response.get("Error", {}).get("Code", ""))
+
+    @classmethod
+    def _is_missing(cls, exc: ClientError) -> bool:
+        return cls._error_status(exc) == 404 or cls._error_code(exc) in {
+            "404", "NoSuchKey", "NotFound"
+        }
+
+    @classmethod
+    def _is_precondition(cls, exc: ClientError) -> bool:
+        return cls._error_status(exc) == 412 or cls._error_code(exc) in {
+            "412", "PreconditionFailed"
+        }
+
+    def _fingerprint_key(self, token: str) -> str:
+        kind, digest = token.split(":", 1)
+        return f"{self.prefix}/fp/{kind}/{digest[:2]}/{digest}"
+
+    def _pending_key(self, batch_id: str) -> str:
+        return f"{self.prefix}/pending/{batch_id}.json"
+
+    def _token_exists(self, token: str) -> bool:
+        try:
+            self.client.head_object(Bucket=self.bucket, Key=self._fingerprint_key(token))
+            return True
+        except ClientError as exc:
+            if self._is_missing(exc):
+                return False
+            raise
 
     def collision_keys(self, leads: Iterable[Lead]) -> set[str]:
-        rows = [collision_payload(lead) for lead in leads]
-        result: set[str] = set()
-        for chunk in self._chunks(rows, self.batch_size):
-            data = self._rpc("vsn_lead_registry_collisions", {"p_rows": chunk}) or []
-            for row in data:
-                token = str(row.get("candidate_unique_token", "")).strip().lower()
-                if token:
-                    result.add(token)
-        return result
+        token_to_candidates: dict[str, set[str]] = {}
+        for lead in leads:
+            fp = fingerprints(lead)
+            unique_token = fingerprint_token("u", fp.unique)
+            if not unique_token:
+                continue
+            for token in lead_fingerprint_tokens(lead):
+                token_to_candidates.setdefault(token, set()).add(unique_token)
+
+        existing_tokens: set[str] = set()
+        with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+            futures = {pool.submit(self._token_exists, token): token for token in token_to_candidates}
+            for future in as_completed(futures):
+                token = futures[future]
+                if future.result():
+                    existing_tokens.add(token)
+
+        collisions: set[str] = set()
+        for token in existing_tokens:
+            collisions.update(token_to_candidates[token])
+        return collisions
+
+    def _put_if_absent(
+        self,
+        *,
+        key: str,
+        owner: str,
+        body: bytes = b"",
+        content_type: str = "application/octet-stream",
+    ) -> bool:
+        try:
+            self.client.put_object(
+                Bucket=self.bucket,
+                Key=key,
+                Body=body,
+                ContentType=content_type,
+                Metadata={"owner": owner},
+                IfNoneMatch="*",
+            )
+            return True
+        except ClientError as exc:
+            if self._is_precondition(exc):
+                return False
+            raise
+
+    def _owner_matches(self, key: str, owner: str) -> bool:
+        try:
+            response = self.client.head_object(Bucket=self.bucket, Key=key)
+        except ClientError as exc:
+            if self._is_missing(exc):
+                return False
+            raise
+        metadata = response.get("Metadata", {}) or {}
+        return str(metadata.get("owner", "")).strip().lower() == owner.lower()
+
+    def _delete_owned(self, key: str, owner: str):
+        if self._owner_matches(key, owner):
+            self.client.delete_object(Bucket=self.bucket, Key=key)
+
+    def _reserve_row(self, row: dict) -> str:
+        unique_token = row["unique_token"]
+        created: list[str] = []
+        try:
+            for token in row["fingerprints"]:
+                key = self._fingerprint_key(token)
+                made = self._put_if_absent(key=key, owner=unique_token)
+                if made:
+                    created.append(token)
+                    continue
+                if self._owner_matches(key, unique_token):
+                    continue
+                for made_token in created:
+                    self._delete_owned(self._fingerprint_key(made_token), unique_token)
+                return ""
+            return unique_token
+        except Exception:
+            for made_token in created:
+                self._delete_owned(self._fingerprint_key(made_token), unique_token)
+            raise
 
     def reserve_pending(self, leads: Iterable[Lead], workbook: dict) -> set[str]:
         rows = [lead_registry_payload(lead, workbook) for lead in leads]
-        inserted: set[str] = set()
-        for chunk in self._chunks(rows, self.batch_size):
-            data = self._rpc("vsn_lead_registry_reserve", {"p_rows": chunk}) or []
-            for row in data:
-                token = str(row.get("unique_token", "")).strip().lower()
-                if token:
-                    inserted.add(token)
-        return inserted
+        if not rows:
+            return set()
+
+        batch_id = uuid.uuid4().hex
+        marker_key = self._pending_key(batch_id)
+        initial = {
+            "batch_id": batch_id,
+            "daily_sheet_id": str(workbook.get("id", "")).strip(),
+            "category": rows[0]["category"],
+            "rows": rows,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        self.client.put_object(
+            Bucket=self.bucket,
+            Key=marker_key,
+            Body=json.dumps(initial, separators=(",", ":")).encode("utf-8"),
+            ContentType="application/json",
+        )
+
+        reserved: set[str] = set()
+        try:
+            with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+                futures = [pool.submit(self._reserve_row, row) for row in rows]
+                for future in as_completed(futures):
+                    token = future.result()
+                    if token:
+                        reserved.add(token)
+
+            reserved_rows = [row for row in rows if row["unique_token"] in reserved]
+            if not reserved_rows:
+                self.client.delete_object(Bucket=self.bucket, Key=marker_key)
+                return set()
+
+            marker = {**initial, "rows": reserved_rows, "state": "reserved"}
+            self.client.put_object(
+                Bucket=self.bucket,
+                Key=marker_key,
+                Body=json.dumps(marker, separators=(",", ":")).encode("utf-8"),
+                ContentType="application/json",
+            )
+            for token in reserved:
+                self._batch_by_token[token] = batch_id
+            return reserved
+        except Exception:
+            for row in rows:
+                for token in row["fingerprints"]:
+                    self._delete_owned(self._fingerprint_key(token), row["unique_token"])
+            self.client.delete_object(Bucket=self.bucket, Key=marker_key)
+            raise
+
+    def _get_pending_batch(self, batch_id: str) -> dict | None:
+        try:
+            response = self.client.get_object(Bucket=self.bucket, Key=self._pending_key(batch_id))
+        except ClientError as exc:
+            if self._is_missing(exc):
+                return None
+            raise
+        return json.loads(response["Body"].read().decode("utf-8"))
+
+    def _rollback_batch(self, batch: dict):
+        for row in batch.get("rows", []) or []:
+            owner = str(row.get("unique_token", "")).strip().lower()
+            for token in row.get("fingerprints", []) or []:
+                self._delete_owned(self._fingerprint_key(token), owner)
+        batch_id = str(batch.get("batch_id", "")).strip()
+        if batch_id:
+            self.client.delete_object(Bucket=self.bucket, Key=self._pending_key(batch_id))
 
     def activate(self, unique_tokens: Iterable[str]) -> int:
-        tokens = sorted({
-            str(token).strip().lower()
-            for token in unique_tokens
-            if str(token).strip()
-        })
-        changed = 0
-        for chunk in self._chunks(tokens, self.batch_size):
-            result = self._rpc("vsn_lead_registry_activate", {"p_tokens": chunk})
-            changed += int(result or 0)
-        return changed
+        tokens = {str(token).strip().lower() for token in unique_tokens if str(token).strip()}
+        batches = {self._batch_by_token.get(token, "") for token in tokens}
+        for batch_id in {item for item in batches if item}:
+            self.client.delete_object(Bucket=self.bucket, Key=self._pending_key(batch_id))
+        for token in tokens:
+            self._batch_by_token.pop(token, None)
+        return len(tokens)
 
     def mark_retryable(self, unique_tokens: Iterable[str]) -> int:
-        tokens = sorted({
-            str(token).strip().lower()
-            for token in unique_tokens
-            if str(token).strip()
-        })
+        tokens = {str(token).strip().lower() for token in unique_tokens if str(token).strip()}
+        batch_ids = {self._batch_by_token.get(token, "") for token in tokens}
         changed = 0
-        for chunk in self._chunks(tokens, self.batch_size):
-            result = self._rpc("vsn_lead_registry_mark_retryable", {"p_tokens": chunk})
-            changed += int(result or 0)
+        for batch_id in {item for item in batch_ids if item}:
+            batch = self._get_pending_batch(batch_id)
+            if batch is not None:
+                self._rollback_batch(batch)
+                changed += len(batch.get("rows", []) or [])
+        for token in tokens:
+            self._batch_by_token.pop(token, None)
         return changed
 
     def shadow_active(self, leads: Iterable[Lead], workbook: dict) -> dict[str, int]:
         leads = list(leads)
-        inserted = self.reserve_pending(leads, workbook)
-        activated = self.activate(inserted) if inserted else 0
-        return {"inserted": len(inserted), "activated": activated}
-
-    def import_rows(self, rows: list[dict]) -> int:
-        inserted = 0
-        for chunk in self._chunks(rows, self.batch_size):
-            data = self._rpc("vsn_lead_registry_import", {"p_rows": chunk}) or []
-            inserted += len(data)
-        return inserted
+        reserved = self.reserve_pending(leads, workbook)
+        activated = self.activate(reserved) if reserved else 0
+        return {
+            "requested": len(leads),
+            "reserved": len(reserved),
+            "activated": activated,
+            "conflicts": len(leads) - len(reserved),
+        }
 
     def pending_rows(self) -> list[dict]:
-        data = self._rpc("vsn_lead_registry_pending", {}) or []
-        return [row for row in data if isinstance(row, dict)]
-
-    def stats(self) -> dict:
-        data = self._rpc("vsn_lead_registry_stats", {}) or {}
-        if isinstance(data, list):
-            return data[0] if data else {}
-        return data if isinstance(data, dict) else {}
-
-    def capacity_report(self, *, daily_leads: int, database_budget_mb: int) -> dict:
-        stats = self.stats()
-        total_rows = int(stats.get("total_rows", 0) or 0)
-        relation_bytes = int(stats.get("total_bytes", 0) or 0)
-        database_bytes = int(stats.get("database_bytes", 0) or 0)
-        budget_bytes = int(database_budget_mb) * 1024 * 1024
-        bytes_per_row = relation_bytes / total_rows if total_rows else 0.0
-        projected_daily_bytes = bytes_per_row * int(daily_leads)
-        remaining_bytes = max(0, budget_bytes - database_bytes)
-        days = (
-            remaining_bytes / projected_daily_bytes
-            if projected_daily_bytes > 0 else None
-        )
-        return {
-            **stats,
-            "database_budget_mb": int(database_budget_mb),
-            "bytes_per_registry_row": round(bytes_per_row, 2),
-            "projected_daily_registry_bytes": round(projected_daily_bytes, 2),
-            "estimated_headroom_days": round(days, 1) if days is not None else None,
-        }
+        prefix = f"{self.prefix}/pending/"
+        paginator = self.client.get_paginator("list_objects_v2")
+        batches: list[dict] = []
+        for page in paginator.paginate(Bucket=self.bucket, Prefix=prefix):
+            for item in page.get("Contents", []) or []:
+                response = self.client.get_object(Bucket=self.bucket, Key=item["Key"])
+                batches.append(json.loads(response["Body"].read().decode("utf-8")))
+        return batches
 
     def reconcile_pending(self, sheets_store) -> dict[str, int]:
-        pending = self.pending_rows()
-        if not pending:
-            return {"checked": 0, "activated": 0, "retryable": 0, "unresolved": 0}
+        batches = self.pending_rows()
+        if not batches:
+            return {"batches": 0, "checked": 0, "activated": 0, "rolled_back": 0, "unresolved": 0}
 
-        grouped: dict[tuple[str, str], list[dict]] = defaultdict(list)
-        direct_retry: list[dict] = []
-        for row in pending:
-            sheet_id = str(row.get("daily_sheet_id", "")).strip()
-            category = str(row.get("category", "")).strip()
-            unique_token = str(row.get("unique_token", "")).strip().lower()
-            if not sheet_id or not category or not unique_token:
-                direct_retry.append(row)
+        checked = activated = rolled_back = unresolved = 0
+        for batch in batches:
+            sheet_id = str(batch.get("daily_sheet_id", "")).strip()
+            category = str(batch.get("category", "")).strip()
+            rows = batch.get("rows", []) or []
+            checked += len(rows)
+            if not sheet_id or not category:
+                self._rollback_batch(batch)
+                rolled_back += len(rows)
                 continue
-            grouped[(sheet_id, category)].append(row)
 
-        activate_tokens: set[str] = set()
-        retryable_tokens: set[str] = {
-            str(row.get("unique_token", "")).strip().lower()
-            for row in direct_retry
-            if str(row.get("unique_token", "")).strip()
-        }
-        unresolved = 0
-
-        for (spreadsheet_id, category), rows in grouped.items():
             escaped = category.replace("'", "''")
             try:
                 values = sheets_store.sheets.spreadsheets().values().get(
-                    spreadsheetId=spreadsheet_id,
+                    spreadsheetId=sheet_id,
                     range=f"'{escaped}'!AB2:AB",
                 ).execute(num_retries=sheets_store.api_retries).get("values", [])
             except Exception:
@@ -285,27 +405,92 @@ class SupabaseRegistryIndex:
                 for item in values
                 if item and str(item[0]).strip()
             }
+            keep = []
+            rollback = []
             for row in rows:
-                token = str(row.get("unique_token", "")).strip().lower()
-                if token in present:
-                    activate_tokens.add(token)
+                if row.get("unique_token", "") in present:
+                    keep.append(row)
                 else:
-                    retryable_tokens.add(token)
+                    rollback.append(row)
 
-        activated = self.activate(activate_tokens) if activate_tokens else 0
-        retryable = self.mark_retryable(retryable_tokens) if retryable_tokens else 0
+            for row in rollback:
+                owner = row.get("unique_token", "")
+                for token in row.get("fingerprints", []) or []:
+                    self._delete_owned(self._fingerprint_key(token), owner)
+            activated += len(keep)
+            rolled_back += len(rollback)
+            self.client.delete_object(Bucket=self.bucket, Key=self._pending_key(batch["batch_id"]))
+
         return {
-            "checked": len(pending),
+            "batches": len(batches),
+            "checked": checked,
             "activated": activated,
-            "retryable": retryable,
+            "rolled_back": rolled_back,
             "unresolved": unresolved,
         }
 
+    def _import_row(self, payload: dict) -> str:
+        owner = payload["unique_token"]
+        created: list[str] = []
+        try:
+            for token in payload["fingerprints"]:
+                key = self._fingerprint_key(token)
+                made = self._put_if_absent(key=key, owner=owner)
+                if made:
+                    created.append(token)
+                    continue
+                if self._owner_matches(key, owner):
+                    continue
+                for made_token in created:
+                    self._delete_owned(self._fingerprint_key(made_token), owner)
+                return "collision"
+            return "imported" if created else "existing"
+        except Exception:
+            for made_token in created:
+                self._delete_owned(self._fingerprint_key(made_token), owner)
+            raise
 
-def build_registry_index(config: dict, session=None):
-    if not supabase_registry_enabled(config):
+    def import_rows(self, rows: list[dict]) -> dict[str, int]:
+        counts = {"imported": 0, "existing": 0, "collision": 0, "skipped": 0}
+        with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+            futures = [pool.submit(self._import_row, row) for row in rows]
+            for future in as_completed(futures):
+                counts[future.result()] += 1
+        return counts
+
+    def audit_rows(self, rows: list[dict]) -> dict[str, int]:
+        tokens = {token for row in rows for token in row.get("fingerprints", [])}
+        found = 0
+        with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+            futures = [pool.submit(self._token_exists, token) for token in tokens]
+            for future in as_completed(futures):
+                if future.result():
+                    found += 1
+        return {
+            "blocking_rows": len(rows),
+            "expected_fingerprints": len(tokens),
+            "found_fingerprints": found,
+            "missing_fingerprints": len(tokens) - found,
+        }
+
+    def stats(self) -> dict:
+        stats = {"fingerprint_objects": 0, "pending_transactions": 0, "bytes": 0}
+        paginator = self.client.get_paginator("list_objects_v2")
+        for name, prefix in [
+            ("fingerprint_objects", f"{self.prefix}/fp/"),
+            ("pending_transactions", f"{self.prefix}/pending/"),
+        ]:
+            for page in paginator.paginate(Bucket=self.bucket, Prefix=prefix):
+                contents = page.get("Contents", []) or []
+                stats[name] += len(contents)
+                stats["bytes"] += sum(int(item.get("Size", 0) or 0) for item in contents)
+        return stats
+
+
+def build_registry_index(config: dict, client=None):
+    if not r2_registry_enabled(config):
         return None
-    return SupabaseRegistryIndex(config, session=session)
+    return R2RegistryIndex(config, client=client)
 
 
 def sheet_registry_payloads(rows: list[list]) -> list[dict]:
@@ -323,13 +508,9 @@ def sheet_registry_payloads(rows: list[list]) -> list[dict]:
         raw_unique = cell(row, "Unique Key").lower()
         if not raw_unique:
             continue
-
-        raw_status = cell(row, "Status")
-        normalized_status = re.sub(r"[^a-z0-9]+", "", raw_status.lower())
-        # Only blocking rows belong in the permanent compact dedupe index.
+        normalized_status = re.sub(r"[^a-z0-9]+", "", cell(row, "Status").lower())
         if normalized_status not in {"", "active", "pendingdaily"}:
             continue
-        status = "PendingDaily" if normalized_status == "pendingdaily" else "Active"
 
         country = cell(row, "Country")
         name = cell(row, "Business Name")
@@ -341,7 +522,6 @@ def sheet_registry_payloads(rows: list[list]) -> list[dict]:
         verification = cell(row, "Verification Sources")
         source_match = re.search(r"Source ID:\s*([^;|]+)", verification, re.I)
         source_id = source_match.group(1).strip().lower() if source_match else ""
-        daily_sheet_id = extract_sheet_id(cell(row, "Daily Sheet URL"))
 
         tokens = fingerprint_tokens_from_values(
             unique_key=raw_unique,
@@ -355,45 +535,42 @@ def sheet_registry_payloads(rows: list[list]) -> list[dict]:
             business_location_key=cell(row, "Business+City+State Key"),
         )
         result.append({
-            "first_added": cell(row, "First Added"),
-            "category": cell(row, "Category") or cell(row, "Field"),
-            "country_code": country_code(country),
             "unique_token": fingerprint_token("u", raw_unique),
             "fingerprints": tokens,
-            "daily_sheet_id": daily_sheet_id,
-            "status": status,
+            "daily_sheet_id": extract_sheet_id(cell(row, "Daily Sheet URL")),
+            "category": cell(row, "Category") or cell(row, "Field"),
         })
     return result
 
 
 def backfill_sheet_registry(
     sheets_store,
-    registry_index: SupabaseRegistryIndex,
+    registry_index: R2RegistryIndex,
     *,
-    dry_run: bool=False,
+    dry_run: bool = False,
 ) -> dict:
     rows = sheets_store._registry_rows()
     payloads = sheet_registry_payloads(rows)
     source_rows = max(0, len(rows) - 1)
     skipped_nonblocking = source_rows - len(payloads)
-    status_counts: dict[str, int] = {}
-    for row in payloads:
-        status = row["status"]
-        status_counts[status] = status_counts.get(status, 0) + 1
     if dry_run:
         return {
             "status": "dry-run",
             "source_rows": source_rows,
-            "rows": len(payloads),
+            "blocking_rows": len(payloads),
             "skipped_nonblocking": skipped_nonblocking,
-            "status_counts": status_counts,
+            "fingerprints": sum(len(row["fingerprints"]) for row in payloads),
         }
-    inserted = registry_index.import_rows(payloads)
+    result = registry_index.import_rows(payloads)
     return {
         "status": "ok",
         "source_rows": source_rows,
-        "rows": len(payloads),
-        "inserted": inserted,
+        "blocking_rows": len(payloads),
         "skipped_nonblocking": skipped_nonblocking,
-        "status_counts": status_counts,
+        **result,
     }
+
+
+def audit_sheet_registry(sheets_store, registry_index: R2RegistryIndex) -> dict:
+    rows = sheet_registry_payloads(sheets_store._registry_rows())
+    return registry_index.audit_rows(rows)

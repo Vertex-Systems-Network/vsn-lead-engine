@@ -1,0 +1,44 @@
+name: R2 Registry Backfill
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/r2-backfill-trigger"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vsn-r2-registry-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -e .
+      - run: python -m vsn_lead_engine.cli validate
+      - name: R2 connectivity
+        run: python -m vsn_lead_engine.cli registry-check
+      - name: Backfill preview
+        run: python -m vsn_lead_engine.cli registry-backfill --dry-run
+      - name: Backfill blocking Registry history
+        run: python -m vsn_lead_engine.cli registry-backfill
+      - name: Exact parity audit
+        run: python -m vsn_lead_engine.cli registry-audit
+      - name: R2 ledger stats
+        run: python -m vsn_lead_engine.cli registry-stats

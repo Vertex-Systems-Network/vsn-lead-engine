@@ -48,22 +48,22 @@ def load_config() -> dict:
 
     registry=config["registry"]
     registry_mode=str(registry.get("mode","sheets")).strip().lower()
-    if registry_mode not in {"sheets","dual","supabase"}:
-        raise ValueError("registry.mode must be one of: sheets, dual, supabase.")
-    if int(registry.get("batch_size",500)) < 1:
-        raise ValueError("registry.batch_size must be at least 1.")
-    if float(registry.get("request_timeout_seconds",30)) <= 0:
-        raise ValueError("registry.request_timeout_seconds must be positive.")
-    if not registry.get("supabase_url_env"):
-        raise ValueError("registry.supabase_url_env is required.")
-    if not registry.get("supabase_service_role_key_env"):
-        raise ValueError("registry.supabase_service_role_key_env is required.")
-    if int(registry.get("database_size_budget_mb",500)) < 100:
-        raise ValueError("registry.database_size_budget_mb must be at least 100.")
-    warn=float(registry.get("warn_at_percent",70))
-    critical=float(registry.get("critical_at_percent",85))
-    if not (0 < warn < critical < 100):
-        raise ValueError("Registry storage thresholds must satisfy 0 < warn < critical < 100.")
+    if registry_mode not in {"sheets","dual","r2"}:
+        raise ValueError("registry.mode must be one of: sheets, dual, r2.")
+    for key in [
+        "account_id_env",
+        "access_key_id_env",
+        "secret_access_key_env",
+        "bucket_env",
+    ]:
+        if not registry.get(key):
+            raise ValueError(f"registry.{key} is required.")
+    if not str(registry.get("prefix","")).strip("/"):
+        raise ValueError("registry.prefix is required.")
+    if int(registry.get("max_workers",32)) < 4:
+        raise ValueError("registry.max_workers must be at least 4.")
+    if int(registry.get("retry_attempts",4)) < 1:
+        raise ValueError("registry.retry_attempts must be at least 1.")
 
     for geo in config["geographies"]:
         bbox=geo.get("bbox")

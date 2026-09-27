@@ -111,7 +111,7 @@ GitHub event / schedule
  -> country/category priority scheduler
  -> taxonomy-first classification
  -> normalize phone
- -> Registry dedupe (Sheets now; Supabase-ready)
+ -> Registry dedupe (Sheets migration source; R2 permanent ledger)
  -> Registry PendingDaily
  -> dated workbook append
  -> Registry Active
@@ -149,100 +149,111 @@ P1 performance controls:
 - the same source objects, Google clients and frozen run date are reused across
   cycles while live Sheet/Registry state is re-read for safety.
 
-## P2 scalable Registry foundation
+## P2 permanent R2 dedupe ledger
 
-Registry backend selection is explicit in `config/runtime.json`:
+The long-term duplicate history is object-storage based, not database based.
+Full lead records continue to live in dated Google Sheets. Cloudflare R2 stores
+only compact hashed fingerprints needed to answer: "have we already accepted
+this business?"
 
-- `sheets` — current production authority; no Supabase secrets required.
-- `dual` — Google Sheet Registry remains authoritative while accepted rows
-  shadow into Supabase. Shadow failure is observable but does not stop lead
-  delivery.
-- `supabase` — scalable Supabase/Postgres Registry becomes the dedupe and
-  reservation authority; dated Google Sheets remain the user-facing daily
-  output.
+Registry modes in `config/runtime.json`:
 
-The database path preserves the existing Registry-first transaction:
+- `sheets` — current Google Master Registry is the authority.
+- `dual` — Google Registry remains authority and accepted rows shadow into R2.
+- `r2` — R2 is the permanent cross-day dedupe authority; Google Master
+  Registry stops growing while dated daily workbooks continue normally.
 
-1. normalize the same six duplicate dimensions already used in production:
-   source ID, place ID, domain, phone+name, business+location and unique key;
-2. convert every non-empty value to a type-separated **96-bit BLAKE2
-   fingerprint** before it leaves the runner;
-3. batch collision-check compact fingerprint arrays;
-4. reserve new rows as `PendingDaily`;
-5. append only reserved leads to the dated Google workbook;
-6. promote successful writes to `Active`;
-7. convert stale missing writes to non-blocking `Retryable`.
+### Exact duplicate dimensions
 
-The scalable Registry intentionally does **not** duplicate full business names,
-phone numbers, websites, emails, addresses or social profiles. Those remain in
-the dated Google Sheets. Postgres stores only first-seen date, category,
-two-letter country code, the compact dedupe fingerprints, daily Sheet ID and
-transaction status.
-
-The SQL blueprint is `db/supabase_registry_schema.sql`. It enables RLS,
-revokes table/function access from `anon` and `authenticated`, uses
-`SECURITY INVOKER` RPC functions, and grants only `service_role` the server
-operations required by the GitHub runner. A single partial GIN fingerprint
-index replaces multiple raw-value indexes. Reservation uses a transaction-level
-advisory lock so concurrent workers cannot reserve two different leads that
-share a secondary fingerprint.
-
-### Duplicate policy
-
-A candidate is rejected when **any** blocking Registry row matches one of:
+A lead is rejected when any permanent blocking fingerprint matches:
 
 - provider/source ID;
-- Google place ID when present;
+- Google Place ID when available;
 - normalized domain;
 - normalized phone + normalized business name;
-- normalized business + city + region;
-- canonical Unique Key.
+- normalized business + city + region.
 
-Only `Active` and `PendingDaily` rows block rediscovery. `NeedsReview`,
-`Retryable`, `Rejected`, `Invalid` and quarantined rows are non-blocking
-in the current Google Registry. The compact database backfill imports only
-blocking rows, so known bad/quarantined records do not consume permanent
-database space or poison future dedupe.
+The canonical Unique Key is derived from place/domain/phone-name/business-location,
+so it is used as transaction identity without writing a redundant sixth
+permanent R2 object.
 
-### Storage budgeting
+Each raw value is normalized and converted on the runner to a type-separated
+96-bit BLAKE2 token before R2 access. R2 object keys therefore contain no raw
+phone number, business name, domain, email, address or social profile.
 
-Supabase Free currently has a 500 MB database-size limit. New projects also
-consume platform/schema space before lead rows are added, so Free is treated as
-a migration/test tier rather than assumed infinite production storage.
+### Object layout
 
-The compact Registry exposes `registry-stats`, which reports table bytes,
-index bytes, total relation bytes and total database bytes. It calculates
-measured bytes/Registry row and estimates remaining days at the configured
-12,000 leads/day rate. Runtime defaults:
+```
+<bucket>/
+  vsn-lead-ledger/v1/
+    fp/
+      p/<prefix>/<digest>   # place
+      s/<prefix>/<digest>   # source
+      d/<prefix>/<digest>   # domain
+      n/<prefix>/<digest>   # phone+name
+      l/<prefix>/<digest>   # business+location
+    pending/
+      <batch-id>.json
+```
 
-- database budget: 500 MB;
-- warning threshold: 70%;
-- critical threshold: 85%.
+Fingerprint objects are zero-byte private objects. `HEAD` gives an exact
+membership check. Conditional `PUT If-None-Match: *` makes reservations
+atomic at the object key.
 
-The engine will not discard blocking historical fingerprints merely to save
-space, because that would allow old businesses to re-enter as duplicates.
-When measured Free-tier headroom becomes too small, the correct options are to
-upgrade database capacity or move the compact exact-fingerprint ledger to a
-larger backend; daily Google Sheets remain unaffected.
+### Registry-first transaction and crash recovery
 
-A zero-downtime cutover is:
+For each category batch:
+
+1. create one compact pending transaction marker;
+2. conditionally reserve fingerprint objects;
+3. append only successfully reserved leads to the dated Google Sheet;
+4. delete the pending marker after the Sheet write succeeds.
+
+If a runner dies, the next real run scans only the small `pending/` prefix.
+For each pending lead it hashes the dated Sheet Unique Key column:
+
+- written lead -> keep its permanent fingerprints and clear pending state;
+- missing lead -> delete only fingerprint objects owned by that reservation.
+
+This prevents both duplicate writes and stale dedupe poisoning.
+
+### Migration
+
+The cutover is zero-downtime:
 
 ```
 sheets
-  -> create dedicated Supabase project/schema
+  -> registry-check
   -> registry-backfill --dry-run
   -> registry-backfill
-  -> dual
-  -> compare counts/collisions
-  -> supabase
+  -> registry-audit   # missing_fingerprints must be 0
+  -> dual (optional observation)
+  -> r2
 ```
 
-Server-only GitHub secrets required for `dual` or `supabase`:
+The backfill imports only blocking Google Registry rows. `NeedsReview`,
+`Retryable`, rejected, invalid and quarantined rows are intentionally skipped,
+so bad historical rows do not block future rediscovery.
 
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
+Server-only GitHub secrets:
 
-The service-role key must never be exposed in a browser or public client.
+- `R2_ACCOUNT_ID`
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+- `R2_BUCKET`
+
+The bucket name is never hard-coded; `R2_BUCKET` is the authority.
+
+### Scale model
+
+R2 is used as an exact object ledger, so there is no fixed SQL database-size
+ceiling and no index rebuild/vacuum requirement. At the 12,000 accepted
+leads/day target, the engine writes at most five permanent zero-byte fingerprint
+objects per lead. Read checks are parallelized and short-lived pending objects
+are deleted after successful commits.
+
+The ledger never expires accepted-history fingerprints merely to save space,
+because deleting them would allow old businesses to re-enter as duplicates.
 
 ## Production credential
 
@@ -261,8 +272,8 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - Daily dated workbook routing: **ENABLED**
 - P0 reliability hardening: **ENABLED**
 - P1 runner performance + quota cycles: **ENABLED**
-- P2 scalable Registry foundation: **READY; compact-hash model prepared, live DB cutover pending dedicated project**
-- Master Registry cross-day dedupe: **ENABLED**
+- P2 permanent R2 dedupe ledger: **IMPLEMENTED; migration/audit pending production cutover**
+- Master Registry cross-day dedupe: **ACTIVE UNTIL R2 CUTOVER**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
 - Taxonomy-first classification: **ENABLED**
