@@ -534,6 +534,11 @@ def run_once(
     result={
         "cursor":cursor,
         "shard_attempts":len(attempts),
+        "categories_attempted":len({
+            str(item.get("category",""))
+            for item in attempts
+            if str(item.get("category",""))
+        }),
         "zero_result_shards":zero_result_shards,
         "source_errors":source_errors,
         "source_retries":source_retries,
@@ -928,6 +933,13 @@ def run_until_quota(
             "zero_result_shards":sum(
                 int(item.get("zero_result_shards",0) or 0)
                 for item in cycles
+            ),
+            "categories_attempted":max(
+                [
+                    int(item.get("categories_attempted",0) or 0)
+                    for item in cycles
+                ]
+                or [0]
             ),
             "adaptive_cooldown_routes_deferred":max(
                 [
