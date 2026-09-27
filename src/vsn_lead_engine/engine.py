@@ -130,14 +130,29 @@ def _candidate_partition_geography(
     cursor: int,
     attempt: int,
     partition_count: int,
+    observed_mask: int = 0,
 ) -> dict:
-    """Attach a deterministic rotating source cohort to one shard search."""
-    count=max(1,int(partition_count))
-    partition=(int(cursor)+max(0,int(attempt)-1)) % count
+    """Prefer the nearest unseen deterministic partition for one shard."""
+    count=max(1,min(64,int(partition_count)))
+    base=(int(cursor)+max(0,int(attempt)-1)) % count
+    mask=max(0,int(observed_mask or 0))
+    partition=base
+    was_unseen=not bool(mask & (1 << base))
+
+    if not was_unseen:
+        for offset in range(1,count):
+            candidate=(base+offset) % count
+            if not (mask & (1 << candidate)):
+                partition=candidate
+                was_unseen=True
+                break
+
     return {
         **geography,
         "_candidate_partition_count":count,
         "_candidate_partition":partition,
+        "_candidate_partition_base":base,
+        "_candidate_partition_was_unseen":was_unseen,
     }
 
 
@@ -164,6 +179,8 @@ def _update_yield_hints(
         )
         partition_mask=max(0,int(hint.get("partition_mask",0) or 0))
         for source in attempt.get("sources",[]) or []:
+            if str(source.get("error","")).strip():
+                continue
             try:
                 partition=int(source.get("candidate_partition"))
             except (TypeError,ValueError,AttributeError):
@@ -506,6 +523,10 @@ def run_once(
     enrichment_totals=defaultdict(int)
     accepted_total=0
     today=run_date
+    partition_selection_masks={
+        str(key):max(0,int((value or {}).get("partition_mask",0) or 0))
+        for key,value in (daily_yield_hints or {}).items()
+    }
 
     for shard in plan:
         if accepted_total >= batch_limit:
@@ -519,6 +540,16 @@ def run_once(
         shard_discovered=0
         shard_accepted_before=accepted_total
         source_attempts=[]
+        route_key=yield_hint_key(category,geography)
+        route_mask=partition_selection_masks.get(route_key,0)
+        search_geography=_candidate_partition_geography(
+            geography,
+            cursor=cursor,
+            attempt=shard["attempt"],
+            partition_count=candidate_partition_count,
+            observed_mask=route_mask,
+        )
+        partition_had_success=False
 
         for source in sources:
             if accepted_total >= batch_limit:
@@ -531,12 +562,6 @@ def run_once(
             if remaining <= 0:
                 break
 
-            search_geography=_candidate_partition_geography(
-                geography,
-                cursor=cursor,
-                attempt=shard["attempt"],
-                partition_count=candidate_partition_count,
-            )
             candidates,source_error,retries=_search_with_retry(
                 source,
                 category,
@@ -548,6 +573,8 @@ def run_once(
             source_retries+=retries
             if source_error:
                 source_errors+=1
+            else:
+                partition_had_success=True
 
             shard_discovered+=len(candidates)
             total_discovered+=len(candidates)
@@ -666,12 +693,20 @@ def run_once(
                 "accepted":accepted_from_source,
                 "candidate_partition":search_geography["_candidate_partition"],
                 "candidate_partition_count":search_geography["_candidate_partition_count"],
+                "candidate_partition_base":search_geography["_candidate_partition_base"],
+                "candidate_partition_was_unseen":bool(
+                    search_geography["_candidate_partition_was_unseen"]
+                ),
                 "source_batch_duplicates":source_batch_duplicates,
                 "remote_prefilter_candidates":remote_prefilter_candidates,
                 "remote_prefilter_duplicates":remote_prefilter_duplicates,
                 "error":source_error,
             })
 
+        if partition_had_success:
+            partition_selection_masks[route_key]=(
+                route_mask | (1 << int(search_geography["_candidate_partition"]))
+            )
         if shard_discovered == 0:
             zero_result_shards+=1
 
@@ -714,6 +749,15 @@ def run_once(
         "source_errors":source_errors,
         "source_retries":source_retries,
         "candidate_partition_count":candidate_partition_count,
+        "unseen_partition_shards":sum(
+            1
+            for attempt in attempts
+            if any(
+                bool(source.get("candidate_partition_was_unseen",False))
+                and not str(source.get("error","")).strip()
+                for source in attempt.get("sources",[]) or []
+            )
+        ),
         "source_batch_dedupe":source_batch_dedupe_enabled,
         "r2_pre_enrichment_prefilter":remote_prefilter_enabled,
         "adaptive_yield_routing":adaptive_yield_routing,
@@ -1138,6 +1182,10 @@ def run_until_quota(
                     for item in cycles
                 ]
                 or [0]
+            ),
+            "unseen_partition_shards":sum(
+                int(item.get("unseen_partition_shards",0) or 0)
+                for item in cycles
             ),
             "source_batch_duplicates":sum(
                 int(item.get("source_batch_duplicates",0) or 0)
