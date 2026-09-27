@@ -22,6 +22,7 @@ def test_production_free_source_breadth_is_expanded():
     assert config["runtime"]["health_ledger_enabled"] is True
     assert config["registry"]["read_cache_enabled"] is True
     assert config["registry"]["read_cache_max_entries"]==128
+    assert config["registry"]["legacy_read_cache_max_entries"]==4096
     assert config["runtime"]["health_ledger_max_events"]==96
     assert config["runtime"]["start_hour"]==8
     assert config["runtime"]["end_hour"]==23
