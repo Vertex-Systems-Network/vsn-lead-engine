@@ -174,8 +174,14 @@ def load_config() -> dict:
 
     enrichment=config.get("enrichment",{})
     if enrichment.get("enabled",False):
-        if int(enrichment.get("max_candidates_per_run",160)) < 1:
+        max_candidates=int(enrichment.get("max_candidates_per_run",160))
+        if max_candidates < 1:
             raise ValueError("enrichment.max_candidates_per_run must be at least 1.")
+        max_candidates_per_call=int(enrichment.get("max_candidates_per_call",12))
+        if max_candidates_per_call < 1 or max_candidates_per_call > max_candidates:
+            raise ValueError(
+                "enrichment.max_candidates_per_call must be between 1 and max_candidates_per_run."
+            )
         workers=int(enrichment.get("workers",8))
         if workers < 1 or workers > 16:
             raise ValueError("enrichment.workers must be between 1 and 16.")
@@ -192,8 +198,14 @@ def load_config() -> dict:
 
         common=enrichment.get("common_crawl",{})
         if common.get("enabled",False):
-            if int(common.get("max_lookups_per_run",8)) < 1:
+            common_max=int(common.get("max_lookups_per_run",8))
+            if common_max < 1:
                 raise ValueError("enrichment.common_crawl.max_lookups_per_run must be at least 1.")
+            common_per_call=int(common.get("max_lookups_per_call",1))
+            if common_per_call < 1 or common_per_call > common_max:
+                raise ValueError(
+                    "enrichment.common_crawl.max_lookups_per_call must be between 1 and max_lookups_per_run."
+                )
             if float(common.get("min_interval_seconds",2.5)) < 1:
                 raise ValueError("enrichment.common_crawl.min_interval_seconds must be at least 1.")
             for key in ["index_url","data_url"]:
