@@ -29,7 +29,8 @@
     "adaptive_yield_history_max_entries": 1500,
     "adaptive_zero_yield_cooldown_enabled": true,
     "adaptive_zero_yield_cooldown_min_visits": 2,
-    "adaptive_zero_yield_cooldown_min_discovered": 100
+    "adaptive_zero_yield_cooldown_min_discovered": 100,
+    "r2_pre_enrichment_prefilter_enabled": true
   },
   "drive": {
     "folder_id": "1CPnHX5lXNb_wqcwk2O4bfACL4qNZ5IEh",
