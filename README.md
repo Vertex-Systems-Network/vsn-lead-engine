@@ -49,7 +49,9 @@ Rules:
 - the accepted lead note records the classification reason for later audits;
 - the Python classifier re-checks every SQL result before it can become a lead;
 - rows quarantined as `Needs Review` are excluded from daily target counts and
-  Overview totals, so questionable legacy rows do not block fresh collection.
+  Overview totals;
+- matching Master Registry rows use `NeedsReview`, which no longer blocks
+  dedupe, so a business may be rediscovered later into the correct category.
 
 This specifically prevents errors such as `retirement_home` matching the
 Cars keyword `tire`, or a dermatology business entering Salon only because

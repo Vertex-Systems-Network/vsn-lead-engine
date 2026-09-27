@@ -50,6 +50,19 @@ def count_current_rows(date_rows, status_rows, today: str) -> int:
     return total
 
 
+def registry_status_blocks_dedupe(status: str) -> bool:
+    """Return whether a Registry row should block future discovery.
+
+    Active and PendingDaily rows block duplicates. Quarantined/rejected rows do
+    not, so a business can be rediscovered into the correct category.
+    Blank legacy status remains blocking for backward compatibility.
+    """
+    normalized = re.sub(r"[^a-z0-9]+", "", str(status or "").lower())
+    if normalized in {"needsreview", "rejected", "invalid", "quarantined"}:
+        return False
+    return True
+
+
 class GoogleSheetsStore:
     def __init__(self, config: dict):
         raw = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
@@ -260,6 +273,10 @@ class GoogleSheetsStore:
             return str(row[i]).strip() if i is not None and i < len(row) else ""
 
         for row in rows[1:]:
+            status = cell(row,"Status")
+            if not registry_status_blocks_dedupe(status):
+                continue
+
             country = cell(row,"Country")
             name = cell(row,"Business Name")
             city = cell(row,"City")

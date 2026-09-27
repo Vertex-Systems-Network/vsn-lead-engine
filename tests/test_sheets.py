@@ -11,3 +11,19 @@ def test_count_current_rows_handles_sparse_status_column():
     dates=[["2026-09-27"],["2026-09-27"]]
     statuses=[]
     assert count_current_rows(dates,statuses,"2026-09-27")==2
+
+
+from vsn_lead_engine.sheets import registry_status_blocks_dedupe
+
+
+def test_registry_active_and_pending_rows_block_dedupe():
+    assert registry_status_blocks_dedupe("Active")
+    assert registry_status_blocks_dedupe("PendingDaily")
+    assert registry_status_blocks_dedupe("")
+
+
+def test_registry_quarantine_rows_do_not_block_dedupe():
+    assert not registry_status_blocks_dedupe("NeedsReview")
+    assert not registry_status_blocks_dedupe("Needs Review")
+    assert not registry_status_blocks_dedupe("Rejected")
+    assert not registry_status_blocks_dedupe("Invalid")
