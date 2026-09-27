@@ -1297,24 +1297,21 @@ def test_source_batch_dedupe_keeps_distinct_entities():
 
 def test_source_contact_mix_matches_p23_raw_contact_semantics():
     candidates=[
-        Lead(
-            country="United States",
-            category="IT & Software",
+        _batch_lead(
             business_name="Phone And Website",
+            source_id="source:phone",
             phone="+1 202 555 0101",
             website="https://phone.example",
         ),
-        Lead(
-            country="United States",
-            category="IT & Software",
+        _batch_lead(
             business_name="Website Only",
+            source_id="source:website",
             phone="",
             website="https://website.example",
         ),
-        Lead(
-            country="United States",
-            category="IT & Software",
+        _batch_lead(
             business_name="Raw Invalid Phone Still Source Phone",
+            source_id="source:invalid",
             phone="not-a-valid-phone",
             website="https://invalid.example",
         ),
