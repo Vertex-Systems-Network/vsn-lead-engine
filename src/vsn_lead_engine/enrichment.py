@@ -225,7 +225,7 @@ class ContactEnricher:
         self.user_agent = str(
             settings.get(
                 "user_agent",
-                "VSN-Lead-Engine/0.26.1 (+https://vertexsystemsnetwork.com/)",
+                "VSN-Lead-Engine/0.27 (+https://vertexsystemsnetwork.com/)",
             )
         ).strip()
         self.common_enabled = bool(common.get("enabled", False))
