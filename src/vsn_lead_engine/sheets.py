@@ -73,7 +73,7 @@ def count_current_countries(date_country_rows, status_rows, today: str) -> dict[
 def registry_status_blocks_dedupe(status: str) -> bool:
     """Return whether a Registry row should block future discovery."""
     normalized = re.sub(r"[^a-z0-9]+", "", str(status or "").lower())
-    if normalized in {"needsreview", "rejected", "invalid", "quarantined"}:
+    if normalized in {"needsreview", "rejected", "invalid", "quarantined", "retryable", "writefailed"}:
         return False
     return True
 
@@ -86,8 +86,18 @@ def escape_drive_query_value(value: str) -> str:
     return str(value).replace("\\", "\\\\").replace("'", "\\'")
 
 
+def extract_spreadsheet_id(value: str) -> str:
+    match = re.search(r"/spreadsheets/d/([A-Za-z0-9_-]+)", str(value or ""))
+    return match.group(1) if match else ""
+
+
+def pending_recovery_status(unique_key: str, present_keys: set[str]) -> str:
+    key = str(unique_key or "").strip().lower()
+    return "Active" if key and key in present_keys else "Retryable"
+
+
 class GoogleSheetsStore:
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, run_date: str | None = None):
         raw = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
         if not raw:
             raise RuntimeError("GOOGLE_SERVICE_ACCOUNT_JSON is required for real writes.")
@@ -101,9 +111,13 @@ class GoogleSheetsStore:
         self.sheets = build("sheets", "v4", credentials=creds, cache_discovery=False)
         self.drive = build("drive", "v3", credentials=creds, cache_discovery=False)
         self.config = config
+        self.run_date = run_date or datetime.now(
+            ZoneInfo(self.config["runtime"]["timezone"])
+        ).date().isoformat()
+        self.api_retries = int(self.config["runtime"].get("google_api_retries", 5))
 
     def _today(self) -> str:
-        return datetime.now(ZoneInfo(self.config["runtime"]["timezone"])).date().isoformat()
+        return self.run_date
 
     def _daily_title(self, date_value: str | None = None) -> str:
         prefix = self.config["drive"].get(
@@ -127,7 +141,7 @@ class GoogleSheetsStore:
             fields="files(id,name,webViewLink,createdTime)",
             orderBy="createdTime asc",
             pageSize=10,
-        ).execute()
+        ).execute(num_retries=self.api_retries)
         files = response.get("files", [])
         if not files:
             return None
@@ -143,7 +157,7 @@ class GoogleSheetsStore:
                 fileId=template_id,
                 body={"name": title, "parents": [folder_id]},
                 fields="id,name,webViewLink,createdTime",
-            ).execute()
+            ).execute(num_retries=self.api_retries)
         except HttpError as exc:
             status = getattr(exc.resp, "status", None)
             if status in {403, 429}:
@@ -162,7 +176,7 @@ class GoogleSheetsStore:
         metadata = self.sheets.spreadsheets().get(
             spreadsheetId=spreadsheet_id,
             fields="properties(title,timeZone),sheets.properties",
-        ).execute()
+        ).execute(num_retries=self.api_retries)
         self._ensure_tabs(spreadsheet_id, metadata)
 
         # A copied template must start clean. Preserve header rows and tab
@@ -172,25 +186,25 @@ class GoogleSheetsStore:
                 spreadsheetId=spreadsheet_id,
                 range=f"'{category}'!A2:AC",
                 body={},
-            ).execute()
+            ).execute(num_retries=self.api_retries)
             self.sheets.spreadsheets().values().update(
                 spreadsheetId=spreadsheet_id,
                 range=f"'{category}'!A1:AC1",
                 valueInputOption="RAW",
                 body={"values": [DAILY_COLUMNS]},
-            ).execute()
+            ).execute(num_retries=self.api_retries)
 
         self.sheets.spreadsheets().values().clear(
             spreadsheetId=spreadsheet_id,
             range="'Overview'!A:B",
             body={},
-        ).execute()
+        ).execute(num_retries=self.api_retries)
         self.sheets.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,
             range="'Overview'!A1",
             valueInputOption="USER_ENTERED",
             body={"values": self._overview_seed(date_value)},
-        ).execute()
+        ).execute(num_retries=self.api_retries)
 
     def ensure_lead_workbook(self):
         date_value = self._today()
@@ -205,7 +219,7 @@ class GoogleSheetsStore:
         metadata = self.sheets.spreadsheets().get(
             spreadsheetId=sid,
             fields="properties(title,timeZone),sheets.properties",
-        ).execute()
+        ).execute(num_retries=self.api_retries)
         self._ensure_tabs(sid, metadata)
         self._ensure_overview_metrics(sid)
         self._refresh_overview_formulas(sid, date_value)
@@ -271,7 +285,7 @@ class GoogleSheetsStore:
         if metadata is None:
             metadata = self.sheets.spreadsheets().get(
                 spreadsheetId=spreadsheet_id, fields="sheets.properties"
-            ).execute()
+            ).execute(num_retries=self.api_retries)
         props = [s["properties"] for s in metadata.get("sheets", [])]
         existing = {p["title"] for p in props}
         wanted = ["Overview", *self.config["categories"]]
@@ -282,12 +296,12 @@ class GoogleSheetsStore:
         if requests:
             self.sheets.spreadsheets().batchUpdate(
                 spreadsheetId=spreadsheet_id, body={"requests":requests}
-            ).execute()
+            ).execute(num_retries=self.api_retries)
 
         for name in wanted:
             row = self.sheets.spreadsheets().values().get(
                 spreadsheetId=spreadsheet_id, range=f"'{name}'!1:1"
-            ).execute().get("values", [])
+            ).execute(num_retries=self.api_retries).get("values", [])
             if row:
                 continue
             values = self._overview_seed() if name == "Overview" else [DAILY_COLUMNS]
@@ -296,13 +310,13 @@ class GoogleSheetsStore:
                 range=f"'{name}'!A1",
                 valueInputOption="USER_ENTERED",
                 body={"values":values}
-            ).execute()
+            ).execute(num_retries=self.api_retries)
 
     def _ensure_overview_metrics(self, spreadsheet_id: str):
         rows=self.sheets.spreadsheets().values().get(
             spreadsheetId=spreadsheet_id,
             range="'Overview'!A1:B100",
-        ).execute().get("values",[])
+        ).execute(num_retries=self.api_retries).get("values",[])
         existing={str(row[0]).strip() for row in rows if row}
         missing=[[metric,0] for metric in OVERVIEW_INCREMENT_METRICS if metric not in existing]
         for metric in ["United States Leads Today","Canada Leads Today"]:
@@ -319,7 +333,7 @@ class GoogleSheetsStore:
                 valueInputOption="RAW",
                 insertDataOption="INSERT_ROWS",
                 body={"values":missing},
-            ).execute()
+            ).execute(num_retries=self.api_retries)
 
     def _refresh_overview_formulas(self, spreadsheet_id: str, date_value: str | None = None):
         date_value = date_value or self._today()
@@ -361,7 +375,7 @@ class GoogleSheetsStore:
         self.sheets.spreadsheets().values().batchUpdate(
             spreadsheetId=spreadsheet_id,
             body={"valueInputOption":"USER_ENTERED","data":data},
-        ).execute()
+        ).execute(num_retries=self.api_retries)
 
     def category_counts(self, spreadsheet_id: str) -> dict[str,int]:
         today = self._today()
@@ -373,7 +387,7 @@ class GoogleSheetsStore:
             spreadsheetId=spreadsheet_id,
             ranges=ranges,
             valueRenderOption="UNFORMATTED_VALUE",
-        ).execute()
+        ).execute(num_retries=self.api_retries)
         value_ranges = response.get("valueRanges", [])
         counts = {}
         for index, category in enumerate(self.config["categories"]):
@@ -394,7 +408,7 @@ class GoogleSheetsStore:
             spreadsheetId=spreadsheet_id,
             ranges=ranges,
             valueRenderOption="UNFORMATTED_VALUE",
-        ).execute()
+        ).execute(num_retries=self.api_retries)
         value_ranges = response.get("valueRanges", [])
         result: dict[str, int] = {}
 
@@ -424,7 +438,112 @@ class GoogleSheetsStore:
         tab = self.config["drive"]["master_registry_tab"]
         return self.sheets.spreadsheets().values().get(
             spreadsheetId=sid, range=f"'{tab}'!A:V"
-        ).execute().get("values", [])
+        ).execute(num_retries=self.api_retries).get("values", [])
+
+    def reconcile_pending_registry(self) -> dict[str, int]:
+        """Repair stale Registry PendingDaily rows before dedupe is built.
+
+        If the referenced daily workbook contains the Unique Key, promote the
+        row to Active. If the daily write never landed (or the referenced file
+        is permanently unavailable), mark it Retryable so it cannot poison
+        cross-day dedupe forever.
+        """
+        rows = self._registry_rows()
+        if not rows:
+            return {"checked": 0, "activated": 0, "retryable": 0, "unresolved": 0}
+
+        header = rows[0]
+        required = {"Status", "Unique Key", "Category", "Daily Sheet URL"}
+        missing = required.difference(header)
+        if missing:
+            raise RuntimeError(
+                f"Master Registry schema missing recovery columns: {sorted(missing)}"
+            )
+
+        index = {name: i for i, name in enumerate(header)}
+        status_col = self._column_letter(index["Status"])
+        pending = []
+
+        def cell(row, name):
+            i = index[name]
+            return str(row[i]).strip() if i < len(row) else ""
+
+        for row_number, row in enumerate(rows[1:], start=2):
+            normalized = re.sub(r"[^a-z0-9]+", "", cell(row, "Status").lower())
+            if normalized != "pendingdaily":
+                continue
+            pending.append({
+                "row": row_number,
+                "unique": cell(row, "Unique Key"),
+                "category": cell(row, "Category"),
+                "sheet_id": extract_spreadsheet_id(cell(row, "Daily Sheet URL")),
+            })
+
+        if not pending:
+            return {"checked": 0, "activated": 0, "retryable": 0, "unresolved": 0}
+
+        grouped: dict[tuple[str, str], list[dict]] = {}
+        direct_retry = []
+        for item in pending:
+            if not item["sheet_id"] or not item["category"] or not item["unique"]:
+                direct_retry.append(item)
+                continue
+            grouped.setdefault((item["sheet_id"], item["category"]), []).append(item)
+
+        updates = []
+        activated = 0
+        retryable = 0
+        unresolved = 0
+
+        for item in direct_retry:
+            updates.append({
+                "range": f"'{self.config['drive']['master_registry_tab']}'!{status_col}{item['row']}",
+                "values": [["Retryable"]],
+            })
+            retryable += 1
+
+        for (spreadsheet_id, category), items in grouped.items():
+            escaped_category = category.replace("'", "''")
+            try:
+                values = self.sheets.spreadsheets().values().get(
+                    spreadsheetId=spreadsheet_id,
+                    range=f"'{escaped_category}'!AB2:AB",
+                ).execute(num_retries=self.api_retries).get("values", [])
+            except HttpError as exc:
+                status = getattr(exc.resp, "status", None)
+                if status not in {403, 404}:
+                    unresolved += len(items)
+                    continue
+                values = []
+
+            present = {
+                str(row[0]).strip().lower()
+                for row in values
+                if row and str(row[0]).strip()
+            }
+            for item in items:
+                new_status = pending_recovery_status(item["unique"], present)
+                updates.append({
+                    "range": f"'{self.config['drive']['master_registry_tab']}'!{status_col}{item['row']}",
+                    "values": [[new_status]],
+                })
+                if new_status == "Active":
+                    activated += 1
+                else:
+                    retryable += 1
+
+        if updates:
+            self.sheets.spreadsheets().values().batchUpdate(
+                spreadsheetId=self.config["drive"]["master_registry_spreadsheet_id"],
+                body={"valueInputOption": "RAW", "data": updates},
+            ).execute(num_retries=self.api_retries)
+
+        return {
+            "checked": len(pending),
+            "activated": activated,
+            "retryable": retryable,
+            "unresolved": unresolved,
+        }
 
     def registry_fingerprints(self):
         rows = self._registry_rows()
@@ -436,7 +555,7 @@ class GoogleSheetsStore:
                 range=f"'{tab}'!A1",
                 valueInputOption="RAW",
                 body={"values":[REGISTRY_COLUMNS]}
-            ).execute()
+            ).execute(num_retries=self.api_retries)
             return {k:set() for k in ["place_id","source_id","domain","phone_name","business_location","unique"]}
 
         header = rows[0]
@@ -548,7 +667,7 @@ class GoogleSheetsStore:
             valueInputOption="RAW",
             insertDataOption="INSERT_ROWS",
             body={"values":registry_rows}
-        ).execute()
+        ).execute(num_retries=self.api_retries)
 
         updated_range = registry_append.get("updates", {}).get("updatedRange", "")
         match = re.search(r"!A(\d+):V(\d+)$", updated_range)
@@ -562,7 +681,7 @@ class GoogleSheetsStore:
             valueInputOption="RAW",
             insertDataOption="INSERT_ROWS",
             body={"values":daily_rows}
-        ).execute()
+        ).execute(num_retries=self.api_retries)
 
         status_letter = self._column_letter(REGISTRY_COLUMNS.index("Status"))
         self.sheets.spreadsheets().values().update(
@@ -570,13 +689,13 @@ class GoogleSheetsStore:
             range=f"'{registry_tab}'!{status_letter}{start_row}:{status_letter}{end_row}",
             valueInputOption="RAW",
             body={"values":[["Active"] for _ in leads]}
-        ).execute()
+        ).execute(num_retries=self.api_retries)
 
     def set_overview_metrics(self, workbook_id: str, values: dict[str, int | str]):
         rows = self.sheets.spreadsheets().values().get(
             spreadsheetId=workbook_id,
             range="'Overview'!A1:B100"
-        ).execute().get("values", [])
+        ).execute(num_retries=self.api_retries).get("values", [])
         metric_rows = {
             str(row[0]).strip(): row_number
             for row_number, row in enumerate(rows, start=1)
@@ -595,13 +714,13 @@ class GoogleSheetsStore:
             self.sheets.spreadsheets().values().batchUpdate(
                 spreadsheetId=workbook_id,
                 body={"valueInputOption":"RAW","data":data},
-            ).execute()
+            ).execute(num_retries=self.api_retries)
 
     def update_overview(self, workbook_id: str, counts: dict[str,int], increments: dict[str,int]):
         rows = self.sheets.spreadsheets().values().get(
             spreadsheetId=workbook_id,
             range="'Overview'!A1:B100"
-        ).execute().get("values", [])
+        ).execute(num_retries=self.api_retries).get("values", [])
         metric_rows = {}
         current = {}
         for row_number,row in enumerate(rows,start=1):
@@ -629,4 +748,4 @@ class GoogleSheetsStore:
             self.sheets.spreadsheets().values().batchUpdate(
                 spreadsheetId=workbook_id,
                 body={"valueInputOption":"RAW","data":data}
-            ).execute()
+            ).execute(num_retries=self.api_retries)

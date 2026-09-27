@@ -37,6 +37,12 @@ def load_config() -> dict:
         raise ValueError("max_shard_attempts must be at least 1.")
     if int(config["runtime"].get("batch_accept_limit",0)) < 1:
         raise ValueError("batch_accept_limit must be at least 1.")
+    if int(config["runtime"].get("google_api_retries",5)) < 0:
+        raise ValueError("google_api_retries cannot be negative.")
+    if int(config["runtime"].get("source_retry_attempts",3)) < 1:
+        raise ValueError("source_retry_attempts must be at least 1.")
+    if float(config["runtime"].get("source_retry_backoff_seconds",2)) < 0:
+        raise ValueError("source_retry_backoff_seconds cannot be negative.")
 
     for geo in config["geographies"]:
         bbox=geo.get("bbox")

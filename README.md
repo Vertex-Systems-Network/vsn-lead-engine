@@ -116,9 +116,25 @@ GitHub event / schedule
  -> dated Overview counters
 ```
 
-## Schedule
+## Reliability and schedule
 
-GitHub Actions: hourly from 08:00 through 23:00 Asia/Karachi (03:00–18:00 UTC).
+The quota supervisor is the primary hourly controller at **:00** from 08:00
+through 23:00 Asia/Karachi. GitHub Actions keeps a staggered **:30 fallback**
+from 08:30 through 22:30, avoiding same-minute duplicate triggers while retaining
+an independent recovery path.
+
+P0 reliability controls:
+
+- one Asia/Karachi `run_date` is frozen at process start and reused for the
+  workbook, rows and counters;
+- every real run reconciles stale Master Registry `PendingDaily` rows before
+  building dedupe state;
+- a pending Registry row becomes `Active` if its Unique Key exists in the
+  referenced daily workbook, otherwise it becomes non-blocking `Retryable`;
+- Google Drive/Sheets calls use bounded API retries;
+- source queries use bounded exponential retry/backoff;
+- GitHub validation and production jobs have hard execution timeouts;
+- the dated workbook is resolved before discovery begins.
 
 ## Production credential
 
@@ -135,6 +151,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - User consent: **APPROVED**
 - Google integration: **VERIFIED**
 - Daily dated workbook routing: **ENABLED**
+- P0 reliability hardening: **ENABLED**
 - Master Registry cross-day dedupe: **ENABLED**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
