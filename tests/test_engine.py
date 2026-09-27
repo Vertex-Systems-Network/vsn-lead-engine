@@ -1,5 +1,5 @@
 import vsn_lead_engine.engine as engine
-from vsn_lead_engine.engine import _candidate_partition_geography, _quality_summary, _search_with_retry, check_workbook_readiness, recover_workbook_readiness
+from vsn_lead_engine.engine import _candidate_partition_geography, _quality_summary, _search_with_retry, _update_yield_hints, _yield_hint_summary, check_workbook_readiness, recover_workbook_readiness
 
 
 class FlakySource:
@@ -445,3 +445,118 @@ def test_workbook_readiness_recovery_first_attempt_reports_ready_without_sleep()
     assert result["failures"]==[]
     assert result["quota_complete"] is True
     assert sleeps==[]
+
+
+def test_yield_hints_accumulate_shard_history():
+    hints={}
+    _update_yield_hints(
+        hints,
+        [
+            {
+                "category":"IT & Software",
+                "geography":{
+                    "country":"United States",
+                    "region":"Texas",
+                    "city":"Austin",
+                },
+                "discovered":100,
+                "accepted":20,
+            },
+            {
+                "category":"IT & Software",
+                "geography":{
+                    "country":"United States",
+                    "region":"Texas",
+                    "city":"Austin",
+                },
+                "discovered":50,
+                "accepted":5,
+            },
+        ],
+    )
+
+    assert hints[
+        "it & software|united states|texas|austin"
+    ]=={
+        "visits":2,
+        "discovered":150,
+        "accepted":25,
+    }
+    assert _yield_hint_summary(hints)=={
+        "markets_observed":1,
+        "visits":2,
+        "discovered":150,
+        "accepted":25,
+    }
+
+
+def test_run_until_quota_passes_learned_yield_to_next_cycle(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    snapshots=[]
+
+    results=[
+        {
+            "status":"ok",
+            "accepted":20,
+            "counts":{"A":20},
+            "country_counts":{"United States":20,"Canada":0},
+            "attempts":[
+                {
+                    "category":"A",
+                    "geography":{
+                        "country":"United States",
+                        "region":"R1",
+                        "city":"US1",
+                    },
+                    "discovered":100,
+                    "accepted":20,
+                }
+            ],
+        },
+        {
+            "status":"complete",
+            "accepted":980,
+            "counts":{"A":1000},
+            "country_counts":{"United States":1000,"Canada":0},
+            "attempts":[],
+        },
+    ]
+
+    def fake_run_once(config,dry_run=False,**kwargs):
+        snapshots.append({
+            key:dict(value) if isinstance(value,dict) else value
+            for key,value in (kwargs.get("yield_hints") or {}).items()
+        })
+        return results[len(snapshots)-1]
+
+    monkeypatch.setattr(engine,"run_once",fake_run_once)
+    config={
+        "runtime":{
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_cycles_per_run":3,
+            "max_zero_progress_cycles":3,
+        },
+        "categories":["A"],
+    }
+
+    result=engine.run_until_quota(config)
+
+    assert snapshots[0]=={}
+    assert snapshots[1][
+        "a|united states|r1|us1"
+    ]=={
+        "visits":1,
+        "discovered":100,
+        "accepted":20,
+    }
+    assert result["adaptive_yield"]=={
+        "markets_observed":1,
+        "visits":1,
+        "discovered":100,
+        "accepted":20,
+    }
+    assert source.closed
