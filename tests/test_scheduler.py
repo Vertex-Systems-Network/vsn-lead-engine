@@ -190,3 +190,143 @@ def test_adaptive_disabled_preserves_rotated_base_order():
     assert adaptive[0]["geography"]["city"]=="US2"
     assert baseline[0]["geography"]["city"]=="US1"
     assert baseline[0]["adaptive_yield_score"] is None
+
+
+def test_same_day_zero_yield_route_is_deferred_when_alternative_exists():
+    blended={
+        "a|united states|r1|us1":{
+            "visits":8,
+            "discovered":400,
+            "accepted":0,
+        },
+        "a|united states|r2|us2":{
+            "visits":1,
+            "discovered":50,
+            "accepted":5,
+        },
+    }
+    daily={
+        "a|united states|r1|us1":{
+            "visits":2,
+            "discovered":120,
+            "accepted":0,
+        },
+    }
+
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=4,
+        country_counts={"United States":0,"Canada":0},
+        yield_hints=blended,
+        daily_yield_hints=daily,
+        adaptive_enabled=True,
+        cooldown_enabled=True,
+        cooldown_min_visits=2,
+        cooldown_min_discovered=100,
+    )
+
+    us_items=[
+        item for item in plan
+        if item["geography"]["country"]=="United States"
+    ]
+    assert us_items
+    assert all(item["geography"]["city"]=="US2" for item in us_items)
+    assert all(item["adaptive_cooldown"] is False for item in us_items)
+    assert all(item["adaptive_cooldown_deferred_count"]==1 for item in us_items)
+
+
+def test_historical_zero_yield_alone_never_triggers_cooldown():
+    blended={
+        "a|united states|r1|us1":{
+            "visits":10,
+            "discovered":500,
+            "accepted":0,
+        },
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=4,
+        country_counts={"United States":0,"Canada":0},
+        yield_hints=blended,
+        daily_yield_hints={},
+        adaptive_enabled=True,
+        cooldown_enabled=True,
+    )
+
+    us_cities=[
+        item["geography"]["city"]
+        for item in plan
+        if item["geography"]["country"]=="United States"
+    ]
+    assert "US1" in us_cities
+    assert all(item["adaptive_cooldown_deferred_count"]==0 for item in plan)
+
+
+def test_all_same_day_routes_cooling_falls_back_without_starvation():
+    daily={
+        "a|united states|r1|us1":{
+            "visits":2,
+            "discovered":150,
+            "accepted":0,
+        },
+        "a|united states|r2|us2":{
+            "visits":3,
+            "discovered":200,
+            "accepted":0,
+        },
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=4,
+        country_counts={"United States":0,"Canada":0},
+        yield_hints=daily,
+        daily_yield_hints=daily,
+        adaptive_enabled=True,
+        cooldown_enabled=True,
+        cooldown_min_visits=2,
+        cooldown_min_discovered=100,
+    )
+
+    us_cities=[
+        item["geography"]["city"]
+        for item in plan
+        if item["geography"]["country"]=="United States"
+    ]
+    assert set(us_cities)=={"US1","US2"}
+    assert all(item["adaptive_cooldown_deferred_count"]==0 for item in plan)
+
+
+def test_route_with_any_acceptance_is_not_cooled():
+    daily={
+        "a|united states|r1|us1":{
+            "visits":5,
+            "discovered":500,
+            "accepted":1,
+        },
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=2,
+        country_counts={"United States":0,"Canada":1000},
+        yield_hints=daily,
+        daily_yield_hints=daily,
+        adaptive_enabled=True,
+        cooldown_enabled=True,
+    )
+    assert plan[0]["adaptive_cooldown_deferred_count"]==0
