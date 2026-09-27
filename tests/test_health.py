@@ -210,6 +210,10 @@ def test_run_health_event_builds_shortfalls_and_schedule():
                 "legacy_entries":73,
                 "legacy_hits":91,
                 "legacy_misses":29,
+                "pending_enabled":True,
+                "pending_entries":14,
+                "pending_hits":22,
+                "pending_misses":4,
             },
         },
         origin="native-schedule",
@@ -232,6 +236,10 @@ def test_run_health_event_builds_shortfalls_and_schedule():
     assert event["registry_legacy_cache_entries"]==73
     assert event["registry_legacy_cache_hits"]==91
     assert event["registry_legacy_cache_misses"]==29
+    assert event["registry_pending_cache_enabled"] is True
+    assert event["registry_pending_cache_entries"]==14
+    assert event["registry_pending_cache_hits"]==22
+    assert event["registry_pending_cache_misses"]==4
 
 
 def test_readiness_health_event_keeps_failure_reason_not_workbook_identity():
