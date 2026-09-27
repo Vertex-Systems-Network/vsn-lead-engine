@@ -184,6 +184,8 @@ def test_run_health_event_builds_shortfalls_and_schedule():
             "status":"ok",
             "accepted":50,
             "discovered":200,
+            "source_phone_candidates":160,
+            "website_only_candidates":40,
             "cycles_executed":2,
             "categories_attempted":12,
             "source_batch_duplicates":5,
@@ -222,6 +224,8 @@ def test_run_health_event_builds_shortfalls_and_schedule():
     assert event["shortfalls"]=={"B":250}
     assert event["quota_complete"] is False
     assert event["schedule_delay_minutes"]==17
+    assert event["source_phone_candidates"]==160
+    assert event["website_only_candidates"]==40
     assert event["categories_attempted"]==12
     assert event["source_batch_duplicates"]==5
     assert event["remote_prefilter_duplicates"]==7
