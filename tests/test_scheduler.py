@@ -92,7 +92,7 @@ def test_priority_weight_is_exposed_for_audit():
         cursor=1,
         max_attempts=3,
     )
-    assert plan[0]["priority_weight"]==3
+    assert plan[0]["priority_weight"]==6
 
 
 def test_adaptive_yield_prefers_good_metro_within_country_only():
@@ -353,7 +353,45 @@ def test_weighted_scheduler_covers_all_pending_categories_before_repeats():
     assert len(set(item["category"] for item in plan))==12
 
 
-def test_weight_layers_preserve_three_two_one_priority_without_clumping():
+def test_weight_layers_preserve_rescue_priority_without_clumping():
+    plan=build_shard_plan(
+        ["A","B","C"],
+        GEOS,
+        {"A":10,"B":300,"C":800},
+        1000,
+        cursor=0,
+        max_attempts=8,
+    )
+    assert [item["category"] for item in plan]==[
+        "A","B","C","A","B","A","A","A"
+    ]
+
+
+def test_critical_deficit_rescue_gets_large_share_after_fair_first_pass():
+    categories=["Critical","Mid","High","Almost"]
+    plan=build_shard_plan(
+        categories,
+        GEOS,
+        {
+            "Critical":24,
+            "Mid":400,
+            "High":700,
+            "Almost":990,
+        },
+        1000,
+        cursor=0,
+        max_attempts=14,
+    )
+
+    first_pass=[item["category"] for item in plan[:4]]
+    assert set(first_pass)==set(categories)
+    counts=Counter(item["category"] for item in plan)
+    assert counts["Critical"] >= 6
+    assert counts["Critical"] > counts["Mid"]
+    assert counts["Mid"] >= counts["High"]
+
+
+def test_rescue_can_be_disabled_to_preserve_legacy_three_two_one_weights():
     plan=build_shard_plan(
         ["A","B","C"],
         GEOS,
@@ -361,10 +399,12 @@ def test_weight_layers_preserve_three_two_one_priority_without_clumping():
         1000,
         cursor=0,
         max_attempts=6,
+        critical_deficit_rescue_enabled=False,
     )
     assert [item["category"] for item in plan]==[
         "A","B","C","A","B","A"
     ]
+    assert plan[0]["priority_weight"]==3
 
 
 def test_fair_weighting_keeps_lowest_progress_first_when_slots_are_tight():
