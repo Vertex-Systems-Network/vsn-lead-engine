@@ -6,7 +6,7 @@
     "product_version": "0.58.0"
   },
   "execution": {
-    "status": "active",
+    "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
     "active_task": "P59-HASH-VERIFIED-DEPENDENCIES",
     "last_completed_task": "P58-REPRODUCIBLE-DEPENDENCIES",
@@ -14,10 +14,10 @@
   },
   "observed_main_sha": "f1759e9c9445c37040faec73d21837c8b366b36b",
   "active_issue": null,
-  "active_pr": null,
+  "active_pr": 105,
   "active_branch": "chore/p59-hash-verified-dependencies",
   "current_milestone": "P59-HASH-VERIFIED-DEPENDENCIES",
-  "milestone_status": "RESOLVING_HASHES",
+  "milestone_status": "VERIFYING",
   "last_completed_milestone": "P58 added a 35-package Python 3.12 dependency lock, exact setuptools/wheel build pins, lock-constrained workflow installs and pip check; PR #104 exact-head CI passed 241 tests and merged.",
   "production": {
     "last_certified_date": "2026-09-28",
@@ -40,5 +40,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Resolve exact selected SHA-256 artifacts for bootstrap, runtime and dev dependency surfaces on a clean GitHub Python 3.12 runner; then enforce --require-hashes and no-deps/no-build-isolation local installation before final exact-head certification."
+  "exact_next_safe_action": "Verify PR #105 final exact-head CI using the hash-enforced installer for dev dependencies, pip check, runtime validation and the complete test suite. If green, squash-merge PR #105. Next session must resolve live main before selecting P60."
 }
