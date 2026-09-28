@@ -18,6 +18,9 @@ def build_sources(config: dict):
                 website_candidate_reserve_fraction=float(
                     overture.get("website_candidate_reserve_fraction", 0.20)
                 ),
+                query_timeout_seconds=float(
+                    overture.get("query_timeout_seconds",45)
+                ),
             )
         )
 
