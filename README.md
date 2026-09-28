@@ -1263,7 +1263,7 @@ R2/Google write semantics.
 ### P53 progressive tail geography
 
 The P52 production certification moved Motorbikes from **829 to 895** on the
-first observed tail commit, then to **901** on the next observed commit. That
+first observed workbook update, then to **901** on the next observed workbook update. That
 confirmed the retained 1.5x outskirts horizon was productive, while the sharp
 drop from +66 to +6 also showed that the first expanded cohort was being
 exhausted quickly.
