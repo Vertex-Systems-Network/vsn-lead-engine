@@ -30,6 +30,11 @@ def _search_with_retry(source, category: str, geography: dict, *, limit: int, at
     for attempt in range(1, max(1, attempts) + 1):
         try:
             return source.search(category, geography, limit=limit), "", retry_count
+        except TimeoutError as exc:
+            # A source-enforced wall-clock timeout is not retried in the same
+            # shard. Rotated shards/cycles provide the next bounded attempt.
+            last_error=f"{type(exc).__name__}: {exc}"
+            break
         except Exception as exc:
             last_error = f"{type(exc).__name__}: {exc}"
             if attempt >= max(1, attempts):
