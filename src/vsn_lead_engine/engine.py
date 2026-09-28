@@ -161,6 +161,44 @@ def _dedupe_source_batch(candidates: list) -> tuple[list,int]:
     ],duplicate_count
 
 
+def _critical_search_geography(
+    geography: dict,
+    *,
+    enabled: bool,
+    completion_ratio: float,
+    threshold: float,
+    bbox_factor: float,
+) -> dict:
+    """Widen a metro bbox only for extreme quota shortfalls."""
+    result=dict(geography)
+    bbox=geography.get("bbox")
+    factor=max(1.0,min(3.0,float(bbox_factor)))
+    threshold=max(0.0,min(1.0,float(threshold)))
+    if (
+        not enabled
+        or float(completion_ratio) >= threshold
+        or factor <= 1.0
+        or not isinstance(bbox,list)
+        or len(bbox) != 4
+    ):
+        result["_bbox_expansion_factor"]=1.0
+        return result
+
+    xmin,ymin,xmax,ymax=[float(value) for value in bbox]
+    center_x=(xmin+xmax)/2.0
+    center_y=(ymin+ymax)/2.0
+    half_width=max(0.0,(xmax-xmin)/2.0)*factor
+    half_height=max(0.0,(ymax-ymin)/2.0)*factor
+    result["bbox"]=[
+        max(-180.0,center_x-half_width),
+        max(-90.0,center_y-half_height),
+        min(180.0,center_x+half_width),
+        min(90.0,center_y+half_height),
+    ]
+    result["_bbox_expansion_factor"]=factor
+    return result
+
+
 def _candidate_partition_geography(
     geography: dict,
     *,
@@ -600,6 +638,15 @@ def run_once(
     critical_deficit_weight=int(
         runtime.get("critical_deficit_weight",6)
     )
+    critical_geography_expansion_enabled=bool(
+        runtime.get("critical_geography_expansion_enabled",True)
+    )
+    critical_geography_expansion_ratio=float(
+        runtime.get("critical_geography_expansion_ratio",0.10)
+    )
+    critical_geography_expansion_factor=float(
+        runtime.get("critical_geography_expansion_factor",1.75)
+    )
     low_deficit_ratio=float(
         runtime.get("low_deficit_ratio",0.25)
     )
@@ -696,8 +743,19 @@ def run_once(
             if remaining <= 0:
                 break
 
-            search_geography=_candidate_partition_geography(
+            category_completion_ratio=(
+                (counts.get(category,0)+len(accepted_by_category[category]))
+                / max(target,1)
+            )
+            route_geography=_critical_search_geography(
                 geography,
+                enabled=critical_geography_expansion_enabled,
+                completion_ratio=category_completion_ratio,
+                threshold=critical_geography_expansion_ratio,
+                bbox_factor=critical_geography_expansion_factor,
+            )
+            search_geography=_candidate_partition_geography(
+                route_geography,
                 category=category,
                 cursor=cursor,
                 attempt=shard["attempt"],
@@ -730,6 +788,9 @@ def run_once(
                 ),
                 candidate_partition_score=search_geography.get(
                     "_candidate_partition_score"
+                ),
+                bbox_expansion_factor=float(
+                    search_geography.get("_bbox_expansion_factor",1.0) or 1.0
                 ),
                 requested_limit=int(remaining),
             )
@@ -944,6 +1005,9 @@ def run_once(
                 "candidate_partition_score":search_geography.get(
                     "_candidate_partition_score"
                 ),
+                "bbox_expansion_factor":float(
+                    search_geography.get("_bbox_expansion_factor",1.0) or 1.0
+                ),
                 "source_batch_duplicates":source_batch_duplicates,
                 "remote_prefilter_candidates":remote_prefilter_candidates,
                 "remote_prefilter_duplicates":remote_prefilter_duplicates,
@@ -1000,6 +1064,11 @@ def run_once(
         "r2_pre_enrichment_prefilter":remote_prefilter_enabled,
         "adaptive_yield_routing":adaptive_yield_routing,
         "adaptive_partition_yield_routing":adaptive_partition_yield_routing,
+        "critical_geography_expansion_enabled":(
+            critical_geography_expansion_enabled
+        ),
+        "critical_geography_expansion_ratio":critical_geography_expansion_ratio,
+        "critical_geography_expansion_factor":critical_geography_expansion_factor,
         "partition_exhaustion_cooldown_enabled":(
             partition_exhaustion_cooldown_enabled
         ),
