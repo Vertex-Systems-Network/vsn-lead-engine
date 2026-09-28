@@ -1260,6 +1260,23 @@ This expands tail discovery into nearby suburbs/outskirts without adding paid
 sources, increasing per-shard limits, weakening taxonomy checks, or changing
 R2/Google write semantics.
 
+### P53 progressive tail geography
+
+The P52 production certification moved Motorbikes from **829 to 895** on the
+first observed tail commit, then to **901** on the next observed commit. That
+confirmed the retained 1.5x outskirts horizon was productive, while the sharp
+drop from +66 to +6 also showed that the first expanded cohort was being
+exhausted quickly.
+
+P53 keeps the P52 1.5x horizon below 90% completion, then raises the bounded
+tail search horizon to **2.0x** once a still-incomplete category reaches 90%.
+The existing 2.25x extreme critical expansion retains precedence, and all
+expansion remains capped at 3x by validation.
+
+This changes search breadth only. It does not expand taxonomy, add providers,
+increase per-shard candidate limits, weaken R2 dedupe, or change Google write
+semantics.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1598,6 +1615,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P50 runtime identity consistency: **PACKAGE-VERSIONED OUTBOUND IDENTITY ACTIVE**
 - P51 single-source release version: **SETUPTOOLS METADATA DERIVED FROM RUNTIME VERSION ACTIVE**
 - P52 tail geography retention: **1.5× BOUNDED OUTSKIRTS COVERAGE IN QUOTA TAIL ACTIVE**
+- P53 progressive tail geography: **2.0× BOUNDED HORIZON AT 90%+ INCOMPLETE QUOTA ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
