@@ -1090,6 +1090,37 @@ P44 does not add shards, event time, providers, paid API usage, Google writes or
 R2 writes. It only changes the geographic footprint of already-budgeted
 critical-category searches.
 
+### P45 recent zero-unique partition cooldown
+
+P44 production certification completed successfully but discovered 303
+candidates and accepted 0 new leads, with 285 duplicate rejections. The
+remaining flaw was recency: partition cooldown used cumulative same-day
+acceptance. A partition that produced unique leads earlier in the day could
+therefore remain eligible indefinitely even after repeated later passes
+produced only already-known businesses.
+
+P45 extends the existing date-scoped adaptive-yield object with two compact
+partition-only counters:
+
+- `zero_unique_streak`: consecutive discovered passes with zero post-R2
+  accepted leads;
+- `recent_discovered`: candidates observed since the last unique acceptance.
+
+Any unique acceptance resets both counters. By default, a partition is eligible
+for cooldown after **2 consecutive zero-unique passes covering at least 20
+recent discoveries**, even if that partition has historical or earlier
+same-day accepted leads. The existing aggregate zero-yield rule remains as a
+fallback, and if all partitions are cooled the selector still restores normal
+ranking to prevent starvation.
+
+The daily R2 state remains backward compatible with existing compact list
+entries; only hints carrying recency data are serialized as compact objects.
+Historical profiles intentionally discard the recency counters so a new day
+starts clean.
+
+No new object family, provider, paid API, event duration, shard count, Google
+write or permanent lead-state write is introduced.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
