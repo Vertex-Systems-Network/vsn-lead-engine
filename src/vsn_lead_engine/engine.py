@@ -19,7 +19,7 @@ from .scheduler import (
     yield_hint_key,
 )
 from .registry import build_registry_index, fingerprint_token, registry_mode
-from .sheets import GoogleSheetsStore
+from .sheets import GoogleSheetsStore, PermanentWorkbookReadinessError
 from .sources import build_sources
 from .yield_state import DailyYieldStateStore, HistoricalYieldProfileStore
 
@@ -537,19 +537,23 @@ def recover_workbook_readiness(
             }
             return result
         except Exception as exc:
+            permanent=isinstance(exc,PermanentWorkbookReadinessError)
             failures.append({
                 "attempt":attempt_number,
                 "timestamp":started_at,
                 "error_type":type(exc).__name__,
                 "message":str(exc),
+                "permanent":permanent,
             })
+            if permanent:
+                break
             if attempt_number < attempts and delay_seconds > 0:
                 sleep_fn(delay_seconds)
 
     return {
         "status":"incident",
         "run_date":run_date,
-        "attempts_used":attempts,
+        "attempts_used":len(failures),
         "attempts_configured":attempts,
         "retry_delay_seconds":delay_seconds,
         "failures":failures,
