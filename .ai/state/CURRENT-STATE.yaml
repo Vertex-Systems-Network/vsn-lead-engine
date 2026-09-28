@@ -3,22 +3,22 @@
   "project": {
     "name": "VSN Lead Engine",
     "repository": "Vertex-Systems-Network/vsn-lead-engine",
-    "product_version": "0.60.0"
+    "product_version": "0.61.0"
   },
   "execution": {
-    "status": "verifying",
+    "status": "active",
     "current_phase": "CONTINUOUS-HARDENING",
-    "active_task": "P64-USER-OAUTH-MY-DRIVE",
-    "last_completed_task": "P63-DEPLOYMENT-READINESS-CATCHUP",
-    "next_task": "P65-NEXT-EVIDENCE-BASED-MILESTONE"
+    "active_task": "P65-OAUTH-ONBOARDING-AND-CAPABILITY",
+    "last_completed_task": "P64-USER-OAUTH-MY-DRIVE",
+    "next_task": "P66-NEXT-EVIDENCE-BASED-MILESTONE"
   },
-  "observed_main_sha": "399c7deffb3d25571480bc347ac1810755c8c101",
+  "observed_main_sha": "200437034ee14d7bb947af804f276b4d050db709",
   "active_issue": null,
-  "active_pr": 111,
-  "active_branch": "feat/p64-user-oauth-drive",
-  "current_milestone": "P64-USER-OAUTH-MY-DRIVE",
-  "milestone_status": "VERIFYING",
-  "last_completed_milestone": "P63 added a bounded main-push next-day readiness catch-up; PR #110 exact-head CI passed 262 tests and merged. Production catch-up run #2 correctly targeted 2026-09-29 but failed closed because service-account auth could not create a user-owned My Drive file.",
+  "active_pr": null,
+  "active_branch": "feat/p65-google-oauth-onboarding",
+  "current_milestone": "P65-OAUTH-ONBOARDING-AND-CAPABILITY",
+  "milestone_status": "IMPLEMENTING",
+  "last_completed_milestone": "P64 added OAuth-first Google auth with service-account fallback; PR #111 exact-head CI passed 268 tests and merged. Production readiness run #3 succeeded for 2026-09-29 in one attempt on the precreated user-owned workbook.",
   "production": {
     "last_certified_date": "2026-09-28",
     "daily_target": 12000,
@@ -29,18 +29,18 @@
     "production_run": 162
   },
   "quality": {
-    "latest_required_ci_run": 207,
+    "latest_required_ci_run": 214,
     "latest_required_ci_result": "success",
-    "pytest": "262 passed",
+    "pytest": "268 passed",
     "node20_deprecation_warning": false
   },
   "blockers": [
-    "GOOGLE_OAUTH_USER_JSON is not yet configured in GitHub; future autonomous My Drive creation still falls back to the service account until that secret is added."
+    "GOOGLE_OAUTH_USER_JSON is not yet configured in GitHub. P65 provides the local onboarding helper and manual production create/trash certification workflow needed to remove this blocker."
   ],
   "timeout_control": {
     "tight_polling_forbidden": true,
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Verify PR #111 exact-head Lead Engine CI. If green, squash-merge. The merge push must trigger Daily Workbook Readiness; verify 2026-09-29 workbook initialization succeeds on the precreated user-owned file. Future missing-file autonomy still requires GOOGLE_OAUTH_USER_JSON."
+  "exact_next_safe_action": "Open P65 PR and verify exact-head Lead Engine CI. If green, squash-merge. Then provision GOOGLE_OAUTH_USER_JSON with scripts/google_oauth_onboard.py and run the manual Google Drive Capability workflow; only a successful create/trash probe closes autonomous My Drive creation."
 }
