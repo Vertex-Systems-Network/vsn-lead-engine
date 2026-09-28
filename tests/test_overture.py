@@ -1,9 +1,11 @@
+import pytest
 import re
 
 from vsn_lead_engine.sources import build_sources
 from vsn_lead_engine.sources.overture import (
     CATEGORY_PATTERNS,
     OverturePlaceSource,
+    OvertureQueryTimeout,
     category_match_reason,
 )
 
@@ -325,6 +327,59 @@ def test_contact_budgets_reserve_website_candidates_without_losing_total_limit()
     assert OverturePlaceSource._contact_budgets(10,0)==(10,0)
 
 
+def test_overture_query_timeout_interrupts_stalled_query(monkeypatch):
+    source=OverturePlaceSource(
+        release="2026-09-24.0",
+        query_timeout_seconds=45,
+    )
+
+    class FakeConnection:
+        def __init__(self):
+            self.interrupted=False
+
+        def interrupt(self):
+            self.interrupted=True
+
+        def execute(self, sql, params=None):
+            if self.interrupted:
+                raise RuntimeError("query interrupted")
+            raise AssertionError("timer should interrupt before execute in this test")
+
+    class ImmediateTimer:
+        def __init__(self, seconds, callback):
+            self.seconds=seconds
+            self.callback=callback
+            self.daemon=False
+            self.cancelled=False
+
+        def start(self):
+            self.callback()
+
+        def cancel(self):
+            self.cancelled=True
+
+    connection=FakeConnection()
+    monkeypatch.setattr(source,"_get_connection",lambda:connection)
+    monkeypatch.setattr(
+        "vsn_lead_engine.sources.overture.threading.Timer",
+        ImmediateTimer,
+    )
+
+    with pytest.raises(OvertureQueryTimeout,match="45s timeout"):
+        source.search(
+            "IT & Software",
+            {
+                "country":"United States",
+                "region":"Texas",
+                "city":"Austin",
+                "bbox":[-98.0,30.0,-97.0,31.0],
+            },
+            limit=10,
+        )
+
+    assert connection.interrupted is True
+
+
 def test_build_sources_passes_website_reserve_fraction():
     sources=build_sources({
         "sources":{
@@ -333,9 +388,11 @@ def test_build_sources_passes_website_reserve_fraction():
                 "release":"2026-09-24.0",
                 "candidate_limit":500,
                 "website_candidate_reserve_fraction":0.25,
+                "query_timeout_seconds":55,
             },
             "overpass":{"enabled":False},
         }
     })
     assert len(sources)==1
     assert sources[0].website_candidate_reserve_fraction==0.25
+    assert sources[0].query_timeout_seconds==55
