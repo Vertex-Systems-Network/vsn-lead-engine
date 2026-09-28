@@ -7,6 +7,7 @@ ROOT=Path(__file__).resolve().parents[1]
 RUNTIME=ROOT/"requirements-runtime.txt"
 DEV=ROOT/"requirements-dev.txt"
 BOOTSTRAP=ROOT/"requirements-bootstrap.txt"
+RESOLVER=ROOT/".github/dependency-resolver.txt"
 PYPROJECT=ROOT/"pyproject.toml"
 WORKFLOW_DIR=ROOT/".github/workflows"
 INSTALLER=ROOT/"scripts/install_locked.py"
@@ -42,9 +43,9 @@ def test_hash_lock_surfaces_are_exact_and_expected_size():
 
     assert len(runtime)==30
     assert len(dev)==5
-    assert len(bootstrap)==4
+    assert len(bootstrap)==3
     assert set(dev)=={"iniconfig","packaging","pluggy","pygments","pytest"}
-    assert set(bootstrap)=={"packaging","pip","setuptools","wheel"}
+    assert set(bootstrap)=={"packaging","setuptools","wheel"}
     assert "-r requirements-runtime.txt" in DEV.read_text(encoding="utf-8")
 
 
@@ -61,6 +62,12 @@ def test_hash_locks_cover_all_declared_project_dependencies():
     for requirement in declared:
         name=re.split(r"[<>=!~\[; ]",requirement,1)[0]
         assert _normalize(name) in locked, requirement
+
+
+def test_resolver_pip_is_exactly_hash_pinned():
+    resolver=_hashed_rows(RESOLVER)
+    assert set(resolver)=={"pip"}
+    assert resolver["pip"][0]=="25.2"
 
 
 def test_build_backend_is_exactly_pinned_and_hash_locked():
@@ -81,6 +88,7 @@ def test_unhashed_legacy_lock_is_retired():
 def test_installer_is_fail_closed_and_hash_enforced():
     content=INSTALLER.read_text(encoding="utf-8")
     assert '"--require-hashes"' in content
+    assert '".github/dependency-resolver.txt"' in content
     assert '"--no-deps"' in content
     assert '"--no-build-isolation"' in content
     assert 'run("check")' in content
