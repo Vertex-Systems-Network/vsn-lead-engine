@@ -1463,11 +1463,13 @@ def test_critical_search_geography_expands_bbox_for_extreme_shortfall():
         geography,
         enabled=True,
         completion_ratio=0.07,
-        threshold=0.10,
+        threshold=0.25,
         bbox_factor=1.75,
+        extreme_threshold=0.10,
+        extreme_bbox_factor=2.25,
     )
-    assert result["bbox"]==[-98.375,29.625,-96.625,31.375]
-    assert result["_bbox_expansion_factor"]==1.75
+    assert result["bbox"]==[-98.625,29.375,-96.375,31.625]
+    assert result["_bbox_expansion_factor"]==2.25
     assert geography["bbox"]==[-98.0,30.0,-97.0,31.0]
 
 
@@ -1482,11 +1484,13 @@ def test_critical_search_geography_keeps_normal_categories_at_base_bbox():
         geography,
         enabled=True,
         completion_ratio=0.10,
-        threshold=0.10,
+        threshold=0.25,
         bbox_factor=1.75,
+        extreme_threshold=0.10,
+        extreme_bbox_factor=2.25,
     )
-    assert result["bbox"]==geography["bbox"]
-    assert result["_bbox_expansion_factor"]==1.0
+    assert result["bbox"]!=geography["bbox"]
+    assert result["_bbox_expansion_factor"]==1.75
 
 
 def test_critical_search_geography_clamps_world_bounds():
@@ -1503,5 +1507,46 @@ def test_critical_search_geography_clamps_world_bounds():
         threshold=0.10,
         bbox_factor=3.0,
     )
+    assert result["bbox"][2] <= 180.0
+    assert result["bbox"][3] <= 90.0
+
+
+def test_critical_search_geography_keeps_quarter_complete_at_base_bbox():
+    geography={
+        "country":"United States",
+        "region":"Texas",
+        "city":"Dallas",
+        "bbox":[-97.2,32.45,-96.35,33.15],
+    }
+    result=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.25,
+        threshold=0.25,
+        bbox_factor=1.75,
+        extreme_threshold=0.10,
+        extreme_bbox_factor=2.25,
+    )
+    assert result["bbox"]==geography["bbox"]
+    assert result["_bbox_expansion_factor"]==1.0
+
+
+def test_critical_search_geography_clamps_extreme_factor_to_three():
+    geography={
+        "country":"Canada",
+        "region":"Test",
+        "city":"Edge2",
+        "bbox":[179.0,89.0,180.0,90.0],
+    }
+    result=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.01,
+        threshold=0.25,
+        bbox_factor=1.75,
+        extreme_threshold=0.10,
+        extreme_bbox_factor=9.0,
+    )
+    assert result["_bbox_expansion_factor"]==3.0
     assert result["bbox"][2] <= 180.0
     assert result["bbox"][3] <= 90.0
