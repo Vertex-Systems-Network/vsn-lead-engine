@@ -1,5 +1,5 @@
 import vsn_lead_engine.engine as engine
-from vsn_lead_engine.engine import _candidate_partition_geography, _deadline_is_near, _dedupe_source_batch, _quality_summary, _search_with_retry, _source_contact_mix, _update_yield_hints, _yield_hint_summary, check_workbook_readiness, recover_workbook_readiness
+from vsn_lead_engine.engine import _candidate_partition_geography, _critical_search_geography, _deadline_is_near, _dedupe_source_batch, _quality_summary, _search_with_retry, _source_contact_mix, _update_yield_hints, _yield_hint_summary, check_workbook_readiness, recover_workbook_readiness
 from vsn_lead_engine.models import Lead
 
 
@@ -1450,3 +1450,58 @@ def test_commit_deadline_guard_never_weakens_event_guard():
         "event_deadline_guard_seconds":240,
         "commit_deadline_guard_seconds":180,
     })==240.0
+
+
+def test_critical_search_geography_expands_bbox_for_extreme_shortfall():
+    geography={
+        "country":"United States",
+        "region":"Texas",
+        "city":"Austin",
+        "bbox":[-98.0,30.0,-97.0,31.0],
+    }
+    result=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.07,
+        threshold=0.10,
+        bbox_factor=1.75,
+    )
+    assert result["bbox"]==[-98.375,29.625,-96.625,31.375]
+    assert result["_bbox_expansion_factor"]==1.75
+    assert geography["bbox"]==[-98.0,30.0,-97.0,31.0]
+
+
+def test_critical_search_geography_keeps_normal_categories_at_base_bbox():
+    geography={
+        "country":"Canada",
+        "region":"Ontario",
+        "city":"Toronto",
+        "bbox":[-79.8,43.4,-79.0,44.0],
+    }
+    result=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.10,
+        threshold=0.10,
+        bbox_factor=1.75,
+    )
+    assert result["bbox"]==geography["bbox"]
+    assert result["_bbox_expansion_factor"]==1.0
+
+
+def test_critical_search_geography_clamps_world_bounds():
+    geography={
+        "country":"Canada",
+        "region":"Test",
+        "city":"Edge",
+        "bbox":[179.0,89.0,180.0,90.0],
+    }
+    result=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.01,
+        threshold=0.10,
+        bbox_factor=3.0,
+    )
+    assert result["bbox"][2] <= 180.0
+    assert result["bbox"][3] <= 90.0

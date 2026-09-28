@@ -1041,6 +1041,32 @@ post-R2 accepted counts.
 No event duration, shard count, source limit, Google write, R2 write or paid
 API budget is increased.
 
+### P43 critical-category metro-outskirts expansion
+
+P42 production certification proved the same-day partition cooldown works: the
+first routing pass added 3 new Motorbikes leads, moving the category from 71 to
+74. The following cycles again saturated, with 239–244 discoveries and zero new
+accepted leads. This is now evidence of geographic coverage saturation across
+the configured 56 metro boxes rather than only partition selection.
+
+P43 widens the search box only for categories below 10% of their daily target.
+The default factor is **1.75x around the existing metro center**. Categories at
+or above the threshold keep their exact existing boxes.
+
+Safety properties:
+
+- expansion is bounded to 1x–3x and clamped to valid longitude/latitude limits;
+- Overture's existing address-country check still rejects cross-border rows;
+- actual lead city and region continue to come from Overture address data;
+- scheduler/yield identity remains the original category+metro route, so no
+  state migration is required;
+- the expansion factor is emitted in source-attempt telemetry;
+- the feature, threshold and factor are runtime-configurable.
+
+P43 adds no new data provider, paid API, database, event duration, shard count,
+or Google/R2 write budget. It spends the existing critical-category shard slots
+over a wider suburban/exurban footprint.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1369,6 +1395,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P40 quota recovery supervisor: **LIVE SHORTFALL CHECK + SINGLE SERIALIZED REDISPATCH ACTIVE**
 - P41 partition exhaustion cooldown: **POST-R2 ZERO-UNIQUE COHORT DEFERRAL ACTIVE**
 - P42 same-day exhaustion authority: **CURRENT-DAY POST-R2 EVIDENCE CONTROLS PARTITION COOLDOWN**
+- P43 critical geography expansion: **<10% QUOTA METRO BBOX 1.75× OUTSKIRTS COVERAGE ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
