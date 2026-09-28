@@ -356,6 +356,63 @@ def _adaptive_country_geographies(
     return result,applied_cooldowns
 
 
+def _tail_country_yield_sequence(
+    balanced_geographies: list[dict],
+    *,
+    category: str,
+    yield_hints: dict[str,dict] | None,
+    min_visits: int,
+    preferred_weight: int,
+    advantage_ratio: float,
+) -> tuple[list[str],dict[str,int]]:
+    """Build a bounded evidence-weighted country sequence for tail routing."""
+    country_order=[]
+    stats=defaultdict(lambda: {"visits":0,"accepted":0})
+    for geography in balanced_geographies:
+        country=str(geography.get("country","")).strip()
+        if not country:
+            continue
+        if country not in country_order:
+            country_order.append(country)
+        hint=(yield_hints or {}).get(yield_hint_key(category,geography),{})
+        stats[country]["visits"]+=max(0,int(hint.get("visits",0) or 0))
+        stats[country]["accepted"]+=max(0,int(hint.get("accepted",0) or 0))
+
+    weights={country:1 for country in country_order}
+    eligible=[
+        country for country in country_order
+        if stats[country]["visits"] >= max(1,int(min_visits))
+    ]
+    if len(eligible) >= 2:
+        ranked=sorted(
+            eligible,
+            key=lambda country: (
+                -(stats[country]["accepted"] / max(1,stats[country]["visits"])),
+                country_order.index(country),
+            ),
+        )
+        best,second=ranked[0],ranked[1]
+        best_score=stats[best]["accepted"] / max(1,stats[best]["visits"])
+        second_score=stats[second]["accepted"] / max(1,stats[second]["visits"])
+        ratio=max(1.0,float(advantage_ratio))
+        if (
+            best_score > 0
+            and (
+                second_score <= 0
+                or best_score >= second_score * ratio
+            )
+        ):
+            weights[best]=max(1,int(preferred_weight))
+
+    sequence=[]
+    max_weight=max(weights.values(),default=1)
+    for layer in range(max_weight):
+        for country in country_order:
+            if weights[country] > layer:
+                sequence.append(country)
+    return sequence or country_order,weights
+
+
 def _balanced_geographies(
     geographies: list[dict],
     *,
@@ -438,6 +495,11 @@ def build_shard_plan(
     mid_deficit_ratio: float = 0.50,
     mid_deficit_weight: int = 2,
     adaptive_score_mode: str = "throughput",
+    tail_country_yield_routing_enabled: bool = False,
+    tail_country_yield_incomplete_threshold: int = 4,
+    tail_country_yield_min_visits: int = 4,
+    tail_country_yield_preferred_weight: int = 2,
+    tail_country_yield_advantage_ratio: float = 1.5,
 ) -> list[dict]:
     """Build a progress-weighted, country-balanced rotating shard plan.
 
@@ -454,8 +516,9 @@ def build_shard_plan(
     - cursor rotation prevents repeatedly hitting the same metro;
     - adaptive scores default to accepted leads per shard attempt so routing
       optimizes quota throughput rather than small-shard conversion percentage;
-    - optional yield hints reorder metros inside each country/category while
-      leaving the country sequence unchanged.
+    - optional yield hints reorder metros inside each country/category;
+    - optional tail country-yield routing can give the evidence-backed stronger
+      country one extra slot while preserving at least one slot for every country.
     """
     category_list = list(categories)
     geography_list = list(geographies)
@@ -499,6 +562,13 @@ def build_shard_plan(
 
     adaptive_groups={}
     cooldown_keys_by_category={}
+    country_sequences={}
+    country_weights={}
+    tail_country_yield_active=(
+        adaptive_enabled
+        and tail_country_yield_routing_enabled
+        and len(pending) <= max(1,int(tail_country_yield_incomplete_threshold))
+    )
     if adaptive_enabled:
         for category in pending:
             groups,cooldowns=_adaptive_country_geographies(
@@ -515,6 +585,17 @@ def build_shard_plan(
             )
             adaptive_groups[category]=groups
             cooldown_keys_by_category[category]=cooldowns
+            if tail_country_yield_active:
+                sequence,weights=_tail_country_yield_sequence(
+                    balanced_geographies,
+                    category=category,
+                    yield_hints=yield_hints,
+                    min_visits=tail_country_yield_min_visits,
+                    preferred_weight=tail_country_yield_preferred_weight,
+                    advantage_ratio=tail_country_yield_advantage_ratio,
+                )
+                country_sequences[category]=sequence
+                country_weights[category]=weights
 
     positions=defaultdict(int)
     plan: list[dict] = []
@@ -524,6 +605,25 @@ def build_shard_plan(
         country=str(base_geography.get("country","")).strip()
         geography=base_geography
         adaptive_score=None
+        adaptive_country_weight=1
+
+        if tail_country_yield_active:
+            sequence=country_sequences.get(category,[])
+            if sequence:
+                country_position=positions[(category,"__country__")] % len(sequence)
+                country=sequence[country_position]
+                positions[(category,"__country__")] += 1
+                adaptive_country_weight=int(
+                    country_weights.get(category,{}).get(country,1)
+                )
+                fallback=[
+                    item for item in balanced_geographies
+                    if str(item.get("country","")).strip()==country
+                ]
+                if fallback:
+                    geography=fallback[
+                        positions[(category,country,"__fallback__")] % len(fallback)
+                    ]
 
         if adaptive_enabled:
             candidates=adaptive_groups.get(category,{}).get(country,[])
@@ -562,6 +662,8 @@ def build_shard_plan(
                 ),
                 "adaptive_cooldown":cooldown_applied,
                 "adaptive_cooldown_deferred_count":len(deferred_keys),
+                "tail_country_yield_routing":tail_country_yield_active,
+                "adaptive_country_weight":adaptive_country_weight,
             }
         )
     return plan

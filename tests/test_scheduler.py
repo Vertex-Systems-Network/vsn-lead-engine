@@ -904,3 +904,71 @@ def test_recent_zero_unique_streak_falls_back_if_every_partition_is_recently_exh
     )
     assert partition in {0,1}
     assert score is not None
+
+
+def test_tail_country_yield_routing_prefers_stronger_country_but_keeps_both():
+    hints={
+        "a|united states|r1|us1":{"visits":5,"discovered":50,"accepted":15},
+        "a|united states|r2|us2":{"visits":5,"discovered":50,"accepted":10},
+        "a|canada|r3|ca1":{"visits":5,"discovered":50,"accepted":4},
+        "a|canada|r4|ca2":{"visits":5,"discovered":50,"accepted":3},
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":200},
+        1000,
+        cursor=0,
+        max_attempts=6,
+        yield_hints=hints,
+        tail_country_yield_routing_enabled=True,
+        tail_country_yield_incomplete_threshold=4,
+        tail_country_yield_min_visits=4,
+        tail_country_yield_preferred_weight=2,
+        tail_country_yield_advantage_ratio=1.5,
+    )
+    countries=[item["geography"]["country"] for item in plan]
+    assert countries.count("United States")==4
+    assert countries.count("Canada")==2
+    assert all(item["tail_country_yield_routing"] is True for item in plan)
+    assert max(item["adaptive_country_weight"] for item in plan)==2
+
+
+def test_tail_country_yield_routing_stays_balanced_without_evidence_floor():
+    hints={
+        "a|united states|r1|us1":{"visits":1,"discovered":50,"accepted":20},
+        "a|canada|r3|ca1":{"visits":1,"discovered":50,"accepted":0},
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":200},
+        1000,
+        cursor=0,
+        max_attempts=6,
+        yield_hints=hints,
+        tail_country_yield_routing_enabled=True,
+        tail_country_yield_incomplete_threshold=4,
+        tail_country_yield_min_visits=4,
+        tail_country_yield_preferred_weight=2,
+        tail_country_yield_advantage_ratio=1.5,
+    )
+    countries=[item["geography"]["country"] for item in plan]
+    assert countries.count("United States")==3
+    assert countries.count("Canada")==3
+
+
+def test_tail_country_yield_routing_is_disabled_on_broad_day():
+    categories=["A","B","C","D","E"]
+    plan=build_shard_plan(
+        categories,
+        GEOS,
+        {category:100 for category in categories},
+        1000,
+        cursor=0,
+        max_attempts=6,
+        yield_hints={},
+        tail_country_yield_routing_enabled=True,
+        tail_country_yield_incomplete_threshold=4,
+    )
+    assert all(item["tail_country_yield_routing"] is False for item in plan)
