@@ -485,3 +485,16 @@ def test_schedule_skips_do_not_inflate_actual_run_counts():
     assert summary["recovery_supervisor_runs"]==0
     assert summary["schedule_blocks"]==1
     assert summary["midnight_guard_blocks"]==1
+
+
+def test_empty_health_summary_exposes_new_recovery_and_gate_counters():
+    summary=DailyHealthLedgerStore(FakeRegistry()).load(
+        "2026-09-28"
+    )["summary"]
+
+    assert summary["recovery_runs"]==0
+    assert summary["recovery_push_runs"]==0
+    assert summary["recovery_supervisor_runs"]==0
+    assert summary["schedule_blocks"]==0
+    assert summary["midnight_guard_blocks"]==0
+    assert summary["latest_schedule_block_reason"]==""
