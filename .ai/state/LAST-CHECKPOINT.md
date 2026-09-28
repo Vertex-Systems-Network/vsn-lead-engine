@@ -5,10 +5,10 @@
 - Snapshot timestamp: `2026-09-28`
 - Observed main: `584bdc8188f8aaa8b0993990911bffdb6ddf75f6`
 - Open issues at snapshot: `0`
-- Open PRs at snapshot: `0`
+- Active PR: `#113`
 - Last completed milestone: `P65-OAUTH-ONBOARDING-AND-CAPABILITY`
 - Current milestone: `P66-STRICT-OAUTH-CERTIFICATION`
-- Milestone status: `IMPLEMENTING`
+- Milestone status: `VERIFYING`
 - Product version target: `0.62.0`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
@@ -40,4 +40,4 @@
 
 ## Next Action
 
-Open P66 PR and certify exact-head CI. If green, squash-merge. Then generate the user credential locally with scripts/google_oauth_onboard.py, add it to GitHub as GOOGLE_OAUTH_USER_JSON, and run Google Drive Capability. Close the autonomy blocker only after the strict create/trash probe passes.
+Verify PR #113 exact-head Lead Engine CI. If green, squash-merge. Then generate the user credential locally with scripts/google_oauth_onboard.py, add it to GitHub as GOOGLE_OAUTH_USER_JSON, and run Google Drive Capability. Close the autonomy blocker only after the strict create/trash probe passes.
