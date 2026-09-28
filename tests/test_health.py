@@ -463,3 +463,25 @@ def test_recovery_supervisor_workflow_records_blocked_gate_telemetry():
     assert "R2_ACCESS_KEY_ID" in supervisor
     assert "R2_SECRET_ACCESS_KEY" in supervisor
     assert "R2_BUCKET" in supervisor
+
+
+def test_schedule_skips_do_not_inflate_actual_run_counts():
+    registry=FakeRegistry()
+    store=DailyHealthLedgerStore(registry)
+    store.append(
+        "2026-09-28",
+        {
+            "event_id":"skip:1",
+            "timestamp":"2026-09-28T23:40:00+05:00",
+            "kind":"run",
+            "origin":"recovery-supervisor",
+            "status":"scheduled-window-skipped",
+            "schedule_block_reason":"insufficient-midnight-runway",
+            "quota_complete":False,
+        },
+    )
+    summary=store.load("2026-09-28")["summary"]
+    assert summary["recovery_runs"]==0
+    assert summary["recovery_supervisor_runs"]==0
+    assert summary["schedule_blocks"]==1
+    assert summary["midnight_guard_blocks"]==1
