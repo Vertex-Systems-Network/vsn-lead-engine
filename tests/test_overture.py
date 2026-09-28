@@ -87,6 +87,8 @@ def test_observed_good_taxonomies_still_match():
         ("Cars","towing_service"),
         ("Motorbikes","motorcycle_repair"),
         ("Motorbikes","motorcycle_dealer"),
+        ("Motorbikes","motorcycle_rental_service"),
+        ("Motorbikes","scooter_rental"),
         ("Insurance","insurance_agency"),
         ("Salon","hair_salon"),
         ("Salon","nail_salon"),
@@ -396,3 +398,30 @@ def test_build_sources_passes_website_reserve_fraction():
     assert len(sources)==1
     assert sources[0].website_candidate_reserve_fraction==0.25
     assert sources[0].query_timeout_seconds==55
+
+
+def test_motorbike_rental_taxonomies_are_canonical_but_adjacent_noise_stays_blocked():
+    assert category_match_reason(
+        "Motorbikes",
+        primary="motorcycle_rental_service",
+        basic="rental_service",
+        hierarchy=["services_and_business","rental_service","motorcycle_rental_service"],
+        name="Example Motorcycle Rental",
+    )=="taxonomy:motorcycle_rental_service"
+
+    assert category_match_reason(
+        "Motorbikes",
+        primary="scooter_rental",
+        basic="recreational_equipment_rental",
+        hierarchy=["travel_and_transportation","scooter_rental"],
+        name="Example Scooter Rental",
+    )=="taxonomy:scooter_rental"
+
+    for taxonomy in ["atv_rental_tour","driving_school","auto_dealer","coffee_shop"]:
+        assert category_match_reason(
+            "Motorbikes",
+            primary=taxonomy,
+            basic=taxonomy,
+            hierarchy=[taxonomy],
+            name="Motorcycle Example",
+        ) is None
