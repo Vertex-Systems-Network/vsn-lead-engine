@@ -32,6 +32,14 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+      - name: Require user OAuth secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$GOOGLE_OAUTH_USER_JSON" || {
+            echo "::error::GOOGLE_OAUTH_USER_JSON is missing. Autonomous My Drive creation cannot be certified."
+            exit 2
+          }
       - run: python scripts/install_locked.py
       - name: Validate runtime auth mode
         run: python -m vsn_lead_engine.cli validate
@@ -47,4 +55,5 @@ jobs:
           fi
           python -m vsn_lead_engine.cli google-drive-capability \
             "${args[@]}" \
+            --require-user-oauth \
             --probe-create
