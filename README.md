@@ -1721,6 +1721,45 @@ not turn an intentional safe skip into an operational outage.
 
 Runtime version is **0.64.0**.
 
+### P69 serialized daily-workbook lifecycle
+
+P69 removes a race between the Daily Workbook Readiness workflow and real Lead
+Engine runs.
+
+Before P69, both workflows could operate on the same dated Google workbook at
+the same time because they used different GitHub Actions concurrency groups.
+That becomes more important once user OAuth enables autonomous workbook
+creation: a delayed 07:50 readiness run and the 08:00 production run could both
+observe a missing workbook and race to create the same dated file.
+
+Production workbook-mutating runs now share the repository-wide concurrency
+group:
+
+`vsn-lead-engine-production`
+
+Both Lead Engine production events and Daily Workbook Readiness use
+`queue: max`, so overlapping production work waits instead of replacing an
+already pending run. Pull-request validation remains isolated in a
+PR-number-specific concurrency group and does not block production.
+
+Drive lookup is also fail-closed:
+
+- zero exact active matches → creation is allowed through the existing
+  capability/auth controls;
+- one exact active match → use it;
+- more than one exact active match → raise
+  `DuplicateDailyWorkbookError` and stop before writes;
+- after a new copy is created, a second exact lookup verifies that the created
+  file is still the sole canonical dated workbook before further sheet writes.
+
+This protects against both GitHub workflow overlap and an external/manual file
+appearing during the create window.
+
+The current `2026-09-29` production folder was checked before rollout and has
+exactly one active dated workbook.
+
+Runtime version is **0.65.0**.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -2075,6 +2114,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P66 strict OAuth certification: **USER-OAUTH-ONLY PRODUCTION PROBE; SERVICE-ACCOUNT FALLBACK CANNOT CERTIFY AUTONOMY**
 - P67 midnight-safe recovery: **DYNAMIC WATCHDOG RUNWAY + EXECUTION-START RECHECK ACTIVE**
 - P68 health telemetry: **RECOVERY-SUPERVISOR ACCOUNTING + MIDNIGHT-GATE R2 EVIDENCE ACTIVE**
+- P69 workbook lifecycle: **SHARED PRODUCTION FIFO QUEUE + DUPLICATE DATED-WORKBOOK FAIL-CLOSED GUARD ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

@@ -2,44 +2,44 @@
 
 ## State
 
-- Snapshot timestamp: `2026-09-28`
-- Observed main: `2348f0f1144010182da40dd44ba28ed9173f7f9a`
+- Snapshot timestamp: `2026-09-29`
+- Observed main: `1e6b8619d0920b4ff353c9fd32b4be743cd67288`
 - Open issues at snapshot: `0`
-- Active PR: `#115`
-- Last completed milestone: `P67-MIDNIGHT-SAFE-RECOVERY`
-- Current milestone: `P68-HEALTH-GATE-TELEMETRY`
+- Active PR: `#116`
+- Last completed milestone: `P68-HEALTH-GATE-TELEMETRY`
+- Current milestone: `P69-WORKBOOK-LIFECYCLE-SERIALIZATION`
 - Milestone status: `VERIFYING`
-- Product version target: `0.64.0`
-- Production quota certification: `2026-09-28 = 12,000 / 12,000`
+- Product version target: `0.65.0`
+- Last production quota certification: `2026-09-28 = 12,000 / 12,000`
+- 2026-09-29 workbook readiness: `READY`
 
 ## Verified
 
-- P67 merged through PR #114 on main `2348f0f1144010182da40dd44ba28ed9173f7f9a`.
-- P67 exact-head Lead Engine CI #223 passed 286 tests.
-- P67 merge-push Daily Workbook Readiness run #6 passed for 2026-09-29 in one attempt.
-- Health summary on P67 counts recovery-push but not recovery-supervisor.
-- A supervisor pre-dispatch midnight block starts no Lead Engine child, so P67 cannot persist that decision through run-health telemetry.
-- A queued recovery that is blocked at execution start currently produces scheduled-window-skipped, which must not inflate actual run counts.
+- P68 merged through PR #115 on main `1e6b8619d0920b4ff353c9fd32b4be743cd67288`.
+- P68 final Lead Engine CI #225 passed 294 tests.
+- P68 merge-push Daily Workbook Readiness run #7 passed for 2026-09-29 in one attempt.
+- Lead Engine and Daily Workbook Readiness currently use different concurrency groups.
+- Google Drive lookup currently selects the first exact active dated workbook when duplicates exist.
+- Drive search confirmed exactly one active `US + Canada Business Leads — 2026-09-29` workbook before P69 rollout.
 
-## P68 Controls
+## P69 Controls
 
-- recovery_runs combines executed recovery-push and recovery-supervisor runs.
-- Per-origin recovery counts remain separately visible.
-- scheduled-window-skipped is excluded from executed run counters.
-- Run-health events persist schedule status, block reason, midnight-safe flag and runway seconds.
-- New schedule-gate events persist supervisor pre-dispatch blocks without lead data.
-- Recovery Supervisor writes blocked schedule-gate telemetry to the existing R2 health ledger.
-- Telemetry write failure is continue-on-error and cannot force a recovery outage.
+- Production Lead Engine and Daily Workbook Readiness share `vsn-lead-engine-production`.
+- Both production workflows use `queue: max` so pending work is queued instead of replaced.
+- Pull-request Lead Engine validation remains isolated by PR number.
+- Duplicate exact active dated workbooks fail closed before writes.
+- A newly created workbook is looked up again before subsequent sheet writes to verify sole-canonical status.
+- Duplicate failures subclass PermanentWorkbookReadinessError and therefore stop bounded readiness retry loops immediately.
 
 ## Not Verified
 
-- P68 exact final-head CI has not run yet.
-- A real late-night supervisor block has not yet been observed on P68 main.
+- P69 exact final-head CI has not run yet.
+- Shared cross-workflow production queue has not yet been observed on protected main.
 
 ## Known Risk
 
-- GOOGLE_OAUTH_USER_JSON remains an independent human-authorization blocker for future missing My Drive workbook creation.
+- GOOGLE_OAUTH_USER_JSON remains an independent human-authorization blocker for future autonomous My Drive creation.
 
 ## Next Action
 
-Verify PR #115 exact-head Lead Engine CI. Squash-merge only after health summary, schedule-gate persistence, CLI telemetry, workflow contract, version metadata and the complete suite are green.
+Verify PR #116 exact-head Lead Engine CI. Squash-merge only after concurrency syntax, duplicate guard behavior, post-create uniqueness verification, version metadata and the complete suite are green.

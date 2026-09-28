@@ -70,6 +70,10 @@ class PermanentWorkbookReadinessError(RuntimeError):
     """Non-transient workbook readiness blocker; retries cannot repair it."""
 
 
+class DuplicateDailyWorkbookError(PermanentWorkbookReadinessError):
+    """More than one active workbook exists for the same configured date/title."""
+
+
 def google_auth_mode_from_env() -> str:
     if os.getenv("GOOGLE_OAUTH_USER_JSON","").strip():
         return "user-oauth"
@@ -338,8 +342,13 @@ class GoogleSheetsStore:
         files = response.get("files", [])
         if not files:
             return None
-        # Concurrency is serialized by GitHub Actions. If an old accidental
-        # duplicate exists, keep one deterministic canonical file.
+        if len(files) > 1:
+            raise DuplicateDailyWorkbookError(
+                "Found "
+                f"{len(files)} active daily workbooks named {title!r} in the "
+                "configured lead folder. Refusing to choose one silently; "
+                "archive/trash duplicates before production continues."
+            )
         return files[0]
 
     def _create_daily_workbook(self, title: str) -> dict:
@@ -511,6 +520,13 @@ class GoogleSheetsStore:
             file = self._create_daily_workbook(title)
             created = True
             initialized = True
+            verified=self._find_daily_workbook(title)
+            if verified is None or verified.get("id") != file.get("id"):
+                raise PermanentWorkbookReadinessError(
+                    "Daily workbook creation could not be verified as the sole "
+                    "active canonical file."
+                )
+            file=verified
 
         sid = file["id"]
         metadata = self.sheets.spreadsheets().get(
