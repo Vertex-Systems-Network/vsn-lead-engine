@@ -778,6 +778,30 @@ A dedicated `Overture Taxonomy Audit` workflow can run this evidence probe
 without starting the production lead engine. Any Motorbikes taxonomy expansion
 must be justified by this audit before entering the production classifier.
 
+### P32 evidence-backed Motorbikes rental taxonomy correction
+
+The P31 live Overture audit on release `2026-09-23.1` found two canonical
+Motorbikes-adjacent business taxonomies that the production classifier was
+missing:
+
+- `motorcycle_rental_service`;
+- `scooter_rental`.
+
+Across the bounded eight-metro P31 sample these two exact taxonomy buckets
+contained **40 rows**, including **39 phone-bearing rows**. They are now accepted
+as Motorbikes because they are explicit vehicle rental taxonomies, not merely
+business names containing motorcycle-related words.
+
+The expansion deliberately does **not** include adjacent or name-only buckets
+such as ATV tours, driving schools, auto dealers, coffee shops, bicycle stores
+or general automotive repair. Taxonomy-first precision remains authoritative.
+
+P31 also showed that the existing classifier already recognized hundreds of
+phone-bearing motorcycle dealer/repair/parts rows in the small audit sample.
+Therefore this correction is a real coverage fix, but it is not treated as the
+full explanation for the low daily Motorbikes count. P30 heartbeat evidence from
+the next current-main production run remains the next root-cause step.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1095,6 +1119,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P29 process watchdog: **26-MIN CHILD DEADLINE + 20S KILL GRACE ACTIVE**
 - P30 live heartbeat telemetry: **SOURCE/ENRICHMENT/R2/COMMIT PHASE TIMING ACTIVE**
 - P31 taxonomy breadth audit: **READ-ONLY MOTORBIKES COVERAGE PROBE ACTIVE**
+- P32 Motorbikes canonical rentals: **MOTORCYCLE RENTAL + SCOOTER RENTAL ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

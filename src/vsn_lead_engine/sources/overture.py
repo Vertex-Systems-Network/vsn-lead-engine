@@ -100,7 +100,8 @@ CATEGORY_RULES: dict[str, CategoryRule] = {
     ),
     "Motorbikes": CategoryRule(
         r"(?:motorcycle_repair|motorcycle_dealer|motorcycle_manufacturer|"
-        r"motorcycle_rental|motorcycle_parts_store|scooter_dealer)",
+        r"motorcycle_rental|motorcycle_rental_service|motorcycle_parts_store|"
+        r"scooter_dealer|scooter_rental)",
         r"\b(?:motorcycle|motorbike|motor cycle|powersports)\b",
     ),
     "Insurance": CategoryRule(
@@ -213,7 +214,7 @@ class OverturePlaceSource:
             response = requests.get(
                 self.stac_url,
                 timeout=20,
-                headers={"User-Agent": "VSN-Lead-Engine/0.37"},
+                headers={"User-Agent": "VSN-Lead-Engine/0.38"},
             )
             response.raise_for_status()
             payload = response.json()
