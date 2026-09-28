@@ -3,39 +3,41 @@
 ## State
 
 - Snapshot timestamp: `2026-09-28`
-- Observed main: `21c2e9e0151c00012b98831a46c24ced09eab6dd`
+- Observed main: `92569798e971c36dc36ec6eef12b5289529e3aa2`
 - Open issues at snapshot: `0`
-- Active PR: `#109`
-- Last completed milestone: `P61-DEPENDENCY-UPDATE-CERTIFICATION`
-- Current milestone: `P62-NEXT-DAY-WORKBOOK-PREFLIGHT`
-- Milestone status: `VERIFYING`
-- Product version target: `0.59.0`
+- Open PRs at snapshot: `0`
+- Last completed milestone: `P62-NEXT-DAY-WORKBOOK-PREFLIGHT`
+- Current milestone: `P63-DEPLOYMENT-READINESS-CATCHUP`
+- Milestone status: `IMPLEMENTING`
+- Product version: `0.59.0`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
 ## Verified
 
-- P61 merged through PR #108 on main `21c2e9e0151c00012b98831a46c24ced09eab6dd`.
-- P61 exact-head Lead Engine CI passed 250 tests with phonenumbers 9.0.40 and pytest 9.1.1.
-- Current readiness already supports an explicit engine-level run_date.
-- Before P62, the only scheduled workbook readiness check was 07:50 PKT, ten minutes before the 08:00 primary window.
+- P62 merged through PR #109 on main `92569798e971c36dc36ec6eef12b5289529e3aa2`.
+- P62 exact-head Lead Engine CI #205 passed 261 tests.
+- P62 merged after the 20:50 PKT evening preflight slot.
+- No 2026-09-29 lead workbook exists yet in Drive.
+- No Daily Workbook Readiness production run was recorded after the P62 merge.
 
-## P62 Controls
+## P63 Controls
 
-- 20:50 PKT scheduled preflight targets local tomorrow.
-- 07:50 PKT scheduled recovery targets local today.
-- Explicit CLI dates are restricted to strict YYYY-MM-DD and local today/tomorrow.
-- Next-day readiness health events use origin prestart-next-day and persist target_kind.
-- Readiness uses existing workbook ensure/repair behavior only; no lead collection or R2 dedupe mutation is introduced.
+- Readiness-related pushes to protected main trigger Daily Workbook Readiness.
+- The push catch-up always targets next-day.
+- Trigger paths are bounded to the readiness workflow and readiness implementation modules.
+- README/docs-only changes do not trigger catch-up.
+- Existing 20:50 PKT next-day and 07:50 PKT current-day schedules remain unchanged.
 
 ## Not Verified
 
-- P62 exact final-head CI has not run yet.
-- The new evening schedule is not active on protected main until P62 merges.
+- P63 exact-head CI has not run.
+- Production main-push catch-up has not yet executed.
+- Tomorrow's 2026-09-29 workbook is not yet production-certified.
 
 ## Known Risk
 
-- Scheduled jobs can be delayed. The evening check is intentionally placed at 20:50 PKT rather than close to midnight so a delayed GitHub scheduler is less likely to cross the local date boundary before resolving --next-day.
+- Without a deployment catch-up trigger, a readiness release merged after the evening scheduled slot can leave tomorrow unprepared until the next scheduled run.
 
 ## Next Action
 
-Verify PR #109 exact-head Lead Engine CI, including date-boundary tests, workflow contract tests, health telemetry tests, package-version metadata and the complete suite. Squash-merge only when green.
+Open P63 PR and certify exact-head CI. If green, squash-merge. The merge itself must trigger Daily Workbook Readiness; verify its production result and tomorrow's workbook before closing P63.
