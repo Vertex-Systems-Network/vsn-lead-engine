@@ -11,6 +11,7 @@ on:
       - "scripts/regenerate_hash_locks.py"
       - "scripts/install_locked.py"
       - ".github/dependabot.yml"
+      - ".github/dependency-resolver.txt"
       - ".github/workflows/dependency-lock.yml"
   workflow_dispatch:
     inputs:
@@ -37,6 +38,8 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+      - name: Install reviewed resolver
+        run: python -m pip install --require-hashes -r .github/dependency-resolver.txt
       - name: Verify generated hash locks
         run: python scripts/regenerate_hash_locks.py --check
 
@@ -77,6 +80,9 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+
+      - name: Install reviewed resolver
+        run: python -m pip install --require-hashes -r .github/dependency-resolver.txt
 
       - name: Regenerate dependency hash locks
         run: python scripts/regenerate_hash_locks.py --write
