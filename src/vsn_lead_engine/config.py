@@ -89,6 +89,24 @@ def load_config() -> dict:
     max_cycles_per_run=int(config["runtime"].get("max_cycles_per_run",3))
     if max_cycles_per_run < 1:
         raise ValueError("max_cycles_per_run must be at least 1.")
+    event_wall=float(
+        config["runtime"].get("event_wall_time_seconds",1500)
+    )
+    if event_wall < 300 or event_wall > 1680:
+        raise ValueError(
+            "event_wall_time_seconds must be between 300 and 1680."
+        )
+    event_guard=float(
+        config["runtime"].get("event_deadline_guard_seconds",60)
+    )
+    if event_guard < 10 or event_guard > 180:
+        raise ValueError(
+            "event_deadline_guard_seconds must be between 10 and 180."
+        )
+    if event_guard >= event_wall:
+        raise ValueError(
+            "event_deadline_guard_seconds must be less than event_wall_time_seconds."
+        )
     readiness_attempts=int(
         config["runtime"].get("workbook_readiness_attempts",3)
     )
