@@ -170,6 +170,35 @@ def load_config() -> dict:
         raise ValueError(
             "adaptive_yield_score_mode must be throughput or conversion."
         )
+    tail_country_threshold=int(
+        config["runtime"].get("tail_country_yield_incomplete_threshold",4)
+    )
+    if tail_country_threshold < 1 or tail_country_threshold > len(config["categories"]):
+        raise ValueError(
+            "tail_country_yield_incomplete_threshold must be between 1 and category count."
+        )
+    tail_country_min_visits=int(
+        config["runtime"].get("tail_country_yield_min_visits",4)
+    )
+    if tail_country_min_visits < 1 or tail_country_min_visits > 100:
+        raise ValueError(
+            "tail_country_yield_min_visits must be between 1 and 100."
+        )
+    tail_country_weight=int(
+        config["runtime"].get("tail_country_yield_preferred_weight",2)
+    )
+    if tail_country_weight < 1 or tail_country_weight > 4:
+        raise ValueError(
+            "tail_country_yield_preferred_weight must be between 1 and 4."
+        )
+    tail_country_advantage=float(
+        config["runtime"].get("tail_country_yield_advantage_ratio",1.5)
+    )
+    if tail_country_advantage < 1 or tail_country_advantage > 10:
+        raise ValueError(
+            "tail_country_yield_advantage_ratio must be between 1 and 10."
+        )
+
     adaptive_state_max_entries=int(
         config["runtime"].get("adaptive_yield_state_max_entries",1500)
     )
