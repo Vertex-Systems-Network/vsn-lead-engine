@@ -559,6 +559,60 @@ class GoogleSheetsStore:
             body={"valueInputOption":"USER_ENTERED","data":data},
         ).execute(num_retries=self.api_retries)
 
+    def daily_state_snapshot(self, spreadsheet_id: str) -> dict:
+        """Read category and country totals in one Sheets batch request."""
+        today=self._today()
+        ranges=[]
+        for category in self.config["categories"]:
+            ranges.extend([f"'{category}'!A2:B",f"'{category}'!AA2:AA"])
+
+        response=self.sheets.spreadsheets().values().batchGet(
+            spreadsheetId=spreadsheet_id,
+            ranges=ranges,
+            valueRenderOption="UNFORMATTED_VALUE",
+        ).execute(num_retries=self.api_retries)
+        value_ranges=response.get("valueRanges",[])
+        category_counts={}
+        country_counts: dict[str,int] = {}
+
+        for index,category in enumerate(self.config["categories"]):
+            date_country_index=index*2
+            status_index=date_country_index+1
+            date_country_rows=(
+                value_ranges[date_country_index].get("values",[])
+                if date_country_index < len(value_ranges)
+                else []
+            )
+            status_rows=(
+                value_ranges[status_index].get("values",[])
+                if status_index < len(value_ranges)
+                else []
+            )
+            date_rows=[
+                [row[0] if row else ""]
+                for row in date_country_rows
+            ]
+            category_counts[category]=count_current_rows(
+                date_rows,
+                status_rows,
+                today,
+            )
+            per_country=count_current_countries(
+                date_country_rows,
+                status_rows,
+                today,
+            )
+            for country,count in per_country.items():
+                country_counts[country]=country_counts.get(country,0)+count
+
+        for country in ["United States","Canada"]:
+            country_counts.setdefault(country,0)
+
+        return {
+            "category_counts":category_counts,
+            "country_counts":country_counts,
+        }
+
     def category_counts(self, spreadsheet_id: str) -> dict[str,int]:
         today = self._today()
         ranges = []

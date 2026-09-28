@@ -288,3 +288,79 @@ def test_populated_overview_upgrade_never_clears_category_ranges():
     assert values.update_ranges==["'Overview'!A1"]
     assert captured["Duplicate Rejections"]==12
     assert captured["Source Phone Candidates"]==34
+
+
+class _SnapshotValues:
+    def __init__(self,value_ranges):
+        self.value_ranges=value_ranges
+        self.batch_get_calls=0
+        self.last_ranges=[]
+
+    def batchGet(self,**kwargs):
+        self.batch_get_calls+=1
+        self.last_ranges=list(kwargs.get("ranges",[]))
+        return _ExecResult({"valueRanges":self.value_ranges})
+
+
+def test_daily_state_snapshot_combines_category_and_country_counts_in_one_batch():
+    store=object.__new__(GoogleSheetsStore)
+    store.run_date="2026-09-28"
+    store.api_retries=0
+    store.config={
+        "runtime":{"timezone":"Asia/Karachi"},
+        "categories":["A","B"],
+    }
+    values=_SnapshotValues([
+        {
+            "values":[
+                ["2026-09-28","United States"],
+                ["2026-09-28","Canada"],
+                ["2026-09-27","Canada"],
+            ]
+        },
+        {"values":[["New"],["Needs Review"],["New"]]},
+        {
+            "values":[
+                ["2026-09-28","Canada"],
+                ["2026-09-28","United States"],
+            ]
+        },
+        {"values":[["New"],["New"]]},
+    ])
+    store.sheets=_BootstrapSheetsService(values)
+
+    snapshot=store.daily_state_snapshot("sheet123")
+
+    assert values.batch_get_calls==1
+    assert values.last_ranges==[
+        "'A'!A2:B","'A'!AA2:AA",
+        "'B'!A2:B","'B'!AA2:AA",
+    ]
+    assert snapshot["category_counts"]=={"A":1,"B":2}
+    assert snapshot["country_counts"]=={
+        "United States":2,
+        "Canada":1,
+    }
+
+
+def test_daily_state_snapshot_keeps_zero_countries_when_no_rows_exist():
+    store=object.__new__(GoogleSheetsStore)
+    store.run_date="2026-09-28"
+    store.api_retries=0
+    store.config={
+        "runtime":{"timezone":"Asia/Karachi"},
+        "categories":["A"],
+    }
+    values=_SnapshotValues([
+        {"values":[]},
+        {"values":[]},
+    ])
+    store.sheets=_BootstrapSheetsService(values)
+
+    snapshot=store.daily_state_snapshot("sheet123")
+
+    assert snapshot["category_counts"]=={"A":0}
+    assert snapshot["country_counts"]=={
+        "United States":0,
+        "Canada":0,
+    }
