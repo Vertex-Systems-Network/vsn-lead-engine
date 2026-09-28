@@ -263,13 +263,13 @@ class GoogleSheetsStore:
                 auth_mode=getattr(self,"google_auth_mode","unknown")
                 if status==403 and auth_mode=="service-account":
                     raise RuntimeError(
-                        "Today's lead workbook is missing and service-account auth "
+                        "Target dated lead workbook is missing and service-account auth "
                         "cannot create the user-owned My Drive copy. Configure "
                         "GOOGLE_OAUTH_USER_JSON or precreate the user-owned dated "
                         "workbook."
                     ) from exc
                 raise RuntimeError(
-                    "Today's lead workbook is missing and Google "
+                    "Target dated lead workbook is missing and Google "
                     f"{auth_mode} credentials could not create it in the target "
                     "folder. Check OAuth scopes/ownership or Drive quota/rate limits."
                 ) from exc
