@@ -166,6 +166,9 @@ def select_candidate_partition(
     adaptive_enabled: bool = True,
     exploration_bonus: float = 0.15,
     score_mode: str = "throughput",
+    exhaustion_cooldown_enabled: bool = True,
+    exhaustion_min_visits: int = 2,
+    exhaustion_min_discovered: int = 20,
 ) -> tuple[int,float | None]:
     """Choose one partition using persisted yield while preserving exploration."""
     count=max(1,min(64,int(partition_count)))
@@ -177,8 +180,30 @@ def select_candidate_partition(
     if not yield_hints:
         return base,round(float(exploration_bonus),6)
 
+    eligible=ordered
+    if exhaustion_cooldown_enabled:
+        exhausted=[]
+        for partition in ordered:
+            hint=yield_hints.get(
+                partition_yield_hint_key(category,geography,partition)
+            )
+            if not hint:
+                continue
+            visits=max(0,int(hint.get("visits",0) or 0))
+            discovered=max(0,int(hint.get("discovered",0) or 0))
+            accepted=max(0,int(hint.get("accepted",0) or 0))
+            if (
+                visits >= max(1,int(exhaustion_min_visits))
+                and discovered >= max(1,int(exhaustion_min_discovered))
+                and accepted == 0
+            ):
+                exhausted.append(partition)
+        survivors=[partition for partition in ordered if partition not in exhausted]
+        if survivors:
+            eligible=survivors
+
     ranked=sorted(
-        enumerate(ordered),
+        enumerate(eligible),
         key=lambda item: (
             -_adaptive_yield_score(
                 yield_hints.get(

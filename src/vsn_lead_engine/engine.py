@@ -172,6 +172,9 @@ def _candidate_partition_geography(
     adaptive_enabled: bool = True,
     exploration_bonus: float = 0.15,
     score_mode: str = "throughput",
+    exhaustion_cooldown_enabled: bool = True,
+    exhaustion_min_visits: int = 2,
+    exhaustion_min_discovered: int = 20,
 ) -> dict:
     """Attach an adaptive rotating source cohort to one shard search."""
     count=max(1,int(partition_count))
@@ -185,6 +188,9 @@ def _candidate_partition_geography(
         adaptive_enabled=adaptive_enabled,
         exploration_bonus=exploration_bonus,
         score_mode=score_mode,
+        exhaustion_cooldown_enabled=exhaustion_cooldown_enabled,
+        exhaustion_min_visits=exhaustion_min_visits,
+        exhaustion_min_discovered=exhaustion_min_discovered,
     )
     return {
         **geography,
@@ -559,6 +565,15 @@ def run_once(
     adaptive_partition_yield_routing=bool(
         runtime.get("adaptive_partition_yield_routing",True)
     )
+    partition_exhaustion_cooldown_enabled=bool(
+        runtime.get("partition_exhaustion_cooldown_enabled",True)
+    )
+    partition_exhaustion_min_visits=int(
+        runtime.get("partition_exhaustion_min_visits",2)
+    )
+    partition_exhaustion_min_discovered=int(
+        runtime.get("partition_exhaustion_min_discovered",20)
+    )
     adaptive_yield_score_mode=str(
         runtime.get("adaptive_yield_score_mode","throughput")
     ).strip().lower()
@@ -689,6 +704,9 @@ def run_once(
                 adaptive_enabled=adaptive_partition_yield_routing,
                 exploration_bonus=adaptive_yield_exploration_bonus,
                 score_mode=adaptive_yield_score_mode,
+                exhaustion_cooldown_enabled=partition_exhaustion_cooldown_enabled,
+                exhaustion_min_visits=partition_exhaustion_min_visits,
+                exhaustion_min_discovered=partition_exhaustion_min_discovered,
             )
             source_started_monotonic=time.monotonic()
             emit_progress(
@@ -979,6 +997,9 @@ def run_once(
         "r2_pre_enrichment_prefilter":remote_prefilter_enabled,
         "adaptive_yield_routing":adaptive_yield_routing,
         "adaptive_partition_yield_routing":adaptive_partition_yield_routing,
+        "partition_exhaustion_cooldown_enabled":(
+            partition_exhaustion_cooldown_enabled
+        ),
         "adaptive_yield_score_mode":adaptive_yield_score_mode,
         "adaptive_yield_hints_used":len(yield_hints or {}),
         "adaptive_zero_yield_cooldown":adaptive_cooldown_enabled,
