@@ -510,6 +510,27 @@ def run_once(
     adaptive_cooldown_min_partitions=int(
         runtime.get("adaptive_zero_yield_cooldown_min_partitions",4)
     )
+    critical_deficit_rescue_enabled=bool(
+        runtime.get("critical_deficit_rescue_enabled",True)
+    )
+    critical_deficit_ratio=float(
+        runtime.get("critical_deficit_ratio",0.10)
+    )
+    critical_deficit_weight=int(
+        runtime.get("critical_deficit_weight",6)
+    )
+    low_deficit_ratio=float(
+        runtime.get("low_deficit_ratio",0.25)
+    )
+    low_deficit_weight=int(
+        runtime.get("low_deficit_weight",4)
+    )
+    mid_deficit_ratio=float(
+        runtime.get("mid_deficit_ratio",0.50)
+    )
+    mid_deficit_weight=int(
+        runtime.get("mid_deficit_weight",2)
+    )
     event_deadline_guard_seconds=float(
         runtime.get("event_deadline_guard_seconds",60)
     )
@@ -529,6 +550,13 @@ def run_once(
         cooldown_min_visits=adaptive_cooldown_min_visits,
         cooldown_min_discovered=adaptive_cooldown_min_discovered,
         cooldown_min_partitions=adaptive_cooldown_min_partitions,
+        critical_deficit_rescue_enabled=critical_deficit_rescue_enabled,
+        critical_deficit_ratio=critical_deficit_ratio,
+        critical_deficit_weight=critical_deficit_weight,
+        low_deficit_ratio=low_deficit_ratio,
+        low_deficit_weight=low_deficit_weight,
+        mid_deficit_ratio=mid_deficit_ratio,
+        mid_deficit_weight=mid_deficit_weight,
     )
     if not plan:
         return {"status":"complete","counts":counts,"cursor":cursor}

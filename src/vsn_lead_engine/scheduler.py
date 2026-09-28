@@ -23,13 +23,45 @@ def _rotate(items: list, offset: int) -> list:
     return items[offset:] + items[:offset]
 
 
-def _category_weight(count: int, target: int) -> int:
-    """Bias shard budget toward the least-complete categories."""
+def _category_weight(
+    count: int,
+    target: int,
+    *,
+    rescue_enabled: bool = True,
+    critical_ratio: float = 0.10,
+    critical_weight: int = 6,
+    low_ratio: float = 0.25,
+    low_weight: int = 4,
+    mid_ratio: float = 0.50,
+    mid_weight: int = 2,
+) -> int:
+    """Bias shard budget toward the least-complete categories.
+
+    P35 keeps the layered fairness invariant (every pending category gets one
+    pass before repeats) but gives extreme shortfalls enough repeat slots to
+    make meaningful progress inside the fixed event budget.
+    """
     ratio = count / max(target, 1)
-    if ratio < 0.25:
-        return 3
-    if ratio < 0.50:
-        return 2
+    if not rescue_enabled:
+        if ratio < 0.25:
+            return 3
+        if ratio < 0.50:
+            return 2
+        return 1
+
+    critical_ratio=max(0.0,min(1.0,float(critical_ratio)))
+    low_ratio=max(critical_ratio,min(1.0,float(low_ratio)))
+    mid_ratio=max(low_ratio,min(1.0,float(mid_ratio)))
+    critical_weight=max(1,int(critical_weight))
+    low_weight=max(1,min(critical_weight,int(low_weight)))
+    mid_weight=max(1,min(low_weight,int(mid_weight)))
+
+    if ratio < critical_ratio:
+        return critical_weight
+    if ratio < low_ratio:
+        return low_weight
+    if ratio < mid_ratio:
+        return mid_weight
     return 1
 
 
@@ -37,10 +69,28 @@ def _fair_weighted_categories(
     categories: list[str],
     counts: dict[str,int],
     target: int,
+    *,
+    rescue_enabled: bool = True,
+    critical_ratio: float = 0.10,
+    critical_weight: int = 6,
+    low_ratio: float = 0.25,
+    low_weight: int = 4,
+    mid_ratio: float = 0.50,
+    mid_weight: int = 2,
 ) -> list[str]:
     """Layer weights so every pending category gets one pass before repeats."""
     weights={
-        category:_category_weight(int(counts.get(category,0)),target)
+        category:_category_weight(
+            int(counts.get(category,0)),
+            target,
+            rescue_enabled=rescue_enabled,
+            critical_ratio=critical_ratio,
+            critical_weight=critical_weight,
+            low_ratio=low_ratio,
+            low_weight=low_weight,
+            mid_ratio=mid_ratio,
+            mid_weight=mid_weight,
+        )
         for category in categories
     }
     max_weight=max(weights.values(),default=0)
@@ -261,12 +311,20 @@ def build_shard_plan(
     cooldown_min_visits: int = 2,
     cooldown_min_discovered: int = 100,
     cooldown_min_partitions: int = 4,
+    critical_deficit_rescue_enabled: bool = True,
+    critical_deficit_ratio: float = 0.10,
+    critical_deficit_weight: int = 6,
+    low_deficit_ratio: float = 0.25,
+    low_deficit_weight: int = 4,
+    mid_deficit_ratio: float = 0.50,
+    mid_deficit_weight: int = 2,
 ) -> list[dict]:
     """Build a progress-weighted, country-balanced rotating shard plan.
 
     Properties:
     - completed categories are skipped;
-    - <25% complete categories receive 3x shard weight;
+    - with P35 rescue enabled, <10% complete categories receive 6x weight;
+    - 10-25% complete categories receive 4x weight;
     - 25-50% complete categories receive 2x weight;
     - >=50% complete categories receive normal weight;
     - weights are layered so every pending category gets one pass before
@@ -300,6 +358,13 @@ def build_shard_plan(
         pending,
         counts,
         target,
+        rescue_enabled=critical_deficit_rescue_enabled,
+        critical_ratio=critical_deficit_ratio,
+        critical_weight=critical_deficit_weight,
+        low_ratio=low_deficit_ratio,
+        low_weight=low_deficit_weight,
+        mid_ratio=mid_deficit_ratio,
+        mid_weight=mid_deficit_weight,
     )
 
     balanced_geographies = _balanced_geographies(
@@ -357,7 +422,15 @@ def build_shard_plan(
                 "category": category,
                 "geography": geography,
                 "priority_weight": _category_weight(
-                    int(counts.get(category, 0)), target
+                    int(counts.get(category, 0)),
+                    target,
+                    rescue_enabled=critical_deficit_rescue_enabled,
+                    critical_ratio=critical_deficit_ratio,
+                    critical_weight=critical_deficit_weight,
+                    low_ratio=low_deficit_ratio,
+                    low_weight=low_deficit_weight,
+                    mid_ratio=mid_deficit_ratio,
+                    mid_weight=mid_deficit_weight,
                 ),
                 "adaptive_yield_score":(
                     round(float(adaptive_score),6)
