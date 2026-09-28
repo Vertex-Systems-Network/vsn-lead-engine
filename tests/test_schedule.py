@@ -80,11 +80,16 @@ def test_recovery_supervisor_dispatches_only_bounded_shortfall_runs():
     )
 
     assert 'workflows: ["Lead Engine"]' in supervisor
+    assert 'cron: "*/10 3-18 * * *"' in supervisor
     assert "actions: write" in supervisor
+    assert "github.event_name == 'schedule'" in supervisor
     assert "github.event.workflow_run.event != 'pull_request'" in supervisor
     assert "workbook-ready-recover --attempts 3 --delay-seconds 20" in supervisor
     assert '.head_branch == "main"' in supervisor
     assert '.event != "pull_request"' in supervisor
+    assert '.status == "waiting"' in supervisor
+    assert '.status == "requested"' in supervisor
+    assert '.status == "pending"' in supervisor
     assert "gh workflow run lead-engine.yml" in supervisor
     assert "-f run_origin=recovery-supervisor" in supervisor
     assert "recovery_supervisor_enabled" in supervisor
