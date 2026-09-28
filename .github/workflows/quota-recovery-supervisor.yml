@@ -52,28 +52,36 @@ jobs:
           python - <<'PY'
           import json
           import os
-          from datetime import datetime
-          from zoneinfo import ZoneInfo
+
+          from vsn_lead_engine.schedule import scheduled_run_window
 
           with open("config/runtime.json", encoding="utf-8") as handle:
-              runtime=json.load(handle)["runtime"]
+              config=json.load(handle)
 
+          runtime=config["runtime"]
           enabled=bool(runtime.get("recovery_supervisor_enabled",True))
-          timezone=str(runtime.get("timezone","Asia/Karachi"))
-          now=datetime.now(ZoneInfo(timezone))
-          start=int(runtime.get("start_hour",8))
-          end=int(runtime.get("end_hour",23))
-          allowed=enabled and start <= now.hour <= end
+          gate=scheduled_run_window(config)
+          allowed=enabled and bool(gate["allowed"])
 
           with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as output:
               output.write(f"enabled={str(enabled).lower()}\n")
               output.write(f"allowed={str(allowed).lower()}\n")
-              output.write(f"local_hour={now.hour}\n")
-              output.write(f"run_date={now.date().isoformat()}\n")
+              output.write(f"run_date={gate['run_date']}\n")
+              output.write(
+                  f"seconds_until_midnight={gate['seconds_until_midnight']}\n"
+              )
+              output.write(
+                  f"required_runway_seconds={gate['required_runway_seconds']}\n"
+              )
+              output.write(f"block_reason={gate.get('block_reason') or ''}\n")
 
           print(
-              f"Recovery window: enabled={enabled} allowed={allowed} "
-              f"local={now.isoformat()} configured={start}:00-{end}:59"
+              "Recovery window: "
+              f"enabled={enabled} allowed={allowed} "
+              f"local={gate['local_time']} status={gate['status']} "
+              f"seconds_until_midnight={gate['seconds_until_midnight']} "
+              f"required_runway_seconds={gate['required_runway_seconds']} "
+              f"block_reason={gate.get('block_reason')}"
           )
           PY
 

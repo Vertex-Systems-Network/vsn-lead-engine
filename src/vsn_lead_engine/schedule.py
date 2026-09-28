@@ -19,11 +19,46 @@ def scheduled_run_window(config: dict, *, now: datetime | None = None) -> dict:
     start_hour=int(runtime.get("start_hour",8))
     end_hour=int(runtime.get("end_hour",23))
     hour=local_now.hour
-    allowed=start_hour <= hour <= end_hour
+    within_hours=start_hour <= hour <= end_hour
+
+    next_midnight=datetime.combine(
+        local_now.date()+timedelta(days=1),
+        datetime.min.time(),
+        tzinfo=zone,
+    )
+    seconds_until_midnight=max(
+        0.0,
+        (next_midnight-local_now).total_seconds(),
+    )
+    watchdog_budget=(
+        float(runtime.get("process_watchdog_seconds",1560))
+        + float(runtime.get("process_watchdog_kill_grace_seconds",20))
+    )
+    event_budget=(
+        float(runtime.get("event_wall_time_seconds",1500))
+        + float(runtime.get("event_deadline_guard_seconds",60))
+    )
+    safety_seconds=max(
+        0.0,
+        float(runtime.get("schedule_midnight_safety_seconds",60)),
+    )
+    required_runway_seconds=max(watchdog_budget,event_budget)+safety_seconds
+    midnight_safe=seconds_until_midnight >= required_runway_seconds
+    allowed=within_hours and midnight_safe
+
+    if not within_hours:
+        status="scheduled-window-closed"
+        block_reason="outside-hour-window"
+    elif not midnight_safe:
+        status="scheduled-window-midnight-guard"
+        block_reason="insufficient-midnight-runway"
+    else:
+        status="scheduled-window-open"
+        block_reason=None
 
     return {
         "allowed":allowed,
-        "status":"scheduled-window-open" if allowed else "scheduled-window-closed",
+        "status":status,
         "timezone":timezone,
         "run_date":local_now.date().isoformat(),
         "local_time":local_now.isoformat(),
@@ -31,6 +66,12 @@ def scheduled_run_window(config: dict, *, now: datetime | None = None) -> dict:
             "start_hour":start_hour,
             "end_hour":end_hour,
         },
+        "within_hours":within_hours,
+        "midnight_safe":midnight_safe,
+        "seconds_until_midnight":round(seconds_until_midnight,3),
+        "required_runway_seconds":round(required_runway_seconds,3),
+        "safety_seconds":round(safety_seconds,3),
+        "block_reason":block_reason,
         "slot":f"{local_now.date().isoformat()}T{hour:02d}:00",
         "start_delay_minutes":local_now.minute,
         "shortfall_catchup":allowed,

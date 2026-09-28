@@ -154,9 +154,13 @@ def main() -> int:
         runtime=config["runtime"]
         scheduled=bool(args.scheduled)
         origin=(
-            "native-schedule"
-            if scheduled
-            else str(os.getenv("VSN_RUN_ORIGIN","manual") or "manual").strip()
+            str(
+                os.getenv(
+                    "VSN_RUN_ORIGIN",
+                    "native-schedule" if scheduled else "manual",
+                )
+                or ("native-schedule" if scheduled else "manual")
+            ).strip()
         )
         command=[sys.executable,"-m","vsn_lead_engine.cli","run"]
         if scheduled:
@@ -395,13 +399,22 @@ def main() -> int:
                 result["health_ledger"]=_health_append(
                     config,
                     gate["run_date"],
-                    run_health_event(result,origin="native-schedule"),
+                    run_health_event(
+                        result,
+                        origin=str(
+                            os.getenv("VSN_RUN_ORIGIN","native-schedule")
+                            or "native-schedule"
+                        ).strip(),
+                    ),
                 )
             print(json.dumps(result,indent=2,default=str))
             return 0
+        scheduled_origin=str(
+            os.getenv("VSN_RUN_ORIGIN","native-schedule") or "native-schedule"
+        ).strip()
         code,result=_run_with_incident_capture(
             config,
-            origin="native-schedule",
+            origin=scheduled_origin,
             schedule=gate,
         )
         print(json.dumps(result,indent=2,default=str))

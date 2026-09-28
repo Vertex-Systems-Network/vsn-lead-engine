@@ -1640,6 +1640,47 @@ only with the intended user-owned OAuth authority.
 
 Runtime version is **0.62.0**.
 
+### P67 midnight-safe recovery runway
+
+P67 closes an end-of-day boundary gap in the production/recovery scheduler.
+
+Before P67, the local-hour gate considered the entire **23:00-23:59 PKT**
+hour valid. The recovery supervisor also used a separate hour-only gate, so a
+late dispatch could start close to midnight while the process watchdog still
+allowed roughly 26 minutes of execution.
+
+Scheduled production and recovery runs now require enough time to finish or be
+terminated **before local midnight**.
+
+The required runway is derived from the active runtime budgets:
+
+- process watchdog: `1560s`;
+- kill grace: `20s`;
+- event budget: `1500s + 60s guard`;
+- midnight safety buffer: `60s`.
+
+Current minimum runway is therefore **1640 seconds (27m20s)**.
+
+Under the current configuration:
+
+- **23:30 PKT** → allowed;
+- **23:32:40 PKT** → exact threshold, allowed;
+- **23:32:41 PKT and later** → blocked by
+  `insufficient-midnight-runway`;
+- 23:40 / 23:50 recovery heartbeats can still run their lightweight quota
+  checks, but they cannot dispatch a real lead process.
+
+The same `scheduled_run_window()` gate is used by both the native Lead Engine
+schedule and the Recovery Supervisor. Recovery-supervisor and recovery-push
+runs also re-check the gate at **actual execution start**, protecting against
+GitHub queue delay after dispatch.
+
+Recovery origin telemetry is preserved through the scheduled gate. Explicit
+human `manual` workflow runs remain operator-controlled and are not silently
+reclassified as scheduled recovery.
+
+Runtime version is **0.63.0**.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1992,6 +2033,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P64 My Drive ownership auth: **USER OAUTH PREFERRED + SERVICE-ACCOUNT FALLBACK + AUTH-MODE TELEMETRY**
 - P65 OAuth autonomy tooling: **LOCAL PKCE ONBOARDING + FAIL-FAST OWNERSHIP CHECK + CREATE/TRASH CERTIFICATION**
 - P66 strict OAuth certification: **USER-OAUTH-ONLY PRODUCTION PROBE; SERVICE-ACCOUNT FALLBACK CANNOT CERTIFY AUTONOMY**
+- P67 midnight-safe recovery: **DYNAMIC WATCHDOG RUNWAY + EXECUTION-START RECHECK ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

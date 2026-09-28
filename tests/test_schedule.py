@@ -10,6 +10,11 @@ def config():
             "timezone":"Asia/Karachi",
             "start_hour":8,
             "end_hour":23,
+            "process_watchdog_seconds":1560,
+            "process_watchdog_kill_grace_seconds":20,
+            "event_wall_time_seconds":1500,
+            "event_deadline_guard_seconds":60,
+            "schedule_midnight_safety_seconds":60,
         }
     }
 
@@ -36,13 +41,40 @@ def test_scheduled_window_allows_delayed_same_hour_catchup():
     assert result["shortfall_catchup"] is True
 
 
-def test_scheduled_window_includes_2300_pkt():
+def test_scheduled_window_allows_2330_pkt_with_full_watchdog_runway():
+    result=scheduled_run_window(
+        config(),
+        now=datetime(2026,9,28,18,30,tzinfo=timezone.utc),
+    )
+    assert result["allowed"] is True
+    assert result["status"]=="scheduled-window-open"
+    assert result["midnight_safe"] is True
+    assert result["seconds_until_midnight"]==1800.0
+    assert result["required_runway_seconds"]==1640.0
+    assert result["block_reason"] is None
+
+
+def test_scheduled_window_blocks_2340_pkt_before_midnight_crossing():
+    result=scheduled_run_window(
+        config(),
+        now=datetime(2026,9,28,18,40,tzinfo=timezone.utc),
+    )
+    assert result["allowed"] is False
+    assert result["status"]=="scheduled-window-midnight-guard"
+    assert result["midnight_safe"] is False
+    assert result["seconds_until_midnight"]==1200.0
+    assert result["required_runway_seconds"]==1640.0
+    assert result["block_reason"]=="insufficient-midnight-runway"
+
+
+def test_scheduled_window_blocks_2359_pkt():
     result=scheduled_run_window(
         config(),
         now=datetime(2026,9,28,18,59,tzinfo=timezone.utc),
     )
-    assert result["allowed"] is True
-    assert result["local_time"].startswith("2026-09-28T23:59")
+    assert result["allowed"] is False
+    assert result["status"]=="scheduled-window-midnight-guard"
+    assert result["seconds_until_midnight"]==60.0
 
 
 def test_scheduled_window_rejects_after_midnight_instead_of_touching_next_day():
@@ -93,8 +125,16 @@ def test_recovery_supervisor_dispatches_only_bounded_shortfall_runs():
     assert "gh workflow run lead-engine.yml" in supervisor
     assert "-f run_origin=recovery-supervisor" in supervisor
     assert "recovery_supervisor_enabled" in supervisor
+    assert "from vsn_lead_engine.schedule import scheduled_run_window" in supervisor
+    assert "required_runway_seconds" in supervisor
+    assert "seconds_until_midnight" in supervisor
+    assert "block_reason" in supervisor
     assert "run_origin:" in lead_workflow
-    assert "VSN_RUN_ORIGIN: ${{ inputs.run_origin }}" in lead_workflow
+    assert "VSN_RUN_ORIGIN: recovery-supervisor" in lead_workflow
+    assert "Recovery-supervisor real run" in lead_workflow
+    assert "python -m vsn_lead_engine.cli supervised-run --scheduled" in lead_workflow
+    assert "Manual operator real run" in lead_workflow
+    assert "VSN_RUN_ORIGIN: manual" in lead_workflow
 
 
 def test_readiness_target_defaults_to_local_today():
@@ -205,3 +245,20 @@ def test_daily_readiness_workflow_has_main_deployment_catchup_scope():
     assert 'if [[ "$EVENT_NAME" == "push" ]]; then' in workflow
     assert 'target="next-day"' in workflow
     assert "README.md" not in workflow
+
+
+def test_scheduled_window_threshold_is_exactly_watchdog_safe():
+    allowed=scheduled_run_window(
+        config(),
+        now=datetime(2026,9,28,18,32,40,tzinfo=timezone.utc),
+    )
+    blocked=scheduled_run_window(
+        config(),
+        now=datetime(2026,9,28,18,32,41,tzinfo=timezone.utc),
+    )
+
+    assert allowed["seconds_until_midnight"]==1640.0
+    assert allowed["allowed"] is True
+    assert blocked["seconds_until_midnight"]==1639.0
+    assert blocked["allowed"] is False
+    assert blocked["block_reason"]=="insufficient-midnight-runway"
