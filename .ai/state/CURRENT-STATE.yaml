@@ -6,19 +6,19 @@
     "product_version": "0.58.0"
   },
   "execution": {
-    "status": "verifying",
+    "status": "active",
     "current_phase": "CONTINUOUS-HARDENING",
-    "active_task": "P58-REPRODUCIBLE-DEPENDENCIES",
-    "last_completed_task": "P57-DEPENDENCY-UPDATE-AUTOMATION",
-    "next_task": "P59-NEXT-EVIDENCE-BASED-MILESTONE"
+    "active_task": "P59-HASH-VERIFIED-DEPENDENCIES",
+    "last_completed_task": "P58-REPRODUCIBLE-DEPENDENCIES",
+    "next_task": "P60-NEXT-EVIDENCE-BASED-MILESTONE"
   },
-  "observed_main_sha": "34c37531046eb6a3c1701a520fc234094aa3a8b8",
+  "observed_main_sha": "f1759e9c9445c37040faec73d21837c8b366b36b",
   "active_issue": null,
-  "active_pr": 104,
-  "active_branch": "chore/p58-reproducible-dependencies",
-  "current_milestone": "P58-REPRODUCIBLE-DEPENDENCIES",
-  "milestone_status": "VERIFYING",
-  "last_completed_milestone": "P57 added weekly grouped Dependabot PRs for GitHub Actions and pip dependencies; PR #102 exact-head CI passed 237 tests and merged.",
+  "active_pr": null,
+  "active_branch": "chore/p59-hash-verified-dependencies",
+  "current_milestone": "P59-HASH-VERIFIED-DEPENDENCIES",
+  "milestone_status": "RESOLVING_HASHES",
+  "last_completed_milestone": "P58 added a 35-package Python 3.12 dependency lock, exact setuptools/wheel build pins, lock-constrained workflow installs and pip check; PR #104 exact-head CI passed 241 tests and merged.",
   "production": {
     "last_certified_date": "2026-09-28",
     "daily_target": 12000,
@@ -29,9 +29,9 @@
     "production_run": 162
   },
   "quality": {
-    "latest_required_ci_run": 174,
+    "latest_required_ci_run": 185,
     "latest_required_ci_result": "success",
-    "pytest": "237 passed",
+    "pytest": "241 passed",
     "node20_deprecation_warning": false
   },
   "blockers": [],
@@ -40,5 +40,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Verify PR #104 final exact-head CI with lock-constrained installation, pip check, runtime validation and tests. If green, squash-merge PR #104; next session must reconcile live main before selecting P59."
+  "exact_next_safe_action": "Resolve exact selected SHA-256 artifacts for bootstrap, runtime and dev dependency surfaces on a clean GitHub Python 3.12 runner; then enforce --require-hashes and no-deps/no-build-isolation local installation before final exact-head certification."
 }
