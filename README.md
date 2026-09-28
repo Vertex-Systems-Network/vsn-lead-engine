@@ -1016,6 +1016,31 @@ event duration, source limits, Google writes, R2 writes or paid API use; it only
 avoids repeatedly spending existing shard budget on cohorts already proven to
 produce no new unique leads.
 
+### P42 same-day partition exhaustion authority
+
+P41 production certification completed successfully at the process level but
+still produced 290 Motorbikes discoveries, 268 duplicate rejections and 0 new
+unique accepted leads. The routing logs exposed why: partition scoring uses a
+blend of historical and same-day yield, and P41 reused that same blended object
+for exhaustion decisions. A partition that was productive historically could
+therefore avoid cooldown even after repeated zero-unique results today.
+
+P42 separates the two decisions:
+
+- adaptive ranking still uses blended historical + same-day yield, preserving
+  useful cross-day priors;
+- partition exhaustion cooldown uses only the current day's post-R2 partition
+  observations;
+- if a caller does not provide a separate same-day evidence object, the selector
+  preserves backward-compatible fallback to the blended hints.
+
+This requires no new state object or migration. The existing date-scoped P9/P36
+adaptive-yield state already contains the needed visits, discoveries and
+post-R2 accepted counts.
+
+No event duration, shard count, source limit, Google write, R2 write or paid
+API budget is increased.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1343,6 +1368,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P39 commit deadline guard: **180S CLEAN COMMIT-START RESERVE ACTIVE**
 - P40 quota recovery supervisor: **LIVE SHORTFALL CHECK + SINGLE SERIALIZED REDISPATCH ACTIVE**
 - P41 partition exhaustion cooldown: **POST-R2 ZERO-UNIQUE COHORT DEFERRAL ACTIVE**
+- P42 same-day exhaustion authority: **CURRENT-DAY POST-R2 EVIDENCE CONTROLS PARTITION COOLDOWN**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

@@ -755,3 +755,61 @@ def test_partition_exhaustion_cooldown_can_be_disabled():
         exhaustion_cooldown_enabled=False,
     )
     assert partition in {0,1}
+
+
+def test_partition_exhaustion_uses_same_day_evidence_over_historical_success():
+    geo=GEOS[0]
+    key=partition_yield_hint_key("Motorbikes",geo,0)
+    blended_hints={
+        key:{
+            "visits":12,
+            "discovered":400,
+            "accepted":30,
+        },
+    }
+    same_day_hints={
+        key:{
+            "visits":3,
+            "discovered":90,
+            "accepted":0,
+        },
+    }
+    partition,_=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=2,
+        cursor=0,
+        attempt=1,
+        yield_hints=blended_hints,
+        exhaustion_hints=same_day_hints,
+        adaptive_enabled=True,
+        exhaustion_cooldown_enabled=True,
+        exhaustion_min_visits=2,
+        exhaustion_min_discovered=20,
+    )
+    assert partition==1
+
+
+def test_partition_exhaustion_falls_back_to_blended_hints_when_scope_not_supplied():
+    geo=GEOS[0]
+    key=partition_yield_hint_key("Motorbikes",geo,0)
+    blended_hints={
+        key:{
+            "visits":3,
+            "discovered":90,
+            "accepted":0,
+        },
+    }
+    partition,_=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=2,
+        cursor=0,
+        attempt=1,
+        yield_hints=blended_hints,
+        adaptive_enabled=True,
+        exhaustion_cooldown_enabled=True,
+        exhaustion_min_visits=2,
+        exhaustion_min_discovered=20,
+    )
+    assert partition==1
