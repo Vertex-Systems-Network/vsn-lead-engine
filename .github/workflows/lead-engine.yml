@@ -14,6 +14,14 @@ on:
         required: true
         default: true
         type: boolean
+      run_origin:
+        description: "Origin label for real workflow_dispatch runs"
+        required: true
+        default: manual
+        type: choice
+        options:
+          - manual
+          - recovery-supervisor
   schedule:
     - cron: "0 3-18 * * *"
 
@@ -95,7 +103,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && !inputs.dry_run && steps.google.outputs.ready == 'true' }}
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          VSN_RUN_ORIGIN: manual
+          VSN_RUN_ORIGIN: ${{ inputs.run_origin }}
         run: python -m vsn_lead_engine.cli supervised-run
       - name: Real run blocked safely
         if: ${{ (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) && steps.google.outputs.ready != 'true' }}
