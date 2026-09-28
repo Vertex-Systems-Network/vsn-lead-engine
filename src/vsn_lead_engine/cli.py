@@ -104,6 +104,11 @@ def main() -> int:
     parser=argparse.ArgumentParser(prog="vsn-lead-engine")
     sub=parser.add_subparsers(dest="command",required=True)
     sub.add_parser("validate")
+    capability_parser=sub.add_parser("google-drive-capability")
+    capability_target=capability_parser.add_mutually_exclusive_group()
+    capability_target.add_argument("--date",default=None)
+    capability_target.add_argument("--next-day",action="store_true")
+    capability_parser.add_argument("--probe-create",action="store_true")
     ready_parser=sub.add_parser("workbook-ready")
     ready_target=ready_parser.add_mutually_exclusive_group()
     ready_target.add_argument("--date",default=None)
@@ -224,6 +229,21 @@ def main() -> int:
             "google_auth_mode":google_auth_mode_from_env(),
         },indent=2))
         return 0
+    if args.command=="google-drive-capability":
+        target=readiness_target_date(
+            config,
+            explicit_date=args.date,
+            next_day=bool(args.next_day),
+        )
+        store=GoogleSheetsStore(config,run_date=target["run_date"])
+        result=store.drive_creation_capability(
+            probe_create=bool(args.probe_create),
+        )
+        result["run_date"]=target["run_date"]
+        result["target_kind"]=target["target_kind"]
+        result["target_resolved_at"]=target["resolved_at"]
+        print(json.dumps(result,indent=2,default=str))
+        return 0 if result.get("status")=="capable" else 2
     if args.command=="workbook-ready":
         target=readiness_target_date(
             config,
