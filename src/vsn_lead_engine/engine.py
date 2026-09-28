@@ -158,6 +158,7 @@ def _candidate_partition_geography(
     yield_hints: dict[str,dict] | None = None,
     adaptive_enabled: bool = True,
     exploration_bonus: float = 0.15,
+    score_mode: str = "throughput",
 ) -> dict:
     """Attach an adaptive rotating source cohort to one shard search."""
     count=max(1,int(partition_count))
@@ -170,6 +171,7 @@ def _candidate_partition_geography(
         yield_hints=yield_hints,
         adaptive_enabled=adaptive_enabled,
         exploration_bonus=exploration_bonus,
+        score_mode=score_mode,
     )
     return {
         **geography,
@@ -544,6 +546,9 @@ def run_once(
     adaptive_partition_yield_routing=bool(
         runtime.get("adaptive_partition_yield_routing",True)
     )
+    adaptive_yield_score_mode=str(
+        runtime.get("adaptive_yield_score_mode","throughput")
+    ).strip().lower()
     adaptive_cooldown_enabled=bool(
         runtime.get("adaptive_zero_yield_cooldown_enabled",True)
     )
@@ -603,6 +608,7 @@ def run_once(
         low_deficit_weight=low_deficit_weight,
         mid_deficit_ratio=mid_deficit_ratio,
         mid_deficit_weight=mid_deficit_weight,
+        adaptive_score_mode=adaptive_yield_score_mode,
     )
     if not plan:
         return {"status":"complete","counts":counts,"cursor":cursor}
@@ -668,6 +674,7 @@ def run_once(
                 yield_hints=yield_hints,
                 adaptive_enabled=adaptive_partition_yield_routing,
                 exploration_bonus=adaptive_yield_exploration_bonus,
+                score_mode=adaptive_yield_score_mode,
             )
             source_started_monotonic=time.monotonic()
             emit_progress(
@@ -958,6 +965,7 @@ def run_once(
         "r2_pre_enrichment_prefilter":remote_prefilter_enabled,
         "adaptive_yield_routing":adaptive_yield_routing,
         "adaptive_partition_yield_routing":adaptive_partition_yield_routing,
+        "adaptive_yield_score_mode":adaptive_yield_score_mode,
         "adaptive_yield_hints_used":len(yield_hints or {}),
         "adaptive_zero_yield_cooldown":adaptive_cooldown_enabled,
         "adaptive_cooldown_routes_deferred":max(
