@@ -1,0 +1,105 @@
+name: Dependency Lock Integrity
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "pyproject.toml"
+      - "requirements-bootstrap.txt"
+      - "requirements-runtime.txt"
+      - "requirements-dev.txt"
+      - "scripts/regenerate_hash_locks.py"
+      - "scripts/install_locked.py"
+      - ".github/dependabot.yml"
+      - ".github/workflows/dependency-lock.yml"
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Existing dependabot/* or deps/* branch to regenerate and validate"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vsn-dependency-lock-${{ github.event.pull_request.number || inputs.target_branch || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Verify generated hash locks
+        run: python scripts/regenerate_hash_locks.py --check
+
+  regenerate:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TARGET_BRANCH: ${{ inputs.target_branch }}
+    steps:
+      - name: Guard regeneration target
+        id: guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$TARGET_BRANCH" in
+            main|master|"")
+              echo "::error::Direct dependency-lock regeneration on main/master is forbidden."
+              exit 2
+              ;;
+            dependabot/*|deps/*)
+              ;;
+            *)
+              echo "::error::target_branch must start with dependabot/ or deps/."
+              exit 2
+              ;;
+          esac
+          echo "target=$TARGET_BRANCH" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.guard.outputs.target }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Regenerate dependency hash locks
+        run: python scripts/regenerate_hash_locks.py --write
+
+      - name: Verify regenerated hash locks
+        run: python scripts/regenerate_hash_locks.py --check
+
+      - name: Certify regenerated dependency surface
+        run: |
+          python scripts/install_locked.py --dev
+          python -m vsn_lead_engine.cli validate
+          pytest -q
+
+      - name: Commit regenerated locks to update branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- requirements-bootstrap.txt requirements-runtime.txt requirements-dev.txt; then
+            echo "Dependency locks already match the resolver; nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add requirements-bootstrap.txt requirements-runtime.txt requirements-dev.txt
+          git commit -m "chore(deps): regenerate verified dependency hashes"
+          git push origin "HEAD:$TARGET_BRANCH"
