@@ -1471,6 +1471,7 @@ def test_critical_search_geography_expands_bbox_for_extreme_shortfall():
     assert geography["bbox"]==[-98.0,30.0,-97.0,31.0]
 
 
+# P44 boundary: expansion ends exactly at the 50% completion tier.
 def test_critical_search_geography_keeps_half_complete_categories_at_base_bbox():
     geography={
         "country":"Canada",
