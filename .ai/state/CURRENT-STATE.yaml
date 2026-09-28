@@ -6,19 +6,19 @@
     "product_version": "0.58.0"
   },
   "execution": {
-    "status": "verifying",
+    "status": "active",
     "current_phase": "CONTINUOUS-HARDENING",
-    "active_task": "P59-HASH-VERIFIED-DEPENDENCIES",
-    "last_completed_task": "P58-REPRODUCIBLE-DEPENDENCIES",
-    "next_task": "P60-NEXT-EVIDENCE-BASED-MILESTONE"
+    "active_task": "P60-HASH-LOCK-REGENERATION",
+    "last_completed_task": "P59-HASH-VERIFIED-DEPENDENCIES",
+    "next_task": "P61-NEXT-EVIDENCE-BASED-MILESTONE"
   },
-  "observed_main_sha": "f1759e9c9445c37040faec73d21837c8b366b36b",
+  "observed_main_sha": "ac748fb193ca86e2727e7056f000ce58b835263e",
   "active_issue": null,
-  "active_pr": 105,
-  "active_branch": "chore/p59-hash-verified-dependencies",
-  "current_milestone": "P59-HASH-VERIFIED-DEPENDENCIES",
-  "milestone_status": "VERIFYING",
-  "last_completed_milestone": "P58 added a 35-package Python 3.12 dependency lock, exact setuptools/wheel build pins, lock-constrained workflow installs and pip check; PR #104 exact-head CI passed 241 tests and merged.",
+  "active_pr": null,
+  "active_branch": "chore/p60-lock-regeneration",
+  "current_milestone": "P60-HASH-LOCK-REGENERATION",
+  "milestone_status": "IMPLEMENTING",
+  "last_completed_milestone": "P59 split bootstrap/runtime/dev dependency surfaces, enforced SHA-256 --require-hashes installation, retired the unhashed lock, and merged PR #105 after exact-head CI #196 passed 244 tests.",
   "production": {
     "last_certified_date": "2026-09-28",
     "daily_target": 12000,
@@ -29,9 +29,9 @@
     "production_run": 162
   },
   "quality": {
-    "latest_required_ci_run": 185,
+    "latest_required_ci_run": 196,
     "latest_required_ci_result": "success",
-    "pytest": "241 passed",
+    "pytest": "244 passed",
     "node20_deprecation_warning": false
   },
   "blockers": [],
@@ -40,5 +40,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Verify PR #105 final exact-head CI using the hash-enforced installer for dev dependencies, pip check, runtime validation and the complete test suite. If green, squash-merge PR #105. Next session must resolve live main before selecting P60."
+  "exact_next_safe_action": "Open P60 PR, run both standard application CI and Dependency Lock Integrity against the exact final head, verify fresh resolver output matches committed locks, then squash-merge only if both required workflows are green."
 }
