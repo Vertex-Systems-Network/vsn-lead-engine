@@ -1441,6 +1441,37 @@ The pre-P59 Dependabot PR #103 was closed as stale because it targeted the
 retired unhashed `requirements.txt` model. Future dependency PRs are required
 to reconcile against the P60 generator instead.
 
+### P61 dependency-update certification
+
+P61 used the first post-P60 Dependabot update as a real end-to-end certification
+of the dependency integrity workflow.
+
+Dependabot proposed:
+
+- `phonenumbers 8.13.55 -> 9.0.40`;
+- `pytest 8.4.2 -> 9.1.1`;
+- direct dependency range widening to allow the new majors.
+
+The initial bot-generated lock lines carried multiple hashes and were rejected
+by both the repository lock contract and the fresh-resolver drift check, as
+designed. P60's pinned pip 25.2 resolver then produced the canonical selected
+artifacts:
+
+- `phonenumbers==9.0.40` →
+  `sha256:189c028c4acd41ee80782e50f74a91260bd76d9115c83be94302509e1cdb5e84`;
+- `pytest==9.1.1` →
+  `sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c`.
+
+After canonical normalization, Dependency Lock Integrity matched a fresh
+resolver result and Lead Engine CI passed the complete suite. Phone
+normalization remains covered for US/Canada E.164 behavior, so the
+`phonenumbers` major upgrade is certified rather than blindly accepted.
+
+This establishes the intended update path:
+
+Dependabot proposal → fail-closed drift detection → canonical regeneration →
+full application validation → protected-main merge.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1787,6 +1818,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P58 reproducible dependencies: **35-PACKAGE PYTHON 3.12 LOCK + EXACT BUILD BACKEND + PIP CHECK ACTIVE**
 - P59 artifact integrity: **SHA-256 REQUIRE-HASHES BOOTSTRAP/RUNTIME/DEV INSTALLS ACTIVE**
 - P60 lock regeneration: **PINNED RESOLVER + PR DRIFT CHECK + MANUAL BRANCH-ONLY REGENERATION ACTIVE**
+- P61 dependency-update certification: **PHONENUMBERS 9 + PYTEST 9 PASSED CANONICAL HASH REGENERATION AND FULL CI**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
