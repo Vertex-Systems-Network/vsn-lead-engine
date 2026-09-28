@@ -231,6 +231,8 @@ def _candidate_partition_geography(
     exhaustion_cooldown_enabled: bool = True,
     exhaustion_min_visits: int = 2,
     exhaustion_min_discovered: int = 20,
+    exhaustion_zero_unique_streak: int = 2,
+    exhaustion_recent_discovered: int = 20,
 ) -> dict:
     """Attach an adaptive rotating source cohort to one shard search."""
     count=max(1,int(partition_count))
@@ -248,6 +250,8 @@ def _candidate_partition_geography(
         exhaustion_cooldown_enabled=exhaustion_cooldown_enabled,
         exhaustion_min_visits=exhaustion_min_visits,
         exhaustion_min_discovered=exhaustion_min_discovered,
+        exhaustion_zero_unique_streak=exhaustion_zero_unique_streak,
+        exhaustion_recent_discovered=exhaustion_recent_discovered,
     )
     return {
         **geography,
@@ -302,13 +306,29 @@ def _update_yield_hints(
                 partition_hint["discovered"]=int(
                     partition_hint.get("discovered",0) or 0
                 )+max(0,int(source.get("discovered",0) or 0))
+                discovered_now=max(
+                    0,int(source.get("discovered",0) or 0)
+                )
+                accepted_now=max(
+                    0,int(source.get("accepted",0) or 0)
+                )
                 partition_hint["accepted"]=int(
                     partition_hint.get("accepted",0) or 0
-                )+max(0,int(source.get("accepted",0) or 0))
+                )+accepted_now
                 partition_hint["accepted"]=min(
                     partition_hint["accepted"],
                     partition_hint["discovered"],
                 )
+                if accepted_now > 0:
+                    partition_hint["zero_unique_streak"]=0
+                    partition_hint["recent_discovered"]=0
+                elif discovered_now > 0:
+                    partition_hint["zero_unique_streak"]=int(
+                        partition_hint.get("zero_unique_streak",0) or 0
+                    )+1
+                    partition_hint["recent_discovered"]=int(
+                        partition_hint.get("recent_discovered",0) or 0
+                    )+discovered_now
         if partition_mask:
             hint["partition_mask"]=partition_mask
 
@@ -631,6 +651,12 @@ def run_once(
     partition_exhaustion_min_discovered=int(
         runtime.get("partition_exhaustion_min_discovered",20)
     )
+    partition_exhaustion_zero_unique_streak=int(
+        runtime.get("partition_exhaustion_zero_unique_streak",2)
+    )
+    partition_exhaustion_recent_discovered=int(
+        runtime.get("partition_exhaustion_recent_discovered",20)
+    )
     adaptive_yield_score_mode=str(
         runtime.get("adaptive_yield_score_mode","throughput")
     ).strip().lower()
@@ -793,6 +819,12 @@ def run_once(
                 exhaustion_cooldown_enabled=partition_exhaustion_cooldown_enabled,
                 exhaustion_min_visits=partition_exhaustion_min_visits,
                 exhaustion_min_discovered=partition_exhaustion_min_discovered,
+                exhaustion_zero_unique_streak=(
+                    partition_exhaustion_zero_unique_streak
+                ),
+                exhaustion_recent_discovered=(
+                    partition_exhaustion_recent_discovered
+                ),
             )
             source_started_monotonic=time.monotonic()
             emit_progress(

@@ -1550,3 +1550,38 @@ def test_critical_search_geography_clamps_extreme_factor_to_three():
     assert result["_bbox_expansion_factor"]==3.0
     assert result["bbox"][2] <= 180.0
     assert result["bbox"][3] <= 90.0
+
+
+def test_update_yield_hints_tracks_and_resets_partition_zero_unique_streak():
+    hints={}
+    geo={"country":"United States","region":"Texas","city":"Austin"}
+    zero_attempt={
+        "category":"Motorbikes",
+        "geography":geo,
+        "discovered":25,
+        "accepted":0,
+        "sources":[{
+            "candidate_partition":3,
+            "discovered":25,
+            "accepted":0,
+        }],
+    }
+    engine._update_yield_hints(hints,[zero_attempt,zero_attempt])
+    key=engine.partition_yield_hint_key("Motorbikes",geo,3)
+    assert hints[key]["zero_unique_streak"]==2
+    assert hints[key]["recent_discovered"]==50
+
+    success_attempt={
+        "category":"Motorbikes",
+        "geography":geo,
+        "discovered":10,
+        "accepted":2,
+        "sources":[{
+            "candidate_partition":3,
+            "discovered":10,
+            "accepted":2,
+        }],
+    }
+    engine._update_yield_hints(hints,[success_attempt])
+    assert hints[key]["zero_unique_streak"]==0
+    assert hints[key]["recent_discovered"]==0

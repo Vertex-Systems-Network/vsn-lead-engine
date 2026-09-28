@@ -304,3 +304,56 @@ def test_daily_yield_state_still_loads_legacy_three_counter_hint():
         "discovered":100,
         "accepted":0,
     }
+
+
+def test_daily_yield_state_round_trips_recent_partition_exhaustion_fields():
+    registry=FakeRegistry()
+    store=DailyYieldStateStore(registry)
+    hints={
+        "motorbikes|united states|texas|austin|partition:3":{
+            "visits":7,
+            "discovered":180,
+            "accepted":12,
+            "zero_unique_streak":3,
+            "recent_discovered":45,
+        }
+    }
+
+    saved=store.save("2026-09-28",hints)
+    loaded,_=store.load("2026-09-28")
+
+    assert loaded==hints
+    payload=json.loads(
+        registry.client.objects[saved["key"]]["body"].decode("utf-8")
+    )
+    raw=payload["hints"][
+        "motorbikes|united states|texas|austin|partition:3"
+    ]
+    assert raw["zero_unique_streak"]==3
+    assert raw["recent_discovered"]==45
+
+
+def test_historical_profile_does_not_carry_daily_recency_streaks():
+    registry=FakeRegistry()
+    store=HistoricalYieldProfileStore(registry)
+    store.load()
+    store.save_completion(
+        "2026-09-28",
+        {
+            "motorbikes|united states|texas|austin|partition:3":{
+                "visits":4,
+                "discovered":100,
+                "accepted":10,
+                "zero_unique_streak":2,
+                "recent_discovered":30,
+            }
+        },
+    )
+    loaded,_=store.load()
+    assert loaded[
+        "motorbikes|united states|texas|austin|partition:3"
+    ]=={
+        "visits":4,
+        "discovered":100,
+        "accepted":10,
+    }

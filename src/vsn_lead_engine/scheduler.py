@@ -170,6 +170,8 @@ def select_candidate_partition(
     exhaustion_cooldown_enabled: bool = True,
     exhaustion_min_visits: int = 2,
     exhaustion_min_discovered: int = 20,
+    exhaustion_zero_unique_streak: int = 2,
+    exhaustion_recent_discovered: int = 20,
 ) -> tuple[int,float | None]:
     """Choose one partition using persisted yield while preserving exploration."""
     count=max(1,min(64,int(partition_count)))
@@ -198,11 +200,24 @@ def select_candidate_partition(
             visits=max(0,int(hint.get("visits",0) or 0))
             discovered=max(0,int(hint.get("discovered",0) or 0))
             accepted=max(0,int(hint.get("accepted",0) or 0))
-            if (
+            zero_unique_streak=max(
+                0,int(hint.get("zero_unique_streak",0) or 0)
+            )
+            recent_discovered=max(
+                0,int(hint.get("recent_discovered",0) or 0)
+            )
+            aggregate_exhausted=(
                 visits >= max(1,int(exhaustion_min_visits))
                 and discovered >= max(1,int(exhaustion_min_discovered))
                 and accepted == 0
-            ):
+            )
+            recent_exhausted=(
+                zero_unique_streak
+                >= max(1,int(exhaustion_zero_unique_streak))
+                and recent_discovered
+                >= max(1,int(exhaustion_recent_discovered))
+            )
+            if aggregate_exhausted or recent_exhausted:
                 exhausted.append(partition)
         survivors=[partition for partition in ordered if partition not in exhausted]
         if survivors:

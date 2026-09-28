@@ -35,6 +35,8 @@ class DailyYieldStateStore:
     def _normalize_hint(raw) -> dict[str, int] | None:
         has_partition_mask=False
         partition_raw=0
+        zero_unique_streak_raw=None
+        recent_discovered_raw=None
         if isinstance(raw, dict):
             values = (
                 raw.get("visits", 0),
@@ -44,6 +46,10 @@ class DailyYieldStateStore:
             if "partition_mask" in raw:
                 has_partition_mask=True
                 partition_raw=raw.get("partition_mask",0)
+            if "zero_unique_streak" in raw:
+                zero_unique_streak_raw=raw.get("zero_unique_streak",0)
+            if "recent_discovered" in raw:
+                recent_discovered_raw=raw.get("recent_discovered",0)
         elif isinstance(raw, (list, tuple)) and len(raw) in {3,4}:
             values = raw[:3]
             if len(raw)==4:
@@ -67,6 +73,20 @@ class DailyYieldStateStore:
         if has_partition_mask:
             # Runtime partitions are capped at 64, so retain only the lower 64 bits.
             result["partition_mask"]=partition_mask & ((1 << 64) - 1)
+        if zero_unique_streak_raw is not None:
+            try:
+                result["zero_unique_streak"]=max(
+                    0,int(zero_unique_streak_raw or 0)
+                )
+            except (TypeError,ValueError):
+                result["zero_unique_streak"]=0
+        if recent_discovered_raw is not None:
+            try:
+                result["recent_discovered"]=max(
+                    0,int(recent_discovered_raw or 0)
+                )
+            except (TypeError,ValueError):
+                result["recent_discovered"]=0
         return result
 
     def load(self, run_date: str) -> tuple[dict[str, dict], dict]:
@@ -119,22 +139,40 @@ class DailyYieldStateStore:
             normalized = self._normalize_hint(hints[key_name])
             if normalized is None:
                 continue
-            values=[
-                normalized["visits"],
-                normalized["discovered"],
-                normalized["accepted"],
-            ]
-            if "partition_mask" in normalized:
-                values.append(normalized["partition_mask"])
-            entries.append((str(key_name),values))
+            if (
+                "zero_unique_streak" in normalized
+                or "recent_discovered" in normalized
+            ):
+                serialized={
+                    "visits":normalized["visits"],
+                    "discovered":normalized["discovered"],
+                    "accepted":normalized["accepted"],
+                    "zero_unique_streak":int(
+                        normalized.get("zero_unique_streak",0) or 0
+                    ),
+                    "recent_discovered":int(
+                        normalized.get("recent_discovered",0) or 0
+                    ),
+                }
+                if "partition_mask" in normalized:
+                    serialized["partition_mask"]=normalized["partition_mask"]
+            else:
+                serialized=[
+                    normalized["visits"],
+                    normalized["discovered"],
+                    normalized["accepted"],
+                ]
+                if "partition_mask" in normalized:
+                    serialized.append(normalized["partition_mask"])
+            entries.append((str(key_name),normalized,serialized))
 
         # Keep the most observed state if a future configuration ever exceeds the
         # compact state ceiling.
         if len(entries) > self.max_entries:
             entries.sort(
                 key=lambda item: (
-                    -int(item[1][0]),
-                    -int(item[1][2]),
+                    -int(item[1]["visits"]),
+                    -int(item[1]["accepted"]),
                     item[0],
                 )
             )
@@ -145,7 +183,10 @@ class DailyYieldStateStore:
             "version": STATE_VERSION,
             "run_date": run_date,
             "updated_at": datetime.now(timezone.utc).isoformat(),
-            "hints": {key_name: values for key_name, values in entries},
+            "hints": {
+                key_name: serialized
+                for key_name,_normalized,serialized in entries
+            },
         }
         body = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
         key = self.key(run_date)
