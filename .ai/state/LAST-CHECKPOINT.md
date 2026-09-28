@@ -3,35 +3,30 @@
 ## State
 
 - Snapshot timestamp: `2026-09-28`
-- Observed main: `34c37531046eb6a3c1701a520fc234094aa3a8b8`
+- Observed main: `f1759e9c9445c37040faec73d21837c8b366b36b`
 - Open issues at snapshot: `0`
-- Active PR: `#104`
-- Last completed milestone: `P57-DEPENDENCY-UPDATE-AUTOMATION`
-- Current milestone: `P58-REPRODUCIBLE-DEPENDENCIES`
-- Milestone status: `VERIFYING`
+- Open PRs at snapshot: `0`
+- Last completed milestone: `P58-REPRODUCIBLE-DEPENDENCIES`
+- Current milestone: `P59-HASH-VERIFIED-DEPENDENCIES`
+- Milestone status: `RESOLVING_HASHES`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
 ## Verified
 
-- P57 merged weekly grouped Dependabot update PR automation.
-- P57 exact-head CI run #174 passed 237 tests.
-- Current CI and production installs still resolve broad pyproject ranges at install time.
-- No dependency lock/constraints artifact exists on main.
-
-## Resolver Evidence
-
-- PR #104 resolver stage produced 35 exact Python 3.12/Linux runtime/dev package pins.
-- Build backend pins: setuptools 84.0.0 and wheel 0.48.0.
+- P58 merged through PR #104 on main `f1759e9c9445c37040faec73d21837c8b366b36b`.
+- P58 exact-head CI run #185 passed lock-constrained install, `pip check`, runtime validation and 241 tests.
+- The repository has exact version pins for the Python 3.12 dependency graph and exact setuptools/wheel build pins.
+- External package artifacts are not yet hash-verified during installation.
 
 ## Not Verified
 
-- The final Python 3.12 transitive lock set is not yet committed.
-- Lock-enforced CI/production installation is not active until P58 merges.
+- Exact selected SHA-256 artifacts for bootstrap, runtime and dev surfaces are not yet committed.
+- `--require-hashes` is not active until P59 merges.
 
 ## Known Risk
 
-- Without an exact transitive lock, two runner executions can install different dependency versions while the repository SHA stays unchanged.
+- Exact version pinning prevents version drift but does not independently verify the downloaded wheel/sdist bytes. A compromised or unexpected artifact for the same version would not be rejected by version matching alone.
 
 ## Next Action
 
-Verify PR #104 final exact-head CI with lock-constrained installation, pip check, runtime validation and tests. If green, squash-merge PR #104; next session must reconcile live main before selecting P59.
+Resolve selected SHA-256 artifacts on a clean GitHub Python 3.12 runner for bootstrap, runtime and dev surfaces. Commit hash-locked requirement files, install external dependencies with `--require-hashes`, install the local project with `--no-deps --no-build-isolation`, add drift guards, and certify the final exact PR head.
