@@ -1437,3 +1437,16 @@ def test_yield_hints_accumulate_distinct_partition_mask():
     assert hint["partition_mask"]==(1 << 2) | (1 << 5)
     assert hint["partition_mask"].bit_count()==2
     assert _yield_hint_summary(hints)["partitions_observed"]==2
+
+
+def test_commit_deadline_guard_defaults_to_three_minutes():
+    assert engine._commit_deadline_guard_seconds({
+        "event_deadline_guard_seconds":60,
+    })==180.0
+
+
+def test_commit_deadline_guard_never_weakens_event_guard():
+    assert engine._commit_deadline_guard_seconds({
+        "event_deadline_guard_seconds":240,
+        "commit_deadline_guard_seconds":180,
+    })==240.0
