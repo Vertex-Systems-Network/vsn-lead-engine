@@ -168,15 +168,32 @@ def _critical_search_geography(
     completion_ratio: float,
     threshold: float,
     bbox_factor: float,
+    extreme_threshold: float = 0.10,
+    extreme_bbox_factor: float = 2.25,
 ) -> dict:
-    """Widen a metro bbox only for extreme quota shortfalls."""
+    """Widen a metro bbox with a graduated deficit-sensitive search horizon."""
     result=dict(geography)
     bbox=geography.get("bbox")
-    factor=max(1.0,min(3.0,float(bbox_factor)))
     threshold=max(0.0,min(1.0,float(threshold)))
+    extreme_threshold=max(
+        0.0,
+        min(threshold,float(extreme_threshold)),
+    )
+    normal_factor=max(1.0,min(3.0,float(bbox_factor)))
+    extreme_factor=max(
+        normal_factor,
+        min(3.0,float(extreme_bbox_factor)),
+    )
+    ratio=float(completion_ratio)
+    if ratio < extreme_threshold:
+        factor=extreme_factor
+    elif ratio < threshold:
+        factor=normal_factor
+    else:
+        factor=1.0
+
     if (
         not enabled
-        or float(completion_ratio) >= threshold
         or factor <= 1.0
         or not isinstance(bbox,list)
         or len(bbox) != 4
@@ -642,10 +659,16 @@ def run_once(
         runtime.get("critical_geography_expansion_enabled",True)
     )
     critical_geography_expansion_ratio=float(
-        runtime.get("critical_geography_expansion_ratio",0.10)
+        runtime.get("critical_geography_expansion_ratio",0.25)
     )
     critical_geography_expansion_factor=float(
         runtime.get("critical_geography_expansion_factor",1.75)
+    )
+    critical_geography_extreme_ratio=float(
+        runtime.get("critical_geography_extreme_ratio",0.10)
+    )
+    critical_geography_extreme_factor=float(
+        runtime.get("critical_geography_extreme_factor",2.25)
     )
     low_deficit_ratio=float(
         runtime.get("low_deficit_ratio",0.25)
@@ -753,6 +776,8 @@ def run_once(
                 completion_ratio=category_completion_ratio,
                 threshold=critical_geography_expansion_ratio,
                 bbox_factor=critical_geography_expansion_factor,
+                extreme_threshold=critical_geography_extreme_ratio,
+                extreme_bbox_factor=critical_geography_extreme_factor,
             )
             search_geography=_candidate_partition_geography(
                 route_geography,
@@ -1069,6 +1094,8 @@ def run_once(
         ),
         "critical_geography_expansion_ratio":critical_geography_expansion_ratio,
         "critical_geography_expansion_factor":critical_geography_expansion_factor,
+        "critical_geography_extreme_ratio":critical_geography_extreme_ratio,
+        "critical_geography_extreme_factor":critical_geography_extreme_factor,
         "partition_exhaustion_cooldown_enabled":(
             partition_exhaustion_cooldown_enabled
         ),
