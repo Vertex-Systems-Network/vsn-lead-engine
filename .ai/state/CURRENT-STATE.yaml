@@ -6,7 +6,7 @@
     "product_version": "0.61.0"
   },
   "execution": {
-    "status": "active",
+    "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
     "active_task": "P65-OAUTH-ONBOARDING-AND-CAPABILITY",
     "last_completed_task": "P64-USER-OAUTH-MY-DRIVE",
@@ -14,10 +14,10 @@
   },
   "observed_main_sha": "200437034ee14d7bb947af804f276b4d050db709",
   "active_issue": null,
-  "active_pr": null,
+  "active_pr": 112,
   "active_branch": "feat/p65-google-oauth-onboarding",
   "current_milestone": "P65-OAUTH-ONBOARDING-AND-CAPABILITY",
-  "milestone_status": "IMPLEMENTING",
+  "milestone_status": "VERIFYING",
   "last_completed_milestone": "P64 added OAuth-first Google auth with service-account fallback; PR #111 exact-head CI passed 268 tests and merged. Production readiness run #3 succeeded for 2026-09-29 in one attempt on the precreated user-owned workbook.",
   "production": {
     "last_certified_date": "2026-09-28",
@@ -42,5 +42,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Open P65 PR and verify exact-head Lead Engine CI. If green, squash-merge. Then provision GOOGLE_OAUTH_USER_JSON with scripts/google_oauth_onboard.py and run the manual Google Drive Capability workflow; only a successful create/trash probe closes autonomous My Drive creation."
+  "exact_next_safe_action": "Verify PR #112 exact-head Lead Engine CI. If green, squash-merge. P65 tooling is then complete; autonomous My Drive creation remains blocked until GOOGLE_OAUTH_USER_JSON is provisioned and the manual Google Drive Capability create/trash workflow passes."
 }
