@@ -5,10 +5,10 @@
 - Snapshot timestamp: `2026-09-28`
 - Observed main: `200437034ee14d7bb947af804f276b4d050db709`
 - Open issues at snapshot: `0`
-- Open PRs at snapshot: `0`
+- Active PR: `#112`
 - Last completed milestone: `P64-USER-OAUTH-MY-DRIVE`
 - Current milestone: `P65-OAUTH-ONBOARDING-AND-CAPABILITY`
-- Milestone status: `IMPLEMENTING`
+- Milestone status: `VERIFYING`
 - Product version target: `0.61.0`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
@@ -43,4 +43,4 @@
 
 ## Next Action
 
-Open P65 PR and certify exact-head CI. If green, squash-merge. Then provision GOOGLE_OAUTH_USER_JSON with the onboarding helper and run the Google Drive Capability workflow. Close the blocker only after the real production create/trash probe succeeds.
+Verify PR #112 exact-head Lead Engine CI. If green, squash-merge. Then provision GOOGLE_OAUTH_USER_JSON with the onboarding helper and run the Google Drive Capability workflow. Close the blocker only after the real production create/trash probe succeeds.
