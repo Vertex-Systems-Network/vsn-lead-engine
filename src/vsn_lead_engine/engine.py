@@ -64,6 +64,19 @@ def _deadline_is_near(
     )
 
 
+def _commit_deadline_guard_seconds(runtime: dict) -> float:
+    """Return a commit-start guard that can never weaken the event guard."""
+    event_guard=max(
+        0.0,
+        float(runtime.get("event_deadline_guard_seconds",60)),
+    )
+    commit_guard=max(
+        0.0,
+        float(runtime.get("commit_deadline_guard_seconds",180)),
+    )
+    return max(event_guard,commit_guard)
+
+
 def _close_sources(sources) -> None:
     for source in sources:
         close = getattr(source, "close", None)
@@ -585,6 +598,7 @@ def run_once(
     event_deadline_guard_seconds=float(
         runtime.get("event_deadline_guard_seconds",60)
     )
+    commit_deadline_guard_seconds=_commit_deadline_guard_seconds(runtime)
     plan=build_shard_plan(
         config["categories"],
         config["geographies"],
@@ -1023,6 +1037,21 @@ def run_once(
         leads=accepted_by_category.get(category,[])
         if not leads:
             continue
+
+        if _deadline_is_near(
+            deadline_monotonic,
+            commit_deadline_guard_seconds,
+        ):
+            event_budget_exhausted=True
+            emit_progress(
+                "category_commit_deferred",
+                enabled=progress_enabled,
+                run_date=run_date,
+                category=category,
+                candidates=len(leads),
+                guard_seconds=commit_deadline_guard_seconds,
+            )
+            break
 
         commit_started_monotonic=time.monotonic()
         emit_progress(
