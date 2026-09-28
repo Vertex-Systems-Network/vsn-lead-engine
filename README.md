@@ -1289,6 +1289,25 @@ the Node 24 action majors and rejects the previous v4/v5 pair. Workflow
 triggers, permissions, schedules, secrets, Python version, commands and quota
 logic are otherwise unchanged.
 
+### P55 immutable GitHub Actions pinning
+
+P54 moved repository workflows onto the Node 24 action line. P55 closes the
+remaining CI supply-chain gap by replacing mutable action tags with immutable
+release commit SHAs across all nine managed workflows.
+
+Pinned releases:
+
+- `actions/checkout v7.0.1` → `3d3c42e5aac5ba805825da76410c181273ba90b1`
+- `actions/setup-python v7.0.0` → `5fda3b95a4ea91299a34e894583c3862153e4b97`
+
+Version comments remain beside each pinned SHA for maintainability, while the
+actual executable reference is immutable. A regression test requires these
+exact SHAs and rejects both mutable `@v7` refs and the previous v4/v5 majors.
+
+This changes only CI dependency integrity. Workflow triggers, permissions,
+schedules, Python version, secrets, quota behavior, R2 dedupe and Google writes
+are unchanged.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1629,6 +1648,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P52 tail geography retention: **PRODUCTION CERTIFIED — 12,000/12,000 DAILY QUOTA CLOSED WITH 1.5× TAIL COVERAGE**
 - P53 progressive tail geography: **EVALUATED / NOT PROMOTED — P52 CLOSED QUOTA WITHOUT 2.0× EXPANSION**
 - P54 workflow runtime modernization: **NODE 24 FIRST-PARTY ACTION MAJORS v7 ACTIVE**
+- P55 CI supply-chain pinning: **IMMUTABLE CHECKOUT/SETUP-PYTHON RELEASE SHAS ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
