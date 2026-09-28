@@ -696,6 +696,31 @@ Production behavior:
 This reduces orphan-lock risk from forced runner termination without increasing
 paid API usage or weakening exact cross-day dedupe.
 
+### P29 process-level watchdog
+
+P28 remains the graceful in-process budget, but production evidence showed that a
+native/blocking call can prevent Python from reaching its deadline checks. A
+second, independent parent-process watchdog now wraps every **real** lead event.
+
+Production behavior:
+
+- the normal engine still gets **25 minutes** to stop cleanly and commit any
+  accepted in-memory leads;
+- the parent watchdog allows **26 minutes** for the child process;
+- if the child is still blocked, the parent sends termination to the whole child
+  process group, waits up to **20 seconds**, then force-kills it if required;
+- watchdog expiry returns exit code `124` so GitHub marks the event failed and
+  the existing recovery supervisor can retry the live shortfall;
+- the parent records a date-scoped health incident after regaining control;
+- R2 pending markers and stale-lock recovery remain the crash-recovery authority
+  for a child that is terminated during a write boundary;
+- GitHub's 30-minute job timeout remains the final platform fail-safe, with
+  several minutes reserved for watchdog cleanup and incident persistence.
+
+Scheduled, assistant-triggered and manual **real** runs use
+`supervised-run`. Manual dry runs remain direct because they do not own the
+production write path.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1010,6 +1035,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P26 user-owned workbook bootstrap: **07:40 PRECREATE + SAFE BLANK INIT ACTIVE**
 - P27 Overture query guard: **45S INTERRUPT + NON-RETRYABLE TIMEOUT ACTIVE**
 - P28 graceful event budget: **25-MIN CLEAN STOP + 60S START GUARD ACTIVE**
+- P29 process watchdog: **26-MIN CHILD DEADLINE + 20S KILL GRACE ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

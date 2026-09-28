@@ -14,6 +14,7 @@ from .health import (
 from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
 from .schedule import scheduled_run_window
 from .sheets import GoogleSheetsStore
+from .watchdog import supervise_process
 
 def _registry_index(config: dict):
     index=build_registry_index(config)
@@ -108,6 +109,8 @@ def main() -> int:
     run_parser=sub.add_parser("run")
     run_parser.add_argument("--dry-run",action="store_true")
     run_parser.add_argument("--scheduled",action="store_true")
+    supervised_parser=sub.add_parser("supervised-run")
+    supervised_parser.add_argument("--scheduled",action="store_true")
     backfill_parser=sub.add_parser("registry-backfill")
     backfill_parser.add_argument("--dry-run",action="store_true")
     sub.add_parser("registry-stats")
@@ -123,6 +126,45 @@ def main() -> int:
     incident_parser.add_argument("--message",required=True)
     args=parser.parse_args()
     config=load_config()
+    if args.command=="supervised-run":
+        runtime=config["runtime"]
+        scheduled=bool(args.scheduled)
+        origin=(
+            "native-schedule"
+            if scheduled
+            else str(os.getenv("VSN_RUN_ORIGIN","manual") or "manual").strip()
+        )
+        command=[sys.executable,"-m","vsn_lead_engine.cli","run"]
+        if scheduled:
+            command.append("--scheduled")
+        result=supervise_process(
+            command,
+            timeout_seconds=float(runtime.get("process_watchdog_seconds",1560)),
+            kill_grace_seconds=float(
+                runtime.get("process_watchdog_kill_grace_seconds",20)
+            ),
+        )
+        result["origin"]=origin
+        result["run_date"]=_run_date(config)
+        if (
+            result.get("status")=="watchdog-timeout"
+            and bool(runtime.get("health_ledger_enabled",True))
+        ):
+            timeout_error=TimeoutError(
+                "Lead child process exceeded the process watchdog budget "
+                f"of {result.get('timeout_seconds')} seconds."
+            )
+            result["health_ledger"]=_health_append(
+                config,
+                result["run_date"],
+                incident_health_event(
+                    origin=origin,
+                    error=timeout_error,
+                    run_date=result["run_date"],
+                ),
+            )
+        print(json.dumps(result,indent=2,default=str))
+        return int(result.get("exit_code",2) or 0)
     if args.command=="validate":
         print(json.dumps({
             "status":"valid",
