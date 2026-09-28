@@ -1681,6 +1681,46 @@ reclassified as scheduled recovery.
 
 Runtime version is **0.63.0**.
 
+### P68 health-ledger recovery and schedule-gate telemetry
+
+P68 makes the operational health ledger accurately distinguish **real recovery
+runs** from **recovery attempts intentionally blocked by schedule policy**.
+
+Recovery accounting now includes both production origins:
+
+- `recovery-push`;
+- `recovery-supervisor`.
+
+The summary exposes:
+
+- `recovery_runs` — combined executed recovery runs;
+- `recovery_push_runs`;
+- `recovery_supervisor_runs`;
+- `schedule_blocks`;
+- `midnight_guard_blocks`;
+- `latest_schedule_block_reason`.
+
+A `scheduled-window-skipped` event is **not** counted as an executed run.
+
+Run-health events now persist the P67 schedule evidence:
+
+- schedule status / block reason;
+- within-hours and midnight-safe flags;
+- seconds remaining to local midnight;
+- required watchdog runway;
+- configured safety buffer.
+
+P68 also adds a PII-free `schedule-gate` health event and
+`health-schedule-gate` CLI command. The Recovery Supervisor records a blocked
+pre-dispatch gate directly into the existing R2 daily health ledger, so a
+23:40/23:50 intentional midnight guard is auditable even though no Lead Engine
+child process starts.
+
+Telemetry failure is non-blocking for the Recovery Supervisor itself; it does
+not turn an intentional safe skip into an operational outage.
+
+Runtime version is **0.64.0**.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -2034,6 +2074,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P65 OAuth autonomy tooling: **LOCAL PKCE ONBOARDING + FAIL-FAST OWNERSHIP CHECK + CREATE/TRASH CERTIFICATION**
 - P66 strict OAuth certification: **USER-OAUTH-ONLY PRODUCTION PROBE; SERVICE-ACCOUNT FALLBACK CANNOT CERTIFY AUTONOMY**
 - P67 midnight-safe recovery: **DYNAMIC WATCHDOG RUNWAY + EXECUTION-START RECHECK ACTIVE**
+- P68 health telemetry: **RECOVERY-SUPERVISOR ACCOUNTING + MIDNIGHT-GATE R2 EVIDENCE ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
