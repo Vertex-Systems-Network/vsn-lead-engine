@@ -9,6 +9,8 @@ from vsn_lead_engine.sheets import (
     extract_spreadsheet_id,
     pending_recovery_status,
     registry_status_blocks_dedupe,
+    overview_schema_is_current,
+    category_tabs_are_blank,
 )
 
 
@@ -134,3 +136,40 @@ def test_daily_overview_seed_contains_quality_metrics():
     assert "Website-Only Candidates" in names
     assert "Enrichment Candidates" in names
     assert "Last Acceptance Rate %" in names
+
+
+def test_overview_schema_current_requires_sentinel_and_matching_tracking_date():
+    assert overview_schema_is_current(
+        [
+            ["VSN Lead Engine — Daily US + Canada Workbook",""],
+            ["Metric","Value"],
+            ["Tracking Date","2026-09-28"],
+        ],
+        "2026-09-28",
+    )
+    assert not overview_schema_is_current(
+        [
+            ["Metric","Value"],
+            ["Date","2026-09-28"],
+        ],
+        "2026-09-28",
+    )
+    assert not overview_schema_is_current(
+        [
+            ["VSN Lead Engine — Daily US + Canada Workbook",""],
+            ["Metric","Value"],
+            ["Tracking Date","2026-09-27"],
+        ],
+        "2026-09-28",
+    )
+
+
+def test_category_tabs_are_blank_only_when_all_value_ranges_have_no_data():
+    assert category_tabs_are_blank([
+        {"values":[]},
+        {"values":[[]]},
+    ])
+    assert not category_tabs_are_blank([
+        {"values":[]},
+        {"values":[["2026-09-28"]]},
+    ])
