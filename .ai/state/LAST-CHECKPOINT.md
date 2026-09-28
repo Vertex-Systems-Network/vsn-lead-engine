@@ -5,10 +5,10 @@
 - Snapshot timestamp: `2026-09-29`
 - Observed main: `9af8b3f14098e1a07636c9a2008d00e720d6b16d`
 - Open issues at snapshot: `0`
-- Open PRs at snapshot: `0`
+- Active PR: `#117`
 - Last completed milestone: `P69-WORKBOOK-LIFECYCLE-SERIALIZATION`
 - Current milestone: `P70-DEPLOYMENT-READINESS-DAY-BOUNDARY`
-- Milestone status: `IMPLEMENTING`
+- Milestone status: `VERIFYING`
 - Product version target: `0.66.0`
 - Last production quota certification: `2026-09-28 = 12,000 / 12,000`
 - 2026-09-29 workbook: `READY / EXACTLY ONE ACTIVE FILE`
@@ -46,4 +46,4 @@
 
 ## Next Action
 
-Open P70 PR and certify exact-head CI. If green, squash-merge. The merge-push readiness run should occur before the evening cutoff and therefore target 2026-09-29; verify that live target/date plus readiness result before closing P70.
+Verify PR #117 exact-head Lead Engine CI. If green, squash-merge. The merge-push readiness run should occur before the evening cutoff and therefore target 2026-09-29; verify the live target/date plus readiness result before closing P70.
