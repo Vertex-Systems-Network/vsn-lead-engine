@@ -44,6 +44,8 @@ def test_production_free_source_breadth_is_expanded():
     assert config["runtime"]["tail_geography_expansion_enabled"] is True
     assert config["runtime"]["tail_geography_expansion_incomplete_threshold"]==4
     assert config["runtime"]["tail_geography_expansion_factor"]==1.5
+    assert config["runtime"]["tail_geography_high_completion_ratio"]==0.9
+    assert config["runtime"]["tail_geography_high_completion_factor"]==2.0
     assert config["runtime"]["timezone"]=="Asia/Karachi"
     assert config["sources"]["overture"]["website_candidate_reserve_fraction"]==0.20
     assert config["enrichment"]["max_candidates_per_run"]==160
