@@ -47,6 +47,33 @@ def test_source_search_stops_after_retry_budget():
     assert source.calls==3
 
 
+
+
+class TimeoutSource:
+    def __init__(self):
+        self.calls=0
+
+    def search(self, category, geography, limit):
+        self.calls+=1
+        raise TimeoutError("source wall clock exceeded")
+
+
+def test_source_search_timeout_is_not_retried():
+    source=TimeoutSource()
+    candidates,error,retries=_search_with_retry(
+        source,
+        "IT & Software",
+        {"country":"Canada"},
+        limit=10,
+        attempts=3,
+        backoff_seconds=0,
+    )
+    assert candidates==[]
+    assert "TimeoutError: source wall clock exceeded" in error
+    assert retries==0
+    assert source.calls==1
+
+
 class FakeClosableSource:
     def __init__(self):
         self.closed=False
