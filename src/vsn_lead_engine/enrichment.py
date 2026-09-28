@@ -16,6 +16,7 @@ from urllib.parse import urljoin, urlparse, urlunparse
 import phonenumbers
 import requests
 
+from .identity import default_user_agent
 from .models import Lead
 from .normalize import normalize_phone
 
@@ -222,12 +223,8 @@ class ContactEnricher:
             65536, min(2_000_000, int(settings.get("max_response_bytes", 524288)))
         )
         self.respect_robots = bool(settings.get("respect_robots_txt", True))
-        self.user_agent = str(
-            settings.get(
-                "user_agent",
-                "VSN-Lead-Engine/0.34 (+https://vertexsystemsnetwork.com/)",
-            )
-        ).strip()
+        configured_user_agent = str(settings.get("user_agent", "")).strip()
+        self.user_agent = configured_user_agent or default_user_agent()
         self.common_enabled = bool(common.get("enabled", False))
         self.common_max_lookups = max(0, int(common.get("max_lookups_per_run", 8)))
         self.common_max_lookups_per_call = max(
