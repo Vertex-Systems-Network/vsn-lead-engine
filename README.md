@@ -871,6 +871,29 @@ slots toward the categories that are furthest from their required 1,000/day
 quota. The feature is runtime-configurable and can be disabled to restore the
 legacy 3x/2x/1x behavior.
 
+### P36 partition-level adaptive yield routing
+
+P34 showed that Motorbikes performance can differ dramatically between hash
+partitions inside the same metro: sampled partitions ranged from fully collided
+to dozens of R2 survivors. Before P36, adaptive routing learned only at the
+category+metro level; the 16-way partition id was retained only as a coverage
+bitmask.
+
+P36 reuses the existing compact daily/historical adaptive-yield objects and
+adds partition-scoped keys for every actually queried cohort. Each partition
+tracks visits, discovered candidates and accepted leads. At search time:
+
+- productive known partitions can outrank weak ones;
+- unseen partitions keep the normal exploration bonus and are preferred over
+  repeatedly observed zero-yield partitions;
+- cursor rotation remains the tie-breaker, so equal/unseen cohorts still move;
+- disabling `runtime.adaptive_partition_yield_routing` restores the previous
+  deterministic cursor+attempt partition choice.
+
+No new database, bucket, Google Sheet write, paid API call or event-time
+increase is introduced. P36 changes only which already-budgeted Overture hash
+cohort is queried.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1192,6 +1215,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P33 production source probe: **EXACT 16-PARTITION MOTORBIKES READ-ONLY PROBE ACTIVE**
 - P34 R2 collision probe: **PACKED-V2 MOTORBIKES READ-ONLY COLLISION AUDIT ACTIVE**
 - P35 critical-deficit rescue: **LAYERED 6×/4×/2×/1× FAIR SLOT REALLOCATION ACTIVE**
+- P36 partition yield routing: **PERSISTED CATEGORY+METRO+PARTITION LEARNING ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
