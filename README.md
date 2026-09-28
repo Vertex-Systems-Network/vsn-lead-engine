@@ -1561,6 +1561,53 @@ The file is owned by the VSN Google user and shared to the service account as
 writer, so existing-file readiness can proceed while user OAuth is configured
 for future autonomous creation.
 
+### P65 OAuth onboarding and Drive creation certification
+
+P64 added an OAuth-first runtime path, but a refresh-token credential still has
+to be provisioned once by the VSN Google user. P65 makes that onboarding and
+future creation verification repository-native.
+
+#### Local OAuth onboarding
+
+Create a Google Cloud **Desktop application** OAuth client with Drive + Sheets
+access, download its client JSON, then run:
+
+```bash
+python scripts/google_oauth_onboard.py client_secret.json
+```
+
+The helper uses a localhost callback, PKCE, offline access and explicit consent.
+It writes the resulting authorized-user credential to
+`.google-oauth-user.json` with private file permissions where supported. It
+does **not** print the refresh token or client secret.
+
+Both `.google-oauth-user.json` and `client_secret*.json` are git-ignored.
+
+After local authorization, add the complete generated JSON to the repository
+secret `GOOGLE_OAUTH_USER_JSON`.
+
+#### Production capability certification
+
+P65 adds:
+
+```bash
+python -m vsn_lead_engine.cli google-drive-capability --next-day --probe-create
+```
+
+and a manual **Google Drive Capability** GitHub Actions workflow. The probe
+creates a temporary Google Sheet in the configured lead folder and immediately
+moves it to trash. A successful probe proves the active credentials can create
+new files in the actual production location.
+
+Normal readiness does not perform the destructive-safe probe on every run.
+Instead, when a dated workbook is missing it first inspects target-folder
+capability. A service-account + My Drive ownership blocker is now classified as
+permanent and fails after **one attempt** rather than waiting through three
+60-second retries. Shared-drive/service-account and user-OAuth paths remain
+eligible for creation.
+
+Runtime version is **0.61.0**.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1911,6 +1958,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P62 next-day readiness: **20:50 PKT TOMORROW PREFLIGHT + 07:50 PKT SAME-DAY RECOVERY ACTIVE**
 - P63 readiness deployment catch-up: **MAIN READINESS CHANGES IMMEDIATELY PREFLIGHT TOMORROW**
 - P64 My Drive ownership auth: **USER OAUTH PREFERRED + SERVICE-ACCOUNT FALLBACK + AUTH-MODE TELEMETRY**
+- P65 OAuth autonomy tooling: **LOCAL PKCE ONBOARDING + FAIL-FAST OWNERSHIP CHECK + CREATE/TRASH CERTIFICATION**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
