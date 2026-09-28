@@ -9,6 +9,8 @@ from vsn_lead_engine.sheets import (
     extract_spreadsheet_id,
     pending_recovery_status,
     registry_status_blocks_dedupe,
+    overview_schema_is_current,
+    category_tabs_are_blank,
 )
 
 
@@ -134,3 +136,155 @@ def test_daily_overview_seed_contains_quality_metrics():
     assert "Website-Only Candidates" in names
     assert "Enrichment Candidates" in names
     assert "Last Acceptance Rate %" in names
+
+
+def test_overview_schema_current_requires_sentinel_and_matching_tracking_date():
+    assert overview_schema_is_current(
+        [
+            ["VSN Lead Engine — Daily US + Canada Workbook",""],
+            ["Metric","Value"],
+            ["Tracking Date","2026-09-28"],
+        ],
+        "2026-09-28",
+    )
+    assert not overview_schema_is_current(
+        [
+            ["Metric","Value"],
+            ["Date","2026-09-28"],
+        ],
+        "2026-09-28",
+    )
+    assert not overview_schema_is_current(
+        [
+            ["VSN Lead Engine — Daily US + Canada Workbook",""],
+            ["Metric","Value"],
+            ["Tracking Date","2026-09-27"],
+        ],
+        "2026-09-28",
+    )
+
+
+def test_category_tabs_are_blank_only_when_all_value_ranges_have_no_data():
+    assert category_tabs_are_blank([
+        {"values":[]},
+        {"values":[[]]},
+    ])
+    assert not category_tabs_are_blank([
+        {"values":[]},
+        {"values":[["2026-09-28"]]},
+    ])
+
+
+class _ExecResult:
+    def __init__(self,payload):
+        self.payload=payload
+
+    def execute(self,**_kwargs):
+        return self.payload
+
+
+class _BootstrapValues:
+    def __init__(self,overview,value_ranges):
+        self.overview=overview
+        self.value_ranges=value_ranges
+        self.batch_get_calls=0
+        self.clear_ranges=[]
+        self.update_ranges=[]
+
+    def get(self,**_kwargs):
+        return _ExecResult({"values":self.overview})
+
+    def batchGet(self,**_kwargs):
+        self.batch_get_calls+=1
+        return _ExecResult({"valueRanges":self.value_ranges})
+
+    def clear(self,**kwargs):
+        self.clear_ranges.append(kwargs.get("range"))
+        return _ExecResult({})
+
+    def update(self,**kwargs):
+        self.update_ranges.append(kwargs.get("range"))
+        return _ExecResult({})
+
+
+class _BootstrapSpreadsheets:
+    def __init__(self,values):
+        self._values=values
+
+    def values(self):
+        return self._values
+
+
+class _BootstrapSheetsService:
+    def __init__(self,values):
+        self._spreadsheets=_BootstrapSpreadsheets(values)
+
+    def spreadsheets(self):
+        return self._spreadsheets
+
+
+def _bootstrap_store(overview,value_ranges):
+    store=object.__new__(GoogleSheetsStore)
+    store.run_date="2026-09-28"
+    store.api_retries=0
+    store.config={
+        "runtime":{
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+        },
+        "categories":["A","B"],
+    }
+    values=_BootstrapValues(overview,value_ranges)
+    store.sheets=_BootstrapSheetsService(values)
+    return store,values
+
+
+def test_precreated_blank_stale_workbook_requires_full_bootstrap():
+    store,values=_bootstrap_store(
+        [["Metric","Value"],["Date","2026-09-26"]],
+        [{"values":[]},{"values":[]}],
+    )
+    assert store._precreated_workbook_state("sheet123")=="blank-stale"
+    assert values.batch_get_calls==1
+
+
+def test_precreated_populated_stale_workbook_uses_overview_only_upgrade():
+    store,values=_bootstrap_store(
+        [["Metric","Value"],["Date","2026-09-26"]],
+        [{"values":[["2026-09-28"]]},{"values":[]}],
+    )
+    assert store._precreated_workbook_state("sheet123")=="populated-stale"
+    assert values.batch_get_calls==1
+
+
+def test_current_schema_skips_category_scan():
+    store,values=_bootstrap_store(
+        [
+            ["VSN Lead Engine — Daily US + Canada Workbook",""],
+            ["Metric","Value"],
+            ["Tracking Date","2026-09-28"],
+        ],
+        [{"values":[["should-not-be-read"]]}],
+    )
+    assert store._precreated_workbook_state("sheet123")=="current"
+    assert values.batch_get_calls==0
+
+
+def test_populated_overview_upgrade_never_clears_category_ranges():
+    store,values=_bootstrap_store(
+        [
+            ["Metric","Value"],
+            ["Duplicate Rejections",12],
+            ["Source Phone Candidates",34],
+        ],
+        [{"values":[["2026-09-28"]]},{"values":[]}],
+    )
+    captured={}
+    store.set_overview_metrics=lambda _sid,preserved: captured.update(preserved)
+
+    store._upgrade_overview_only("sheet123")
+
+    assert values.clear_ranges==["'Overview'!A:B"]
+    assert values.update_ranges==["'Overview'!A1"]
+    assert captured["Duplicate Rejections"]==12
+    assert captured["Source Phone Candidates"]==34

@@ -623,6 +623,34 @@ Implementation:
 This protects unexplored source cohorts without adding source calls, shard
 attempts, paid APIs, per-lead state writes or a second daily state object.
 
+### P26 user-owned daily workbook bootstrap
+
+My Drive ownership is handled outside the service-account write path. A
+user-owned precreator ensures the exact dated workbook exists before the GitHub
+lead engine needs it.
+
+Operational contract:
+
+- the external precreator runs at **07:40 Asia/Karachi**;
+- it copies the configured clean native Google Sheets template into the lead
+  folder only when the exact dated title is missing;
+- duplicate dated workbooks are never intentionally created;
+- GitHub/service-account production keeps using the existing workbook once it
+  exists;
+- when a copied user-owned workbook is still blank and its Overview does not
+  use the current engine schema, the engine safely initializes it in place;
+- blank bootstrap refreshes category headers, clears stale template lead rows,
+  writes the current Overview schema and enforces the configured spreadsheet
+  timezone;
+- an already-populated dated workbook never has category lead rows reset or
+  wiped merely because its Overview is old; only the generated Overview schema
+  is rebuilt, with matching operational counters preserved when available;
+- the behavior can be disabled with
+  `runtime.precreated_workbook_bootstrap_enabled=false`.
+
+This closes the My Drive service-account ownership gap without moving the
+production ledger, weakening R2 dedupe, or requiring a paid Drive tier.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -934,6 +962,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P23 Overture contact stratification: **80% PHONE-FIRST + 20% WEBSITE EXPLORATION RESERVE ACTIVE**
 - P24 contact-mix observability: **SOURCE-PHONE + WEBSITE-ONLY FUNNEL TELEMETRY ACTIVE**
 - P25 partition-aware cooldown: **4-DISTINCT-PARTITION FLOOR ACTIVE**
+- P26 user-owned workbook bootstrap: **07:40 PRECREATE + SAFE BLANK INIT ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

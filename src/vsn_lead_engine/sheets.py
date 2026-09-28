@@ -57,6 +57,8 @@ OVERVIEW_LATEST_METRICS = [
     "Last Partitions Visited",
 ]
 
+OVERVIEW_SENTINEL = "VSN Lead Engine — Daily US + Canada Workbook"
+
 
 def count_current_rows(date_rows, status_rows, today: str) -> int:
     """Count today's usable leads, excluding rows quarantined for review."""
@@ -108,6 +110,30 @@ def escape_drive_query_value(value: str) -> str:
 def extract_spreadsheet_id(value: str) -> str:
     match = re.search(r"/spreadsheets/d/([A-Za-z0-9_-]+)", str(value or ""))
     return match.group(1) if match else ""
+
+
+def overview_schema_is_current(rows: list[list], run_date: str) -> bool:
+    """Return whether a dated workbook already uses the current Overview schema."""
+    if not rows:
+        return False
+    first = str(rows[0][0]).strip() if rows[0] else ""
+    if first != OVERVIEW_SENTINEL:
+        return False
+    tracking = ""
+    for row in rows[:10]:
+        if row and str(row[0]).strip() == "Tracking Date":
+            tracking = str(row[1]).strip() if len(row) > 1 else ""
+            break
+    return tracking == str(run_date).strip()
+
+
+def category_tabs_are_blank(value_ranges: list[dict]) -> bool:
+    """Treat a precreated template as blank only when every category has no data rows."""
+    for item in value_ranges or []:
+        values = item.get("values", []) or []
+        if any(any(str(cell).strip() for cell in row) for row in values):
+            return False
+    return True
 
 
 def pending_recovery_status(unique_key: str, present_keys: set[str]) -> str:
@@ -190,6 +216,36 @@ class GoogleSheetsStore:
         self._initialize_new_daily_workbook(created["id"])
         return created
 
+    def _ensure_spreadsheet_timezone(
+        self,
+        spreadsheet_id: str,
+        metadata: dict | None = None,
+    ):
+        metadata = metadata or self.sheets.spreadsheets().get(
+            spreadsheetId=spreadsheet_id,
+            fields="properties(timeZone)",
+        ).execute(num_retries=self.api_retries)
+        desired_timezone=str(
+            self.config["runtime"].get("timezone","Asia/Karachi")
+        ).strip()
+        current_timezone=str(
+            metadata.get("properties",{}).get("timeZone","")
+        ).strip()
+        if desired_timezone and current_timezone != desired_timezone:
+            self.sheets.spreadsheets().batchUpdate(
+                spreadsheetId=spreadsheet_id,
+                body={
+                    "requests":[
+                        {
+                            "updateSpreadsheetProperties":{
+                                "properties":{"timeZone":desired_timezone},
+                                "fields":"timeZone",
+                            }
+                        }
+                    ]
+                },
+            ).execute(num_retries=self.api_retries)
+
     def _initialize_new_daily_workbook(self, spreadsheet_id: str):
         date_value = self._today()
         metadata = self.sheets.spreadsheets().get(
@@ -197,6 +253,7 @@ class GoogleSheetsStore:
             fields="properties(title,timeZone),sheets.properties",
         ).execute(num_retries=self.api_retries)
         self._ensure_tabs(spreadsheet_id, metadata)
+        self._ensure_spreadsheet_timezone(spreadsheet_id, metadata)
 
         # A copied template must start clean. Preserve header rows and tab
         # formatting while removing any old lead rows.
@@ -225,14 +282,74 @@ class GoogleSheetsStore:
             body={"values": self._overview_seed(date_value)},
         ).execute(num_retries=self.api_retries)
 
+    def _precreated_workbook_state(self, spreadsheet_id: str) -> str:
+        overview = self.sheets.spreadsheets().values().get(
+            spreadsheetId=spreadsheet_id,
+            range="'Overview'!A1:B10",
+        ).execute(num_retries=self.api_retries).get("values",[])
+        if overview_schema_is_current(overview,self._today()):
+            return "current"
+
+        response=self.sheets.spreadsheets().values().batchGet(
+            spreadsheetId=spreadsheet_id,
+            ranges=[
+                f"'{category}'!A2:AC"
+                for category in self.config["categories"]
+            ],
+            valueRenderOption="UNFORMATTED_VALUE",
+        ).execute(num_retries=self.api_retries)
+        return (
+            "blank-stale"
+            if category_tabs_are_blank(response.get("valueRanges",[]))
+            else "populated-stale"
+        )
+
+    def _upgrade_overview_only(self, spreadsheet_id: str):
+        """Upgrade stale Overview without touching populated category rows."""
+        existing=self.sheets.spreadsheets().values().get(
+            spreadsheetId=spreadsheet_id,
+            range="'Overview'!A1:B100",
+        ).execute(num_retries=self.api_retries).get("values",[])
+        preserve_names=set(OVERVIEW_INCREMENT_METRICS) | set(
+            OVERVIEW_LATEST_METRICS
+        ) | {
+            "United States Leads Today",
+            "Canada Leads Today",
+        }
+        preserved={
+            str(row[0]).strip():row[1]
+            for row in existing
+            if (
+                row
+                and len(row)>1
+                and str(row[0]).strip() in preserve_names
+            )
+        }
+
+        self.sheets.spreadsheets().values().clear(
+            spreadsheetId=spreadsheet_id,
+            range="'Overview'!A:B",
+            body={},
+        ).execute(num_retries=self.api_retries)
+        self.sheets.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id,
+            range="'Overview'!A1",
+            valueInputOption="USER_ENTERED",
+            body={"values":self._overview_seed(self._today())},
+        ).execute(num_retries=self.api_retries)
+        if preserved:
+            self.set_overview_metrics(spreadsheet_id,preserved)
+
     def ensure_lead_workbook(self):
         date_value = self._today()
         title = self._daily_title(date_value)
         file = self._find_daily_workbook(title)
         created = False
+        initialized = False
         if file is None:
             file = self._create_daily_workbook(title)
             created = True
+            initialized = True
 
         sid = file["id"]
         metadata = self.sheets.spreadsheets().get(
@@ -240,6 +357,30 @@ class GoogleSheetsStore:
             fields="properties(title,timeZone),sheets.properties",
         ).execute(num_retries=self.api_retries)
         self._ensure_tabs(sid, metadata)
+
+        bootstrap_precreated=bool(
+            self.config["runtime"].get(
+                "precreated_workbook_bootstrap_enabled",
+                True,
+            )
+        )
+        if not created and bootstrap_precreated:
+            precreated_state=self._precreated_workbook_state(sid)
+            if precreated_state=="blank-stale":
+                self._initialize_new_daily_workbook(sid)
+                initialized = True
+            elif precreated_state=="populated-stale":
+                self._upgrade_overview_only(sid)
+                self._ensure_spreadsheet_timezone(sid,metadata)
+                initialized = True
+
+            if initialized:
+                metadata = self.sheets.spreadsheets().get(
+                    spreadsheetId=sid,
+                    fields="properties(title,timeZone),sheets.properties",
+                ).execute(num_retries=self.api_retries)
+
+        self._ensure_spreadsheet_timezone(sid,metadata)
         self._ensure_overview_metrics(sid)
         self._refresh_overview_formulas(sid, date_value)
         self.set_overview_metrics(
@@ -259,6 +400,7 @@ class GoogleSheetsStore:
             ),
             "date": date_value,
             "created": created,
+            "initialized": initialized,
         }
 
     def _overview_seed(self, date_value: str | None = None):
@@ -266,7 +408,7 @@ class GoogleSheetsStore:
         categories = self.config["categories"]
         target = int(self.config["runtime"]["daily_target_per_category"])
         rows = [
-            ["VSN Lead Engine — Daily US + Canada Workbook",""],
+            [OVERVIEW_SENTINEL,""],
             ["Metric","Value"],
             ["Tracking Date",date_value],
             ["Countries","United States + Canada"],
@@ -380,7 +522,7 @@ class GoogleSheetsStore:
         categories = self.config["categories"]
         target = int(self.config["runtime"]["daily_target_per_category"])
         data = [
-            {"range":"'Overview'!A1","values":[["VSN Lead Engine — Daily US + Canada Workbook"]]},
+            {"range":"'Overview'!A1","values":[[OVERVIEW_SENTINEL]]},
             {"range":"'Overview'!B3","values":[[date_value]]},
         ]
         actual_start = 7
