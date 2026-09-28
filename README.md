@@ -1197,6 +1197,24 @@ existing balanced sequence. The feature is runtime-configurable and does not
 change per-cycle shard limits, event time, providers, Google writes or R2
 dedupe semantics.
 
+### P49 combined daily state snapshot
+
+P47 tail mode can run up to eight cycles in one process. Each production cycle
+previously read live category totals and live country totals with two separate
+Google Sheets `batchGet` requests at cycle start and again after commit.
+
+P49 adds `daily_state_snapshot()`, which reads each category's date+country
+columns and review status once and derives both views from the same response.
+The engine now uses one snapshot for workbook readiness, one at cycle start,
+and one after commit.
+
+Existing `category_counts()` and `daily_country_counts()` methods remain
+available for backward compatibility. Lead writes, R2 dedupe, quota logic and
+the Google workbook schema are unchanged.
+
+For tail events this removes one full Sheets state request at every state-read
+boundary, reducing free API pressure and latency without relaxing freshness.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
