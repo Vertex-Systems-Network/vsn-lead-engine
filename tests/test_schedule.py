@@ -183,3 +183,25 @@ def test_readiness_target_rejects_non_iso_basic_format():
             now=datetime(2026,9,28,12,0,tzinfo=timezone.utc),
             explicit_date="20260929",
         )
+
+
+def test_daily_readiness_workflow_has_main_deployment_catchup_scope():
+    workflow=Path(".github/workflows/daily-workbook-readiness.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "push:" in workflow
+    assert "branches: [main]" in workflow
+    for path in [
+        ".github/workflows/daily-workbook-readiness.yml",
+        "src/vsn_lead_engine/cli.py",
+        "src/vsn_lead_engine/schedule.py",
+        "src/vsn_lead_engine/health.py",
+        "src/vsn_lead_engine/engine.py",
+        "src/vsn_lead_engine/sheets.py",
+    ]:
+        assert f'- "{path}"' in workflow
+
+    assert 'if [[ "$EVENT_NAME" == "push" ]]; then' in workflow
+    assert 'target="next-day"' in workflow
+    assert "README.md" not in workflow

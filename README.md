@@ -1509,6 +1509,27 @@ the existing `prestart` origin.
 This path still performs no lead discovery, no R2 dedupe mutation, no quota
 lead writes, and no source/enrichment work.
 
+### P63 deployment catch-up next-day readiness
+
+P62 added a 20:50 PKT next-day preflight, but its first production deployment
+landed after that day's scheduled slot. That exposed a deployment-timing gap:
+new readiness logic could be correct and CI-green while tomorrow's workbook
+still remained unprepared until the next scheduled readiness run.
+
+P63 adds a bounded **main-push catch-up trigger** to the Daily Workbook
+Readiness workflow. It runs only when readiness-related production files change:
+
+- `.github/workflows/daily-workbook-readiness.yml`;
+- readiness CLI/schedule/health/engine/Sheets modules.
+
+A qualifying main deployment always targets **next-day** readiness. Unrelated
+README/docs-only pushes do not trigger the workflow.
+
+The catch-up uses the same bounded readiness repair path introduced by P62:
+no lead discovery, no source/enrichment work, no quota lead writes, and no R2
+dedupe mutation. It exists only to ensure a readiness deployment cannot miss
+the evening preflight window.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1857,6 +1878,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P60 lock regeneration: **PINNED RESOLVER + PR DRIFT CHECK + MANUAL BRANCH-ONLY REGENERATION ACTIVE**
 - P61 dependency-update certification: **PHONENUMBERS 9 + PYTEST 9 PASSED CANONICAL HASH REGENERATION AND FULL CI**
 - P62 next-day readiness: **20:50 PKT TOMORROW PREFLIGHT + 07:50 PKT SAME-DAY RECOVERY ACTIVE**
+- P63 readiness deployment catch-up: **MAIN READINESS CHANGES IMMEDIATELY PREFLIGHT TOMORROW**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

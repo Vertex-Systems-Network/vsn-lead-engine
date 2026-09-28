@@ -1,6 +1,15 @@
 name: Daily Workbook Readiness
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/daily-workbook-readiness.yml"
+      - "src/vsn_lead_engine/cli.py"
+      - "src/vsn_lead_engine/schedule.py"
+      - "src/vsn_lead_engine/health.py"
+      - "src/vsn_lead_engine/engine.py"
+      - "src/vsn_lead_engine/sheets.py"
   workflow_dispatch:
     inputs:
       target_day:
@@ -52,7 +61,9 @@ jobs:
         run: |
           set -euo pipefail
           target="today"
-          if [[ "$EVENT_NAME" == "schedule" && "$SCHEDULE_EXPR" == "50 15 * * *" ]]; then
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            target="next-day"
+          elif [[ "$EVENT_NAME" == "schedule" && "$SCHEDULE_EXPR" == "50 15 * * *" ]]; then
             target="next-day"
           elif [[ "$EVENT_NAME" == "workflow_dispatch" && "$MANUAL_TARGET" == "next-day" ]]; then
             target="next-day"
