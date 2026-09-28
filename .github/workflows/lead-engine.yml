@@ -44,6 +44,26 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: python -m pip install -e ".[dev]"
+      - name: Resolve dependency lock candidate
+        shell: bash
+        run: |
+          python -m pip install --dry-run --ignore-installed --report dependency-report.json -e ".[dev]"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data=json.loads(Path("dependency-report.json").read_text(encoding="utf-8"))
+          rows=[]
+          for item in data.get("install",[]):
+              metadata=item.get("metadata") or {}
+              name=str(metadata.get("name") or "").strip()
+              version=str(metadata.get("version") or "").strip()
+              if not name or not version or name.lower()=="vsn-lead-engine":
+                  continue
+              rows.append((name.lower().replace("_","-"),version))
+          for name,version in sorted(set(rows)):
+              print(f"LOCK_CANDIDATE {name}=={version}")
+          PY
       - run: python -m vsn_lead_engine.cli validate
       - run: pytest -q
 
