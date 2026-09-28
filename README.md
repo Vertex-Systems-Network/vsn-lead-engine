@@ -1273,6 +1273,22 @@ telemetry recorded **236** source-search events with
 A proposed 2.0x follow-up widening was intentionally not promoted because P52
 closed the quota with the smaller bounded horizon.
 
+### P54 Node 24 workflow runtime modernization
+
+GitHub Actions production logs on 2026-09-28 emitted deprecation warnings
+because the repository still referenced `actions/checkout@v4` and
+`actions/setup-python@v5`, both Node 20-era action majors.
+
+P54 upgrades all nine repository workflows to `actions/checkout@v7` and
+`actions/setup-python@v7`. Their current upstream action metadata uses
+`node24`, matching the GitHub-hosted runner runtime instead of relying on
+GitHub's compatibility override.
+
+A repository regression test now asserts that every managed workflow stays on
+the Node 24 action majors and rejects the previous v4/v5 pair. Workflow
+triggers, permissions, schedules, secrets, Python version, commands and quota
+logic are otherwise unchanged.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1611,6 +1627,8 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P50 runtime identity consistency: **PACKAGE-VERSIONED OUTBOUND IDENTITY ACTIVE**
 - P51 single-source release version: **SETUPTOOLS METADATA DERIVED FROM RUNTIME VERSION ACTIVE**
 - P52 tail geography retention: **PRODUCTION CERTIFIED — 12,000/12,000 DAILY QUOTA CLOSED WITH 1.5× TAIL COVERAGE**
+- P53 progressive tail geography: **EVALUATED / NOT PROMOTED — P52 CLOSED QUOTA WITHOUT 2.0× EXPANSION**
+- P54 workflow runtime modernization: **NODE 24 FIRST-PARTY ACTION MAJORS v7 ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
