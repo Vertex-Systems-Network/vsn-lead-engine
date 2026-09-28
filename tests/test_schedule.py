@@ -130,7 +130,11 @@ def test_recovery_supervisor_dispatches_only_bounded_shortfall_runs():
     assert "seconds_until_midnight" in supervisor
     assert "block_reason" in supervisor
     assert "run_origin:" in lead_workflow
-    assert "VSN_RUN_ORIGIN: ${{ inputs.run_origin }}" in lead_workflow
+    assert "VSN_RUN_ORIGIN: recovery-supervisor" in lead_workflow
+    assert "Recovery-supervisor real run" in lead_workflow
+    assert "python -m vsn_lead_engine.cli supervised-run --scheduled" in lead_workflow
+    assert "Manual operator real run" in lead_workflow
+    assert "VSN_RUN_ORIGIN: manual" in lead_workflow
 
 
 def test_readiness_target_defaults_to_local_today():
@@ -241,3 +245,20 @@ def test_daily_readiness_workflow_has_main_deployment_catchup_scope():
     assert 'if [[ "$EVENT_NAME" == "push" ]]; then' in workflow
     assert 'target="next-day"' in workflow
     assert "README.md" not in workflow
+
+
+def test_scheduled_window_threshold_is_exactly_watchdog_safe():
+    allowed=scheduled_run_window(
+        config(),
+        now=datetime(2026,9,28,18,32,40,tzinfo=timezone.utc),
+    )
+    blocked=scheduled_run_window(
+        config(),
+        now=datetime(2026,9,28,18,32,41,tzinfo=timezone.utc),
+    )
+
+    assert allowed["seconds_until_midnight"]==1640.0
+    assert allowed["allowed"] is True
+    assert blocked["seconds_until_midnight"]==1639.0
+    assert blocked["allowed"] is False
+    assert blocked["block_reason"]=="insufficient-midnight-runway"
