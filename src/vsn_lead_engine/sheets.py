@@ -300,15 +300,20 @@ class GoogleSheetsStore:
             initialized = True
 
         sid = file["id"]
-        if not created and self._should_initialize_precreated_workbook(sid):
-            self._initialize_new_daily_workbook(sid)
-            initialized = True
-
         metadata = self.sheets.spreadsheets().get(
             spreadsheetId=sid,
             fields="properties(title,timeZone),sheets.properties",
         ).execute(num_retries=self.api_retries)
         self._ensure_tabs(sid, metadata)
+
+        if not created and self._should_initialize_precreated_workbook(sid):
+            self._initialize_new_daily_workbook(sid)
+            initialized = True
+            metadata = self.sheets.spreadsheets().get(
+                spreadsheetId=sid,
+                fields="properties(title,timeZone),sheets.properties",
+            ).execute(num_retries=self.api_retries)
+
         self._ensure_overview_metrics(sid)
         self._refresh_overview_formulas(sid, date_value)
         self.set_overview_metrics(
