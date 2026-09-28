@@ -94,6 +94,27 @@ def run_health_event(
         event["schedule_delay_minutes"]=max(
             0,int(schedule.get("start_delay_minutes",0) or 0)
         )
+        event["schedule_status"]=_clean_text(schedule.get("status",""),80)
+        event["schedule_block_reason"]=_clean_text(
+            schedule.get("block_reason",""),100
+        )
+        event["schedule_midnight_safe"]=bool(
+            schedule.get("midnight_safe",False)
+        )
+        event["schedule_within_hours"]=bool(
+            schedule.get("within_hours",False)
+        )
+        for field in (
+            "seconds_until_midnight",
+            "required_runway_seconds",
+            "safety_seconds",
+        ):
+            try:
+                event[f"schedule_{field}"]=max(
+                    0.0,float(schedule.get(field,0) or 0)
+                )
+            except (TypeError,ValueError):
+                event[f"schedule_{field}"]=0.0
     adaptive=result.get("adaptive_yield") or {}
     if isinstance(adaptive,dict):
         event["adaptive_partitions_observed"]=max(
@@ -148,6 +169,46 @@ def run_health_event(
         event["registry_pending_cache_misses"]=max(
             0,int(cache.get("pending_misses",0) or 0)
         )
+    return event
+
+
+def schedule_gate_health_event(
+    gate: dict,
+    *,
+    origin: str,
+    timestamp: str | None = None,
+) -> dict:
+    """Build one PII-free schedule gate decision event."""
+    allowed=bool(gate.get("allowed",False))
+    event={
+        "event_id":health_event_id("schedule-gate",origin),
+        "timestamp":timestamp or datetime.now(timezone.utc).isoformat(),
+        "kind":"schedule-gate",
+        "origin":_clean_text(origin,60),
+        "status":"allowed" if allowed else "blocked",
+        "schedule_status":_clean_text(gate.get("status",""),80),
+        "schedule_slot":_clean_text(gate.get("slot",""),80),
+        "schedule_delay_minutes":max(
+            0,int(gate.get("start_delay_minutes",0) or 0)
+        ),
+        "schedule_block_reason":_clean_text(
+            gate.get("block_reason",""),100
+        ),
+        "schedule_midnight_safe":bool(gate.get("midnight_safe",False)),
+        "schedule_within_hours":bool(gate.get("within_hours",False)),
+        "quota_complete":False,
+    }
+    for field in (
+        "seconds_until_midnight",
+        "required_runway_seconds",
+        "safety_seconds",
+    ):
+        try:
+            event[f"schedule_{field}"]=max(
+                0.0,float(gate.get(field,0) or 0)
+            )
+        except (TypeError,ValueError):
+            event[f"schedule_{field}"]=0.0
     return event
 
 
@@ -328,6 +389,10 @@ class DailyHealthLedgerStore:
             "adaptive_cooldown_routes_deferred","adaptive_partitions_observed",
             "quota_complete",
             "schedule_slot","schedule_delay_minutes",
+            "schedule_status","schedule_block_reason",
+            "schedule_midnight_safe","schedule_within_hours",
+            "schedule_seconds_until_midnight",
+            "schedule_required_runway_seconds","schedule_safety_seconds",
             "adaptive_state_loaded","adaptive_state_saved",
             "adaptive_state_load_error","adaptive_state_save_error",
             "adaptive_history_loaded","adaptive_history_saved",
@@ -368,21 +433,55 @@ class DailyHealthLedgerStore:
 
     @staticmethod
     def _summary(events: list[dict]) -> dict:
+        def executed_run(item: dict) -> bool:
+            return (
+                item.get("kind")=="run"
+                and item.get("status")!="scheduled-window-skipped"
+            )
+
         native=sum(
             1 for item in events
-            if item.get("kind")=="run" and item.get("origin")=="native-schedule"
+            if executed_run(item) and item.get("origin")=="native-schedule"
         )
-        recovery=sum(
+        recovery_push=sum(
             1 for item in events
-            if item.get("kind")=="run" and item.get("origin")=="recovery-push"
+            if executed_run(item) and item.get("origin")=="recovery-push"
         )
+        recovery_supervisor=sum(
+            1 for item in events
+            if executed_run(item)
+            and item.get("origin")=="recovery-supervisor"
+        )
+        recovery=recovery_push+recovery_supervisor
         manual=sum(
             1 for item in events
-            if item.get("kind")=="run" and item.get("origin")=="manual"
+            if executed_run(item) and item.get("origin")=="manual"
         )
         incidents=sum(
             1 for item in events
-            if item.get("kind")=="incident" or item.get("status") in {"incident","failed"}
+            if item.get("kind")=="incident"
+            or item.get("status") in {"incident","failed"}
+        )
+        schedule_blocks=sum(
+            1 for item in events
+            if (
+                item.get("kind")=="schedule-gate"
+                and item.get("status")=="blocked"
+            )
+            or item.get("status")=="scheduled-window-skipped"
+        )
+        midnight_guard_blocks=sum(
+            1 for item in events
+            if item.get("schedule_block_reason")
+            =="insufficient-midnight-runway"
+        )
+        latest_schedule_block_reason=next(
+            (
+                _clean_text(item.get("schedule_block_reason",""),100)
+                for item in reversed(events)
+                if item.get("schedule_block_reason")
+            ),
+            "",
         )
         quota_completed_at=""
         for item in events:
@@ -401,8 +500,13 @@ class DailyHealthLedgerStore:
             "event_count":len(events),
             "native_runs":native,
             "recovery_runs":recovery,
+            "recovery_push_runs":recovery_push,
+            "recovery_supervisor_runs":recovery_supervisor,
             "manual_runs":manual,
             "incidents":incidents,
+            "schedule_blocks":schedule_blocks,
+            "midnight_guard_blocks":midnight_guard_blocks,
+            "latest_schedule_block_reason":latest_schedule_block_reason,
             "latest_readiness":latest_readiness,
             "quota_completed_at":quota_completed_at,
             "last_event_at":(

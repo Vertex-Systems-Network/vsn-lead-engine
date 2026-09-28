@@ -3,22 +3,22 @@
   "project": {
     "name": "VSN Lead Engine",
     "repository": "Vertex-Systems-Network/vsn-lead-engine",
-    "product_version": "0.63.0"
+    "product_version": "0.64.0"
   },
   "execution": {
     "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
-    "active_task": "P67-MIDNIGHT-SAFE-RECOVERY",
-    "last_completed_task": "P66-STRICT-OAUTH-CERTIFICATION",
-    "next_task": "P68-NEXT-EVIDENCE-BASED-MILESTONE"
+    "active_task": "P68-HEALTH-GATE-TELEMETRY",
+    "last_completed_task": "P67-MIDNIGHT-SAFE-RECOVERY",
+    "next_task": "P69-NEXT-EVIDENCE-BASED-MILESTONE"
   },
-  "observed_main_sha": "f769cb5b8f27923ba2a872174c852a46fedfc4bc",
+  "observed_main_sha": "2348f0f1144010182da40dd44ba28ed9173f7f9a",
   "active_issue": null,
-  "active_pr": 114,
-  "active_branch": "feat/p67-midnight-runway-guard",
-  "current_milestone": "P67-MIDNIGHT-SAFE-RECOVERY",
+  "active_pr": 115,
+  "active_branch": "feat/p68-health-gate-telemetry",
+  "current_milestone": "P68-HEALTH-GATE-TELEMETRY",
   "milestone_status": "VERIFYING",
-  "last_completed_milestone": "P66 made autonomous My Drive certification strictly user-OAuth-only; PR #113 exact-head CI #220 passed 280 tests and merged. Merge-push readiness run #5 stayed green for 2026-09-29 in one attempt.",
+  "last_completed_milestone": "P67 added a dynamic midnight runway guard shared by native schedule and recovery supervisor, plus execution-start rechecks; PR #114 exact-head CI #223 passed 286 tests and merged. Merge-push readiness run #6 stayed green for 2026-09-29.",
   "production": {
     "last_certified_date": "2026-09-28",
     "daily_target": 12000,
@@ -29,9 +29,9 @@
     "production_run": 162
   },
   "quality": {
-    "latest_required_ci_run": 220,
+    "latest_required_ci_run": 223,
     "latest_required_ci_result": "success",
-    "pytest": "280 passed",
+    "pytest": "286 passed",
     "node20_deprecation_warning": false
   },
   "blockers": [
@@ -42,5 +42,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Verify PR #114 exact-head Lead Engine CI. Confirm midnight runway threshold, shared recovery-supervisor gate, execution-start recheck, recovery origin preservation, runtime version 0.63.0 and the full suite; squash-merge only when green."
+  "exact_next_safe_action": "Verify PR #115 exact-head Lead Engine CI. Confirm combined/per-origin recovery counters, blocked-skip exclusion, schedule runway persistence, blocked supervisor gate R2 telemetry, runtime version 0.64.0 and the complete suite; squash-merge only when green."
 }

@@ -7,6 +7,7 @@ from vsn_lead_engine.health import (
     DailyHealthLedgerStore,
     readiness_health_event,
     run_health_event,
+    schedule_gate_health_event,
 )
 
 
@@ -342,3 +343,158 @@ def test_health_ledger_persists_readiness_target_kind():
     loaded=store.load("2026-09-29")
     assert loaded["events"][0]["target_kind"]=="next-day"
     assert loaded["events"][0]["origin"]=="prestart-next-day"
+
+
+def test_health_summary_counts_both_recovery_origins():
+    registry=FakeRegistry()
+    store=DailyHealthLedgerStore(registry)
+    for event_id,origin in [
+        ("recovery-push:1","recovery-push"),
+        ("recovery-supervisor:1","recovery-supervisor"),
+        ("manual:1","manual"),
+    ]:
+        store.append(
+            "2026-09-28",
+            {
+                "event_id":event_id,
+                "timestamp":"2026-09-28T10:00:00+05:00",
+                "kind":"run",
+                "origin":origin,
+                "status":"ok",
+                "quota_complete":False,
+            },
+        )
+
+    summary=store.load("2026-09-28")["summary"]
+    assert summary["recovery_runs"]==2
+    assert summary["recovery_push_runs"]==1
+    assert summary["recovery_supervisor_runs"]==1
+    assert summary["manual_runs"]==1
+
+
+def test_run_health_event_persists_midnight_schedule_metrics():
+    event=run_health_event(
+        {
+            "status":"scheduled-window-skipped",
+            "counts":{},
+            "schedule":{
+                "status":"scheduled-window-midnight-guard",
+                "slot":"2026-09-28T23:00",
+                "start_delay_minutes":40,
+                "block_reason":"insufficient-midnight-runway",
+                "midnight_safe":False,
+                "within_hours":True,
+                "seconds_until_midnight":1200.0,
+                "required_runway_seconds":1640.0,
+                "safety_seconds":60.0,
+            },
+        },
+        origin="recovery-supervisor",
+        timestamp="2026-09-28T23:40:00+05:00",
+    )
+
+    assert event["schedule_status"]=="scheduled-window-midnight-guard"
+    assert event["schedule_block_reason"]=="insufficient-midnight-runway"
+    assert event["schedule_midnight_safe"] is False
+    assert event["schedule_within_hours"] is True
+    assert event["schedule_seconds_until_midnight"]==1200.0
+    assert event["schedule_required_runway_seconds"]==1640.0
+    assert event["schedule_safety_seconds"]==60.0
+
+    registry=FakeRegistry()
+    store=DailyHealthLedgerStore(registry)
+    store.append("2026-09-28",event)
+    loaded=store.load("2026-09-28")
+    persisted=loaded["events"][0]
+    assert persisted["schedule_block_reason"]=="insufficient-midnight-runway"
+    assert persisted["schedule_seconds_until_midnight"]==1200.0
+    assert loaded["summary"]["schedule_blocks"]==1
+    assert loaded["summary"]["midnight_guard_blocks"]==1
+    assert loaded["summary"]["latest_schedule_block_reason"]==(
+        "insufficient-midnight-runway"
+    )
+
+
+def test_schedule_gate_health_event_records_block_without_run():
+    event=schedule_gate_health_event(
+        {
+            "allowed":False,
+            "status":"scheduled-window-midnight-guard",
+            "slot":"2026-09-28T23:00",
+            "start_delay_minutes":50,
+            "block_reason":"insufficient-midnight-runway",
+            "midnight_safe":False,
+            "within_hours":True,
+            "seconds_until_midnight":600,
+            "required_runway_seconds":1640,
+            "safety_seconds":60,
+        },
+        origin="recovery-supervisor",
+        timestamp="2026-09-28T23:50:00+05:00",
+    )
+
+    assert event["kind"]=="schedule-gate"
+    assert event["origin"]=="recovery-supervisor"
+    assert event["status"]=="blocked"
+    assert event["schedule_block_reason"]=="insufficient-midnight-runway"
+    assert event["schedule_seconds_until_midnight"]==600.0
+
+    registry=FakeRegistry()
+    store=DailyHealthLedgerStore(registry)
+    store.append("2026-09-28",event)
+    summary=store.load("2026-09-28")["summary"]
+    assert summary["recovery_runs"]==0
+    assert summary["schedule_blocks"]==1
+    assert summary["midnight_guard_blocks"]==1
+
+
+def test_recovery_supervisor_workflow_records_blocked_gate_telemetry():
+    from pathlib import Path
+
+    supervisor=Path(
+        ".github/workflows/quota-recovery-supervisor.yml"
+    ).read_text(encoding="utf-8")
+
+    assert "Record blocked recovery schedule gate" in supervisor
+    assert "health-schedule-gate" in supervisor
+    assert "--origin recovery-supervisor" in supervisor
+    assert "steps.window.outputs.allowed != 'true'" in supervisor
+    assert "R2_ACCOUNT_ID" in supervisor
+    assert "R2_ACCESS_KEY_ID" in supervisor
+    assert "R2_SECRET_ACCESS_KEY" in supervisor
+    assert "R2_BUCKET" in supervisor
+
+
+def test_schedule_skips_do_not_inflate_actual_run_counts():
+    registry=FakeRegistry()
+    store=DailyHealthLedgerStore(registry)
+    store.append(
+        "2026-09-28",
+        {
+            "event_id":"skip:1",
+            "timestamp":"2026-09-28T23:40:00+05:00",
+            "kind":"run",
+            "origin":"recovery-supervisor",
+            "status":"scheduled-window-skipped",
+            "schedule_block_reason":"insufficient-midnight-runway",
+            "quota_complete":False,
+        },
+    )
+    summary=store.load("2026-09-28")["summary"]
+    assert summary["recovery_runs"]==0
+    assert summary["recovery_supervisor_runs"]==0
+    assert summary["schedule_blocks"]==1
+    assert summary["midnight_guard_blocks"]==1
+
+
+def test_empty_health_summary_exposes_new_recovery_and_gate_counters():
+    summary=DailyHealthLedgerStore(FakeRegistry()).load(
+        "2026-09-28"
+    )["summary"]
+
+    assert summary["recovery_runs"]==0
+    assert summary["recovery_push_runs"]==0
+    assert summary["recovery_supervisor_runs"]==0
+    assert summary["schedule_blocks"]==0
+    assert summary["midnight_guard_blocks"]==0
+    assert summary["latest_schedule_block_reason"]==""
