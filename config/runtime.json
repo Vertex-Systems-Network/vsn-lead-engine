@@ -48,7 +48,8 @@
       "release": "latest",
       "stac_url": "https://stac.overturemaps.org/catalog.json",
       "candidate_limit": 500,
-      "website_candidate_reserve_fraction": 0.2
+      "website_candidate_reserve_fraction": 0.2,
+      "query_timeout_seconds": 45
     },
     "overpass": {
       "enabled": false,
