@@ -449,9 +449,17 @@ def check_workbook_readiness(
     ).date().isoformat()
     store=store or GoogleSheetsStore(config,run_date=run_date)
     workbook=store.ensure_lead_workbook()
-    daily_state=store.daily_state_snapshot(workbook["id"])
-    counts=daily_state["category_counts"]
-    country_counts=daily_state["country_counts"]
+    snapshot_reader=getattr(store,"daily_state_snapshot",None)
+    if callable(snapshot_reader):
+        daily_state=snapshot_reader(workbook["id"])
+        counts=daily_state["category_counts"]
+        country_counts=daily_state["country_counts"]
+    else:
+        # Backward-compatible path for lightweight stores/integrations that
+        # predate the combined snapshot API. Production GoogleSheetsStore uses
+        # the single-read snapshot path.
+        counts=store.category_counts(workbook["id"])
+        country_counts=store.daily_country_counts(workbook["id"])
     target=int(runtime["daily_target_per_category"])
     quota_complete=all(
         int(counts.get(category,0) or 0) >= target
