@@ -3,35 +3,39 @@
 ## State
 
 - Snapshot timestamp: `2026-09-28`
-- Observed main: `f1759e9c9445c37040faec73d21837c8b366b36b`
+- Observed main: `ac748fb193ca86e2727e7056f000ce58b835263e`
 - Open issues at snapshot: `0`
-- Active PR: `#105`
-- Last completed milestone: `P58-REPRODUCIBLE-DEPENDENCIES`
-- Current milestone: `P59-HASH-VERIFIED-DEPENDENCIES`
-- Milestone status: `VERIFYING`
+- Stale dependency PR reconciled: `#103 closed / superseded`
+- Last completed milestone: `P59-HASH-VERIFIED-DEPENDENCIES`
+- Current milestone: `P60-HASH-LOCK-REGENERATION`
+- Milestone status: `IMPLEMENTING`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
 ## Verified
 
-- P58 merged through PR #104 on main `f1759e9c9445c37040faec73d21837c8b366b36b`.
-- P58 exact-head CI run #185 passed lock-constrained install, `pip check`, runtime validation and 241 tests.
-- The repository has exact version pins for the Python 3.12 dependency graph and exact setuptools/wheel build pins.
-- External package artifacts are not yet hash-verified during installation.
+- P59 merged through PR #105 on main `ac748fb193ca86e2727e7056f000ce58b835263e`.
+- P59 exact-head CI #196 passed the hash-enforced installer, runtime validation and 244 tests.
+- Bootstrap/runtime/dev external dependencies are SHA-256 verified.
+- Dependabot PR #103 was based on the retired pre-P59 `requirements.txt` model and was closed as superseded.
 
-## Hash Evidence
+## P60 Controls
 
-- PR #105 clean-runner resolver captured selected SHA-256 artifacts for 30 runtime packages, 5 test-only packages, and 4 bootstrap/build packages.
-- The unhashed legacy `requirements.txt` is retired on the P59 branch.
+- Fresh resolution is implemented by `scripts/regenerate_hash_locks.py`.
+- Resolver pip is independently hash-pinned at 25.2.
+- PR dependency-surface changes run `--check`.
+- Manual regeneration rejects main/master and permits only `dependabot/*` or `deps/*`.
+- Regenerated hashes must install and pass runtime validation + pytest before the workflow commits them to the update branch.
+- No automatic merge is enabled.
 
 ## Not Verified
 
-- Exact selected SHA-256 artifacts for bootstrap, runtime and dev surfaces are not yet committed.
-- `--require-hashes` is not active until P59 merges.
+- P60 exact final-head CI has not run yet.
+- Manual regeneration has not been promoted to protected main until P60 merges.
 
 ## Known Risk
 
-- Exact version pinning prevents version drift but does not independently verify the downloaded wheel/sdist bytes. A compromised or unexpected artifact for the same version would not be rejected by version matching alone.
+- A future dependency PR that changes versions without regenerated hashes must fail closed. P60 CI must prove that the current committed locks exactly match a fresh pinned-resolver result.
 
 ## Next Action
 
-Verify PR #105 final exact-head CI using the hash-enforced installer for dev dependencies, pip check, runtime validation and the complete test suite. If green, squash-merge PR #105. Next session must resolve live main before selecting P60.
+Open the P60 PR, verify both standard application CI and Dependency Lock Integrity on the exact final head, and squash-merge only when both are green.
