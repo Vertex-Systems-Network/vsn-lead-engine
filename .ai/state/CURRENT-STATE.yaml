@@ -6,19 +6,19 @@
     "product_version": "0.58.0"
   },
   "execution": {
-    "status": "verifying",
+    "status": "active",
     "current_phase": "CONTINUOUS-HARDENING",
-    "active_task": "P57-DEPENDENCY-UPDATE-AUTOMATION",
-    "last_completed_task": "P56-PERSISTENT-AI-STATE",
-    "next_task": "P58-NEXT-EVIDENCE-BASED-MILESTONE"
+    "active_task": "P58-REPRODUCIBLE-DEPENDENCIES",
+    "last_completed_task": "P57-DEPENDENCY-UPDATE-AUTOMATION",
+    "next_task": "P59-NEXT-EVIDENCE-BASED-MILESTONE"
   },
-  "observed_main_sha": "24cc26856a6267d13c627b9386a2b60fcb10f00a",
+  "observed_main_sha": "34c37531046eb6a3c1701a520fc234094aa3a8b8",
   "active_issue": null,
-  "active_pr": 102,
-  "active_branch": "chore/p57-dependabot-updates",
-  "current_milestone": "P57-DEPENDENCY-UPDATE-AUTOMATION",
-  "milestone_status": "VERIFYING",
-  "last_completed_milestone": "P56 added compact CURRENT-STATE, LAST-CHECKPOINT, RECOVERY-PROTOCOL, AGENTS contract and CI enforcement; PR #101 merged after required CI passed.",
+  "active_pr": null,
+  "active_branch": "chore/p58-reproducible-dependencies",
+  "current_milestone": "P58-REPRODUCIBLE-DEPENDENCIES",
+  "milestone_status": "RESOLVING_LOCK",
+  "last_completed_milestone": "P57 added weekly grouped Dependabot PRs for GitHub Actions and pip dependencies; PR #102 exact-head CI passed 237 tests and merged.",
   "production": {
     "last_certified_date": "2026-09-28",
     "daily_target": 12000,
@@ -29,9 +29,9 @@
     "production_run": 162
   },
   "quality": {
-    "latest_required_ci_run": 172,
+    "latest_required_ci_run": 174,
     "latest_required_ci_result": "success",
-    "pytest": "P56 required suite passed",
+    "pytest": "237 passed",
     "node20_deprecation_warning": false
   },
   "blockers": [],
@@ -40,5 +40,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Verify PR #102 exact-head required CI. If it passes, squash-merge PR #102. On the next session, reconcile live main and Dependabot-created PRs before selecting P58."
+  "exact_next_safe_action": "Use a clean GitHub Python 3.12 resolver report to derive the exact transitive dependency lock. Commit the lock, enforce it in CI/production installs, add drift guards, then certify the final exact PR head."
 }
