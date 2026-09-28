@@ -3,39 +3,38 @@
 ## State
 
 - Snapshot timestamp: `2026-09-28`
-- Observed main: `f769cb5b8f27923ba2a872174c852a46fedfc4bc`
+- Observed main: `2348f0f1144010182da40dd44ba28ed9173f7f9a`
 - Open issues at snapshot: `0`
-- Active PR: `#114`
-- Last completed milestone: `P66-STRICT-OAUTH-CERTIFICATION`
-- Current milestone: `P67-MIDNIGHT-SAFE-RECOVERY`
-- Milestone status: `VERIFYING`
-- Product version target: `0.63.0`
+- Open PRs at snapshot: `0`
+- Last completed milestone: `P67-MIDNIGHT-SAFE-RECOVERY`
+- Current milestone: `P68-HEALTH-GATE-TELEMETRY`
+- Milestone status: `IMPLEMENTING`
+- Product version target: `0.64.0`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
 ## Verified
 
-- P66 merged through PR #113 on main `f769cb5b8f27923ba2a872174c852a46fedfc4bc`.
-- P66 exact-head Lead Engine CI #220 passed 280 tests.
-- P66 merge-push Daily Workbook Readiness run #5 passed for 2026-09-29 in one attempt.
-- Current scheduled_run_window on main still treats the full 23:00-23:59 hour as open.
-- Recovery Supervisor currently repeats an independent hour-only gate.
-- Current process watchdog + kill grace can consume about 1580 seconds, so a late 23:40/23:50 start can cross local midnight.
+- P67 merged through PR #114 on main `2348f0f1144010182da40dd44ba28ed9173f7f9a`.
+- P67 exact-head Lead Engine CI #223 passed 286 tests.
+- P67 merge-push Daily Workbook Readiness run #6 passed for 2026-09-29 in one attempt.
+- Health summary on P67 counts recovery-push but not recovery-supervisor.
+- A supervisor pre-dispatch midnight block starts no Lead Engine child, so P67 cannot persist that decision through run-health telemetry.
+- A queued recovery that is blocked at execution start currently produces scheduled-window-skipped, which must not inflate actual run counts.
 
-## P67 Controls
+## P68 Controls
 
-- Scheduled window computes seconds remaining to local midnight.
-- Required runway is max(watchdog+kill-grace, event-budget+deadline-guard) plus a configurable 60-second safety buffer.
-- Current required runway is 1640 seconds.
-- Recovery Supervisor reuses the same scheduled_run_window gate.
-- Recovery-supervisor and recovery-push runs re-check the schedule gate at actual execution start.
-- Recovery origin telemetry survives the scheduled execution path.
-- Explicit manual operator runs remain separate.
-- schedule_midnight_safety_seconds is configured at 60.
+- recovery_runs combines executed recovery-push and recovery-supervisor runs.
+- Per-origin recovery counts remain separately visible.
+- scheduled-window-skipped is excluded from executed run counters.
+- Run-health events persist schedule status, block reason, midnight-safe flag and runway seconds.
+- New schedule-gate events persist supervisor pre-dispatch blocks without lead data.
+- Recovery Supervisor writes blocked schedule-gate telemetry to the existing R2 health ledger.
+- Telemetry write failure is continue-on-error and cannot force a recovery outage.
 
 ## Not Verified
 
-- P67 exact final-head CI has not run yet.
-- The new late-night block has not yet been observed in a real 23:40+ recovery heartbeat.
+- P68 exact final-head CI has not run yet.
+- A real late-night supervisor block has not yet been observed on P68 main.
 
 ## Known Risk
 
@@ -43,4 +42,4 @@
 
 ## Next Action
 
-Verify PR #114 exact-head Lead Engine CI. Squash-merge only after midnight-boundary tests, shared supervisor gate tests, execution-start recovery tests, version metadata and the complete suite are green.
+Open P68 PR and certify exact-head Lead Engine CI. Squash-merge only after health summary, schedule-gate persistence, CLI telemetry, workflow contract, version metadata and the complete suite are green.
