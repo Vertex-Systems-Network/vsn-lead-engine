@@ -1760,6 +1760,46 @@ exactly one active dated workbook.
 
 Runtime version is **0.65.0**.
 
+### P70 day-boundary-aware deployment readiness
+
+P70 corrects the deployment catch-up target around local midnight.
+
+Before P70, every readiness-related push to protected main forced
+`next-day`. A deployment at 00:20 PKT therefore skipped the current upcoming
+production day and targeted tomorrow instead.
+
+Deployment catch-up now uses the configured **20:50 PKT evening preflight
+cutoff**:
+
+- **00:00–20:49:59 PKT** → target local **today**;
+- **20:50:00–23:59:59 PKT** → target local **next-day**.
+
+At midnight the rule naturally resets to the new local day. This means a
+00:20 deployment on September 29 targets **September 29**, not September 30.
+
+The cutoff is explicit in runtime configuration:
+
+- `readiness_evening_preflight_hour = 20`;
+- `readiness_evening_preflight_minute = 50`.
+
+The workflow target-resolution step now uses the shared Python schedule module
+instead of duplicating push-date logic in Bash. It records the resolved target
+kind, run date, resolution reason and local resolution time in the Actions log.
+
+Scheduled semantics remain unchanged:
+
+- 07:50 PKT schedule → today;
+- 20:50 PKT schedule → next-day;
+- manual `today` / `next-day` selection remains explicit.
+
+P69's first post-merge catch-up at 00:20 PKT correctly exposed the old behavior
+by targeting September 30. That run hit the already-known My Drive
+service-account creation blocker; September 29 remained intact with exactly
+one active workbook. September 30 was then precreated under the VSN user owner
+so the OAuth blocker cannot disrupt its evening readiness.
+
+Runtime version is **0.66.0**.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -2115,6 +2155,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P67 midnight-safe recovery: **DYNAMIC WATCHDOG RUNWAY + EXECUTION-START RECHECK ACTIVE**
 - P68 health telemetry: **RECOVERY-SUPERVISOR ACCOUNTING + MIDNIGHT-GATE R2 EVIDENCE ACTIVE**
 - P69 workbook lifecycle: **SHARED PRODUCTION FIFO QUEUE + DUPLICATE DATED-WORKBOOK FAIL-CLOSED GUARD ACTIVE**
+- P70 deployment boundary targeting: **TODAY BEFORE 20:50 PKT; NEXT-DAY AT/AFTER 20:50 PKT**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
