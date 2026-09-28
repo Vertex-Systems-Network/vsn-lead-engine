@@ -1308,6 +1308,28 @@ This changes only CI dependency integrity. Workflow triggers, permissions,
 schedules, Python version, secrets, quota behavior, R2 dedupe and Google writes
 are unchanged.
 
+### P56 persistent AI supervisor resume state
+
+P56 adds a repository-native compact recovery layer so future supervisor
+sessions do not depend on chat history or broad re-audits before resuming work.
+
+Canonical resume files:
+
+- `.ai/state/CURRENT-STATE.yaml` — <= 12 KiB machine-readable snapshot/index;
+- `.ai/state/LAST-CHECKPOINT.md` — <= 16 KiB last verified checkpoint;
+- `.ai/state/RECOVERY-PROTOCOL.md` — deterministic resume/reconciliation order;
+- `AGENTS.md` — repository-local supervisor execution and safety contract.
+
+On every fresh session, `continue`, timeout, or connector recovery, the
+supervisor must read the compact state/checkpoint first, resolve live protected
+`main`, reconcile open Issues before open PRs, and let live GitHub/CI/R2/
+workbook evidence override stale compact state or chat memory.
+
+A CI regression test enforces required fields, size bounds, recovery headings,
+resume ordering and the immutable GitHub Actions security rule. This milestone
+does not change lead discovery, quota logic, R2 dedupe, Google writes, schedules
+or production runtime behavior.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1649,6 +1671,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P53 progressive tail geography: **EVALUATED / NOT PROMOTED — P52 CLOSED QUOTA WITHOUT 2.0× EXPANSION**
 - P54 workflow runtime modernization: **NODE 24 FIRST-PARTY ACTION MAJORS v7 ACTIVE**
 - P55 CI supply-chain pinning: **IMMUTABLE CHECKOUT/SETUP-PYTHON RELEASE SHAS ACTIVE**
+- P56 persistent AI resume state: **COMPACT STATE + CHECKPOINT + RECOVERY CONTRACT ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
