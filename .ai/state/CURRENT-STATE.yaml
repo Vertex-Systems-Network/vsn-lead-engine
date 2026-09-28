@@ -6,7 +6,7 @@
     "product_version": "0.58.0"
   },
   "execution": {
-    "status": "active",
+    "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
     "active_task": "P60-HASH-LOCK-REGENERATION",
     "last_completed_task": "P59-HASH-VERIFIED-DEPENDENCIES",
@@ -14,10 +14,10 @@
   },
   "observed_main_sha": "ac748fb193ca86e2727e7056f000ce58b835263e",
   "active_issue": null,
-  "active_pr": null,
+  "active_pr": 107,
   "active_branch": "chore/p60-lock-regeneration",
   "current_milestone": "P60-HASH-LOCK-REGENERATION",
-  "milestone_status": "IMPLEMENTING",
+  "milestone_status": "VERIFYING",
   "last_completed_milestone": "P59 split bootstrap/runtime/dev dependency surfaces, enforced SHA-256 --require-hashes installation, retired the unhashed lock, and merged PR #105 after exact-head CI #196 passed 244 tests.",
   "production": {
     "last_certified_date": "2026-09-28",
@@ -40,5 +40,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Open P60 PR, run both standard application CI and Dependency Lock Integrity against the exact final head, verify fresh resolver output matches committed locks, then squash-merge only if both required workflows are green."
+  "exact_next_safe_action": "Verify PR #107 exact-head Lead Engine CI and Dependency Lock Integrity. The dependency-lock check must prove the committed bootstrap/runtime/dev hashes exactly match a fresh pip 25.2 resolver result. If both are green, squash-merge PR #107."
 }
