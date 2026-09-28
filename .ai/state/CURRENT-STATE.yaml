@@ -6,7 +6,7 @@
     "product_version": "0.65.0"
   },
   "execution": {
-    "status": "active",
+    "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
     "active_task": "P69-WORKBOOK-LIFECYCLE-SERIALIZATION",
     "last_completed_task": "P68-HEALTH-GATE-TELEMETRY",
@@ -14,10 +14,10 @@
   },
   "observed_main_sha": "1e6b8619d0920b4ff353c9fd32b4be743cd67288",
   "active_issue": null,
-  "active_pr": null,
+  "active_pr": 116,
   "active_branch": "feat/p69-workbook-lifecycle-serialization",
   "current_milestone": "P69-WORKBOOK-LIFECYCLE-SERIALIZATION",
-  "milestone_status": "IMPLEMENTING",
+  "milestone_status": "VERIFYING",
   "last_completed_milestone": "P68 corrected recovery health accounting, persisted midnight schedule-gate evidence, and added blocked-supervisor R2 telemetry; PR #115 final CI passed 294 tests and merged. Merge-push readiness run #7 stayed green for 2026-09-29.",
   "production": {
     "last_certified_date": "2026-09-28",
@@ -42,5 +42,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Open P69 PR and verify exact-head Lead Engine CI. Confirm shared production queue syntax, PR-CI isolation, duplicate dated-workbook fail-closed behavior, post-create uniqueness verification, runtime version 0.65.0 and the complete suite; squash-merge only when green."
+  "exact_next_safe_action": "Verify PR #116 exact-head Lead Engine CI. Confirm shared production queue syntax, PR-CI isolation, duplicate dated-workbook fail-closed behavior, post-create sole-canonical verification, runtime version 0.65.0 and the complete suite; squash-merge only when green."
 }
