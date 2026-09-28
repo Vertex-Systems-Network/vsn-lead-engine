@@ -3,47 +3,58 @@
 ## State
 
 - Snapshot timestamp: `2026-09-29`
-- Observed main: `9af8b3f14098e1a07636c9a2008d00e720d6b16d`
+- Observed main: `ee79c6d1a4ab502fc366e22a4aa368f305a6c74f`
 - Open issues at snapshot: `0`
-- Active PR: `#117`
-- Last completed milestone: `P69-WORKBOOK-LIFECYCLE-SERIALIZATION`
-- Current milestone: `P70-DEPLOYMENT-READINESS-DAY-BOUNDARY`
-- Milestone status: `VERIFYING`
-- Product version target: `0.66.0`
-- Last production quota certification: `2026-09-28 = 12,000 / 12,000`
-- 2026-09-29 workbook: `READY / EXACTLY ONE ACTIVE FILE`
+- Open PRs at snapshot: `0`
+- Last completed milestone: `P70-DEPLOYMENT-READINESS-DAY-BOUNDARY`
+- Current status: `PRODUCTION-READY`
+- Active development milestone: `NONE`
+- Product version: `0.66.0`
+- Last fully certified production quota: `2026-09-28 = 12,000 / 12,000`
+- 2026-09-29 workbook: `READY`
 - 2026-09-30 workbook: `USER-OWNED PRECREATED`
 
 ## Verified
 
-- P69 merged through PR #116 on main `9af8b3f14098e1a07636c9a2008d00e720d6b16d`.
-- P69 exact-head Lead Engine CI #227 passed 299 tests.
-- Production workflows accepted the shared `vsn-lead-engine-production` queue configuration on protected main.
-- P69 merge-push readiness ran at about 00:20 PKT and, under the old unconditional push rule, targeted 2026-09-30.
-- The 2026-09-30 catch-up failed closed after one attempt because GOOGLE_OAUTH_USER_JSON is not configured and service-account auth cannot create a user-owned My Drive file.
-- Drive search confirmed exactly one active 2026-09-29 workbook and no duplicate regression.
-- Immediate recovery precreated user-owned workbook `1zkr6rzeVBmA_3O7LUJ3DMTCnQPUJY6NEaBdkG-ujSf4` for 2026-09-30 with service-account writer access.
+- P70 merged through PR #117 on main `ee79c6d1a4ab502fc366e22a4aa368f305a6c74f`.
+- P70 exact-head Lead Engine CI #231 passed 305 tests.
+- P70 merge-push Daily Workbook Readiness run #9 passed.
+- Run #9 resolved at about 00:34 PKT with:
+  - target kind: `today`;
+  - run date: `2026-09-29`;
+  - reason: `same-day-before-evening-preflight`;
+  - readiness status: `ready`;
+  - attempts used: `1`.
+- Lead Engine production schedule remains configured from 08:00 PKT onward.
+- Open pull requests are zero.
 
-## P70 Controls
+## Production-Ready Boundary
 
-- Deployment readiness uses local Asia/Karachi time.
-- Push before 20:50 PKT targets today.
-- Push at or after 20:50 PKT targets next-day.
-- Midnight resets deployment targeting to the new local today.
-- Evening cutoff is explicit in runtime config and aligned with the 20:50 readiness cron.
-- Scheduled 07:50 today / 20:50 next-day semantics remain unchanged.
-- Manual target selection remains explicit.
-- Workflow logs target kind, run date, reason and resolved local time.
+The repository should not automatically start another P71/P72 hardening
+milestone without evidence from a real production problem.
 
-## Not Verified
+The next operational proof is the scheduled 2026-09-29 08:00 PKT Lead Engine
+run and its 12,000-lead daily quota result.
 
-- P70 exact final-head CI has not run yet.
-- P70 merge-push target resolution has not yet been production-certified on protected main.
+## Remaining External Blocker
 
-## Known Risk
+`GOOGLE_OAUTH_USER_JSON` is not configured in GitHub.
 
-- GOOGLE_OAUTH_USER_JSON remains the independent human-authorization blocker for autonomous creation of a genuinely missing My Drive workbook.
+Existing and precreated user-owned workbooks remain operational through
+service-account writer access. Fully autonomous creation of a genuinely missing
+My Drive workbook requires:
+
+1. generate Google authorized-user JSON with
+   `scripts/google_oauth_onboard.py`;
+2. add the complete JSON as GitHub secret `GOOGLE_OAUTH_USER_JSON`;
+3. run the strict **Google Drive Capability** workflow;
+4. require a green create → trash production-folder probe before marking My
+   Drive creation autonomy complete.
 
 ## Next Action
 
-Verify PR #117 exact-head Lead Engine CI. If green, squash-merge. The merge-push readiness run should occur before the evening cutoff and therefore target 2026-09-29; verify the live target/date plus readiness result before closing P70.
+Do not create another development milestone by default.
+
+At/after 08:00 PKT, verify the real 2026-09-29 production run, quota result,
+workbook state, and health ledger. Separately, complete OAuth provisioning when
+the human Google authorization step is available.
