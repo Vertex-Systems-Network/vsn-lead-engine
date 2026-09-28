@@ -9,13 +9,15 @@ import secrets
 import stat
 import sys
 import urllib.parse
+import urllib.request
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
-import requests
-
-from vsn_lead_engine.sheets import GOOGLE_SCOPES
+GOOGLE_SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
 
 
 DEFAULT_AUTH_URI="https://accounts.google.com/o/oauth2/v2/auth"
@@ -78,17 +80,29 @@ def authorization_url(
     return f"{client['auth_uri']}?{query}"
 
 
+def _post_form_json(url: str, data: dict) -> dict:
+    encoded=urllib.parse.urlencode(data).encode("utf-8")
+    request=urllib.request.Request(
+        url,
+        data=encoded,
+        headers={"Content-Type":"application/x-www-form-urlencoded"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request,timeout=30) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
 def exchange_code(
     client: dict,
     *,
     code: str,
     redirect_uri: str,
     verifier: str,
-    post=requests.post,
+    post=None,
 ) -> dict:
-    response=post(
+    payload=(post or _post_form_json)(
         client["token_uri"],
-        data={
+        {
             "code":code,
             "client_id":client["client_id"],
             "client_secret":client["client_secret"],
@@ -96,10 +110,7 @@ def exchange_code(
             "grant_type":"authorization_code",
             "code_verifier":verifier,
         },
-        timeout=30,
     )
-    response.raise_for_status()
-    payload=response.json()
     refresh_token=str(payload.get("refresh_token") or "").strip()
     if not refresh_token:
         raise RuntimeError(
