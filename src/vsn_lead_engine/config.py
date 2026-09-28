@@ -199,6 +199,27 @@ def load_config() -> dict:
             "tail_country_yield_advantage_ratio must be between 1 and 10."
         )
 
+    tail_geography_threshold=int(
+        config["runtime"].get(
+            "tail_geography_expansion_incomplete_threshold",
+            config["runtime"].get("tail_incomplete_category_threshold",4),
+        )
+    )
+    if (
+        tail_geography_threshold < 1
+        or tail_geography_threshold > len(config["categories"])
+    ):
+        raise ValueError(
+            "tail_geography_expansion_incomplete_threshold must be between 1 and category count."
+        )
+    tail_geography_factor=float(
+        config["runtime"].get("tail_geography_expansion_factor",1.5)
+    )
+    if tail_geography_factor < 1 or tail_geography_factor > 3:
+        raise ValueError(
+            "tail_geography_expansion_factor must be between 1 and 3."
+        )
+
     adaptive_state_max_entries=int(
         config["runtime"].get("adaptive_yield_state_max_entries",1500)
     )

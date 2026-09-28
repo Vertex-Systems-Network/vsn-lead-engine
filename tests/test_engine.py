@@ -1702,3 +1702,75 @@ def test_run_until_quota_tail_extension_still_honors_zero_progress_cutoff(monkey
     assert result["zero_progress_streak"]==3
     assert len(calls)==3
     assert source.closed
+
+
+def test_tail_geography_retains_breadth_near_quota():
+    geography={
+        "country":"United States",
+        "region":"Example",
+        "city":"Example",
+        "bbox":[0.0,0.0,10.0,10.0],
+    }
+
+    expanded=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.829,
+        threshold=0.25,
+        bbox_factor=1.75,
+        extreme_threshold=0.10,
+        extreme_bbox_factor=2.25,
+        tail_enabled=True,
+        tail_active=True,
+        tail_bbox_factor=1.5,
+    )
+
+    assert expanded["_bbox_expansion_factor"]==1.5
+    assert expanded["bbox"]==[-2.5,-2.5,12.5,12.5]
+
+
+def test_tail_geography_never_reduces_existing_critical_expansion():
+    geography={
+        "country":"Canada",
+        "region":"Example",
+        "city":"Example",
+        "bbox":[0.0,0.0,10.0,10.0],
+    }
+
+    expanded=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.05,
+        threshold=0.25,
+        bbox_factor=1.75,
+        extreme_threshold=0.10,
+        extreme_bbox_factor=2.25,
+        tail_enabled=True,
+        tail_active=True,
+        tail_bbox_factor=1.5,
+    )
+
+    assert expanded["_bbox_expansion_factor"]==2.25
+
+
+def test_tail_geography_stays_original_when_not_in_tail():
+    geography={
+        "country":"United States",
+        "region":"Example",
+        "city":"Example",
+        "bbox":[0.0,0.0,10.0,10.0],
+    }
+
+    expanded=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.829,
+        threshold=0.25,
+        bbox_factor=1.75,
+        tail_enabled=True,
+        tail_active=False,
+        tail_bbox_factor=1.5,
+    )
+
+    assert expanded["_bbox_expansion_factor"]==1.0
+    assert expanded["bbox"]==geography["bbox"]
