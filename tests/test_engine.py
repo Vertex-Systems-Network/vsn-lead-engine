@@ -1774,3 +1774,80 @@ def test_tail_geography_stays_original_when_not_in_tail():
 
     assert expanded["_bbox_expansion_factor"]==1.0
     assert expanded["bbox"]==geography["bbox"]
+
+
+def test_tail_geography_progresses_to_wider_horizon_near_completion():
+    geography={
+        "country":"United States",
+        "region":"Example",
+        "city":"Example",
+        "bbox":[0.0,0.0,10.0,10.0],
+    }
+
+    expanded=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.901,
+        threshold=0.25,
+        bbox_factor=1.75,
+        extreme_threshold=0.10,
+        extreme_bbox_factor=2.25,
+        tail_enabled=True,
+        tail_active=True,
+        tail_bbox_factor=1.5,
+        tail_high_completion_ratio=0.90,
+        tail_high_bbox_factor=2.0,
+    )
+
+    assert expanded["_bbox_expansion_factor"]==2.0
+    assert expanded["bbox"]==[-5.0,-5.0,15.0,15.0]
+
+
+def test_tail_geography_uses_base_tail_horizon_before_high_completion():
+    geography={
+        "country":"Canada",
+        "region":"Example",
+        "city":"Example",
+        "bbox":[0.0,0.0,10.0,10.0],
+    }
+
+    expanded=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.899,
+        threshold=0.25,
+        bbox_factor=1.75,
+        tail_enabled=True,
+        tail_active=True,
+        tail_bbox_factor=1.5,
+        tail_high_completion_ratio=0.90,
+        tail_high_bbox_factor=2.0,
+    )
+
+    assert expanded["_bbox_expansion_factor"]==1.5
+
+
+def test_tail_geography_high_tier_never_exceeds_critical_extreme_precedence():
+    geography={
+        "country":"United States",
+        "region":"Example",
+        "city":"Example",
+        "bbox":[0.0,0.0,10.0,10.0],
+    }
+
+    expanded=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.05,
+        threshold=0.25,
+        bbox_factor=1.75,
+        extreme_threshold=0.10,
+        extreme_bbox_factor=2.25,
+        tail_enabled=True,
+        tail_active=True,
+        tail_bbox_factor=1.5,
+        tail_high_completion_ratio=0.90,
+        tail_high_bbox_factor=2.0,
+    )
+
+    assert expanded["_bbox_expansion_factor"]==2.25
