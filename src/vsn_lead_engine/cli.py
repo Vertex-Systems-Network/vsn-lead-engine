@@ -14,6 +14,7 @@ from .health import (
 from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
 from .schedule import scheduled_run_window
 from .sheets import GoogleSheetsStore
+from .taxonomy_audit import audit_motorbike_taxonomy
 from .watchdog import supervise_process
 
 def _registry_index(config: dict):
@@ -111,6 +112,9 @@ def main() -> int:
     run_parser.add_argument("--scheduled",action="store_true")
     supervised_parser=sub.add_parser("supervised-run")
     supervised_parser.add_argument("--scheduled",action="store_true")
+    taxonomy_parser=sub.add_parser("taxonomy-audit")
+    taxonomy_parser.add_argument("--max-geographies",type=int,default=8)
+    taxonomy_parser.add_argument("--rows-per-geography",type=int,default=250)
     backfill_parser=sub.add_parser("registry-backfill")
     backfill_parser.add_argument("--dry-run",action="store_true")
     sub.add_parser("registry-stats")
@@ -165,6 +169,14 @@ def main() -> int:
             )
         print(json.dumps(result,indent=2,default=str))
         return int(result.get("exit_code",2) or 0)
+    if args.command=="taxonomy-audit":
+        result=audit_motorbike_taxonomy(
+            config,
+            max_geographies=max(1,min(24,args.max_geographies)),
+            rows_per_geography=max(25,min(1000,args.rows_per_geography)),
+        )
+        print(json.dumps(result,indent=2,default=str))
+        return 0 if result.get("status")=="ok" else 2
     if args.command=="validate":
         print(json.dumps({
             "status":"valid",

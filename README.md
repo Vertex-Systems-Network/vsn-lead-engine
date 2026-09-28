@@ -748,6 +748,36 @@ hard process watchdog. The telemetry is logs-only and adds no R2, Google API,
 paid-source or per-lead storage writes. It can be disabled with
 `runtime.progress_telemetry_enabled=false`.
 
+### P31 read-only Overture taxonomy breadth audit
+
+Motorbikes is currently the extreme quota outlier, so category expansion is now
+driven by live taxonomy evidence instead of guessed labels.
+
+The command:
+
+```
+python -m vsn_lead_engine.cli taxonomy-audit --max-geographies 8 --rows-per-geography 250
+```
+
+reads the current Overture Places release across a deterministic US/Canada
+balanced metro sample and reports aggregated taxonomy buckets for
+motorcycle/motorbike/scooter/powersports/ATV-like records.
+
+Safety and cost properties:
+
+- no Google Drive or Sheets access;
+- no R2 access or mutation;
+- no lead writes or quota changes;
+- no paid API;
+- no raw business names, phones, emails, websites or addresses in output;
+- bounded per-geography rows and the existing Overture query timeout;
+- output identifies current-rule coverage vs unrecognized taxonomy buckets and
+  their aggregate phone/web availability.
+
+A dedicated `Overture Taxonomy Audit` workflow can run this evidence probe
+without starting the production lead engine. Any Motorbikes taxonomy expansion
+must be justified by this audit before entering the production classifier.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1064,6 +1094,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P28 graceful event budget: **25-MIN CLEAN STOP + 60S START GUARD ACTIVE**
 - P29 process watchdog: **26-MIN CHILD DEADLINE + 20S KILL GRACE ACTIVE**
 - P30 live heartbeat telemetry: **SOURCE/ENRICHMENT/R2/COMMIT PHASE TIMING ACTIVE**
+- P31 taxonomy breadth audit: **READ-ONLY MOTORBIKES COVERAGE PROBE ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
