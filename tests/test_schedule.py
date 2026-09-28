@@ -1,7 +1,10 @@
 from pathlib import Path
 from datetime import datetime, timezone
 
-from vsn_lead_engine.schedule import scheduled_run_window
+from vsn_lead_engine.schedule import (
+    deployment_readiness_target,
+    scheduled_run_window,
+)
 
 
 def config():
@@ -15,6 +18,8 @@ def config():
             "event_wall_time_seconds":1500,
             "event_deadline_guard_seconds":60,
             "schedule_midnight_safety_seconds":60,
+            "readiness_evening_preflight_hour":20,
+            "readiness_evening_preflight_minute":50,
         }
     }
 
@@ -242,8 +247,11 @@ def test_daily_readiness_workflow_has_main_deployment_catchup_scope():
     ]:
         assert f'- "{path}"' in workflow
 
-    assert 'if [[ "$EVENT_NAME" == "push" ]]; then' in workflow
-    assert 'target="next-day"' in workflow
+    assert "deployment_readiness_target" in workflow
+    assert 'event=="push"' in workflow
+    assert '"scheduled-evening-preflight"' in workflow
+    assert '"scheduled-morning-recovery"' in workflow
+    assert 'output.write(f"run_date={target[\'run_date\']}\\n")' in workflow
     assert "README.md" not in workflow
 
 
@@ -262,3 +270,78 @@ def test_scheduled_window_threshold_is_exactly_watchdog_safe():
     assert blocked["seconds_until_midnight"]==1639.0
     assert blocked["allowed"] is False
     assert blocked["block_reason"]=="insufficient-midnight-runway"
+
+
+def test_deployment_readiness_targets_today_after_midnight_before_cutoff():
+    result=deployment_readiness_target(
+        config(),
+        now=datetime(2026,9,28,19,20,tzinfo=timezone.utc),
+    )
+
+    assert result["deployment_local_time"].startswith("2026-09-29T00:20")
+    assert result["run_date"]=="2026-09-29"
+    assert result["target_kind"]=="today"
+    assert result["reason"]=="same-day-before-evening-preflight"
+    assert result["cutoff_local_time"].startswith("2026-09-29T20:50")
+
+
+def test_deployment_readiness_targets_today_one_minute_before_evening_cutoff():
+    result=deployment_readiness_target(
+        config(),
+        now=datetime(2026,9,28,15,49,tzinfo=timezone.utc),
+    )
+
+    assert result["run_date"]=="2026-09-28"
+    assert result["target_kind"]=="today"
+    assert result["reason"]=="same-day-before-evening-preflight"
+
+
+def test_deployment_readiness_targets_tomorrow_at_evening_cutoff():
+    result=deployment_readiness_target(
+        config(),
+        now=datetime(2026,9,28,15,50,tzinfo=timezone.utc),
+    )
+
+    assert result["run_date"]=="2026-09-29"
+    assert result["target_kind"]=="next-day"
+    assert result["reason"]=="post-evening-preflight-cutoff"
+
+
+def test_deployment_readiness_targets_tomorrow_late_evening():
+    result=deployment_readiness_target(
+        config(),
+        now=datetime(2026,9,28,18,59,tzinfo=timezone.utc),
+    )
+
+    assert result["deployment_local_time"].startswith("2026-09-28T23:59")
+    assert result["run_date"]=="2026-09-29"
+    assert result["target_kind"]=="next-day"
+
+
+def test_deployment_readiness_validates_cutoff_config():
+    import pytest
+
+    broken=config()
+    broken["runtime"]["readiness_evening_preflight_hour"]=24
+    with pytest.raises(ValueError,match="preflight_hour"):
+        deployment_readiness_target(broken)
+
+    broken=config()
+    broken["runtime"]["readiness_evening_preflight_minute"]=60
+    with pytest.raises(ValueError,match="preflight_minute"):
+        deployment_readiness_target(broken)
+
+
+def test_readiness_cutoff_config_matches_evening_cron():
+    import json
+
+    runtime=json.loads(
+        Path("config/runtime.json").read_text(encoding="utf-8")
+    )["runtime"]
+    workflow=Path(
+        ".github/workflows/daily-workbook-readiness.yml"
+    ).read_text(encoding="utf-8")
+
+    assert runtime["readiness_evening_preflight_hour"]==20
+    assert runtime["readiness_evening_preflight_minute"]==50
+    assert 'cron: "50 15 * * *"' in workflow
