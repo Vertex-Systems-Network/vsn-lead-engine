@@ -128,8 +128,14 @@ def _adaptive_yield_score(
     hint: dict | None,
     *,
     exploration_bonus: float,
+    score_mode: str = "throughput",
 ) -> float:
-    """Smoothed score that rewards yield while preserving exploration."""
+    """Smoothed score that rewards usable lead throughput plus exploration.
+
+    throughput ranks routes by accepted leads per attempted shard, which aligns
+    routing with the daily quota objective. conversion preserves the legacy
+    accepted/discovered ratio for emergency rollback.
+    """
     bonus=max(0.0,min(1.0,float(exploration_bonus)))
     if not hint:
         return bonus
@@ -140,7 +146,11 @@ def _adaptive_yield_score(
     if visits <= 0:
         return bonus
 
-    empirical=(accepted / discovered) if discovered else 0.0
+    mode=str(score_mode or "throughput").strip().lower()
+    if mode=="conversion":
+        empirical=(accepted / discovered) if discovered else 0.0
+    else:
+        empirical=accepted / visits
     exploration=bonus / math.sqrt(visits + 1)
     return empirical + exploration
 
@@ -155,6 +165,7 @@ def select_candidate_partition(
     yield_hints: dict[str,dict] | None = None,
     adaptive_enabled: bool = True,
     exploration_bonus: float = 0.15,
+    score_mode: str = "throughput",
 ) -> tuple[int,float | None]:
     """Choose one partition using persisted yield while preserving exploration."""
     count=max(1,min(64,int(partition_count)))
@@ -178,6 +189,7 @@ def select_candidate_partition(
                     )
                 ),
                 exploration_bonus=exploration_bonus,
+                score_mode=score_mode,
             ),
             item[0],
         ),
@@ -188,6 +200,7 @@ def select_candidate_partition(
             partition_yield_hint_key(category,geography,partition)
         ),
         exploration_bonus=exploration_bonus,
+        score_mode=score_mode,
     )
     return partition,round(float(score),6)
 
@@ -252,6 +265,7 @@ def _adaptive_country_geographies(
     cooldown_min_visits: int,
     cooldown_min_discovered: int,
     cooldown_min_partitions: int,
+    score_mode: str,
 ) -> tuple[dict[str,list[dict]],set[str]]:
     """Rank metros inside each country without changing country interleave."""
     groups: dict[str,list[tuple[int,dict]]] = defaultdict(list)
@@ -287,6 +301,7 @@ def _adaptive_country_geographies(
                 -_adaptive_yield_score(
                     (yield_hints or {}).get(yield_hint_key(category,item[1])),
                     exploration_bonus=exploration_bonus,
+                    score_mode=score_mode,
                 ),
                 item[0],
             ),
@@ -376,6 +391,7 @@ def build_shard_plan(
     low_deficit_weight: int = 4,
     mid_deficit_ratio: float = 0.50,
     mid_deficit_weight: int = 2,
+    adaptive_score_mode: str = "throughput",
 ) -> list[dict]:
     """Build a progress-weighted, country-balanced rotating shard plan.
 
@@ -390,8 +406,10 @@ def build_shard_plan(
     - countries are interleaved, with the country having fewer usable leads
       scheduled first;
     - cursor rotation prevents repeatedly hitting the same metro;
-    - optional in-memory yield hints reorder metros inside each country/category
-      while leaving the country sequence unchanged.
+    - adaptive scores default to accepted leads per shard attempt so routing
+      optimizes quota throughput rather than small-shard conversion percentage;
+    - optional yield hints reorder metros inside each country/category while
+      leaving the country sequence unchanged.
     """
     category_list = list(categories)
     geography_list = list(geographies)
@@ -447,6 +465,7 @@ def build_shard_plan(
                 cooldown_min_visits=cooldown_min_visits,
                 cooldown_min_discovered=cooldown_min_discovered,
                 cooldown_min_partitions=cooldown_min_partitions,
+                score_mode=adaptive_score_mode,
             )
             adaptive_groups[category]=groups
             cooldown_keys_by_category[category]=cooldowns
@@ -469,6 +488,7 @@ def build_shard_plan(
                 adaptive_score=_adaptive_yield_score(
                     (yield_hints or {}).get(yield_hint_key(category,geography)),
                     exploration_bonus=exploration_bonus,
+                    score_mode=adaptive_score_mode,
                 )
         route_key=yield_hint_key(category,geography)
         deferred_keys=cooldown_keys_by_category.get(category,set())
