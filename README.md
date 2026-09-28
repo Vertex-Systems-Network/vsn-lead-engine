@@ -848,6 +848,29 @@ This operation is strictly read-only: it does not reserve pending rows, acquire
 the packed write lock, activate fingerprints, modify R2 objects, touch Google
 Sheets, or change quota state.
 
+### P35 critical-deficit rescue scheduling
+
+P34 proved that the Motorbikes bottleneck is not an empty Overture source and
+not primarily an R2 exhaustion problem: the bounded production-equivalent
+probe returned 111 unique candidates with 84 R2 survivors. The remaining
+problem is allocation: a category at only a few percent of quota previously
+received at most the same 3x weight used for every category below 25%.
+
+P35 keeps the existing layered fairness invariant—every pending category gets
+one shard before any category repeats—but adds configurable urgency tiers inside
+the same fixed shard/event budget:
+
+- below 10% complete: **6x**;
+- 10% to below 25%: **4x**;
+- 25% to below 50%: **2x**;
+- 50% or more: **1x**.
+
+This does not increase `max_shard_attempts`, the 25-minute event budget, Google
+Sheet writes, R2 writes or paid API usage. It only reallocates existing shard
+slots toward the categories that are furthest from their required 1,000/day
+quota. The feature is runtime-configurable and can be disabled to restore the
+legacy 3x/2x/1x behavior.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1168,6 +1191,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P32 Motorbikes canonical rentals: **MOTORCYCLE RENTAL + SCOOTER RENTAL ACTIVE**
 - P33 production source probe: **EXACT 16-PARTITION MOTORBIKES READ-ONLY PROBE ACTIVE**
 - P34 R2 collision probe: **PACKED-V2 MOTORBIKES READ-ONLY COLLISION AUDIT ACTIVE**
+- P35 critical-deficit rescue: **LAYERED 6×/4×/2×/1× FAIR SLOT REALLOCATION ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
