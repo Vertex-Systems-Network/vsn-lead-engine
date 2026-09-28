@@ -71,7 +71,9 @@
     "process_watchdog_seconds": 1560,
     "process_watchdog_kill_grace_seconds": 20,
     "progress_telemetry_enabled": true,
-    "schedule_midnight_safety_seconds": 60
+    "schedule_midnight_safety_seconds": 60,
+    "readiness_evening_preflight_hour": 20,
+    "readiness_evening_preflight_minute": 50
   },
   "drive": {
     "folder_id": "1CPnHX5lXNb_wqcwk2O4bfACL4qNZ5IEh",
