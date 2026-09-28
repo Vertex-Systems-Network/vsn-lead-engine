@@ -5,10 +5,10 @@
 - Snapshot timestamp: `2026-09-28`
 - Observed main: `2348f0f1144010182da40dd44ba28ed9173f7f9a`
 - Open issues at snapshot: `0`
-- Open PRs at snapshot: `0`
+- Active PR: `#115`
 - Last completed milestone: `P67-MIDNIGHT-SAFE-RECOVERY`
 - Current milestone: `P68-HEALTH-GATE-TELEMETRY`
-- Milestone status: `IMPLEMENTING`
+- Milestone status: `VERIFYING`
 - Product version target: `0.64.0`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
@@ -42,4 +42,4 @@
 
 ## Next Action
 
-Open P68 PR and certify exact-head Lead Engine CI. Squash-merge only after health summary, schedule-gate persistence, CLI telemetry, workflow contract, version metadata and the complete suite are green.
+Verify PR #115 exact-head Lead Engine CI. Squash-merge only after health summary, schedule-gate persistence, CLI telemetry, workflow contract, version metadata and the complete suite are green.
