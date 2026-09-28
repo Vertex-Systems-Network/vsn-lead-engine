@@ -34,6 +34,7 @@ def main() -> int:
             f"Locked CI/runtime surface requires Linux; got {sys.platform}."
         )
 
+    run("install","--require-hashes","-r",".github/dependency-resolver.txt")
     run("install","--require-hashes","-r","requirements-bootstrap.txt")
     lock="requirements-dev.txt" if args.dev else "requirements-runtime.txt"
     run("install","--require-hashes","-r",lock)
