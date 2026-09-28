@@ -917,6 +917,32 @@ accepted/discovered ranking. Config validation rejects unknown modes.
 No source limit, shard-attempt limit, event duration, Google write, R2 write or
 paid API budget is increased.
 
+### P38 parallel packed-registry commit
+
+P30 heartbeat evidence from production run #104 isolated the dominant runtime
+cost to category commit, not source discovery. Real category commits repeatedly
+spent tens of seconds after discovery had already completed, and the P29
+watchdog ultimately stopped the event during a later category commit.
+
+Packed-v2 activation previously read, merged and wrote every touched pack shard
+serially while holding the global packed-registry lock. A category can touch
+dozens of independent pack objects because each permanent lead has multiple
+fingerprint kinds distributed across hash shards.
+
+P38 keeps the same global lock and exact transaction/recovery model, but merges
+distinct pack keys concurrently with a bounded worker pool. The production
+default is 16 pack-commit workers, capped by registry.max_workers. Pack keys are
+independent inside one lock ownership window, so no concurrent writer can race
+these merges.
+
+P38 also emits separate flushed timings for reservation, Google Sheet append
+and R2 activation. The next production event can therefore measure whether any
+remaining commit latency is in Google Sheets, reservation, or permanent pack
+activation.
+
+No dedupe semantics, pending-marker recovery, quota target, source limit, paid
+API use or event timeout is changed.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1240,6 +1266,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P35 critical-deficit rescue: **LAYERED 6×/4×/2×/1× FAIR SLOT REALLOCATION ACTIVE**
 - P36 partition yield routing: **PERSISTED CATEGORY+METRO+PARTITION LEARNING ACTIVE**
 - P37 quota-throughput scoring: **ACCEPTED-PER-SHARD + EXPLORATION ACTIVE**
+- P38 packed commit throughput: **16-WORKER DISTINCT-SHARD MERGE + SUBSTAGE TIMING ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
