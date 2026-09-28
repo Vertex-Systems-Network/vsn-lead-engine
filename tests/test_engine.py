@@ -1471,7 +1471,7 @@ def test_critical_search_geography_expands_bbox_for_extreme_shortfall():
     assert geography["bbox"]==[-98.0,30.0,-97.0,31.0]
 
 
-def test_critical_search_geography_keeps_normal_categories_at_base_bbox():
+def test_critical_search_geography_keeps_half_complete_categories_at_base_bbox():
     geography={
         "country":"Canada",
         "region":"Ontario",
@@ -1481,7 +1481,7 @@ def test_critical_search_geography_keeps_normal_categories_at_base_bbox():
     result=_critical_search_geography(
         geography,
         enabled=True,
-        completion_ratio=0.10,
+        completion_ratio=0.50,
         threshold=0.10,
         bbox_factor=1.75,
     )
