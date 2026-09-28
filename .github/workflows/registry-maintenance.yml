@@ -19,6 +19,7 @@ jobs:
     timeout-minutes: 60
     env:
       GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      GOOGLE_OAUTH_USER_JSON: ${{ secrets.GOOGLE_OAUTH_USER_JSON }}
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -35,7 +36,7 @@ jobs:
       - name: Credential presence
         shell: bash
         run: |
-          test -n "$GOOGLE_SERVICE_ACCOUNT_JSON" || { echo "::error::GOOGLE_SERVICE_ACCOUNT_JSON missing"; exit 1; }
+          { test -n "$GOOGLE_OAUTH_USER_JSON" || test -n "$GOOGLE_SERVICE_ACCOUNT_JSON"; } || { echo "::error::Google OAuth/service-account credential missing"; exit 1; }
           test -n "$R2_ACCOUNT_ID" || { echo "::error::R2_ACCOUNT_ID missing"; exit 1; }
           test -n "$R2_ACCESS_KEY_ID" || { echo "::error::R2_ACCESS_KEY_ID missing"; exit 1; }
           test -n "$R2_SECRET_ACCESS_KEY" || { echo "::error::R2_SECRET_ACCESS_KEY missing"; exit 1; }

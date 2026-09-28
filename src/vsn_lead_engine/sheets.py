@@ -7,6 +7,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from google.oauth2 import service_account
+from google.oauth2.credentials import Credentials as UserCredentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -58,6 +59,67 @@ OVERVIEW_LATEST_METRICS = [
 ]
 
 OVERVIEW_SENTINEL = "VSN Lead Engine — Daily US + Canada Workbook"
+
+GOOGLE_SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+
+
+def google_auth_mode_from_env() -> str:
+    if os.getenv("GOOGLE_OAUTH_USER_JSON","").strip():
+        return "user-oauth"
+    if os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON","").strip():
+        return "service-account"
+    return "missing"
+
+
+def google_credentials_from_env():
+    """Return Google credentials and auth mode, preferring user OAuth for My Drive."""
+    user_raw=os.getenv("GOOGLE_OAUTH_USER_JSON","").strip()
+    if user_raw:
+        try:
+            info=json.loads(user_raw)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("GOOGLE_OAUTH_USER_JSON must contain valid JSON.") from exc
+        if not isinstance(info,dict):
+            raise RuntimeError("GOOGLE_OAUTH_USER_JSON must contain a JSON object.")
+        if str(info.get("type","authorized_user")).strip()!="authorized_user":
+            raise RuntimeError(
+                "GOOGLE_OAUTH_USER_JSON must be Google authorized-user credentials."
+            )
+        try:
+            credentials=UserCredentials.from_authorized_user_info(
+                info,
+                scopes=GOOGLE_SCOPES,
+            )
+        except (TypeError,ValueError) as exc:
+            raise RuntimeError(
+                "GOOGLE_OAUTH_USER_JSON is not valid authorized-user credential data."
+            ) from exc
+        return credentials,"user-oauth"
+
+    raw=os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON","").strip()
+    if not raw:
+        raise RuntimeError(
+            "Google credentials are required. Configure GOOGLE_OAUTH_USER_JSON "
+            "for My Drive ownership-safe writes or GOOGLE_SERVICE_ACCOUNT_JSON "
+            "for existing-file access."
+        )
+    try:
+        info=json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("GOOGLE_SERVICE_ACCOUNT_JSON must contain valid JSON.") from exc
+    try:
+        credentials=service_account.Credentials.from_service_account_info(
+            info,
+            scopes=GOOGLE_SCOPES,
+        )
+    except (TypeError,ValueError) as exc:
+        raise RuntimeError(
+            "GOOGLE_SERVICE_ACCOUNT_JSON is not valid service-account credential data."
+        ) from exc
+    return credentials,"service-account"
 
 
 def count_current_rows(date_rows, status_rows, today: str) -> int:
@@ -143,16 +205,8 @@ def pending_recovery_status(unique_key: str, present_keys: set[str]) -> str:
 
 class GoogleSheetsStore:
     def __init__(self, config: dict, run_date: str | None = None):
-        raw = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
-        if not raw:
-            raise RuntimeError("GOOGLE_SERVICE_ACCOUNT_JSON is required for real writes.")
-        creds = service_account.Credentials.from_service_account_info(
-            json.loads(raw),
-            scopes=[
-                "https://www.googleapis.com/auth/spreadsheets",
-                "https://www.googleapis.com/auth/drive",
-            ],
-        )
+        creds,auth_mode=google_credentials_from_env()
+        self.google_auth_mode=auth_mode
         self.sheets = build("sheets", "v4", credentials=creds, cache_discovery=False)
         self.drive = build("drive", "v3", credentials=creds, cache_discovery=False)
         self.config = config
@@ -206,10 +260,18 @@ class GoogleSheetsStore:
         except HttpError as exc:
             status = getattr(exc.resp, "status", None)
             if status in {403, 429}:
+                auth_mode=getattr(self,"google_auth_mode","unknown")
+                if status==403 and auth_mode=="service-account":
+                    raise RuntimeError(
+                        "Target dated lead workbook is missing and service-account auth "
+                        "cannot create the user-owned My Drive copy. Configure "
+                        "GOOGLE_OAUTH_USER_JSON or precreate the user-owned dated "
+                        "workbook."
+                    ) from exc
                 raise RuntimeError(
-                    "Today's lead workbook is missing and the Google service account "
-                    "could not create it in this My Drive folder. A user-owned daily "
-                    "workbook precreator must create the dated file first."
+                    "Target dated lead workbook is missing and Google "
+                    f"{auth_mode} credentials could not create it in the target "
+                    "folder. Check OAuth scopes/ownership or Drive quota/rate limits."
                 ) from exc
             raise
 

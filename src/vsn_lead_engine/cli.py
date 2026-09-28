@@ -15,7 +15,7 @@ from .registry import audit_sheet_registry, backfill_sheet_registry, build_regis
 from .registry_collision_probe import probe_motorbike_registry_collisions
 from .schedule import readiness_target_date, scheduled_run_window
 from .source_probe import probe_motorbike_source
-from .sheets import GoogleSheetsStore
+from .sheets import GoogleSheetsStore, google_auth_mode_from_env
 from .taxonomy_audit import audit_motorbike_taxonomy
 from .watchdog import supervise_process
 
@@ -221,6 +221,7 @@ def main() -> int:
             "categories":len(config["categories"]),
             "daily_target_total":len(config["categories"])*int(config["runtime"]["daily_target_per_category"]),
             "registry_mode":config["registry"]["mode"],
+            "google_auth_mode":google_auth_mode_from_env(),
         },indent=2))
         return 0
     if args.command=="workbook-ready":

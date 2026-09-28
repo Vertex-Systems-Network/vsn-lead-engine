@@ -3,22 +3,22 @@
   "project": {
     "name": "VSN Lead Engine",
     "repository": "Vertex-Systems-Network/vsn-lead-engine",
-    "product_version": "0.59.0"
+    "product_version": "0.60.0"
   },
   "execution": {
     "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
-    "active_task": "P63-DEPLOYMENT-READINESS-CATCHUP",
-    "last_completed_task": "P62-NEXT-DAY-WORKBOOK-PREFLIGHT",
-    "next_task": "P64-NEXT-EVIDENCE-BASED-MILESTONE"
+    "active_task": "P64-USER-OAUTH-MY-DRIVE",
+    "last_completed_task": "P63-DEPLOYMENT-READINESS-CATCHUP",
+    "next_task": "P65-NEXT-EVIDENCE-BASED-MILESTONE"
   },
-  "observed_main_sha": "92569798e971c36dc36ec6eef12b5289529e3aa2",
+  "observed_main_sha": "399c7deffb3d25571480bc347ac1810755c8c101",
   "active_issue": null,
-  "active_pr": 110,
-  "active_branch": "feat/p63-deployment-readiness-catchup",
-  "current_milestone": "P63-DEPLOYMENT-READINESS-CATCHUP",
+  "active_pr": 111,
+  "active_branch": "feat/p64-user-oauth-drive",
+  "current_milestone": "P64-USER-OAUTH-MY-DRIVE",
   "milestone_status": "VERIFYING",
-  "last_completed_milestone": "P62 added bounded today/tomorrow readiness targeting, 20:50 PKT next-day preflight, 07:50 PKT same-day recovery and distinct next-day health telemetry; PR #109 exact-head CI passed 261 tests and merged.",
+  "last_completed_milestone": "P63 added a bounded main-push next-day readiness catch-up; PR #110 exact-head CI passed 262 tests and merged. Production catch-up run #2 correctly targeted 2026-09-29 but failed closed because service-account auth could not create a user-owned My Drive file.",
   "production": {
     "last_certified_date": "2026-09-28",
     "daily_target": 12000,
@@ -29,16 +29,18 @@
     "production_run": 162
   },
   "quality": {
-    "latest_required_ci_run": 205,
+    "latest_required_ci_run": 207,
     "latest_required_ci_result": "success",
-    "pytest": "261 passed",
+    "pytest": "262 passed",
     "node20_deprecation_warning": false
   },
-  "blockers": [],
+  "blockers": [
+    "GOOGLE_OAUTH_USER_JSON is not yet configured in GitHub; future autonomous My Drive creation still falls back to the service account until that secret is added."
+  ],
   "timeout_control": {
     "tight_polling_forbidden": true,
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Verify PR #110 exact-head Lead Engine CI. If green, squash-merge PR #110; the resulting main push must trigger Daily Workbook Readiness and target next-day. Verify that workflow plus the 2026-09-29 workbook before closing P63."
+  "exact_next_safe_action": "Verify PR #111 exact-head Lead Engine CI. If green, squash-merge. The merge push must trigger Daily Workbook Readiness; verify 2026-09-29 workbook initialization succeeds on the precreated user-owned file. Future missing-file autonomy still requires GOOGLE_OAUTH_USER_JSON."
 }
