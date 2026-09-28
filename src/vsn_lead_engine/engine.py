@@ -11,7 +11,13 @@ from .enrichment import build_contact_enricher
 from .health import DailyHealthLedgerStore, run_health_event
 from .normalize import normalize_phone
 from .progress import emit_progress
-from .scheduler import build_shard_plan, run_cursor, yield_hint_key
+from .scheduler import (
+    build_shard_plan,
+    partition_yield_hint_key,
+    run_cursor,
+    select_candidate_partition,
+    yield_hint_key,
+)
 from .registry import build_registry_index, fingerprint_token, registry_mode
 from .sheets import GoogleSheetsStore
 from .sources import build_sources
@@ -145,17 +151,31 @@ def _dedupe_source_batch(candidates: list) -> tuple[list,int]:
 def _candidate_partition_geography(
     geography: dict,
     *,
+    category: str = "",
     cursor: int,
     attempt: int,
     partition_count: int,
+    yield_hints: dict[str,dict] | None = None,
+    adaptive_enabled: bool = True,
+    exploration_bonus: float = 0.15,
 ) -> dict:
-    """Attach a deterministic rotating source cohort to one shard search."""
+    """Attach an adaptive rotating source cohort to one shard search."""
     count=max(1,int(partition_count))
-    partition=(int(cursor)+max(0,int(attempt)-1)) % count
+    partition,score=select_candidate_partition(
+        category,
+        geography,
+        partition_count=count,
+        cursor=cursor,
+        attempt=attempt,
+        yield_hints=yield_hints,
+        adaptive_enabled=adaptive_enabled,
+        exploration_bonus=exploration_bonus,
+    )
     return {
         **geography,
         "_candidate_partition_count":count,
         "_candidate_partition":partition,
+        "_candidate_partition_score":score,
     }
 
 
@@ -188,6 +208,29 @@ def _update_yield_hints(
                 continue
             if 0 <= partition < 64:
                 partition_mask |= 1 << partition
+
+                partition_key=partition_yield_hint_key(
+                    category,
+                    geography,
+                    partition,
+                )
+                partition_hint=yield_hints.setdefault(
+                    partition_key,
+                    {"visits":0,"discovered":0,"accepted":0},
+                )
+                partition_hint["visits"]=int(
+                    partition_hint.get("visits",0) or 0
+                )+1
+                partition_hint["discovered"]=int(
+                    partition_hint.get("discovered",0) or 0
+                )+max(0,int(source.get("discovered",0) or 0))
+                partition_hint["accepted"]=int(
+                    partition_hint.get("accepted",0) or 0
+                )+max(0,int(source.get("accepted",0) or 0))
+                partition_hint["accepted"]=min(
+                    partition_hint["accepted"],
+                    partition_hint["discovered"],
+                )
         if partition_mask:
             hint["partition_mask"]=partition_mask
 
@@ -498,6 +541,9 @@ def run_once(
     adaptive_yield_exploration_bonus=float(
         runtime.get("adaptive_yield_exploration_bonus",0.15)
     )
+    adaptive_partition_yield_routing=bool(
+        runtime.get("adaptive_partition_yield_routing",True)
+    )
     adaptive_cooldown_enabled=bool(
         runtime.get("adaptive_zero_yield_cooldown_enabled",True)
     )
@@ -615,9 +661,13 @@ def run_once(
 
             search_geography=_candidate_partition_geography(
                 geography,
+                category=category,
                 cursor=cursor,
                 attempt=shard["attempt"],
                 partition_count=candidate_partition_count,
+                yield_hints=yield_hints,
+                adaptive_enabled=adaptive_partition_yield_routing,
+                exploration_bonus=adaptive_yield_exploration_bonus,
             )
             source_started_monotonic=time.monotonic()
             emit_progress(
@@ -635,6 +685,9 @@ def run_once(
                 ),
                 candidate_partition_count=int(
                     search_geography["_candidate_partition_count"]
+                ),
+                candidate_partition_score=search_geography.get(
+                    "_candidate_partition_score"
                 ),
                 requested_limit=int(remaining),
             )
@@ -846,6 +899,9 @@ def run_once(
                 "accepted":accepted_from_source,
                 "candidate_partition":search_geography["_candidate_partition"],
                 "candidate_partition_count":search_geography["_candidate_partition_count"],
+                "candidate_partition_score":search_geography.get(
+                    "_candidate_partition_score"
+                ),
                 "source_batch_duplicates":source_batch_duplicates,
                 "remote_prefilter_candidates":remote_prefilter_candidates,
                 "remote_prefilter_duplicates":remote_prefilter_duplicates,
@@ -901,6 +957,7 @@ def run_once(
         "source_batch_dedupe":source_batch_dedupe_enabled,
         "r2_pre_enrichment_prefilter":remote_prefilter_enabled,
         "adaptive_yield_routing":adaptive_yield_routing,
+        "adaptive_partition_yield_routing":adaptive_partition_yield_routing,
         "adaptive_yield_hints_used":len(yield_hints or {}),
         "adaptive_zero_yield_cooldown":adaptive_cooldown_enabled,
         "adaptive_cooldown_routes_deferred":max(

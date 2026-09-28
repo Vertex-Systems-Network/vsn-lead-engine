@@ -1,6 +1,10 @@
 from collections import Counter
 
-from vsn_lead_engine.scheduler import build_shard_plan
+from vsn_lead_engine.scheduler import (
+    build_shard_plan,
+    partition_yield_hint_key,
+    select_candidate_partition,
+)
 
 
 CATEGORIES=["A","B","C"]
@@ -475,3 +479,83 @@ def test_zero_yield_route_cools_after_four_distinct_partitions():
     )
     assert plan[0]["geography"]["city"]=="US2"
     assert all(item["adaptive_cooldown_deferred_count"]==1 for item in plan)
+
+
+def test_partition_key_is_scoped_to_category_market_and_partition():
+    geo=GEOS[0]
+    assert partition_yield_hint_key("Motorbikes",geo,3)==(
+        "motorbikes|united states|r1|us1|partition:3"
+    )
+
+
+def test_partition_routing_prefers_productive_partition_over_rotated_base():
+    geo=GEOS[0]
+    hints={
+        partition_yield_hint_key("Motorbikes",geo,0):{
+            "visits":3,
+            "discovered":90,
+            "accepted":0,
+        },
+        partition_yield_hint_key("Motorbikes",geo,1):{
+            "visits":2,
+            "discovered":80,
+            "accepted":40,
+        },
+    }
+    partition,score=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=4,
+        cursor=0,
+        attempt=1,
+        yield_hints=hints,
+        adaptive_enabled=True,
+        exploration_bonus=0.15,
+    )
+    assert partition==1
+    assert score > 0.5
+
+
+def test_partition_routing_explores_unseen_before_known_zero_yield():
+    geo=GEOS[0]
+    hints={
+        partition_yield_hint_key("Motorbikes",geo,0):{
+            "visits":4,
+            "discovered":120,
+            "accepted":0,
+        },
+    }
+    partition,score=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=4,
+        cursor=0,
+        attempt=1,
+        yield_hints=hints,
+        adaptive_enabled=True,
+        exploration_bonus=0.15,
+    )
+    assert partition==1
+    assert score==0.15
+
+
+def test_partition_routing_can_be_disabled_for_deterministic_rotation():
+    geo=GEOS[0]
+    hints={
+        partition_yield_hint_key("Motorbikes",geo,2):{
+            "visits":1,
+            "discovered":50,
+            "accepted":50,
+        },
+    }
+    partition,score=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=4,
+        cursor=5,
+        attempt=2,
+        yield_hints=hints,
+        adaptive_enabled=False,
+    )
+    assert partition==2
+    assert score is None
