@@ -433,23 +433,29 @@ class DailyHealthLedgerStore:
 
     @staticmethod
     def _summary(events: list[dict]) -> dict:
+        def executed_run(item: dict) -> bool:
+            return (
+                item.get("kind")=="run"
+                and item.get("status")!="scheduled-window-skipped"
+            )
+
         native=sum(
             1 for item in events
-            if item.get("kind")=="run" and item.get("origin")=="native-schedule"
+            if executed_run(item) and item.get("origin")=="native-schedule"
         )
         recovery_push=sum(
             1 for item in events
-            if item.get("kind")=="run" and item.get("origin")=="recovery-push"
+            if executed_run(item) and item.get("origin")=="recovery-push"
         )
         recovery_supervisor=sum(
             1 for item in events
-            if item.get("kind")=="run"
+            if executed_run(item)
             and item.get("origin")=="recovery-supervisor"
         )
         recovery=recovery_push+recovery_supervisor
         manual=sum(
             1 for item in events
-            if item.get("kind")=="run" and item.get("origin")=="manual"
+            if executed_run(item) and item.get("origin")=="manual"
         )
         incidents=sum(
             1 for item in events
