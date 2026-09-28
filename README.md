@@ -1244,6 +1244,22 @@ always matches the runtime `__version__`.
 This is release-process hardening only; lead discovery, quota scheduling,
 enrichment, R2 dedupe and Google write behavior are unchanged.
 
+### P52 tail geography retention
+
+The 2026-09-28 live workbook reached **11,829 / 12,000** accepted daily rows
+with every category complete except Motorbikes at **829 / 1,000**. Motorbikes
+was already highly dedupe-saturated, while the existing P43/P44 geography
+helper stopped widening metro bounds once category completion rose above 25%.
+
+P52 keeps a bounded **1.5x metro bbox** active when four or fewer categories
+remain incomplete, until the category reaches quota. Existing low-completion
+expansion still wins: 1.75x and 2.25x critical expansion are never reduced by
+tail mode.
+
+This expands tail discovery into nearby suburbs/outskirts without adding paid
+sources, increasing per-shard limits, weakening taxonomy checks, or changing
+R2/Google write semantics.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1581,6 +1597,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P49 combined daily state snapshot: **SINGLE SHEETS STATE READ PER BOUNDARY ACTIVE**
 - P50 runtime identity consistency: **PACKAGE-VERSIONED OUTBOUND IDENTITY ACTIVE**
 - P51 single-source release version: **SETUPTOOLS METADATA DERIVED FROM RUNTIME VERSION ACTIVE**
+- P52 tail geography retention: **1.5× BOUNDED OUTSKIRTS COVERAGE IN QUOTA TAIL ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
