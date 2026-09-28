@@ -216,15 +216,18 @@ class GoogleSheetsStore:
         self._initialize_new_daily_workbook(created["id"])
         return created
 
-    def _initialize_new_daily_workbook(self, spreadsheet_id: str):
-        date_value = self._today()
-        metadata = self.sheets.spreadsheets().get(
+    def _ensure_spreadsheet_timezone(
+        self,
+        spreadsheet_id: str,
+        metadata: dict | None = None,
+    ):
+        metadata = metadata or self.sheets.spreadsheets().get(
             spreadsheetId=spreadsheet_id,
-            fields="properties(title,timeZone),sheets.properties",
+            fields="properties(timeZone)",
         ).execute(num_retries=self.api_retries)
-        self._ensure_tabs(spreadsheet_id, metadata)
-
-        desired_timezone=str(self.config["runtime"].get("timezone","Asia/Karachi")).strip()
+        desired_timezone=str(
+            self.config["runtime"].get("timezone","Asia/Karachi")
+        ).strip()
         current_timezone=str(
             metadata.get("properties",{}).get("timeZone","")
         ).strip()
@@ -242,6 +245,15 @@ class GoogleSheetsStore:
                     ]
                 },
             ).execute(num_retries=self.api_retries)
+
+    def _initialize_new_daily_workbook(self, spreadsheet_id: str):
+        date_value = self._today()
+        metadata = self.sheets.spreadsheets().get(
+            spreadsheetId=spreadsheet_id,
+            fields="properties(title,timeZone),sheets.properties",
+        ).execute(num_retries=self.api_retries)
+        self._ensure_tabs(spreadsheet_id, metadata)
+        self._ensure_spreadsheet_timezone(spreadsheet_id, metadata)
 
         # A copied template must start clean. Preserve header rows and tab
         # formatting while removing any old lead rows.
@@ -270,13 +282,13 @@ class GoogleSheetsStore:
             body={"values": self._overview_seed(date_value)},
         ).execute(num_retries=self.api_retries)
 
-    def _should_initialize_precreated_workbook(self, spreadsheet_id: str) -> bool:
+    def _precreated_workbook_state(self, spreadsheet_id: str) -> str:
         overview = self.sheets.spreadsheets().values().get(
             spreadsheetId=spreadsheet_id,
             range="'Overview'!A1:B10",
         ).execute(num_retries=self.api_retries).get("values",[])
         if overview_schema_is_current(overview,self._today()):
-            return False
+            return "current"
 
         response=self.sheets.spreadsheets().values().batchGet(
             spreadsheetId=spreadsheet_id,
@@ -286,7 +298,47 @@ class GoogleSheetsStore:
             ],
             valueRenderOption="UNFORMATTED_VALUE",
         ).execute(num_retries=self.api_retries)
-        return category_tabs_are_blank(response.get("valueRanges",[]))
+        return (
+            "blank-stale"
+            if category_tabs_are_blank(response.get("valueRanges",[]))
+            else "populated-stale"
+        )
+
+    def _upgrade_overview_only(self, spreadsheet_id: str):
+        """Upgrade stale Overview without touching populated category rows."""
+        existing=self.sheets.spreadsheets().values().get(
+            spreadsheetId=spreadsheet_id,
+            range="'Overview'!A1:B100",
+        ).execute(num_retries=self.api_retries).get("values",[])
+        preserve_names=set(OVERVIEW_INCREMENT_METRICS) | set(
+            OVERVIEW_LATEST_METRICS
+        ) | {
+            "United States Leads Today",
+            "Canada Leads Today",
+        }
+        preserved={
+            str(row[0]).strip():row[1]
+            for row in existing
+            if (
+                row
+                and len(row)>1
+                and str(row[0]).strip() in preserve_names
+            )
+        }
+
+        self.sheets.spreadsheets().values().clear(
+            spreadsheetId=spreadsheet_id,
+            range="'Overview'!A:B",
+            body={},
+        ).execute(num_retries=self.api_retries)
+        self.sheets.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id,
+            range="'Overview'!A1",
+            valueInputOption="USER_ENTERED",
+            body={"values":self._overview_seed(self._today())},
+        ).execute(num_retries=self.api_retries)
+        if preserved:
+            self.set_overview_metrics(spreadsheet_id,preserved)
 
     def ensure_lead_workbook(self):
         date_value = self._today()
@@ -312,17 +364,21 @@ class GoogleSheetsStore:
                 True,
             )
         )
-        if (
-            not created
-            and bootstrap_precreated
-            and self._should_initialize_precreated_workbook(sid)
-        ):
-            self._initialize_new_daily_workbook(sid)
-            initialized = True
-            metadata = self.sheets.spreadsheets().get(
-                spreadsheetId=sid,
-                fields="properties(title,timeZone),sheets.properties",
-            ).execute(num_retries=self.api_retries)
+        if not created and bootstrap_precreated:
+            precreated_state=self._precreated_workbook_state(sid)
+            if precreated_state=="blank-stale":
+                self._initialize_new_daily_workbook(sid)
+                initialized = True
+            elif precreated_state=="populated-stale":
+                self._upgrade_overview_only(sid)
+                self._ensure_spreadsheet_timezone(sid,metadata)
+                initialized = True
+
+            if initialized:
+                metadata = self.sheets.spreadsheets().get(
+                    spreadsheetId=sid,
+                    fields="properties(title,timeZone),sheets.properties",
+                ).execute(num_retries=self.api_retries)
 
         self._ensure_overview_metrics(sid)
         self._refresh_overview_formulas(sid, date_value)
