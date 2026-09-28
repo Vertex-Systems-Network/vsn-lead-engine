@@ -12,6 +12,7 @@ WORKFLOWS = [
     "taxonomy-audit.yml",
     "main-protection-controller.yml",
     "dependency-lock.yml",
+    "google-drive-capability.yml",
 ]
 
 CHECKOUT_SHA = "3d3c42e5aac5ba805825da76410c181273ba90b1"
