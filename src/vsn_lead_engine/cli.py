@@ -13,7 +13,7 @@ from .health import (
 )
 from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
 from .registry_collision_probe import probe_motorbike_registry_collisions
-from .schedule import scheduled_run_window
+from .schedule import readiness_target_date, scheduled_run_window
 from .source_probe import probe_motorbike_source
 from .sheets import GoogleSheetsStore
 from .taxonomy_audit import audit_motorbike_taxonomy
@@ -104,8 +104,14 @@ def main() -> int:
     parser=argparse.ArgumentParser(prog="vsn-lead-engine")
     sub=parser.add_subparsers(dest="command",required=True)
     sub.add_parser("validate")
-    sub.add_parser("workbook-ready")
+    ready_parser=sub.add_parser("workbook-ready")
+    ready_target=ready_parser.add_mutually_exclusive_group()
+    ready_target.add_argument("--date",default=None)
+    ready_target.add_argument("--next-day",action="store_true")
     recovery_parser=sub.add_parser("workbook-ready-recover")
+    recovery_target=recovery_parser.add_mutually_exclusive_group()
+    recovery_target.add_argument("--date",default=None)
+    recovery_target.add_argument("--next-day",action="store_true")
     recovery_parser.add_argument("--attempts",type=int,default=None)
     recovery_parser.add_argument("--delay-seconds",type=float,default=None)
     recovery_parser.add_argument("--record-health",action="store_true")
@@ -218,14 +224,33 @@ def main() -> int:
         },indent=2))
         return 0
     if args.command=="workbook-ready":
-        print(json.dumps(check_workbook_readiness(config),indent=2,default=str))
+        target=readiness_target_date(
+            config,
+            explicit_date=args.date,
+            next_day=bool(args.next_day),
+        )
+        result=check_workbook_readiness(
+            config,
+            run_date=target["run_date"],
+        )
+        result["target_kind"]=target["target_kind"]
+        result["target_resolved_at"]=target["resolved_at"]
+        print(json.dumps(result,indent=2,default=str))
         return 0
     if args.command=="workbook-ready-recover":
+        target=readiness_target_date(
+            config,
+            explicit_date=args.date,
+            next_day=bool(args.next_day),
+        )
         result=recover_workbook_readiness(
             config,
+            run_date=target["run_date"],
             attempts=args.attempts,
             delay_seconds=args.delay_seconds,
         )
+        result["target_kind"]=target["target_kind"]
+        result["target_resolved_at"]=target["resolved_at"]
         if args.record_health:
             result["health_ledger"]=_health_append(
                 config,
