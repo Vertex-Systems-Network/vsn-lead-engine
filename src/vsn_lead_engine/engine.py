@@ -151,7 +151,7 @@ def _dedupe_source_batch(candidates: list) -> tuple[list,int]:
 def _candidate_partition_geography(
     geography: dict,
     *,
-    category: str,
+    category: str = "",
     cursor: int,
     attempt: int,
     partition_count: int,
