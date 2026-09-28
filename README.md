@@ -965,6 +965,34 @@ process failure.
 This changes no daily quota, source limit, paid API usage, dedupe authority or
 watchdog duration.
 
+### P40 quota recovery supervisor
+
+The production engine is intentionally bounded to a 25-minute child event, but
+the daily business requirement is not bounded to one event: every category
+should keep progressing toward 1,000 accepted leads for the current dated
+workbook. Before P40, only the hourly native schedule and manually changed
+lead-run trigger could start another real event.
+
+P40 adds a separate `Lead Engine Recovery Supervisor` workflow. After a
+default-branch non-PR Lead Engine run completes—successfully or through a
+controlled P29 watchdog exit—the supervisor:
+
+- checks the existing configured Asia/Karachi run window;
+- reads the live dated workbook with the existing readiness recovery command;
+- stops immediately when all category quotas are complete;
+- checks GitHub Actions for an already queued/in-progress real main-branch run;
+- dispatches exactly one `workflow_dispatch` recovery run only when shortfall
+  remains and no real run is already active.
+
+The supervisor uses the repository `GITHUB_TOKEN` with only `actions: write`
+and `contents: read`. GitHub permits workflow-dispatch events created with
+`GITHUB_TOKEN`, while ordinary token-generated events remain
+recursion-protected. The time-window gate bounds the recovery chain, and the
+Lead Engine concurrency group continues to serialize real execution.
+
+A runtime kill switch, `recovery_supervisor_enabled`, can stop automatic
+continuation without removing the workflow.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1290,6 +1318,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P37 quota-throughput scoring: **ACCEPTED-PER-SHARD + EXPLORATION ACTIVE**
 - P38 packed commit throughput: **16-WORKER DISTINCT-SHARD MERGE + SUBSTAGE TIMING ACTIVE**
 - P39 commit deadline guard: **180S CLEAN COMMIT-START RESERVE ACTIVE**
+- P40 quota recovery supervisor: **LIVE SHORTFALL CHECK + SINGLE SERIALIZED REDISPATCH ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
