@@ -1330,6 +1330,28 @@ resume ordering and the immutable GitHub Actions security rule. This milestone
 does not change lead discovery, quota logic, R2 dedupe, Google writes, schedules
 or production runtime behavior.
 
+### P57 automated dependency update PRs
+
+P55 made GitHub Actions execution immutable by pinning reviewed release SHAs.
+P57 adds the update path needed to keep those pins and Python dependencies from
+silently aging.
+
+`.github/dependabot.yml` now monitors:
+
+- GitHub Actions at the repository root, weekly;
+- Python/pip dependencies from the root `pyproject.toml`, weekly;
+- both schedules in `Asia/Karachi`;
+- grouped updates to reduce PR noise;
+- a small open-PR ceiling so automation cannot flood protected main.
+
+Dependabot only proposes changes. Every generated PR must still pass the normal
+protected-main validation before it can merge. The pip policy uses
+`increase-if-necessary`, so version constraints are only raised when the
+existing manifest does not already allow the update.
+
+A repository regression test guards the required ecosystems, weekly schedule,
+timezone, grouping and PR limits.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1672,6 +1694,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P54 workflow runtime modernization: **NODE 24 FIRST-PARTY ACTION MAJORS v7 ACTIVE**
 - P55 CI supply-chain pinning: **IMMUTABLE CHECKOUT/SETUP-PYTHON RELEASE SHAS ACTIVE**
 - P56 persistent AI resume state: **COMPACT STATE + CHECKPOINT + RECOVERY CONTRACT ACTIVE**
+- P57 dependency update automation: **DEPENDABOT ACTIONS + PIP WEEKLY GROUPED PRS ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
