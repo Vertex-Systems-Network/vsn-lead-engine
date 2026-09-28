@@ -4,6 +4,7 @@ import argparse
 import difflib
 import json
 import platform
+import pip
 import re
 import subprocess
 import sys
@@ -19,6 +20,7 @@ PYPROJECT=ROOT/"pyproject.toml"
 BOOTSTRAP=ROOT/"requirements-bootstrap.txt"
 RUNTIME=ROOT/"requirements-runtime.txt"
 DEV=ROOT/"requirements-dev.txt"
+RESOLVER=ROOT/".github/dependency-resolver.txt"
 
 LOCK_LINE_RE=re.compile(
     r"^(?P<name>[A-Za-z0-9_.-]+)==(?P<version>[^\s]+)"
@@ -53,6 +55,20 @@ def ensure_platform() -> None:
 
 def read_pyproject() -> dict:
     return tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+
+
+def ensure_resolver() -> None:
+    versions=parse_existing_versions(RESOLVER)
+    expected=versions.get("pip")
+    if not expected:
+        raise SystemExit(".github/dependency-resolver.txt must pin pip exactly.")
+    if pip.__version__ != expected:
+        raise SystemExit(
+            "Hash-lock regeneration requires the reviewed pip resolver "
+            f"{expected}; got {pip.__version__}. Install it with "
+            "'python -m pip install --require-hashes "
+            "-r .github/dependency-resolver.txt'."
+        )
 
 
 def parse_existing_versions(path: Path) -> dict[str,str]:
@@ -179,6 +195,7 @@ def render_dev(
 
 def generate_contents() -> dict[Path,str]:
     ensure_platform()
+    ensure_resolver()
     data=read_pyproject()
     project=data["project"]
     runtime_requirements=list(project["dependencies"])
@@ -187,16 +204,7 @@ def generate_contents() -> dict[Path,str]:
         *project.get("optional-dependencies",{}).get("dev",[]),
     ]
 
-    bootstrap_versions=parse_existing_versions(BOOTSTRAP)
-    pip_version=bootstrap_versions.get("pip")
-    if not pip_version:
-        raise SystemExit(
-            "requirements-bootstrap.txt must keep an explicit pip== version seed."
-        )
-    bootstrap_requirements=[
-        f"pip=={pip_version}",
-        *exact_build_requirements(data),
-    ]
+    bootstrap_requirements=exact_build_requirements(data)
 
     with tempfile.TemporaryDirectory(prefix="vsn-lock-") as tmp:
         temp=Path(tmp)
