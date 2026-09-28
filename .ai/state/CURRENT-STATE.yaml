@@ -6,7 +6,7 @@
     "product_version": "0.66.0"
   },
   "execution": {
-    "status": "active",
+    "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
     "active_task": "P70-DEPLOYMENT-READINESS-DAY-BOUNDARY",
     "last_completed_task": "P69-WORKBOOK-LIFECYCLE-SERIALIZATION",
@@ -14,10 +14,10 @@
   },
   "observed_main_sha": "9af8b3f14098e1a07636c9a2008d00e720d6b16d",
   "active_issue": null,
-  "active_pr": null,
+  "active_pr": 117,
   "active_branch": "feat/p70-deployment-readiness-boundary",
   "current_milestone": "P70-DEPLOYMENT-READINESS-DAY-BOUNDARY",
-  "milestone_status": "IMPLEMENTING",
+  "milestone_status": "VERIFYING",
   "last_completed_milestone": "P69 serialized Lead Engine production and Daily Workbook Readiness through one shared queue and made duplicate dated workbooks fail closed; PR #116 exact-head CI #227 passed 299 tests and merged. The first post-merge catch-up ran at 00:20 PKT and targeted 2026-09-30 under the old unconditional next-day rule, exposing the P70 boundary gap rather than a P69 regression.",
   "production": {
     "last_certified_date": "2026-09-28",
@@ -42,5 +42,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Open P70 PR and verify exact-head Lead Engine CI. Confirm 00:20/20:49/20:50/23:59 deployment target boundaries, workflow use of the shared resolver, cutoff config/cron alignment, runtime version 0.66.0 and the complete suite; squash-merge only when green."
+  "exact_next_safe_action": "Verify PR #117 exact-head Lead Engine CI. Confirm deployment target boundaries at 00:20/20:49/20:50/23:59 PKT, workflow use of deployment_readiness_target, cutoff config/cron alignment, runtime version 0.66.0 and the complete suite; squash-merge only when green."
 }
