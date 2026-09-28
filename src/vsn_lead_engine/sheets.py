@@ -380,6 +380,7 @@ class GoogleSheetsStore:
                     fields="properties(title,timeZone),sheets.properties",
                 ).execute(num_retries=self.api_retries)
 
+        self._ensure_spreadsheet_timezone(sid,metadata)
         self._ensure_overview_metrics(sid)
         self._refresh_overview_formulas(sid, date_value)
         self.set_overview_metrics(
