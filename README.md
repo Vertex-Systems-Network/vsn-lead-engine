@@ -1150,6 +1150,31 @@ This does not increase per-run shard limits, event duration, source requests,
 Google writes or R2 writes. It only guarantees that the existing bounded
 recovery engine is revisited while quota remains incomplete.
 
+### P47 tail-mode cycle extension
+
+Production certification runs consistently completed in roughly five to seven
+minutes while the supervised child budget allows up to 25 minutes. Once the
+daily workbook reaches the tail, startup and recovery-heartbeat overhead becomes
+a larger share of elapsed time than discovery itself.
+
+P47 keeps the normal broad-day event at the existing **3 cycles**, but when the
+live workbook has **4 or fewer incomplete categories**, the same process may
+continue up to **8 cycles**. Every extended cycle still re-reads live quota and
+dedupe state, rotates its cursor, and remains bounded by the existing event
+deadline.
+
+Safety remains unchanged:
+
+- the 25-minute event wall-time and deadline guards still stop the process;
+- 3 consecutive zero-progress cycles still stop exploration early;
+- per-cycle shard attempts and candidate limits are unchanged;
+- no paid provider, Google-write budget or R2-write semantics are added;
+- disabling `tail_cycle_extension_enabled` restores the previous 3-cycle
+  behavior.
+
+This uses otherwise-idle free runner time to close tail shortfalls faster,
+especially the remaining Motorbikes quota.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
