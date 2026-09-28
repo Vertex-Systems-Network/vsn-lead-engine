@@ -10,6 +10,7 @@ from .health import (
     incident_health_event,
     readiness_health_event,
     run_health_event,
+    schedule_gate_health_event,
 )
 from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
 from .registry_collision_probe import probe_motorbike_registry_collisions
@@ -148,6 +149,8 @@ def main() -> int:
     incident_parser.add_argument("--origin",required=True)
     incident_parser.add_argument("--error-type",required=True)
     incident_parser.add_argument("--message",required=True)
+    gate_health_parser=sub.add_parser("health-schedule-gate")
+    gate_health_parser.add_argument("--origin",required=True)
     args=parser.parse_args()
     config=load_config()
     if args.command=="supervised-run":
@@ -375,6 +378,26 @@ def main() -> int:
         )
         print(json.dumps(result,indent=2,default=str))
         return 0 if result.get("recorded") else 2
+    if args.command=="health-schedule-gate":
+        gate=scheduled_run_window(config)
+        event=schedule_gate_health_event(
+            gate,
+            origin=args.origin,
+            timestamp=datetime.now(
+                ZoneInfo(config["runtime"]["timezone"])
+            ).isoformat(),
+        )
+        result={
+            "gate":gate,
+            "event":event,
+            "health_ledger":_health_append(
+                config,
+                gate["run_date"],
+                event,
+            ),
+        }
+        print(json.dumps(result,indent=2,default=str))
+        return 0 if result["health_ledger"].get("recorded") else 2
     if args.command=="health-show":
         run_date=args.date or _run_date(config)
         index=_registry_index(config)
