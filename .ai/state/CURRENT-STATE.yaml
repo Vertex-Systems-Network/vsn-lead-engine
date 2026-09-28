@@ -6,7 +6,7 @@
     "product_version": "0.62.0"
   },
   "execution": {
-    "status": "active",
+    "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
     "active_task": "P66-STRICT-OAUTH-CERTIFICATION",
     "last_completed_task": "P65-OAUTH-ONBOARDING-AND-CAPABILITY",
@@ -14,10 +14,10 @@
   },
   "observed_main_sha": "584bdc8188f8aaa8b0993990911bffdb6ddf75f6",
   "active_issue": null,
-  "active_pr": null,
+  "active_pr": 113,
   "active_branch": "feat/p66-strict-oauth-certification",
   "current_milestone": "P66-STRICT-OAUTH-CERTIFICATION",
-  "milestone_status": "IMPLEMENTING",
+  "milestone_status": "VERIFYING",
   "last_completed_milestone": "P65 added PKCE OAuth onboarding, fail-fast My Drive ownership checks, a Drive create/trash capability probe and manual certification workflow; PR #112 exact-head CI passed 277 tests and merged. Production readiness run #4 remained green for 2026-09-29.",
   "production": {
     "last_certified_date": "2026-09-28",
@@ -42,5 +42,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Open P66 PR and verify exact-head Lead Engine CI. If green, squash-merge. After merge, generate the authorized-user JSON locally with scripts/google_oauth_onboard.py, add it as GOOGLE_OAUTH_USER_JSON in GitHub, then run the Google Drive Capability workflow. Do not mark autonomous My Drive creation certified until that strict user-OAuth probe is green."
+  "exact_next_safe_action": "Verify PR #113 exact-head Lead Engine CI. If green, squash-merge. After merge, autonomous My Drive creation remains blocked until GOOGLE_OAUTH_USER_JSON is provisioned and the strict Google Drive Capability create/trash workflow passes."
 }
