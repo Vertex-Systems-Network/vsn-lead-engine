@@ -1650,6 +1650,13 @@ def run_until_quota(
                 final_status="complete"
                 break
 
+            if int(result.get("accepted",0) or 0) <= 0:
+                zero_progress_streak += 1
+                if zero_progress_streak >= max_zero_progress_cycles:
+                    break
+            else:
+                zero_progress_streak = 0
+
             incomplete_categories=sum(
                 1
                 for category in config["categories"]
@@ -1663,13 +1670,6 @@ def run_until_quota(
                 )
             ):
                 break
-
-            if int(result.get("accepted",0) or 0) <= 0:
-                zero_progress_streak += 1
-                if zero_progress_streak >= max_zero_progress_cycles:
-                    break
-            else:
-                zero_progress_streak = 0
 
         if yield_state_store is not None and yield_state_dirty:
             try:
