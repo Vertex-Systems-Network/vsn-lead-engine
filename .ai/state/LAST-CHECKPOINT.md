@@ -28,6 +28,17 @@
 - Lead Engine production schedule remains configured from 08:00 PKT onward.
 - Open pull requests are zero.
 
+## Not Verified
+
+- The 2026-09-29 real 08:00 PKT Lead Engine production run has not happened yet.
+- The 2026-09-29 daily 12,000-lead quota is therefore not yet certified.
+- Autonomous creation of a genuinely missing My Drive workbook is not certified because `GOOGLE_OAUTH_USER_JSON` is not yet provisioned.
+
+## Known Risk
+
+- Existing/precreated workbooks are operational, but a future genuinely missing My Drive workbook still depends on the pending user-OAuth authorization.
+- No new development milestone should be started solely to remove hypothetical risks; use production evidence as the trigger.
+
 ## Production-Ready Boundary
 
 The repository should not automatically start another P71/P72 hardening
