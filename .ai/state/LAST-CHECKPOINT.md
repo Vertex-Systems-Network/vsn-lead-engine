@@ -5,10 +5,10 @@
 - Snapshot timestamp: `2026-09-28`
 - Observed main: `399c7deffb3d25571480bc347ac1810755c8c101`
 - Open issues at snapshot: `0`
-- Open PRs at snapshot: `0`
+- Active PR: `#111`
 - Last completed milestone: `P63-DEPLOYMENT-READINESS-CATCHUP`
 - Current milestone: `P64-USER-OAUTH-MY-DRIVE`
-- Milestone status: `IMPLEMENTING`
+- Milestone status: `VERIFYING`
 - Product version target: `0.60.0`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
@@ -42,4 +42,4 @@
 
 ## Next Action
 
-Open P64 PR and certify exact-head CI. If green, squash-merge and verify the merge-push readiness catch-up successfully initializes the user-owned 2026-09-29 workbook. Then add GOOGLE_OAUTH_USER_JSON to remove the remaining future creation blocker.
+Verify PR #111 exact-head Lead Engine CI. If green, squash-merge and verify the merge-push readiness catch-up successfully initializes the user-owned 2026-09-29 workbook. Then add GOOGLE_OAUTH_USER_JSON to remove the remaining future creation blocker.
