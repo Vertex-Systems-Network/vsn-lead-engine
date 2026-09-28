@@ -827,6 +827,27 @@ or R2 operations**. The isolated `Overture Production Source Probe` workflow
 can therefore distinguish partition/query failure from later dedupe/enrichment
 or commit loss before changing production routing.
 
+### P34 read-only Motorbikes R2 collision probe
+
+P33 certified the exact production Overture source path: eight real 16-way
+partition queries returned **112 Motorbikes candidates**, including **109 with
+source phones**, with zero query failures. P34 moves the diagnostic one boundary
+downstream.
+
+The collision probe runs those production-equivalent searches and checks the
+resulting candidates through the production packed-v2 `collision_keys()`
+lookup. It reports per metro/partition and in aggregate:
+
+- candidate unique tokens;
+- R2 collisions;
+- surviving unique candidates;
+- collision rate;
+- source and collision-check timing.
+
+This operation is strictly read-only: it does not reserve pending rows, acquire
+the packed write lock, activate fingerprints, modify R2 objects, touch Google
+Sheets, or change quota state.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1146,6 +1167,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P31 taxonomy breadth audit: **READ-ONLY MOTORBIKES COVERAGE PROBE ACTIVE**
 - P32 Motorbikes canonical rentals: **MOTORCYCLE RENTAL + SCOOTER RENTAL ACTIVE**
 - P33 production source probe: **EXACT 16-PARTITION MOTORBIKES READ-ONLY PROBE ACTIVE**
+- P34 R2 collision probe: **PACKED-V2 MOTORBIKES READ-ONLY COLLISION AUDIT ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
