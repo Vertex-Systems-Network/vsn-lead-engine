@@ -220,6 +220,24 @@ def load_config() -> dict:
             "tail_geography_expansion_factor must be between 1 and 3."
         )
 
+    tail_geography_high_ratio=float(
+        config["runtime"].get("tail_geography_high_completion_ratio",0.90)
+    )
+    if tail_geography_high_ratio < 0 or tail_geography_high_ratio >= 1:
+        raise ValueError(
+            "tail_geography_high_completion_ratio must be at least 0 and below 1."
+        )
+    tail_geography_high_factor=float(
+        config["runtime"].get("tail_geography_high_completion_factor",2.0)
+    )
+    if (
+        tail_geography_high_factor < tail_geography_factor
+        or tail_geography_high_factor > 3
+    ):
+        raise ValueError(
+            "tail_geography_high_completion_factor must be >= tail_geography_expansion_factor and <= 3."
+        )
+
     adaptive_state_max_entries=int(
         config["runtime"].get("adaptive_yield_state_max_entries",1500)
     )
