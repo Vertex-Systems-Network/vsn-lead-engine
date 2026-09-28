@@ -1260,6 +1260,19 @@ This expands tail discovery into nearby suburbs/outskirts without adding paid
 sources, increasing per-shard limits, weakening taxonomy checks, or changing
 R2/Google write semantics.
 
+Production certification on 2026-09-28 used protected-main trigger sequence 31.
+GitHub Actions run #162 completed successfully in **616.207 seconds**. Runtime
+telemetry recorded **236** source-search events with
+`bbox_expansion_factor=1.5`, and the live workbook finished at:
+
+- **12,000 / 12,000** accepted daily rows;
+- **Motorbikes 1,000 / 1,000** with shortfall **0**;
+- **United States 7,459** and **Canada 4,541** accepted rows;
+- final workbook status **Complete**.
+
+A proposed 2.0x follow-up widening was intentionally not promoted because P52
+closed the quota with the smaller bounded horizon.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1597,7 +1610,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P49 combined daily state snapshot: **SINGLE SHEETS STATE READ PER BOUNDARY ACTIVE**
 - P50 runtime identity consistency: **PACKAGE-VERSIONED OUTBOUND IDENTITY ACTIVE**
 - P51 single-source release version: **SETUPTOOLS METADATA DERIVED FROM RUNTIME VERSION ACTIVE**
-- P52 tail geography retention: **1.5× BOUNDED OUTSKIRTS COVERAGE IN QUOTA TAIL ACTIVE**
+- P52 tail geography retention: **PRODUCTION CERTIFIED — 12,000/12,000 DAILY QUOTA CLOSED WITH 1.5× TAIL COVERAGE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
