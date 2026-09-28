@@ -21,11 +21,11 @@ RUNTIME=ROOT/"requirements-runtime.txt"
 DEV=ROOT/"requirements-dev.txt"
 
 LOCK_LINE_RE=re.compile(
-    r"^(?P<name>[A-Za-z0-9_.-]+)==(?P<version>[^\\s]+)"
+    r"^(?P<name>[A-Za-z0-9_.-]+)==(?P<version>[^\s]+)"
     r"(?: --hash=sha256:(?P<hash>[0-9a-f]{64}))?$"
 )
 EXACT_REQ_RE=re.compile(
-    r"^(?P<name>[A-Za-z0-9_.-]+)==(?P<version>[^\\s;]+)$"
+    r"^(?P<name>[A-Za-z0-9_.-]+)==(?P<version>[^\s;]+)$"
 )
 
 
