@@ -187,6 +187,11 @@ def load_config() -> dict:
             raise ValueError(
                 "sources.overture.website_candidate_reserve_fraction must be between 0 and 0.5."
             )
+        query_timeout=float(overture.get("query_timeout_seconds",45))
+        if query_timeout < 10 or query_timeout > 120:
+            raise ValueError(
+                "sources.overture.query_timeout_seconds must be between 10 and 120."
+            )
 
     enrichment=config.get("enrichment",{})
     if enrichment.get("enabled",False):
