@@ -12,6 +12,7 @@ from .health import (
     run_health_event,
 )
 from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
+from .registry_collision_probe import probe_motorbike_registry_collisions
 from .schedule import scheduled_run_window
 from .source_probe import probe_motorbike_source
 from .sheets import GoogleSheetsStore
@@ -119,6 +120,9 @@ def main() -> int:
     probe_parser=sub.add_parser("source-probe")
     probe_parser.add_argument("--max-geographies",type=int,default=4)
     probe_parser.add_argument("--partitions-per-geography",type=int,default=2)
+    collision_probe=sub.add_parser("registry-collision-probe")
+    collision_probe.add_argument("--max-geographies",type=int,default=4)
+    collision_probe.add_argument("--partitions-per-geography",type=int,default=2)
     backfill_parser=sub.add_parser("registry-backfill")
     backfill_parser.add_argument("--dry-run",action="store_true")
     sub.add_parser("registry-stats")
@@ -173,6 +177,17 @@ def main() -> int:
             )
         print(json.dumps(result,indent=2,default=str))
         return int(result.get("exit_code",2) or 0)
+    if args.command=="registry-collision-probe":
+        result=probe_motorbike_registry_collisions(
+            config,
+            max_geographies=max(1,min(12,args.max_geographies)),
+            partitions_per_geography=max(
+                1,
+                min(16,args.partitions_per_geography),
+            ),
+        )
+        print(json.dumps(result,indent=2,default=str))
+        return 0 if result.get("status")=="ok" else 2
     if args.command=="source-probe":
         result=probe_motorbike_source(
             config,
