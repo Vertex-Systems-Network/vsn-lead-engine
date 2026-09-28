@@ -6,7 +6,7 @@
     "product_version": "0.58.0"
   },
   "execution": {
-    "status": "active",
+    "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
     "active_task": "P58-REPRODUCIBLE-DEPENDENCIES",
     "last_completed_task": "P57-DEPENDENCY-UPDATE-AUTOMATION",
@@ -14,10 +14,10 @@
   },
   "observed_main_sha": "34c37531046eb6a3c1701a520fc234094aa3a8b8",
   "active_issue": null,
-  "active_pr": null,
+  "active_pr": 104,
   "active_branch": "chore/p58-reproducible-dependencies",
   "current_milestone": "P58-REPRODUCIBLE-DEPENDENCIES",
-  "milestone_status": "RESOLVING_LOCK",
+  "milestone_status": "VERIFYING",
   "last_completed_milestone": "P57 added weekly grouped Dependabot PRs for GitHub Actions and pip dependencies; PR #102 exact-head CI passed 237 tests and merged.",
   "production": {
     "last_certified_date": "2026-09-28",
@@ -40,5 +40,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Use a clean GitHub Python 3.12 resolver report to derive the exact transitive dependency lock. Commit the lock, enforce it in CI/production installs, add drift guards, then certify the final exact PR head."
+  "exact_next_safe_action": "Verify PR #104 final exact-head CI with lock-constrained installation, pip check, runtime validation and tests. If green, squash-merge PR #104; next session must reconcile live main before selecting P59."
 }
