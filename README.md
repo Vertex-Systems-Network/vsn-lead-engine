@@ -651,6 +651,29 @@ Operational contract:
 This closes the My Drive service-account ownership gap without moving the
 production ledger, weakening R2 dedupe, or requiring a paid Drive tier.
 
+### P27 bounded Overture query wall time
+
+Every individual Overture DuckDB/httpfs discovery query now has its own
+wall-clock budget instead of relying only on the 30-minute GitHub job timeout.
+
+Production behavior:
+
+- `sources.overture.query_timeout_seconds = 45`;
+- a timer calls DuckDB's supported connection `interrupt()` when the budget is
+  exceeded;
+- the interrupted search raises a bounded timeout error and contributes to the
+  normal source-error telemetry;
+- source timeouts are **not retried inside the same shard**, avoiding three
+  repeated waits on the same stalled remote query;
+- ordinary transient source errors keep the existing bounded retry/backoff
+  behavior;
+- rotated shards and later cycles remain the next exploration opportunity;
+- the GitHub job timeout remains the final event-level fail-safe.
+
+This reduces the chance that one remote Parquet/httpfs query monopolizes an
+hourly production event while preserving taxonomy, phone validation, quota and
+R2 dedupe semantics.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -963,6 +986,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P24 contact-mix observability: **SOURCE-PHONE + WEBSITE-ONLY FUNNEL TELEMETRY ACTIVE**
 - P25 partition-aware cooldown: **4-DISTINCT-PARTITION FLOOR ACTIVE**
 - P26 user-owned workbook bootstrap: **07:40 PRECREATE + SAFE BLANK INIT ACTIVE**
+- P27 Overture query guard: **45S INTERRUPT + NON-RETRYABLE TIMEOUT ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
