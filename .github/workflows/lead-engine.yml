@@ -81,13 +81,13 @@ jobs:
         if: ${{ github.event_name == 'schedule' && steps.google.outputs.ready == 'true' }}
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-        run: python -m vsn_lead_engine.cli run --scheduled
+        run: python -m vsn_lead_engine.cli supervised-run --scheduled
       - name: Assistant-triggered real run
         if: ${{ github.event_name == 'push' && steps.google.outputs.ready == 'true' }}
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           VSN_RUN_ORIGIN: recovery-push
-        run: python -m vsn_lead_engine.cli run
+        run: python -m vsn_lead_engine.cli supervised-run
       - name: Manual dry run
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
         run: python -m vsn_lead_engine.cli run --dry-run
@@ -96,7 +96,7 @@ jobs:
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           VSN_RUN_ORIGIN: manual
-        run: python -m vsn_lead_engine.cli run
+        run: python -m vsn_lead_engine.cli supervised-run
       - name: Real run blocked safely
         if: ${{ (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) && steps.google.outputs.ready != 'true' }}
         shell: bash
