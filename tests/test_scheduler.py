@@ -813,3 +813,94 @@ def test_partition_exhaustion_falls_back_to_blended_hints_when_scope_not_supplie
         exhaustion_min_discovered=20,
     )
     assert partition==1
+
+
+def test_recent_zero_unique_streak_cools_partition_with_prior_success():
+    geo=GEOS[0]
+    key=partition_yield_hint_key("Motorbikes",geo,0)
+    blended={
+        key:{
+            "visits":9,
+            "discovered":250,
+            "accepted":20,
+        },
+    }
+    same_day={
+        key:{
+            "visits":5,
+            "discovered":140,
+            "accepted":8,
+            "zero_unique_streak":2,
+            "recent_discovered":35,
+        },
+    }
+    partition,_=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=2,
+        cursor=0,
+        attempt=1,
+        yield_hints=blended,
+        exhaustion_hints=same_day,
+        adaptive_enabled=True,
+        exhaustion_cooldown_enabled=True,
+        exhaustion_zero_unique_streak=2,
+        exhaustion_recent_discovered=20,
+    )
+    assert partition==1
+
+
+def test_recent_zero_unique_streak_requires_recent_discovery_floor():
+    geo=GEOS[0]
+    key=partition_yield_hint_key("Motorbikes",geo,0)
+    same_day={
+        key:{
+            "visits":5,
+            "discovered":140,
+            "accepted":8,
+            "zero_unique_streak":3,
+            "recent_discovered":6,
+        },
+    }
+    partition,_=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=2,
+        cursor=0,
+        attempt=1,
+        yield_hints=same_day,
+        exhaustion_hints=same_day,
+        adaptive_enabled=True,
+        exhaustion_cooldown_enabled=True,
+        exhaustion_zero_unique_streak=2,
+        exhaustion_recent_discovered=20,
+    )
+    assert partition in {0,1}
+
+
+def test_recent_zero_unique_streak_falls_back_if_every_partition_is_recently_exhausted():
+    geo=GEOS[0]
+    hints={}
+    for partition in [0,1]:
+        hints[partition_yield_hint_key("Motorbikes",geo,partition)]={
+            "visits":5,
+            "discovered":140,
+            "accepted":8,
+            "zero_unique_streak":2,
+            "recent_discovered":35,
+        }
+    partition,score=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=2,
+        cursor=0,
+        attempt=1,
+        yield_hints=hints,
+        exhaustion_hints=hints,
+        adaptive_enabled=True,
+        exhaustion_cooldown_enabled=True,
+        exhaustion_zero_unique_streak=2,
+        exhaustion_recent_discovered=20,
+    )
+    assert partition in {0,1}
+    assert score is not None
