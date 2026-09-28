@@ -8,17 +8,17 @@
   "execution": {
     "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
-    "active_task": "P60-HASH-LOCK-REGENERATION",
-    "last_completed_task": "P59-HASH-VERIFIED-DEPENDENCIES",
-    "next_task": "P61-NEXT-EVIDENCE-BASED-MILESTONE"
+    "active_task": "P61-DEPENDENCY-UPDATE-CERTIFICATION",
+    "last_completed_task": "P60-HASH-LOCK-REGENERATION",
+    "next_task": "P62-NEXT-EVIDENCE-BASED-MILESTONE"
   },
-  "observed_main_sha": "ac748fb193ca86e2727e7056f000ce58b835263e",
+  "observed_main_sha": "19d618261eb6738969b7b3bb6eae84b213f08dbc",
   "active_issue": null,
-  "active_pr": 107,
-  "active_branch": "chore/p60-lock-regeneration",
-  "current_milestone": "P60-HASH-LOCK-REGENERATION",
+  "active_pr": 108,
+  "active_branch": "dependabot/pip/python-dependencies-f5ca4df260",
+  "current_milestone": "P61-DEPENDENCY-UPDATE-CERTIFICATION",
   "milestone_status": "VERIFYING",
-  "last_completed_milestone": "P59 split bootstrap/runtime/dev dependency surfaces, enforced SHA-256 --require-hashes installation, retired the unhashed lock, and merged PR #105 after exact-head CI #196 passed 244 tests.",
+  "last_completed_milestone": "P60 added deterministic hash-lock regeneration, pinned pip 25.2 resolver, PR drift checks, and manual branch-only regeneration; PR #107 exact-head CI passed 250 tests and fresh lock verification.",
   "production": {
     "last_certified_date": "2026-09-28",
     "daily_target": 12000,
@@ -29,9 +29,9 @@
     "production_run": 162
   },
   "quality": {
-    "latest_required_ci_run": 196,
+    "latest_required_ci_run": 201,
     "latest_required_ci_result": "success",
-    "pytest": "244 passed",
+    "pytest": "250 passed",
     "node20_deprecation_warning": false
   },
   "blockers": [],
@@ -40,5 +40,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Verify PR #107 exact-head Lead Engine CI and Dependency Lock Integrity. The dependency-lock check must prove the committed bootstrap/runtime/dev hashes exactly match a fresh pip 25.2 resolver result. If both are green, squash-merge PR #107."
+  "exact_next_safe_action": "Verify PR #108 final documentation/state head with both Lead Engine CI and Dependency Lock Integrity. If both are green, squash-merge the certified phonenumbers 9.0.40 and pytest 9.1.1 update."
 }
