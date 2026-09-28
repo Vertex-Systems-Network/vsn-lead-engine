@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -14,6 +15,7 @@ def _load_module():
     spec=importlib.util.spec_from_file_location("vsn_regenerate_hash_locks",SCRIPT)
     assert spec and spec.loader
     module=importlib.util.module_from_spec(spec)
+    sys.modules[spec.name]=module
     spec.loader.exec_module(module)
     return module
 
@@ -108,6 +110,9 @@ def test_dependency_lock_workflow_is_manual_write_only_and_main_safe():
     assert "main|master" in content
     assert "dependabot/*|deps/*" in content
     assert "Direct dependency-lock regeneration on main/master is forbidden." in content
+    assert content.count(
+        "python -m pip install --require-hashes -r .github/dependency-resolver.txt"
+    ) == 2
     assert "python scripts/regenerate_hash_locks.py --write" in content
     assert content.count("python scripts/regenerate_hash_locks.py --check") >= 2
     assert "python scripts/install_locked.py --dev" in content
