@@ -1608,6 +1608,38 @@ eligible for creation.
 
 Runtime version is **0.61.0**.
 
+### P66 strict user-OAuth autonomy certification
+
+P65 added the onboarding helper and create/trash capability probe. P66 makes
+the final production certification **strict** so service-account fallback can
+never be mistaken for autonomous My Drive readiness.
+
+The `google-drive-capability` CLI now supports:
+
+```bash
+python -m vsn_lead_engine.cli google-drive-capability \
+  --next-day \
+  --require-user-oauth \
+  --probe-create
+```
+
+With `--require-user-oauth`, any active mode other than `user-oauth`
+returns a permanent blocked result **before** a probe is attempted.
+
+The manual **Google Drive Capability** workflow now also:
+
+- fails immediately if `GOOGLE_OAUTH_USER_JSON` is missing;
+- refuses service-account fallback as certification evidence;
+- requires the strict user-OAuth CLI gate;
+- performs the real production-folder create → trash probe only after the
+  secret is present.
+
+This keeps existing service-account fallback available for normal operations on
+already-shared files, while autonomous missing-workbook creation is certified
+only with the intended user-owned OAuth authority.
+
+Runtime version is **0.62.0**.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1959,6 +1991,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P63 readiness deployment catch-up: **MAIN READINESS CHANGES IMMEDIATELY PREFLIGHT TOMORROW**
 - P64 My Drive ownership auth: **USER OAUTH PREFERRED + SERVICE-ACCOUNT FALLBACK + AUTH-MODE TELEMETRY**
 - P65 OAuth autonomy tooling: **LOCAL PKCE ONBOARDING + FAIL-FAST OWNERSHIP CHECK + CREATE/TRASH CERTIFICATION**
+- P66 strict OAuth certification: **USER-OAUTH-ONLY PRODUCTION PROBE; SERVICE-ACCOUNT FALLBACK CANNOT CERTIFY AUTONOMY**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

@@ -109,6 +109,7 @@ def main() -> int:
     capability_target.add_argument("--date",default=None)
     capability_target.add_argument("--next-day",action="store_true")
     capability_parser.add_argument("--probe-create",action="store_true")
+    capability_parser.add_argument("--require-user-oauth",action="store_true")
     ready_parser=sub.add_parser("workbook-ready")
     ready_target=ready_parser.add_mutually_exclusive_group()
     ready_target.add_argument("--date",default=None)
@@ -236,9 +237,22 @@ def main() -> int:
             next_day=bool(args.next_day),
         )
         store=GoogleSheetsStore(config,run_date=target["run_date"])
-        result=store.drive_creation_capability(
-            probe_create=bool(args.probe_create),
-        )
+        if bool(args.require_user_oauth) and store.google_auth_mode!="user-oauth":
+            result={
+                "status":"blocked",
+                "permanent":True,
+                "auth_mode":store.google_auth_mode,
+                "reason":(
+                    "User OAuth certification requires GOOGLE_OAUTH_USER_JSON; "
+                    f"active auth mode is {store.google_auth_mode}."
+                ),
+                "probe_performed":False,
+                "probe_cleaned":False,
+            }
+        else:
+            result=store.drive_creation_capability(
+                probe_create=bool(args.probe_create),
+            )
         result["run_date"]=target["run_date"]
         result["target_kind"]=target["target_kind"]
         result["target_resolved_at"]=target["resolved_at"]
