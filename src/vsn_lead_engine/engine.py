@@ -10,6 +10,7 @@ from .dedupe import fingerprints,is_duplicate
 from .enrichment import build_contact_enricher
 from .health import DailyHealthLedgerStore, run_health_event
 from .normalize import normalize_phone
+from .progress import emit_progress
 from .scheduler import build_shard_plan, run_cursor, yield_hint_key
 from .registry import build_registry_index, fingerprint_token, registry_mode
 from .sheets import GoogleSheetsStore
@@ -418,6 +419,15 @@ def run_once(
 ) -> dict:
     runtime=config["runtime"]
     run_date=run_date or datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
+    cycle_started_monotonic=time.monotonic()
+    progress_enabled=bool(runtime.get("progress_telemetry_enabled",True))
+    emit_progress(
+        "cycle_enter",
+        enabled=progress_enabled,
+        run_date=run_date,
+        dry_run=bool(dry_run),
+        cursor_offset=int(cursor_offset),
+    )
     if not runtime.get("enabled") and not dry_run:
         return {"status":"disabled","message":"Lead collection is disabled pending explicit user consent."}
 
@@ -461,6 +471,16 @@ def run_once(
         country_counts=store.daily_country_counts(workbook["id"])
 
     target=int(runtime["daily_target_per_category"])
+    emit_progress(
+        "cycle_ready",
+        enabled=progress_enabled,
+        started_monotonic=cycle_started_monotonic,
+        run_date=run_date,
+        registry_mode=mode,
+        total_today=sum(int(value or 0) for value in counts.values()),
+        target_per_category=target,
+        countries=len(countries),
+    )
     cursor=run_cursor()+int(cursor_offset)
     max_attempts=int(runtime.get("max_shard_attempts",12))
     batch_limit=int(runtime.get("batch_accept_limit",1000))
@@ -571,6 +591,25 @@ def run_once(
                 attempt=shard["attempt"],
                 partition_count=candidate_partition_count,
             )
+            source_started_monotonic=time.monotonic()
+            emit_progress(
+                "source_search_start",
+                enabled=progress_enabled,
+                run_date=run_date,
+                category=category,
+                country=geography["country"],
+                region=geography["region"],
+                city=geography["city"],
+                source=source.name,
+                shard_attempt=int(shard["attempt"]),
+                candidate_partition=int(
+                    search_geography["_candidate_partition"]
+                ),
+                candidate_partition_count=int(
+                    search_geography["_candidate_partition_count"]
+                ),
+                requested_limit=int(remaining),
+            )
             candidates,source_error,retries=_search_with_retry(
                 source,
                 category,
@@ -578,6 +617,23 @@ def run_once(
                 limit=remaining,
                 attempts=source_retry_attempts,
                 backoff_seconds=source_retry_backoff_seconds,
+            )
+            emit_progress(
+                "source_search_end",
+                enabled=progress_enabled,
+                started_monotonic=source_started_monotonic,
+                run_date=run_date,
+                category=category,
+                country=geography["country"],
+                city=geography["city"],
+                source=source.name,
+                shard_attempt=int(shard["attempt"]),
+                candidate_partition=int(
+                    search_geography["_candidate_partition"]
+                ),
+                discovered=len(candidates),
+                retries=int(retries),
+                error=bool(source_error),
             )
             source_retries+=retries
             if source_error:
@@ -631,8 +687,27 @@ def run_once(
                 ]
                 remote_prefilter_candidates=len(prefilter_targets)
                 if prefilter_targets:
+                    prefilter_started_monotonic=time.monotonic()
+                    emit_progress(
+                        "remote_prefilter_start",
+                        enabled=progress_enabled,
+                        run_date=run_date,
+                        category=category,
+                        country=geography["country"],
+                        city=geography["city"],
+                        candidates=len(prefilter_targets),
+                    )
                     prefilter_collisions=registry_index.collision_keys(
                         prefilter_targets
+                    )
+                    emit_progress(
+                        "remote_prefilter_end",
+                        enabled=progress_enabled,
+                        started_monotonic=prefilter_started_monotonic,
+                        run_date=run_date,
+                        category=category,
+                        candidates=len(prefilter_targets),
+                        collisions=len(prefilter_collisions),
                     )
                     if prefilter_collisions:
                         survivors=[]
@@ -650,13 +725,56 @@ def run_once(
                         enrichment_candidates=survivors
 
             if enricher is not None and enrichment_candidates:
+                enrichment_started_monotonic=time.monotonic()
+                emit_progress(
+                    "enrichment_start",
+                    enabled=progress_enabled,
+                    run_date=run_date,
+                    category=category,
+                    country=geography["country"],
+                    city=geography["city"],
+                    candidates=len(enrichment_candidates),
+                )
                 enrichment_stats=enricher.enrich(enrichment_candidates)
+                emit_progress(
+                    "enrichment_end",
+                    enabled=progress_enabled,
+                    started_monotonic=enrichment_started_monotonic,
+                    run_date=run_date,
+                    category=category,
+                    candidates=len(enrichment_candidates),
+                    live_phone_recovered=int(
+                        enrichment_stats.get("live_phone_recovered",0) or 0
+                    ),
+                    common_crawl_phone_recovered=int(
+                        enrichment_stats.get("common_crawl_phone_recovered",0)
+                        or 0
+                    ),
+                    errors=int(enrichment_stats.get("errors",0) or 0),
+                )
                 for key,value in enrichment_stats.items():
                     enrichment_totals[key]+=int(value or 0)
 
             remote_collisions=set()
             if mode=="r2" and enrichment_candidates:
+                collision_started_monotonic=time.monotonic()
+                emit_progress(
+                    "registry_collision_start",
+                    enabled=progress_enabled,
+                    run_date=run_date,
+                    category=category,
+                    candidates=len(enrichment_candidates),
+                )
                 remote_collisions=registry_index.collision_keys(enrichment_candidates)
+                emit_progress(
+                    "registry_collision_end",
+                    enabled=progress_enabled,
+                    started_monotonic=collision_started_monotonic,
+                    run_date=run_date,
+                    category=category,
+                    candidates=len(enrichment_candidates),
+                    collisions=len(remote_collisions),
+                )
 
             for lead in enrichment_candidates:
                 phone=normalize_phone(lead.phone,lead.country)
@@ -793,6 +911,17 @@ def run_once(
         attempts=attempts,
     )
     if dry_run:
+        emit_progress(
+            "cycle_exit",
+            enabled=progress_enabled,
+            started_monotonic=cycle_started_monotonic,
+            run_date=run_date,
+            status="dry-run",
+            accepted=int(result.get("accepted",0) or 0),
+            discovered=int(result.get("discovered",0) or 0),
+            shard_attempts=len(attempts),
+            event_budget_exhausted=bool(event_budget_exhausted),
+        )
         return {"status":"dry-run",**result}
     result["pending_recovery"]=recovery
 
@@ -801,6 +930,16 @@ def run_once(
         leads=accepted_by_category.get(category,[])
         if not leads:
             continue
+
+        commit_started_monotonic=time.monotonic()
+        emit_progress(
+            "category_commit_start",
+            enabled=progress_enabled,
+            run_date=run_date,
+            category=category,
+            candidates=len(leads),
+            registry_mode=mode,
+        )
 
         if mode=="r2":
             reserved=registry_index.reserve_pending(leads,workbook)
@@ -832,6 +971,16 @@ def run_once(
                     registry_shadow_errors+=int(shadow.get("conflicts",0) or 0)
                 except Exception:
                     registry_shadow_errors+=1
+
+        emit_progress(
+            "category_commit_end",
+            enabled=progress_enabled,
+            started_monotonic=commit_started_monotonic,
+            run_date=run_date,
+            category=category,
+            committed=len(committed_by_category.get(category,[])),
+            registry_mode=mode,
+        )
 
     if mode=="r2":
         committed_total=sum(len(items) for items in committed_by_category.values())
@@ -903,6 +1052,17 @@ def run_once(
             "Zero-Progress Cycles":1 if int(result.get("accepted",0) or 0)<=0 else 0,
         }
     )
+    emit_progress(
+        "cycle_exit",
+        enabled=progress_enabled,
+        started_monotonic=cycle_started_monotonic,
+        run_date=run_date,
+        status="ok",
+        accepted=int(result.get("accepted",0) or 0),
+        discovered=int(result.get("discovered",0) or 0),
+        shard_attempts=len(attempts),
+        event_budget_exhausted=bool(event_budget_exhausted),
+    )
     return {
         "status":"ok",
         **result,
@@ -938,6 +1098,17 @@ def run_until_quota(
     event_started_monotonic=time.monotonic()
     event_deadline_monotonic=(
         event_started_monotonic + event_wall_time_seconds
+    )
+    progress_enabled=bool(runtime.get("progress_telemetry_enabled",True))
+    emit_progress(
+        "event_start",
+        enabled=progress_enabled,
+        run_date=run_date,
+        origin=str(
+            origin or os.getenv("VSN_RUN_ORIGIN","manual") or "manual"
+        ).strip(),
+        max_cycles=max_cycles,
+        event_wall_time_seconds=event_wall_time_seconds,
     )
     max_zero_progress_cycles=max(
         1,
@@ -1079,6 +1250,15 @@ def run_until_quota(
                 historical_hints,
                 historical_weight=history_weight,
             ) if adaptive_enabled else yield_hints
+            emit_progress(
+                "event_cycle_start",
+                enabled=progress_enabled,
+                started_monotonic=event_started_monotonic,
+                run_date=run_date,
+                cycle=cycle_index+1,
+                max_cycles=max_cycles,
+                zero_progress_streak=zero_progress_streak,
+            )
             result=run_once(
                 config,
                 dry_run=False,
@@ -1093,6 +1273,19 @@ def run_until_quota(
                 deadline_monotonic=event_deadline_monotonic,
             )
             cycles.append(result)
+            emit_progress(
+                "event_cycle_end",
+                enabled=progress_enabled,
+                started_monotonic=event_started_monotonic,
+                run_date=run_date,
+                cycle=cycle_index+1,
+                status=result.get("status",""),
+                accepted=int(result.get("accepted",0) or 0),
+                discovered=int(result.get("discovered",0) or 0),
+                event_budget_exhausted=bool(
+                    result.get("event_budget_exhausted",False)
+                ),
+            )
             cycle_attempts=result.get("attempts",[]) or []
             if cycle_attempts:
                 _update_yield_hints(yield_hints,cycle_attempts)
@@ -1253,6 +1446,12 @@ def run_until_quota(
                 health_telemetry["error"]=f"{type(exc).__name__}: {exc}"
         final_result["health_ledger"]=health_telemetry
     finally:
+        emit_progress(
+            "event_cleanup_start",
+            enabled=progress_enabled,
+            started_monotonic=event_started_monotonic,
+            run_date=run_date,
+        )
         _close_sources(sources)
         if registry_index is not None:
             close=getattr(registry_index,"close",None)
@@ -1262,5 +1461,23 @@ def run_until_quota(
             close=getattr(enricher,"close",None)
             if callable(close):
                 close()
+        emit_progress(
+            "event_cleanup_end",
+            enabled=progress_enabled,
+            started_monotonic=event_started_monotonic,
+            run_date=run_date,
+        )
 
+    emit_progress(
+        "event_end",
+        enabled=progress_enabled,
+        started_monotonic=event_started_monotonic,
+        run_date=run_date,
+        status=final_result.get("status",""),
+        accepted=int(final_result.get("accepted",0) or 0),
+        cycles_executed=int(final_result.get("cycles_executed",0) or 0),
+        event_budget_exhausted=bool(
+            final_result.get("event_budget_exhausted",False)
+        ),
+    )
     return final_result
