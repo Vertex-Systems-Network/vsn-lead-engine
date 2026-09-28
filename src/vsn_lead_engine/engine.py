@@ -660,6 +660,21 @@ def run_once(
     adaptive_yield_score_mode=str(
         runtime.get("adaptive_yield_score_mode","throughput")
     ).strip().lower()
+    tail_country_yield_routing_enabled=bool(
+        runtime.get("tail_country_yield_routing_enabled",False)
+    )
+    tail_country_yield_incomplete_threshold=int(
+        runtime.get("tail_country_yield_incomplete_threshold",4)
+    )
+    tail_country_yield_min_visits=int(
+        runtime.get("tail_country_yield_min_visits",4)
+    )
+    tail_country_yield_preferred_weight=int(
+        runtime.get("tail_country_yield_preferred_weight",2)
+    )
+    tail_country_yield_advantage_ratio=float(
+        runtime.get("tail_country_yield_advantage_ratio",1.5)
+    )
     adaptive_cooldown_enabled=bool(
         runtime.get("adaptive_zero_yield_cooldown_enabled",True)
     )
@@ -736,6 +751,11 @@ def run_once(
         mid_deficit_ratio=mid_deficit_ratio,
         mid_deficit_weight=mid_deficit_weight,
         adaptive_score_mode=adaptive_yield_score_mode,
+        tail_country_yield_routing_enabled=tail_country_yield_routing_enabled,
+        tail_country_yield_incomplete_threshold=tail_country_yield_incomplete_threshold,
+        tail_country_yield_min_visits=tail_country_yield_min_visits,
+        tail_country_yield_preferred_weight=tail_country_yield_preferred_weight,
+        tail_country_yield_advantage_ratio=tail_country_yield_advantage_ratio,
     )
     if not plan:
         return {"status":"complete","counts":counts,"cursor":cursor}
@@ -1087,6 +1107,12 @@ def run_once(
             "priority_weight":shard.get("priority_weight",1),
             "adaptive_yield_score":shard.get("adaptive_yield_score"),
             "adaptive_cooldown":bool(shard.get("adaptive_cooldown",False)),
+            "tail_country_yield_routing":bool(
+                shard.get("tail_country_yield_routing",False)
+            ),
+            "adaptive_country_weight":int(
+                shard.get("adaptive_country_weight",1) or 1
+            ),
             "adaptive_cooldown_deferred_count":int(
                 shard.get("adaptive_cooldown_deferred_count",0) or 0
             ),
