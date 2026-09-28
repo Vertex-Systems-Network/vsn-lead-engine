@@ -1,5 +1,5 @@
 import vsn_lead_engine.engine as engine
-from vsn_lead_engine.engine import _candidate_partition_geography, _dedupe_source_batch, _quality_summary, _search_with_retry, _source_contact_mix, _update_yield_hints, _yield_hint_summary, check_workbook_readiness, recover_workbook_readiness
+from vsn_lead_engine.engine import _candidate_partition_geography, _deadline_is_near, _dedupe_source_batch, _quality_summary, _search_with_retry, _source_contact_mix, _update_yield_hints, _yield_hint_summary, check_workbook_readiness, recover_workbook_readiness
 from vsn_lead_engine.models import Lead
 
 
@@ -13,6 +13,14 @@ class FlakySource:
         if self.calls<=self.failures:
             raise RuntimeError("temporary")
         return ["lead"]
+
+
+def test_deadline_helper_respects_guard(monkeypatch):
+    values=iter([100.0,100.0,100.0])
+    monkeypatch.setattr(engine.time,"monotonic",lambda:next(values))
+    assert _deadline_is_near(None,60) is False
+    assert _deadline_is_near(170.0,60) is False
+    assert _deadline_is_near(160.0,60) is True
 
 
 def test_source_search_retries_then_succeeds():
@@ -132,6 +140,44 @@ def test_run_until_quota_reuses_process_and_stops_on_complete(monkeypatch):
     assert calls[0]["run_date"]==calls[1]["run_date"]
     assert calls[0]["cursor_offset"]==0
     assert calls[1]["cursor_offset"]==1
+    assert source.closed
+
+
+def test_run_until_quota_stops_cleanly_on_event_budget(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    calls=[]
+    def fake_run_once(config,dry_run=False,**kwargs):
+        calls.append(kwargs)
+        return {
+            "status":"ok",
+            "accepted":25,
+            "counts":{"A":125},
+            "country_counts":{"United States":125,"Canada":0},
+            "event_budget_exhausted":True,
+        }
+
+    monkeypatch.setattr(engine,"run_once",fake_run_once)
+    config={
+        "runtime":{
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_cycles_per_run":3,
+            "max_zero_progress_cycles":3,
+            "event_wall_time_seconds":1500,
+            "event_deadline_guard_seconds":60,
+        },
+        "categories":["A"],
+    }
+
+    result=engine.run_until_quota(config)
+    assert result["status"]=="partial-budget"
+    assert result["cycles_executed"]==1
+    assert result["accepted"]==25
+    assert result["event_budget_exhausted"] is True
+    assert calls[0]["deadline_monotonic"] is not None
     assert source.closed
 
 

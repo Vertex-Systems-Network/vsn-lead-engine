@@ -45,6 +45,18 @@ def _search_with_retry(source, category: str, geography: dict, *, limit: int, at
     return [], last_error, retry_count
 
 
+def _deadline_is_near(
+    deadline_monotonic: float | None,
+    guard_seconds: float = 0,
+) -> bool:
+    if deadline_monotonic is None:
+        return False
+    return (
+        time.monotonic() + max(0.0,float(guard_seconds))
+        >= float(deadline_monotonic)
+    )
+
+
 def _close_sources(sources) -> None:
     for source in sources:
         close = getattr(source, "close", None)
@@ -402,6 +414,7 @@ def run_once(
     yield_hints: dict[str,dict] | None = None,
     daily_yield_hints: dict[str,dict] | None = None,
     cursor_offset: int = 0,
+    deadline_monotonic: float | None = None,
 ) -> dict:
     runtime=config["runtime"]
     run_date=run_date or datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
@@ -477,6 +490,9 @@ def run_once(
     adaptive_cooldown_min_partitions=int(
         runtime.get("adaptive_zero_yield_cooldown_min_partitions",4)
     )
+    event_deadline_guard_seconds=float(
+        runtime.get("event_deadline_guard_seconds",60)
+    )
     plan=build_shard_plan(
         config["categories"],
         config["geographies"],
@@ -511,8 +527,15 @@ def run_once(
     enrichment_totals=defaultdict(int)
     accepted_total=0
     today=run_date
+    event_budget_exhausted=False
 
     for shard in plan:
+        if _deadline_is_near(
+            deadline_monotonic,
+            event_deadline_guard_seconds,
+        ):
+            event_budget_exhausted=True
+            break
         if accepted_total >= batch_limit:
             break
         category=shard["category"]
@@ -526,6 +549,12 @@ def run_once(
         source_attempts=[]
 
         for source in sources:
+            if _deadline_is_near(
+                deadline_monotonic,
+                event_deadline_guard_seconds,
+            ):
+                event_budget_exhausted=True
+                break
             if accepted_total >= batch_limit:
                 break
             remaining=min(
@@ -699,6 +728,9 @@ def run_once(
             "sources":source_attempts,
         })
 
+        if event_budget_exhausted:
+            break
+
     registry_read_cache={}
     cache_stats=getattr(registry_index,"cache_stats",None)
     if callable(cache_stats):
@@ -718,6 +750,7 @@ def run_once(
         "zero_result_shards":zero_result_shards,
         "source_errors":source_errors,
         "source_retries":source_retries,
+        "event_budget_exhausted":event_budget_exhausted,
         "candidate_partition_count":candidate_partition_count,
         "source_batch_dedupe":source_batch_dedupe_enabled,
         "r2_pre_enrichment_prefilter":remote_prefilter_enabled,
@@ -899,6 +932,13 @@ def run_until_quota(
     runtime=config["runtime"]
     run_date=datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
     max_cycles=max(1, int(runtime.get("max_cycles_per_run", 3)))
+    event_wall_time_seconds=float(
+        runtime.get("event_wall_time_seconds",1500)
+    )
+    event_started_monotonic=time.monotonic()
+    event_deadline_monotonic=(
+        event_started_monotonic + event_wall_time_seconds
+    )
     max_zero_progress_cycles=max(
         1,
         min(
@@ -1024,8 +1064,16 @@ def run_until_quota(
                 "load_error":f"{type(exc).__name__}: {exc}",
             })
 
+    event_budget_exhausted=False
     try:
         for cycle_index in range(max_cycles):
+            if _deadline_is_near(
+                event_deadline_monotonic,
+                float(runtime.get("event_deadline_guard_seconds",60)),
+            ):
+                event_budget_exhausted=True
+                final_status="partial-budget"
+                break
             routing_hints=_merge_routing_hints(
                 yield_hints,
                 historical_hints,
@@ -1042,6 +1090,7 @@ def run_until_quota(
                 yield_hints=routing_hints,
                 daily_yield_hints=yield_hints,
                 cursor_offset=cycle_index,
+                deadline_monotonic=event_deadline_monotonic,
             )
             cycles.append(result)
             cycle_attempts=result.get("attempts",[]) or []
@@ -1052,6 +1101,11 @@ def run_until_quota(
             final_counts = result.get("counts", final_counts) or final_counts
             final_country_counts = result.get("country_counts", final_country_counts) or final_country_counts
             final_status = result.get("status", "ok")
+
+            if bool(result.get("event_budget_exhausted",False)):
+                event_budget_exhausted=True
+                final_status="partial-budget"
+                break
 
             if final_status in {"complete","disabled","no-sources"}:
                 break
@@ -1115,6 +1169,12 @@ def run_until_quota(
             "cycles_executed":len(cycles),
             "max_cycles_per_run":max_cycles,
             "max_zero_progress_cycles":max_zero_progress_cycles,
+            "event_wall_time_seconds":event_wall_time_seconds,
+            "event_budget_exhausted":event_budget_exhausted,
+            "event_runtime_seconds":round(
+                max(0.0,time.monotonic()-event_started_monotonic),
+                3,
+            ),
             "zero_progress_streak":zero_progress_streak,
             "accepted":accepted_total,
             "discovered":sum(

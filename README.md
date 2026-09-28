@@ -674,6 +674,28 @@ This reduces the chance that one remote Parquet/httpfs query monopolizes an
 hourly production event while preserving taxonomy, phone validation, quota and
 R2 dedupe semantics.
 
+### P28 graceful event wall-clock budget
+
+Production collection now stops itself before GitHub's 30-minute hard job
+timeout can terminate the Python process while it owns an R2 lock.
+
+Production behavior:
+
+- `runtime.event_wall_time_seconds = 1500` (25 minutes);
+- `runtime.event_deadline_guard_seconds = 60`;
+- the engine will not start another shard/source when the remaining event budget
+  is inside the guard window;
+- already accepted in-memory leads still go through the normal R2 reservation
+  and Google Sheets commit path before the run exits;
+- the result is marked `partial-budget`, not an incident, so the next hourly
+  event can resume from live sheet + R2 state;
+- sources, registry clients and enrichers close through the existing `finally`
+  path;
+- the 30-minute GitHub job timeout remains only the final emergency fail-safe.
+
+This reduces orphan-lock risk from forced runner termination without increasing
+paid API usage or weakening exact cross-day dedupe.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -987,6 +1009,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P25 partition-aware cooldown: **4-DISTINCT-PARTITION FLOOR ACTIVE**
 - P26 user-owned workbook bootstrap: **07:40 PRECREATE + SAFE BLANK INIT ACTIVE**
 - P27 Overture query guard: **45S INTERRUPT + NON-RETRYABLE TIMEOUT ACTIVE**
+- P28 graceful event budget: **25-MIN CLEAN STOP + 60S START GUARD ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
