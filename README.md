@@ -1067,6 +1067,28 @@ P43 adds no new data provider, paid API, database, event duration, shard count,
 or Google/R2 write budget. It spends the existing critical-category shard slots
 over a wider suburban/exurban footprint.
 
+### P44 graduated geography expansion
+
+P43 production certification validated that wider geography is materially useful:
+Motorbikes moved from 77 to 104 in one event while the existing country filter,
+R2 dedupe and watchdog remained healthy. A fixed "<10%" gate would immediately
+disable that useful coverage as soon as the category crossed 100/1000.
+
+P44 replaces the abrupt gate with graduated quota-aware widening:
+
+- below 10% complete: **1.75x** metro bbox;
+- 10% to below 25%: **1.50x**;
+- 25% to below 50%: **1.25x**;
+- 50% or more: **1.00x** (original configured bbox).
+
+All tiers are runtime-configurable. Only the existing bbox footprint changes;
+the Overture source, category taxonomy, partition routing, R2 authority and
+event/shard budgets remain unchanged.
+
+At the current 104/1000 Motorbikes position, the next production event therefore
+uses 1.50x coverage instead of falling back to the already saturated base metro
+box.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1395,7 +1417,8 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P40 quota recovery supervisor: **LIVE SHORTFALL CHECK + SINGLE SERIALIZED REDISPATCH ACTIVE**
 - P41 partition exhaustion cooldown: **POST-R2 ZERO-UNIQUE COHORT DEFERRAL ACTIVE**
 - P42 same-day exhaustion authority: **CURRENT-DAY POST-R2 EVIDENCE CONTROLS PARTITION COOLDOWN**
-- P43 critical geography expansion: **<10% QUOTA METRO BBOX 1.75× OUTSKIRTS COVERAGE ACTIVE**
+- P43 critical geography expansion: **PRODUCTION-CERTIFIED OUTSKIRTS COVERAGE**
+- P44 graduated geography expansion: **1.75× / 1.50× / 1.25× / 1.00× QUOTA-AWARE TIERS ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
