@@ -137,6 +137,13 @@ def load_config() -> dict:
         raise ValueError(
             "adaptive_yield_exploration_bonus must be between 0 and 1."
         )
+    adaptive_score_mode=str(
+        config["runtime"].get("adaptive_yield_score_mode","throughput")
+    ).strip().lower()
+    if adaptive_score_mode not in {"throughput","conversion"}:
+        raise ValueError(
+            "adaptive_yield_score_mode must be throughput or conversion."
+        )
     adaptive_state_max_entries=int(
         config["runtime"].get("adaptive_yield_state_max_entries",1500)
     )

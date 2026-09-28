@@ -132,8 +132,11 @@ The adaptive router is deliberately in-memory only:
 - no paid API dependency.
 
 For each attempted category/metro shard the engine accumulates visits,
-discovered candidates and accepted leads. The scheduler uses an empirical yield
-rate plus a small exploration bonus to rank metros **inside the same country**.
+discovered candidates and accepted leads. P37 makes the default adaptive score
+**accepted leads per shard attempt** plus a small exploration bonus, so routing
+optimizes daily quota throughput instead of favoring tiny shards with a perfect
+accepted/discovered percentage. The legacy conversion-ratio score remains
+available through runtime configuration for rollback.
 
 Important fairness rules remain unchanged:
 
@@ -894,6 +897,26 @@ No new database, bucket, Google Sheet write, paid API call or event-time
 increase is introduced. P36 changes only which already-budgeted Overture hash
 cohort is queried.
 
+### P37 quota-throughput adaptive scoring
+
+Production diagnostics exposed a scoring mismatch for sparse categories.
+The older adaptive score used accepted/discovered. That is a conversion
+percentage, not a quota-throughput metric: a shard returning 2 accepted leads
+from 2 candidates could outrank a shard returning 30 accepted leads from 40
+candidates even though the latter closes the 1,000/day target much faster.
+
+P37 changes the default adaptive score to accepted leads per attempted shard
+plus the existing exploration bonus. The same score is used for metro ranking
+and P36 partition ranking. Existing daily and historical R2 counters are reused,
+so no migration or extra state writes are required.
+
+Rollback is configuration-only: setting
+runtime.adaptive_yield_score_mode to "conversion" restores the previous
+accepted/discovered ranking. Config validation rejects unknown modes.
+
+No source limit, shard-attempt limit, event duration, Google write, R2 write or
+paid API budget is increased.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1216,6 +1239,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P34 R2 collision probe: **PACKED-V2 MOTORBIKES READ-ONLY COLLISION AUDIT ACTIVE**
 - P35 critical-deficit rescue: **LAYERED 6×/4×/2×/1× FAIR SLOT REALLOCATION ACTIVE**
 - P36 partition yield routing: **PERSISTED CATEGORY+METRO+PARTITION LEARNING ACTIVE**
+- P37 quota-throughput scoring: **ACCEPTED-PER-SHARD + EXPLORATION ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

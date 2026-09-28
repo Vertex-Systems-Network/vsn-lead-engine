@@ -559,3 +559,88 @@ def test_partition_routing_can_be_disabled_for_deterministic_rotation():
     )
     assert partition==2
     assert score is None
+
+
+def test_throughput_scoring_prefers_more_accepted_leads_per_shard():
+    hints={
+        "a|united states|r1|us1":{
+            "visits":1,
+            "discovered":2,
+            "accepted":2,
+        },
+        "a|united states|r2|us2":{
+            "visits":1,
+            "discovered":40,
+            "accepted":30,
+        },
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=1,
+        country_counts={"United States":0,"Canada":1000},
+        yield_hints=hints,
+        adaptive_enabled=True,
+        adaptive_score_mode="throughput",
+    )
+    assert plan[0]["geography"]["city"]=="US2"
+
+
+def test_conversion_score_mode_preserves_legacy_ratio_ranking():
+    hints={
+        "a|united states|r1|us1":{
+            "visits":1,
+            "discovered":2,
+            "accepted":2,
+        },
+        "a|united states|r2|us2":{
+            "visits":1,
+            "discovered":40,
+            "accepted":30,
+        },
+    }
+    plan=build_shard_plan(
+        ["A"],
+        GEOS,
+        {"A":0},
+        1000,
+        cursor=0,
+        max_attempts=1,
+        country_counts={"United States":0,"Canada":1000},
+        yield_hints=hints,
+        adaptive_enabled=True,
+        adaptive_score_mode="conversion",
+    )
+    assert plan[0]["geography"]["city"]=="US1"
+
+
+def test_partition_throughput_prefers_large_survivor_cohort():
+    geo=GEOS[0]
+    hints={
+        partition_yield_hint_key("Motorbikes",geo,0):{
+            "visits":1,
+            "discovered":2,
+            "accepted":2,
+        },
+        partition_yield_hint_key("Motorbikes",geo,1):{
+            "visits":1,
+            "discovered":40,
+            "accepted":30,
+        },
+    }
+    partition,score=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=2,
+        cursor=0,
+        attempt=1,
+        yield_hints=hints,
+        adaptive_enabled=True,
+        exploration_bonus=0.15,
+        score_mode="throughput",
+    )
+    assert partition==1
+    assert score > 20
