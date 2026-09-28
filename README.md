@@ -1231,6 +1231,19 @@ This is a reliability and observability hardening only: discovery scope, quota
 logic, R2 dedupe, Google writes, enrichment budgets and provider selection are
 unchanged.
 
+### P51 single-source release version
+
+P51 removes the remaining duplicate release-version source. Packaging metadata
+now derives `project.version` dynamically from `vsn_lead_engine.__version__`
+through setuptools, so one version bump controls installed package metadata and
+the P50 canonical outbound identity together.
+
+A regression test verifies that `importlib.metadata.version("vsn-lead-engine")`
+always matches the runtime `__version__`.
+
+This is release-process hardening only; lead discovery, quota scheduling,
+enrichment, R2 dedupe and Google write behavior are unchanged.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1567,6 +1580,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P48 tail country-yield routing: **EVIDENCE-GATED COUNTRY WEIGHTING ACTIVE**
 - P49 combined daily state snapshot: **SINGLE SHEETS STATE READ PER BOUNDARY ACTIVE**
 - P50 runtime identity consistency: **PACKAGE-VERSIONED OUTBOUND IDENTITY ACTIVE**
+- P51 single-source release version: **SETUPTOOLS METADATA DERIVED FROM RUNTIME VERSION ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
