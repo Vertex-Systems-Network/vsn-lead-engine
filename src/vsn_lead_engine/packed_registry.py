@@ -36,6 +36,13 @@ class PackedR2RegistryIndex(R2RegistryIndex):
         self.pack_shard_chars = max(1, min(2, int(settings.get("pack_shard_chars", 1))))
         self.lock_stale_seconds = max(30, int(settings.get("lock_stale_seconds", 180)))
         self.read_cache_enabled = bool(settings.get("read_cache_enabled", True))
+        self.pack_commit_workers = max(
+            1,
+            min(
+                self.max_workers,
+                int(settings.get("pack_commit_workers", 16)),
+            ),
+        )
         self.pending_read_cache_enabled = bool(
             settings.get("pending_read_cache_enabled", True)
         )
@@ -64,6 +71,7 @@ class PackedR2RegistryIndex(R2RegistryIndex):
             **result,
             "layout": self.LAYOUT,
             "pack_shard_chars": self.pack_shard_chars,
+            "pack_commit_workers": self.pack_commit_workers,
             "read_cache_enabled": self.read_cache_enabled,
             "pending_read_cache_enabled": self.pending_read_cache_enabled,
             "read_cache_max_entries": self.read_cache_max_entries,
@@ -439,6 +447,15 @@ class PackedR2RegistryIndex(R2RegistryIndex):
         finally:
             self._release_lock(lock_owner)
 
+    def _merge_pack_additions(self, key: str, additions: set[str]) -> bool:
+        """Merge one already-lock-protected pack shard and report if written."""
+        current = self._read_pack(key)
+        merged = current | additions
+        if merged == current:
+            return False
+        self._write_pack(key, merged)
+        return True
+
     def _commit_rows_to_packs(self, rows: Iterable[dict]) -> int:
         groups: dict[str, set[str]] = {}
         token_count = 0
@@ -448,11 +465,23 @@ class PackedR2RegistryIndex(R2RegistryIndex):
                 groups.setdefault(self._pack_key(token), set()).add(digest)
                 token_count += 1
 
-        for key, additions in groups.items():
-            current = self._read_pack(key)
-            merged = current | additions
-            if merged != current:
-                self._write_pack(key, merged)
+        if not groups:
+            return token_count
+
+        workers = min(self.pack_commit_workers, len(groups))
+        if workers <= 1:
+            for key, additions in groups.items():
+                self._merge_pack_additions(key, additions)
+            return token_count
+
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = {
+                pool.submit(self._merge_pack_additions, key, additions): key
+                for key, additions in groups.items()
+            }
+            for future in as_completed(futures):
+                future.result()
+
         return token_count
 
     def _find_batches_for_tokens(self, tokens: set[str]) -> dict[str, dict]:
