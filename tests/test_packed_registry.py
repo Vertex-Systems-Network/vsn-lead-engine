@@ -529,3 +529,42 @@ def test_pending_cache_can_be_disabled_without_changing_dedupe(monkeypatch):
 
     assert second_lists > first_lists
     assert index.cache_stats()["pending_enabled"] is False
+
+
+def test_pack_commit_workers_are_bounded_by_registry_workers(monkeypatch):
+    set_r2_env(monkeypatch)
+    cfg=config()
+    cfg["registry"]["max_workers"]=8
+    cfg["registry"]["pack_commit_workers"]=32
+
+    index=PackedR2RegistryIndex(cfg,client=FakeS3())
+
+    assert index.pack_commit_workers==8
+    assert index.verify()["pack_commit_workers"]==8
+
+
+def test_parallel_pack_commit_preserves_exact_activation(monkeypatch):
+    set_r2_env(monkeypatch)
+    fake=FakeS3()
+    cfg=config()
+    cfg["registry"]["pack_commit_workers"]=8
+    index=PackedR2RegistryIndex(cfg,client=fake)
+
+    leads=[
+        make_lead(
+            business_name=f"Packed Example Systems {number}",
+            source_id=f"overture:packed-{number}",
+            phone=f"+1 416 555 {1000+number:04d}",
+            website=f"https://packed-{number}.example.com",
+        )
+        for number in range(12)
+    ]
+    reserved=index.reserve_pending(leads,{"id":"sheet123"})
+    assert len(reserved)==12
+
+    activated=index.activate(reserved)
+
+    assert activated==12
+    assert not any("/pending/" in key for key in fake.objects)
+    for lead in leads:
+        assert index.collision_keys([lead])

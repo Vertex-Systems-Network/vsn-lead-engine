@@ -1035,12 +1035,30 @@ def run_once(
         )
 
         if mode=="r2":
+            reserve_started_monotonic=time.monotonic()
+            emit_progress(
+                "category_reserve_start",
+                enabled=progress_enabled,
+                run_date=run_date,
+                category=category,
+                candidates=len(leads),
+            )
             reserved=registry_index.reserve_pending(leads,workbook)
             committed=[
                 lead for lead in leads
                 if fingerprint_token("u",fingerprints(lead).unique) in reserved
             ]
             conflicts=len(leads)-len(committed)
+            emit_progress(
+                "category_reserve_end",
+                enabled=progress_enabled,
+                started_monotonic=reserve_started_monotonic,
+                run_date=run_date,
+                category=category,
+                candidates=len(leads),
+                reserved=len(committed),
+                conflicts=conflicts,
+            )
             if conflicts:
                 rejections["duplicate"]+=conflicts
             if committed:
@@ -1048,12 +1066,45 @@ def run_once(
                     fingerprint_token("u",fingerprints(lead).unique)
                     for lead in committed
                 }
+                sheet_started_monotonic=time.monotonic()
+                emit_progress(
+                    "category_sheet_append_start",
+                    enabled=progress_enabled,
+                    run_date=run_date,
+                    category=category,
+                    rows=len(committed),
+                )
                 try:
                     store.append_daily_leads(workbook,committed)
                 except Exception:
                     registry_index.mark_retryable(keys)
                     raise
-                registry_index.activate(keys)
+                emit_progress(
+                    "category_sheet_append_end",
+                    enabled=progress_enabled,
+                    started_monotonic=sheet_started_monotonic,
+                    run_date=run_date,
+                    category=category,
+                    rows=len(committed),
+                )
+                activate_started_monotonic=time.monotonic()
+                emit_progress(
+                    "category_registry_activate_start",
+                    enabled=progress_enabled,
+                    run_date=run_date,
+                    category=category,
+                    rows=len(committed),
+                )
+                activated=registry_index.activate(keys)
+                emit_progress(
+                    "category_registry_activate_end",
+                    enabled=progress_enabled,
+                    started_monotonic=activate_started_monotonic,
+                    run_date=run_date,
+                    category=category,
+                    rows=len(committed),
+                    activated=int(activated or 0),
+                )
                 committed_by_category[category].extend(committed)
         else:
             store.commit_leads(workbook,leads)
