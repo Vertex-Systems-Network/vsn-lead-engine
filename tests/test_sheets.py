@@ -173,3 +173,85 @@ def test_category_tabs_are_blank_only_when_all_value_ranges_have_no_data():
         {"values":[]},
         {"values":[["2026-09-28"]]},
     ])
+
+
+class _ExecResult:
+    def __init__(self,payload):
+        self.payload=payload
+
+    def execute(self,**_kwargs):
+        return self.payload
+
+
+class _BootstrapValues:
+    def __init__(self,overview,value_ranges):
+        self.overview=overview
+        self.value_ranges=value_ranges
+        self.batch_get_calls=0
+
+    def get(self,**_kwargs):
+        return _ExecResult({"values":self.overview})
+
+    def batchGet(self,**_kwargs):
+        self.batch_get_calls+=1
+        return _ExecResult({"valueRanges":self.value_ranges})
+
+
+class _BootstrapSpreadsheets:
+    def __init__(self,values):
+        self._values=values
+
+    def values(self):
+        return self._values
+
+
+class _BootstrapSheetsService:
+    def __init__(self,values):
+        self._spreadsheets=_BootstrapSpreadsheets(values)
+
+    def spreadsheets(self):
+        return self._spreadsheets
+
+
+def _bootstrap_store(overview,value_ranges):
+    store=object.__new__(GoogleSheetsStore)
+    store.run_date="2026-09-28"
+    store.api_retries=0
+    store.config={
+        "runtime":{"timezone":"Asia/Karachi"},
+        "categories":["A","B"],
+    }
+    values=_BootstrapValues(overview,value_ranges)
+    store.sheets=_BootstrapSheetsService(values)
+    return store,values
+
+
+def test_precreated_blank_stale_workbook_requires_bootstrap():
+    store,values=_bootstrap_store(
+        [["Metric","Value"],["Date","2026-09-26"]],
+        [{"values":[]},{"values":[]}],
+    )
+    assert store._should_initialize_precreated_workbook("sheet123") is True
+    assert values.batch_get_calls==1
+
+
+def test_precreated_populated_stale_workbook_is_never_reset():
+    store,values=_bootstrap_store(
+        [["Metric","Value"],["Date","2026-09-26"]],
+        [{"values":[["2026-09-28"]]},{"values":[]}],
+    )
+    assert store._should_initialize_precreated_workbook("sheet123") is False
+    assert values.batch_get_calls==1
+
+
+def test_current_schema_skips_destructive_blank_scan():
+    store,values=_bootstrap_store(
+        [
+            ["VSN Lead Engine — Daily US + Canada Workbook",""],
+            ["Metric","Value"],
+            ["Tracking Date","2026-09-28"],
+        ],
+        [{"values":[["should-not-be-read"]]}],
+    )
+    assert store._should_initialize_precreated_workbook("sheet123") is False
+    assert values.batch_get_calls==0
