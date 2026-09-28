@@ -1505,3 +1505,68 @@ def test_critical_search_geography_clamps_world_bounds():
     )
     assert result["bbox"][2] <= 180.0
     assert result["bbox"][3] <= 90.0
+
+
+def test_graduated_geography_expansion_uses_low_tier_after_ten_percent():
+    geography={
+        "country":"United States",
+        "region":"Texas",
+        "city":"Austin",
+        "bbox":[-98.0,30.0,-97.0,31.0],
+    }
+    result=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.104,
+        threshold=0.10,
+        bbox_factor=1.75,
+        low_threshold=0.25,
+        low_factor=1.50,
+        mid_threshold=0.50,
+        mid_factor=1.25,
+    )
+    assert result["_bbox_expansion_factor"]==1.50
+    assert result["bbox"]==[-98.25,29.75,-96.75,31.25]
+
+
+def test_graduated_geography_expansion_uses_mid_tier_before_half_quota():
+    geography={
+        "country":"United States",
+        "region":"Texas",
+        "city":"Austin",
+        "bbox":[-98.0,30.0,-97.0,31.0],
+    }
+    result=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.30,
+        threshold=0.10,
+        bbox_factor=1.75,
+        low_threshold=0.25,
+        low_factor=1.50,
+        mid_threshold=0.50,
+        mid_factor=1.25,
+    )
+    assert result["_bbox_expansion_factor"]==1.25
+
+
+def test_graduated_geography_expansion_returns_base_at_half_quota():
+    geography={
+        "country":"United States",
+        "region":"Texas",
+        "city":"Austin",
+        "bbox":[-98.0,30.0,-97.0,31.0],
+    }
+    result=_critical_search_geography(
+        geography,
+        enabled=True,
+        completion_ratio=0.50,
+        threshold=0.10,
+        bbox_factor=1.75,
+        low_threshold=0.25,
+        low_factor=1.50,
+        mid_threshold=0.50,
+        mid_factor=1.25,
+    )
+    assert result["_bbox_expansion_factor"]==1.0
+    assert result["bbox"]==geography["bbox"]
