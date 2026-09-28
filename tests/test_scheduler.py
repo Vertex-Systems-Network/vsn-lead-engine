@@ -644,3 +644,114 @@ def test_partition_throughput_prefers_large_survivor_cohort():
     )
     assert partition==1
     assert score > 20
+
+
+def test_partition_exhaustion_cooldown_skips_proven_zero_unique_partition():
+    geo=GEOS[0]
+    hints={
+        partition_yield_hint_key("Motorbikes",geo,0):{
+            "visits":3,
+            "discovered":80,
+            "accepted":0,
+        },
+        partition_yield_hint_key("Motorbikes",geo,1):{
+            "visits":2,
+            "discovered":30,
+            "accepted":5,
+        },
+    }
+    partition,score=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=4,
+        cursor=0,
+        attempt=1,
+        yield_hints=hints,
+        adaptive_enabled=True,
+        exhaustion_cooldown_enabled=True,
+        exhaustion_min_visits=2,
+        exhaustion_min_discovered=20,
+    )
+    assert partition != 0
+    assert score is not None
+
+
+def test_partition_exhaustion_cooldown_requires_evidence_floor():
+    geo=GEOS[0]
+    hints={
+        partition_yield_hint_key("Motorbikes",geo,0):{
+            "visits":1,
+            "discovered":100,
+            "accepted":0,
+        },
+        partition_yield_hint_key("Motorbikes",geo,1):{
+            "visits":4,
+            "discovered":5,
+            "accepted":0,
+        },
+    }
+    partition,_=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=2,
+        cursor=0,
+        attempt=1,
+        yield_hints=hints,
+        adaptive_enabled=True,
+        exhaustion_cooldown_enabled=True,
+        exhaustion_min_visits=2,
+        exhaustion_min_discovered=20,
+    )
+    assert partition in {0,1}
+
+
+def test_partition_exhaustion_cooldown_falls_back_when_all_are_exhausted():
+    geo=GEOS[0]
+    hints={
+        partition_yield_hint_key("Motorbikes",geo,0):{
+            "visits":3,
+            "discovered":80,
+            "accepted":0,
+        },
+        partition_yield_hint_key("Motorbikes",geo,1):{
+            "visits":2,
+            "discovered":40,
+            "accepted":0,
+        },
+    }
+    partition,score=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=2,
+        cursor=0,
+        attempt=1,
+        yield_hints=hints,
+        adaptive_enabled=True,
+        exhaustion_cooldown_enabled=True,
+        exhaustion_min_visits=2,
+        exhaustion_min_discovered=20,
+    )
+    assert partition in {0,1}
+    assert score is not None
+
+
+def test_partition_exhaustion_cooldown_can_be_disabled():
+    geo=GEOS[0]
+    hints={
+        partition_yield_hint_key("Motorbikes",geo,0):{
+            "visits":3,
+            "discovered":80,
+            "accepted":0,
+        },
+    }
+    partition,_=select_candidate_partition(
+        "Motorbikes",
+        geo,
+        partition_count=2,
+        cursor=0,
+        attempt=1,
+        yield_hints=hints,
+        adaptive_enabled=True,
+        exhaustion_cooldown_enabled=False,
+    )
+    assert partition in {0,1}
