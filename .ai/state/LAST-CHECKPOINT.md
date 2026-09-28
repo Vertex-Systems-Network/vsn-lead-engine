@@ -3,32 +3,39 @@
 ## State
 
 - Snapshot timestamp: `2026-09-28`
-- Observed main: `19d618261eb6738969b7b3bb6eae84b213f08dbc`
-- Active PR: `#108`
-- Last completed milestone: `P60-HASH-LOCK-REGENERATION`
-- Current milestone: `P61-DEPENDENCY-UPDATE-CERTIFICATION`
-- Milestone status: `VERIFYING`
+- Observed main: `21c2e9e0151c00012b98831a46c24ced09eab6dd`
+- Open issues at snapshot: `0`
+- Open PRs at snapshot: `0`
+- Last completed milestone: `P61-DEPENDENCY-UPDATE-CERTIFICATION`
+- Current milestone: `P62-NEXT-DAY-WORKBOOK-PREFLIGHT`
+- Milestone status: `IMPLEMENTING`
+- Product version target: `0.59.0`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
 ## Verified
 
-- P60 merged through PR #107 and established pinned-resolver lock regeneration.
-- The stale pre-P60 Dependabot PR #106 failed closed on generated multi-hash lock lines.
-- PR #108 is based on current P60 main.
-- P60 generator canonicalized phonenumbers 9.0.40 and pytest 9.1.1 to selected SHA-256 artifacts.
-- Dependency Lock Integrity run #4 passed after canonicalization.
-- Lead Engine CI run #201 passed 250 tests after canonicalization.
-- US and Canada E.164 phone normalization tests remain green with phonenumbers 9.0.40.
+- P61 merged through PR #108 on main `21c2e9e0151c00012b98831a46c24ced09eab6dd`.
+- P61 exact-head Lead Engine CI passed 250 tests with phonenumbers 9.0.40 and pytest 9.1.1.
+- Current readiness already supports an explicit engine-level run_date.
+- Before P62, the only scheduled workbook readiness check was 07:50 PKT, ten minutes before the 08:00 primary window.
+
+## P62 Controls
+
+- 20:50 PKT scheduled preflight targets local tomorrow.
+- 07:50 PKT scheduled recovery targets local today.
+- Explicit CLI dates are restricted to strict YYYY-MM-DD and local today/tomorrow.
+- Next-day readiness health events use origin prestart-next-day and persist target_kind.
+- Readiness uses existing workbook ensure/repair behavior only; no lead collection or R2 dedupe mutation is introduced.
 
 ## Not Verified
 
-- The final P61 docs/state head has not yet completed both CI gates.
-- PR #108 is not merged until the final exact head is certified.
+- P62 exact final-head CI has not run yet.
+- The new evening schedule is not active on protected main until P62 merges.
 
 ## Known Risk
 
-- Dependency major upgrades can change behavior even when package installation succeeds. P61 therefore requires full application tests and explicit phone-normalization coverage before merge.
+- Scheduled jobs can be delayed. The evening check is intentionally placed at 20:50 PKT rather than close to midnight so a delayed GitHub scheduler is less likely to cross the local date boundary before resolving --next-day.
 
 ## Next Action
 
-Verify PR #108 final exact head with both Lead Engine CI and Dependency Lock Integrity. Squash-merge only when both are green.
+Open the P62 PR and verify exact-head Lead Engine CI, including date-boundary tests, workflow contract tests, health telemetry tests, package-version metadata and the complete suite. Squash-merge only when green.
