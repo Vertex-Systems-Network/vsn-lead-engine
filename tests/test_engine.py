@@ -1585,3 +1585,120 @@ def test_update_yield_hints_tracks_and_resets_partition_zero_unique_streak():
     engine._update_yield_hints(hints,[success_attempt])
     assert hints[key]["zero_unique_streak"]==0
     assert hints[key]["recent_discovered"]==0
+
+
+def test_run_until_quota_tail_extension_uses_remaining_budget_for_small_shortfall(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    calls=[]
+    counts=[200,350,500,700,1000]
+
+    def fake_run_once(config,dry_run=False,**kwargs):
+        index=len(calls)
+        calls.append(kwargs)
+        value=counts[index]
+        return {
+            "status":"ok",
+            "accepted":150 if value < 1000 else 300,
+            "counts":{"A":value},
+            "country_counts":{"United States":value,"Canada":0},
+        }
+
+    monkeypatch.setattr(engine,"run_once",fake_run_once)
+    config={
+        "runtime":{
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_cycles_per_run":3,
+            "tail_cycle_extension_enabled":True,
+            "tail_max_cycles_per_run":8,
+            "tail_incomplete_category_threshold":4,
+            "max_zero_progress_cycles":3,
+        },
+        "categories":["A"],
+    }
+
+    result=engine.run_until_quota(config)
+    assert result["status"]=="complete"
+    assert result["cycles_executed"]==5
+    assert result["max_cycles_per_run"]==3
+    assert result["effective_max_cycles_per_run"]==8
+    assert result["tail_cycle_extension_enabled"] is True
+    assert [call["cursor_offset"] for call in calls]==[0,1,2,3,4]
+    assert source.closed
+
+
+def test_run_until_quota_tail_extension_keeps_broad_day_at_base_cycles(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    calls=[]
+    categories=["A","B","C","D","E"]
+
+    def fake_run_once(config,dry_run=False,**kwargs):
+        calls.append(kwargs)
+        return {
+            "status":"ok",
+            "accepted":25,
+            "counts":{category:100 for category in categories},
+            "country_counts":{"United States":100,"Canada":0},
+        }
+
+    monkeypatch.setattr(engine,"run_once",fake_run_once)
+    config={
+        "runtime":{
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_cycles_per_run":3,
+            "tail_cycle_extension_enabled":True,
+            "tail_max_cycles_per_run":8,
+            "tail_incomplete_category_threshold":4,
+            "max_zero_progress_cycles":3,
+        },
+        "categories":categories,
+    }
+
+    result=engine.run_until_quota(config)
+    assert result["cycles_executed"]==3
+    assert len(calls)==3
+    assert result["effective_max_cycles_per_run"]==8
+    assert source.closed
+
+
+def test_run_until_quota_tail_extension_still_honors_zero_progress_cutoff(monkeypatch):
+    source=FakeClosableSource()
+    monkeypatch.setattr(engine,"build_sources",lambda config:[source])
+    monkeypatch.setattr(engine,"GoogleSheetsStore",lambda config,run_date=None:object())
+
+    calls=[]
+    def fake_run_once(config,dry_run=False,**kwargs):
+        calls.append(kwargs)
+        return {
+            "status":"ok",
+            "accepted":0,
+            "counts":{"A":100},
+            "country_counts":{"United States":100,"Canada":0},
+        }
+
+    monkeypatch.setattr(engine,"run_once",fake_run_once)
+    config={
+        "runtime":{
+            "timezone":"Asia/Karachi",
+            "daily_target_per_category":1000,
+            "max_cycles_per_run":3,
+            "tail_cycle_extension_enabled":True,
+            "tail_max_cycles_per_run":8,
+            "tail_incomplete_category_threshold":4,
+            "max_zero_progress_cycles":3,
+        },
+        "categories":["A"],
+    }
+
+    result=engine.run_until_quota(config)
+    assert result["cycles_executed"]==3
+    assert result["zero_progress_streak"]==3
+    assert len(calls)==3
+    assert source.closed

@@ -1416,7 +1416,23 @@ def run_until_quota(
 
     runtime=config["runtime"]
     run_date=datetime.now(ZoneInfo(runtime["timezone"])).date().isoformat()
-    max_cycles=max(1, int(runtime.get("max_cycles_per_run", 3)))
+    base_max_cycles=max(1, int(runtime.get("max_cycles_per_run", 3)))
+    tail_cycle_extension_enabled=bool(
+        runtime.get("tail_cycle_extension_enabled",False)
+    )
+    tail_max_cycles=max(
+        base_max_cycles,
+        int(runtime.get("tail_max_cycles_per_run",base_max_cycles)),
+    )
+    tail_incomplete_category_threshold=max(
+        1,
+        int(runtime.get("tail_incomplete_category_threshold",4)),
+    )
+    max_cycles=(
+        tail_max_cycles
+        if tail_cycle_extension_enabled
+        else base_max_cycles
+    )
     event_wall_time_seconds=float(
         runtime.get("event_wall_time_seconds",1500)
     )
@@ -1433,6 +1449,9 @@ def run_until_quota(
             origin or os.getenv("VSN_RUN_ORIGIN","manual") or "manual"
         ).strip(),
         max_cycles=max_cycles,
+        base_max_cycles=base_max_cycles,
+        tail_cycle_extension_enabled=tail_cycle_extension_enabled,
+        tail_incomplete_category_threshold=tail_incomplete_category_threshold,
         event_wall_time_seconds=event_wall_time_seconds,
     )
     max_zero_progress_cycles=max(
@@ -1638,6 +1657,20 @@ def run_until_quota(
             else:
                 zero_progress_streak = 0
 
+            incomplete_categories=sum(
+                1
+                for category in config["categories"]
+                if int(final_counts.get(category,0) or 0) < target
+            ) if final_counts else len(config["categories"])
+            if (
+                cycle_index + 1 >= base_max_cycles
+                and (
+                    not tail_cycle_extension_enabled
+                    or incomplete_categories > tail_incomplete_category_threshold
+                )
+            ):
+                break
+
         if yield_state_store is not None and yield_state_dirty:
             try:
                 save_meta=yield_state_store.save(run_date,yield_hints)
@@ -1685,7 +1718,11 @@ def run_until_quota(
             "status":final_status,
             "run_date":run_date,
             "cycles_executed":len(cycles),
-            "max_cycles_per_run":max_cycles,
+            "max_cycles_per_run":base_max_cycles,
+            "effective_max_cycles_per_run":max_cycles,
+            "tail_cycle_extension_enabled":tail_cycle_extension_enabled,
+            "tail_max_cycles_per_run":tail_max_cycles,
+            "tail_incomplete_category_threshold":tail_incomplete_category_threshold,
             "max_zero_progress_cycles":max_zero_progress_cycles,
             "event_wall_time_seconds":event_wall_time_seconds,
             "event_budget_exhausted":event_budget_exhausted,
