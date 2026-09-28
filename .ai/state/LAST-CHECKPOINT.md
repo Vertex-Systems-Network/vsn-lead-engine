@@ -5,10 +5,10 @@
 - Snapshot timestamp: `2026-09-28`
 - Observed main: `92569798e971c36dc36ec6eef12b5289529e3aa2`
 - Open issues at snapshot: `0`
-- Open PRs at snapshot: `0`
+- Active PR: `#110`
 - Last completed milestone: `P62-NEXT-DAY-WORKBOOK-PREFLIGHT`
 - Current milestone: `P63-DEPLOYMENT-READINESS-CATCHUP`
-- Milestone status: `IMPLEMENTING`
+- Milestone status: `VERIFYING`
 - Product version: `0.59.0`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
@@ -40,4 +40,4 @@
 
 ## Next Action
 
-Open P63 PR and certify exact-head CI. If green, squash-merge. The merge itself must trigger Daily Workbook Readiness; verify its production result and tomorrow's workbook before closing P63.
+Verify PR #110 exact-head Lead Engine CI. If green, squash-merge. The resulting main push must trigger Daily Workbook Readiness; verify its production result and the 2026-09-29 workbook before closing P63.
