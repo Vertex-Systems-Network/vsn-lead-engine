@@ -2,8 +2,18 @@ name: Daily Workbook Readiness
 
 on:
   workflow_dispatch:
+    inputs:
+      target_day:
+        description: "Workbook readiness target"
+        required: true
+        default: "today"
+        type: choice
+        options:
+          - today
+          - next-day
   schedule:
     - cron: "50 2 * * *"
+    - cron: "50 15 * * *"
 
 permissions:
   contents: read
@@ -32,13 +42,37 @@ jobs:
       - name: Runtime config preflight
         run: python -m vsn_lead_engine.cli validate
 
-      - name: Recover today's dated workbook readiness
+      - name: Resolve readiness target
+        id: target
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SCHEDULE_EXPR: ${{ github.event.schedule }}
+          MANUAL_TARGET: ${{ inputs.target_day }}
+        run: |
+          set -euo pipefail
+          target="today"
+          if [[ "$EVENT_NAME" == "schedule" && "$SCHEDULE_EXPR" == "50 15 * * *" ]]; then
+            target="next-day"
+          elif [[ "$EVENT_NAME" == "workflow_dispatch" && "$MANUAL_TARGET" == "next-day" ]]; then
+            target="next-day"
+          fi
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+
+      - name: Recover targeted dated workbook readiness
         id: readiness
         continue-on-error: true
         shell: bash
+        env:
+          TARGET_DAY: ${{ steps.target.outputs.target }}
         run: |
           set -o pipefail
+          args=()
+          if [[ "$TARGET_DAY" == "next-day" ]]; then
+            args+=(--next-day)
+          fi
           python -m vsn_lead_engine.cli workbook-ready-recover \
+            "${args[@]}" \
             --attempts 3 \
             --delay-seconds 60 \
             --record-health | tee readiness-result.json
@@ -85,6 +119,7 @@ jobs:
               "# VSN Daily Workbook Readiness",
               "",
               f"- Status: **{status.upper()}**",
+              f"- Target: **{str(data.get('target_kind','today')).upper()}**",
               f"- Run date: `{data.get('run_date','unknown')}`",
               f"- Attempts used: **{data.get('attempts_used',0)} / {data.get('attempts_configured',0)}**",
               f"- Quota already complete: **{bool(data.get('quota_complete',False))}**",

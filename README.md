@@ -1472,6 +1472,43 @@ This establishes the intended update path:
 Dependabot proposal → fail-closed drift detection → canonical regeneration →
 full application validation → protected-main merge.
 
+### P62 next-day workbook preflight and early recovery
+
+P62 moves daily workbook readiness from a single last-minute check into a
+two-stage preflight without changing lead collection or dedupe behavior.
+
+Readiness cadence in `Asia/Karachi`:
+
+- **20:50 PKT (15:50 UTC)** — preflight the **next day's** workbook;
+- **07:50 PKT (02:50 UTC)** — re-check/recover the **current day's** workbook;
+- **08:00 PKT** — normal primary lead-collection window begins.
+
+The earlier preflight creates or repairs tomorrow's dated workbook through the
+existing readiness path roughly eleven hours before production. If My Drive
+ownership or template-copy permissions block creation, the incident is visible
+well before the morning run instead of leaving only a ten-minute recovery
+window.
+
+CLI readiness is now date-aware but intentionally bounded:
+
+```
+python -m vsn_lead_engine.cli workbook-ready --next-day
+python -m vsn_lead_engine.cli workbook-ready-recover --next-day --attempts 3 --delay-seconds 60
+python -m vsn_lead_engine.cli workbook-ready --date YYYY-MM-DD
+```
+
+Explicit dates must be strict `YYYY-MM-DD` and may target only local **today**
+or **tomorrow**. Historical dates and dates beyond tomorrow are rejected, which
+prevents this repair path from mutating arbitrary workbooks.
+
+The readiness workflow also supports a manual `today` / `next-day` target
+choice. Next-day readiness events use distinct `prestart-next-day` health
+telemetry and persist `target_kind`, while the morning readiness event keeps
+the existing `prestart` origin.
+
+This path still performs no lead discovery, no R2 dedupe mutation, no quota
+lead writes, and no source/enrichment work.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1819,6 +1856,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P59 artifact integrity: **SHA-256 REQUIRE-HASHES BOOTSTRAP/RUNTIME/DEV INSTALLS ACTIVE**
 - P60 lock regeneration: **PINNED RESOLVER + PR DRIFT CHECK + MANUAL BRANCH-ONLY REGENERATION ACTIVE**
 - P61 dependency-update certification: **PHONENUMBERS 9 + PYTEST 9 PASSED CANONICAL HASH REGENERATION AND FULL CI**
+- P62 next-day readiness: **20:50 PKT TOMORROW PREFLIGHT + 07:50 PKT SAME-DAY RECOVERY ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

@@ -95,3 +95,91 @@ def test_recovery_supervisor_dispatches_only_bounded_shortfall_runs():
     assert "recovery_supervisor_enabled" in supervisor
     assert "run_origin:" in lead_workflow
     assert "VSN_RUN_ORIGIN: ${{ inputs.run_origin }}" in lead_workflow
+
+
+def test_readiness_target_defaults_to_local_today():
+    from vsn_lead_engine.schedule import readiness_target_date
+
+    result=readiness_target_date(
+        config(),
+        now=datetime(2026,9,28,15,30,tzinfo=timezone.utc),
+    )
+
+    assert result["run_date"]=="2026-09-28"
+    assert result["target_kind"]=="today"
+    assert result["resolved_at"].startswith("2026-09-28T20:30")
+
+
+def test_readiness_target_next_day_uses_local_tomorrow():
+    from vsn_lead_engine.schedule import readiness_target_date
+
+    result=readiness_target_date(
+        config(),
+        now=datetime(2026,9,28,15,50,tzinfo=timezone.utc),
+        next_day=True,
+    )
+
+    assert result["run_date"]=="2026-09-29"
+    assert result["target_kind"]=="next-day"
+    assert result["resolved_at"].startswith("2026-09-28T20:50")
+
+
+def test_readiness_target_accepts_explicit_tomorrow_only():
+    from vsn_lead_engine.schedule import readiness_target_date
+
+    result=readiness_target_date(
+        config(),
+        now=datetime(2026,9,28,12,0,tzinfo=timezone.utc),
+        explicit_date="2026-09-29",
+    )
+    assert result["run_date"]=="2026-09-29"
+    assert result["target_kind"]=="next-day"
+
+
+def test_readiness_target_rejects_historical_or_far_future_dates():
+    import pytest
+    from vsn_lead_engine.schedule import readiness_target_date
+
+    now=datetime(2026,9,28,12,0,tzinfo=timezone.utc)
+    with pytest.raises(ValueError,match="today or tomorrow"):
+        readiness_target_date(config(),now=now,explicit_date="2026-09-27")
+    with pytest.raises(ValueError,match="today or tomorrow"):
+        readiness_target_date(config(),now=now,explicit_date="2026-09-30")
+
+
+def test_readiness_target_rejects_ambiguous_date_flags():
+    import pytest
+    from vsn_lead_engine.schedule import readiness_target_date
+
+    with pytest.raises(ValueError,match="either explicit_date or next_day"):
+        readiness_target_date(
+            config(),
+            explicit_date="2026-09-29",
+            next_day=True,
+        )
+
+
+def test_daily_readiness_workflow_has_evening_next_day_and_morning_recovery():
+    workflow=Path(".github/workflows/daily-workbook-readiness.yml").read_text(
+        encoding="utf-8"
+    )
+    assert 'cron: "50 15 * * *"' in workflow
+    assert 'cron: "50 2 * * *"' in workflow
+    assert 'target_day:' in workflow
+    assert 'next-day' in workflow
+    assert 'args+=(--next-day)' in workflow
+    assert 'workbook-ready-recover' in workflow
+    assert '--attempts 3' in workflow
+    assert '--delay-seconds 60' in workflow
+
+
+def test_readiness_target_rejects_non_iso_basic_format():
+    import pytest
+    from vsn_lead_engine.schedule import readiness_target_date
+
+    with pytest.raises(ValueError,match="YYYY-MM-DD"):
+        readiness_target_date(
+            config(),
+            now=datetime(2026,9,28,12,0,tzinfo=timezone.utc),
+            explicit_date="20260929",
+        )
