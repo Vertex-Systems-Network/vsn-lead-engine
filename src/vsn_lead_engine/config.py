@@ -294,8 +294,12 @@ def load_config() -> dict:
         response_bytes=int(enrichment.get("max_response_bytes",524288))
         if response_bytes < 65536 or response_bytes > 2000000:
             raise ValueError("enrichment.max_response_bytes must be 65536..2000000.")
-        if not str(enrichment.get("user_agent","")).strip():
-            raise ValueError("enrichment.user_agent is required when enrichment is enabled.")
+        explicit_user_agent=str(enrichment.get("user_agent","")).strip()
+        if explicit_user_agent:
+            if "\r" in explicit_user_agent or "\n" in explicit_user_agent:
+                raise ValueError("enrichment.user_agent must not contain newlines.")
+            if len(explicit_user_agent) > 256:
+                raise ValueError("enrichment.user_agent must be at most 256 characters.")
 
         common=enrichment.get("common_crawl",{})
         if common.get("enabled",False):
