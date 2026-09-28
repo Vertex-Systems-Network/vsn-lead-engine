@@ -123,7 +123,7 @@ def test_explicit_enrichment_user_agent_rejects_header_injection(tmp_path, monke
     production["enrichment"]["user_agent"]="safe-agent\nInjected: value"
     path=tmp_path/"runtime.json"
     path.write_text(json.dumps(production),encoding="utf-8")
-    monkeypatch.setattr(config_module,"CONFIG_PATH",path)
+    monkeypatch.setenv("VSN_RUNTIME_CONFIG",str(path))
 
     with pytest.raises(ValueError,match="must not contain newlines"):
         config_module.load_config()
