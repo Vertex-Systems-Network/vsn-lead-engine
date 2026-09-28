@@ -7,8 +7,9 @@
 - Open issues at snapshot: `0`
 - Stale dependency PR reconciled: `#103 closed / superseded`
 - Last completed milestone: `P59-HASH-VERIFIED-DEPENDENCIES`
+- Active PR: `#107`
 - Current milestone: `P60-HASH-LOCK-REGENERATION`
-- Milestone status: `IMPLEMENTING`
+- Milestone status: `VERIFYING`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
 ## Verified
@@ -38,4 +39,4 @@
 
 ## Next Action
 
-Open the P60 PR, verify both standard application CI and Dependency Lock Integrity on the exact final head, and squash-merge only when both are green.
+Verify PR #107 exact-head Lead Engine CI and Dependency Lock Integrity. The lock check must prove committed bootstrap/runtime/dev hashes exactly match a fresh pip 25.2 resolver result. Squash-merge only when both are green.
