@@ -303,3 +303,42 @@ def test_health_workflow_contract_records_readiness_and_blocked_runs():
     assert "VSN_RUN_ORIGIN: recovery-push" in lead
     assert "health-incident" in lead
     assert "MissingGoogleCredential" in lead
+
+
+def test_readiness_health_event_distinguishes_next_day_preflight():
+    event=readiness_health_event(
+        {
+            "status":"ready",
+            "target_kind":"next-day",
+            "attempts_used":1,
+            "attempts_configured":3,
+            "workbook":{"created":True},
+            "counts":{"A":0},
+            "quota_complete":False,
+        },
+        timestamp="2026-09-28T15:50:00+00:00",
+    )
+
+    assert event["origin"]=="prestart-next-day"
+    assert event["target_kind"]=="next-day"
+    assert event["kind"]=="readiness"
+
+
+def test_health_ledger_persists_readiness_target_kind():
+    registry=FakeRegistry()
+    store=DailyHealthLedgerStore(registry)
+    event=readiness_health_event(
+        {
+            "status":"ready",
+            "target_kind":"next-day",
+            "attempts_used":1,
+            "attempts_configured":3,
+            "workbook":{"created":False},
+            "counts":{"A":0},
+            "quota_complete":False,
+        }
+    )
+    store.append("2026-09-29",event)
+    loaded=store.load("2026-09-29")
+    assert loaded["events"][0]["target_kind"]=="next-day"
+    assert loaded["events"][0]["origin"]=="prestart-next-day"
