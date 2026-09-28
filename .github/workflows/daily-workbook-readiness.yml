@@ -54,22 +54,57 @@ jobs:
 
       - name: Resolve readiness target
         id: target
-        shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
           SCHEDULE_EXPR: ${{ github.event.schedule }}
           MANUAL_TARGET: ${{ inputs.target_day }}
         run: |
-          set -euo pipefail
-          target="today"
-          if [[ "$EVENT_NAME" == "push" ]]; then
-            target="next-day"
-          elif [[ "$EVENT_NAME" == "schedule" && "$SCHEDULE_EXPR" == "50 15 * * *" ]]; then
-            target="next-day"
-          elif [[ "$EVENT_NAME" == "workflow_dispatch" && "$MANUAL_TARGET" == "next-day" ]]; then
-            target="next-day"
-          fi
-          echo "target=$target" >> "$GITHUB_OUTPUT"
+          python - <<'PY'
+          import json
+          import os
+
+          from vsn_lead_engine.schedule import (
+              deployment_readiness_target,
+              readiness_target_date,
+          )
+
+          with open("config/runtime.json",encoding="utf-8") as handle:
+              config=json.load(handle)
+
+          event=os.getenv("EVENT_NAME","")
+          schedule=os.getenv("SCHEDULE_EXPR","")
+          manual=os.getenv("MANUAL_TARGET","")
+
+          if event=="push":
+              target=deployment_readiness_target(config)
+          elif event=="schedule" and schedule=="50 15 * * *":
+              target=readiness_target_date(config,next_day=True)
+              target["reason"]="scheduled-evening-preflight"
+          elif event=="workflow_dispatch" and manual=="next-day":
+              target=readiness_target_date(config,next_day=True)
+              target["reason"]="manual-next-day"
+          else:
+              target=readiness_target_date(config)
+              target["reason"]=(
+                  "scheduled-morning-recovery"
+                  if event=="schedule"
+                  else "manual-today"
+              )
+
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as output:
+              output.write(f"target={target['target_kind']}\n")
+              output.write(f"run_date={target['run_date']}\n")
+              output.write(f"reason={target['reason']}\n")
+              output.write(f"resolved_at={target['resolved_at']}\n")
+
+          print(
+              "Readiness target resolved: "
+              f"target={target['target_kind']} "
+              f"run_date={target['run_date']} "
+              f"reason={target['reason']} "
+              f"resolved_at={target['resolved_at']}"
+          )
+          PY
 
       - name: Recover targeted dated workbook readiness
         id: readiness
