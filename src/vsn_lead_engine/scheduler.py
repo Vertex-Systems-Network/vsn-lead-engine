@@ -113,6 +113,17 @@ def yield_hint_key(category: str, geography: dict) -> str:
     ).lower()
 
 
+def partition_yield_hint_key(
+    category: str,
+    geography: dict,
+    partition: int,
+) -> str:
+    return (
+        f"{yield_hint_key(category,geography)}|partition:"
+        f"{max(0,int(partition))}"
+    )
+
+
 def _adaptive_yield_score(
     hint: dict | None,
     *,
@@ -132,6 +143,53 @@ def _adaptive_yield_score(
     empirical=(accepted / discovered) if discovered else 0.0
     exploration=bonus / math.sqrt(visits + 1)
     return empirical + exploration
+
+
+def select_candidate_partition(
+    category: str,
+    geography: dict,
+    *,
+    partition_count: int,
+    cursor: int,
+    attempt: int,
+    yield_hints: dict[str,dict] | None = None,
+    adaptive_enabled: bool = True,
+    exploration_bonus: float = 0.15,
+) -> tuple[int,float | None]:
+    """Choose one partition using persisted yield while preserving exploration."""
+    count=max(1,min(64,int(partition_count)))
+    base=(int(cursor)+max(0,int(attempt)-1)) % count
+    if not adaptive_enabled:
+        return base,None
+
+    ordered=[(base+offset) % count for offset in range(count)]
+    if not yield_hints:
+        return base,round(float(exploration_bonus),6)
+
+    ranked=sorted(
+        enumerate(ordered),
+        key=lambda item: (
+            -_adaptive_yield_score(
+                yield_hints.get(
+                    partition_yield_hint_key(
+                        category,
+                        geography,
+                        item[1],
+                    )
+                ),
+                exploration_bonus=exploration_bonus,
+            ),
+            item[0],
+        ),
+    )
+    partition=ranked[0][1]
+    score=_adaptive_yield_score(
+        yield_hints.get(
+            partition_yield_hint_key(category,geography,partition)
+        ),
+        exploration_bonus=exploration_bonus,
+    )
+    return partition,round(float(score),6)
 
 
 def _same_day_route_is_cooldown(
