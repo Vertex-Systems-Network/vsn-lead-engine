@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
+import re
 from zoneinfo import ZoneInfo
 
 
@@ -58,8 +59,11 @@ def readiness_target_date(
 
     local_date=local_now.date()
     if explicit_date:
+        raw_date=str(explicit_date).strip()
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}",raw_date):
+            raise ValueError("Readiness date must use YYYY-MM-DD format.")
         try:
-            target=date.fromisoformat(str(explicit_date).strip())
+            target=date.fromisoformat(raw_date)
         except ValueError as exc:
             raise ValueError("Readiness date must use YYYY-MM-DD format.") from exc
     else:
