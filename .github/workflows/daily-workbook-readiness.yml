@@ -28,8 +28,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: vsn-lead-engine-daily-readiness
-  cancel-in-progress: false
+  group: vsn-lead-engine-production
+  queue: max
 
 jobs:
   readiness:
