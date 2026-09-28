@@ -13,7 +13,7 @@ on:
           - next-day
   schedule:
     - cron: "50 2 * * *"
-    - cron: "50 17 * * *"
+    - cron: "50 15 * * *"
 
 permissions:
   contents: read
@@ -52,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           target="today"
-          if [[ "$EVENT_NAME" == "schedule" && "$SCHEDULE_EXPR" == "50 17 * * *" ]]; then
+          if [[ "$EVENT_NAME" == "schedule" && "$SCHEDULE_EXPR" == "50 15 * * *" ]]; then
             target="next-day"
           elif [[ "$EVENT_NAME" == "workflow_dispatch" && "$MANUAL_TARGET" == "next-day" ]]; then
             target="next-day"
