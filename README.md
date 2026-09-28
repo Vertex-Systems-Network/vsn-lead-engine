@@ -1067,6 +1067,29 @@ P43 adds no new data provider, paid API, database, event duration, shard count,
 or Google/R2 write budget. It spends the existing critical-category shard slots
 over a wider suburban/exurban footprint.
 
+### P44 graduated critical-category geography expansion
+
+P43 proved that wider metro outskirts can still produce new Motorbikes leads,
+but its expansion stopped as soon as a category reached 10% completion. After
+P41/P42/P43, Motorbikes crossed that boundary while still carrying an 896-lead
+shortfall, so abruptly reverting to the original metro boxes would discard the
+coverage benefit too early.
+
+P44 turns the single threshold into a graduated search horizon:
+
+- below 10% complete: **2.25x** bbox around the existing metro center;
+- 10% to below 25% complete: **1.75x** bbox;
+- 25% or more complete: original bbox.
+
+Both thresholds and factors remain runtime-configurable and are clamped to safe
+world-coordinate bounds. Overture country-address validation still rejects
+cross-border rows, and scheduler/yield identity remains the original metro
+route.
+
+P44 does not add shards, event time, providers, paid API usage, Google writes or
+R2 writes. It only changes the geographic footprint of already-budgeted
+critical-category searches.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
