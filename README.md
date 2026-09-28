@@ -1215,6 +1215,22 @@ the Google workbook schema are unchanged.
 For tail events this removes one full Sheets state request at every state-read
 boundary, reducing free API pressure and latency without relaxing freshness.
 
+### P50 centralized runtime identity
+
+P50 removes version drift between package releases and outbound public-network
+requests. Overture STAC resolution and official-site/Common Crawl enrichment now
+derive their default `User-Agent` from the package `__version__` through one
+canonical helper.
+
+The stale version-pinned enrichment override was removed from production config.
+An explicit operator-provided `enrichment.user_agent` is still honored, while
+normal releases now advance network identity automatically with the package
+version.
+
+This is a reliability and observability hardening only: discovery scope, quota
+logic, R2 dedupe, Google writes, enrichment budgets and provider selection are
+unchanged.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1544,6 +1560,13 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P41 partition exhaustion cooldown: **POST-R2 ZERO-UNIQUE COHORT DEFERRAL ACTIVE**
 - P42 same-day exhaustion authority: **CURRENT-DAY POST-R2 EVIDENCE CONTROLS PARTITION COOLDOWN**
 - P43 critical geography expansion: **<10% QUOTA METRO BBOX 1.75× OUTSKIRTS COVERAGE ACTIVE**
+- P44 graduated geography expansion: **DEFICIT-TIERED BBOX EXPANSION ACTIVE**
+- P45 recent zero-unique cooldown: **RECENCY-AWARE PARTITION DEFERRAL ACTIVE**
+- P46 recovery heartbeat: **INDEPENDENT QUOTA-RECOVERY HEARTBEAT ACTIVE**
+- P47 tail-cycle extension: **UP TO 8 BOUNDED TAIL CYCLES ACTIVE**
+- P48 tail country-yield routing: **EVIDENCE-GATED COUNTRY WEIGHTING ACTIVE**
+- P49 combined daily state snapshot: **SINGLE SHEETS STATE READ PER BOUNDARY ACTIVE**
+- P50 runtime identity consistency: **PACKAGE-VERSIONED OUTBOUND IDENTITY ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

@@ -108,3 +108,22 @@ def test_geography_validation_rejects_invalid_bounds(bbox,error):
                 "bbox":bbox,
             }
         ])
+
+
+def test_production_config_uses_runtime_default_user_agent():
+    config=load_config()
+    assert "user_agent" not in config["enrichment"]
+
+
+def test_explicit_enrichment_user_agent_rejects_header_injection(tmp_path, monkeypatch):
+    import json
+    import vsn_lead_engine.config as config_module
+
+    production=load_config()
+    production["enrichment"]["user_agent"]="safe-agent\nInjected: value"
+    path=tmp_path/"runtime.json"
+    path.write_text(json.dumps(production),encoding="utf-8")
+    monkeypatch.setenv("VSN_RUNTIME_CONFIG",str(path))
+
+    with pytest.raises(ValueError,match="must not contain newlines"):
+        config_module.load_config()
