@@ -5,6 +5,8 @@ on:
     workflows: ["Lead Engine"]
     types: [completed]
     branches: [main]
+  schedule:
+    - cron: "*/10 3-18 * * *"
 
 permissions:
   actions: write
@@ -16,7 +18,7 @@ concurrency:
 
 jobs:
   recover:
-    if: ${{ github.event.workflow_run.event != 'pull_request' }}
+    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.event != 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 7
     steps:
@@ -96,7 +98,8 @@ jobs:
         run: |
           set -euo pipefail
           active="$(
-            gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/lead-engine.yml/runs?per_page=100"               --jq '[.workflow_runs[] | select((.status == "queued" or .status == "in_progress") and .head_branch == "main" and .event != "pull_request")] | length'
+            gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/lead-engine.yml/runs?per_page=100" \
+              --jq '[.workflow_runs[] | select((.status == "queued" or .status == "in_progress" or .status == "waiting" or .status == "requested" or .status == "pending") and .head_branch == "main" and .event != "pull_request")] | length'
           )"
           echo "count=$active" >> "$GITHUB_OUTPUT"
           echo "Active/queued real Lead Engine runs: $active"
