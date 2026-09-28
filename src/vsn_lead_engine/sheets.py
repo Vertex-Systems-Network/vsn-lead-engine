@@ -66,6 +66,10 @@ GOOGLE_SCOPES = [
 ]
 
 
+class PermanentWorkbookReadinessError(RuntimeError):
+    """Non-transient workbook readiness blocker; retries cannot repair it."""
+
+
 def google_auth_mode_from_env() -> str:
     if os.getenv("GOOGLE_OAUTH_USER_JSON","").strip():
         return "user-oauth"
@@ -223,6 +227,96 @@ class GoogleSheetsStore:
             "daily_title_prefix", "US + Canada Business Leads — "
         )
         return daily_workbook_title(prefix, date_value or self._today())
+
+    def drive_creation_capability(self, *, probe_create: bool = False) -> dict:
+        """Return whether current credentials can autonomously create in target folder."""
+        folder_id=self.config["drive"]["folder_id"]
+        folder=self.drive.files().get(
+            fileId=folder_id,
+            fields="id,name,driveId,capabilities(canAddChildren)",
+            supportsAllDrives=True,
+        ).execute(num_retries=self.api_retries)
+        drive_id=str(folder.get("driveId") or "").strip()
+        storage="shared-drive" if drive_id else "my-drive"
+        can_add=(folder.get("capabilities") or {}).get("canAddChildren")
+        result={
+            "status":"capable",
+            "auth_mode":self.google_auth_mode,
+            "storage":storage,
+            "folder_id":folder_id,
+            "can_add_children":can_add,
+            "probe_performed":False,
+            "probe_cleaned":False,
+        }
+
+        if can_add is False:
+            return {
+                **result,
+                "status":"blocked",
+                "permanent":True,
+                "reason":"Authenticated principal cannot add children to the target folder.",
+            }
+
+        if self.google_auth_mode=="service-account" and storage=="my-drive":
+            return {
+                **result,
+                "status":"blocked",
+                "permanent":True,
+                "reason":(
+                    "Service-account credentials cannot autonomously own a new "
+                    "file in this user-owned My Drive folder. Configure "
+                    "GOOGLE_OAUTH_USER_JSON or precreate the dated workbook."
+                ),
+            }
+
+        if not probe_create:
+            return result
+
+        probe_name=(
+            "VSN Lead Engine — Google Drive Creation Probe — "
+            + datetime.now(ZoneInfo(self.config["runtime"]["timezone"])).strftime(
+                "%Y%m%dT%H%M%S"
+            )
+        )
+        created=None
+        try:
+            created=self.drive.files().create(
+                body={
+                    "name":probe_name,
+                    "mimeType":"application/vnd.google-apps.spreadsheet",
+                    "parents":[folder_id],
+                },
+                fields="id,name,driveId,parents",
+                supportsAllDrives=True,
+            ).execute(num_retries=self.api_retries)
+            result["probe_performed"]=True
+            result["probe_file_id"]=created.get("id","")
+            result["probe_file_name"]=created.get("name",probe_name)
+        except HttpError as exc:
+            return {
+                **result,
+                "status":"blocked",
+                "probe_performed":True,
+                "permanent":getattr(exc.resp,"status",None)==403,
+                "error_type":type(exc).__name__,
+                "reason":f"Drive creation probe failed with HTTP {getattr(exc.resp,'status',None)}.",
+            }
+
+        try:
+            self.drive.files().update(
+                fileId=created["id"],
+                body={"trashed":True},
+                fields="id,trashed",
+                supportsAllDrives=True,
+            ).execute(num_retries=self.api_retries)
+            result["probe_cleaned"]=True
+        except HttpError as exc:
+            raise RuntimeError(
+                "Drive creation probe succeeded but cleanup failed; remove the "
+                f"probe file manually: {created.get('id','unknown')}."
+            ) from exc
+
+        return result
 
     def _find_daily_workbook(self, title: str) -> dict | None:
         folder_id = self.config["drive"]["folder_id"]
@@ -409,6 +503,11 @@ class GoogleSheetsStore:
         created = False
         initialized = False
         if file is None:
+            capability=self.drive_creation_capability()
+            if capability.get("status")!="capable":
+                raise PermanentWorkbookReadinessError(
+                    str(capability.get("reason") or "Google Drive creation is blocked.")
+                )
             file = self._create_daily_workbook(title)
             created = True
             initialized = True
