@@ -1,0 +1,50 @@
+name: Google Drive Capability
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_day:
+        description: "Capability target date context"
+        required: true
+        default: "next-day"
+        type: choice
+        options:
+          - today
+          - next-day
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vsn-google-drive-capability
+  cancel-in-progress: false
+
+jobs:
+  capability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GOOGLE_OAUTH_USER_JSON: ${{ secrets.GOOGLE_OAUTH_USER_JSON }}
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python scripts/install_locked.py
+      - name: Validate runtime auth mode
+        run: python -m vsn_lead_engine.cli validate
+      - name: Probe target Drive creation capability
+        shell: bash
+        env:
+          TARGET_DAY: ${{ inputs.target_day }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [[ "$TARGET_DAY" == "next-day" ]]; then
+            args+=(--next-day)
+          fi
+          python -m vsn_lead_engine.cli google-drive-capability \
+            "${args[@]}" \
+            --probe-create
