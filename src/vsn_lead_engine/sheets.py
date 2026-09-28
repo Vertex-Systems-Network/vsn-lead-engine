@@ -66,6 +66,14 @@ GOOGLE_SCOPES = [
 ]
 
 
+def google_auth_mode_from_env() -> str:
+    if os.getenv("GOOGLE_OAUTH_USER_JSON","").strip():
+        return "user-oauth"
+    if os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON","").strip():
+        return "service-account"
+    return "missing"
+
+
 def google_credentials_from_env():
     """Return Google credentials and auth mode, preferring user OAuth for My Drive."""
     user_raw=os.getenv("GOOGLE_OAUTH_USER_JSON","").strip()
