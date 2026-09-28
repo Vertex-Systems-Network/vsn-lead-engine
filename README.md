@@ -1530,6 +1530,37 @@ no lead discovery, no source/enrichment work, no quota lead writes, and no R2
 dedupe mutation. It exists only to ensure a readiness deployment cannot miss
 the evening preflight window.
 
+### P64 ownership-safe Google My Drive authentication
+
+P63 certified the deployment catch-up trigger in production, but the real
+next-day readiness run exposed the Google ownership boundary: the target folder
+is **My Drive**, owned by the VSN user account, while the GitHub service account
+is only a writer. The push catch-up correctly targeted `2026-09-29`, retried
+three times, recorded the incident in the target-date health ledger, and failed
+closed when the service account could not create the missing file.
+
+Google's Drive model does not give service accounts personal Drive storage
+quota. P64 therefore adds an ownership-safe human-user OAuth path.
+
+Credential priority:
+
+1. `GOOGLE_OAUTH_USER_JSON` — Google authorized-user JSON; preferred for
+   My Drive reads/writes and new dated workbook creation;
+2. `GOOGLE_SERVICE_ACCOUNT_JSON` — preserved as a fallback for existing
+   shared files and backward compatibility.
+
+The OAuth secret is never logged. `validate` reports only the non-secret mode:
+`user-oauth`, `service-account`, or `missing`.
+
+All Google-write workflows expose both credential options and their credential
+gates accept either one. Runtime version is **0.60.0**.
+
+As immediate incident recovery, the connected user-owned Drive authority
+precreated `US + Canada Business Leads — 2026-09-29` in the configured folder.
+The file is owned by the VSN Google user and shared to the service account as
+writer, so existing-file readiness can proceed while user OAuth is configured
+for future autonomous creation.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1879,6 +1910,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P61 dependency-update certification: **PHONENUMBERS 9 + PYTEST 9 PASSED CANONICAL HASH REGENERATION AND FULL CI**
 - P62 next-day readiness: **20:50 PKT TOMORROW PREFLIGHT + 07:50 PKT SAME-DAY RECOVERY ACTIVE**
 - P63 readiness deployment catch-up: **MAIN READINESS CHANGES IMMEDIATELY PREFLIGHT TOMORROW**
+- P64 My Drive ownership auth: **USER OAUTH PREFERRED + SERVICE-ACCOUNT FALLBACK + AUTH-MODE TELEMETRY**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
