@@ -170,6 +170,9 @@ def _critical_search_geography(
     bbox_factor: float,
     extreme_threshold: float = 0.10,
     extreme_bbox_factor: float = 2.25,
+    tail_enabled: bool = False,
+    tail_active: bool = False,
+    tail_bbox_factor: float = 1.5,
 ) -> dict:
     """Widen a metro bbox with a graduated deficit-sensitive search horizon."""
     result=dict(geography)
@@ -184,17 +187,19 @@ def _critical_search_geography(
         normal_factor,
         min(3.0,float(extreme_bbox_factor)),
     )
+    tail_factor=max(1.0,min(3.0,float(tail_bbox_factor)))
     ratio=float(completion_ratio)
-    if ratio < extreme_threshold:
+    if enabled and ratio < extreme_threshold:
         factor=extreme_factor
-    elif ratio < threshold:
+    elif enabled and ratio < threshold:
         factor=normal_factor
+    elif tail_enabled and tail_active and ratio < 1.0:
+        factor=tail_factor
     else:
         factor=1.0
 
     if (
-        not enabled
-        or factor <= 1.0
+        factor <= 1.0
         or not isinstance(bbox,list)
         or len(bbox) != 4
     ):
@@ -685,6 +690,18 @@ def run_once(
     tail_country_yield_advantage_ratio=float(
         runtime.get("tail_country_yield_advantage_ratio",1.5)
     )
+    tail_geography_expansion_enabled=bool(
+        runtime.get("tail_geography_expansion_enabled",False)
+    )
+    tail_geography_expansion_incomplete_threshold=int(
+        runtime.get(
+            "tail_geography_expansion_incomplete_threshold",
+            runtime.get("tail_incomplete_category_threshold",4),
+        )
+    )
+    tail_geography_expansion_factor=float(
+        runtime.get("tail_geography_expansion_factor",1.5)
+    )
     adaptive_cooldown_enabled=bool(
         runtime.get("adaptive_zero_yield_cooldown_enabled",True)
     )
@@ -826,6 +843,18 @@ def run_once(
                 (counts.get(category,0)+len(accepted_by_category[category]))
                 / max(target,1)
             )
+            incomplete_category_count=sum(
+                1
+                for candidate_category in config["categories"]
+                if (
+                    counts.get(candidate_category,0)
+                    + len(accepted_by_category[candidate_category])
+                ) < target
+            )
+            tail_geography_active=(
+                incomplete_category_count
+                <= tail_geography_expansion_incomplete_threshold
+            )
             route_geography=_critical_search_geography(
                 geography,
                 enabled=critical_geography_expansion_enabled,
@@ -834,6 +863,9 @@ def run_once(
                 bbox_factor=critical_geography_expansion_factor,
                 extreme_threshold=critical_geography_extreme_ratio,
                 extreme_bbox_factor=critical_geography_extreme_factor,
+                tail_enabled=tail_geography_expansion_enabled,
+                tail_active=tail_geography_active,
+                tail_bbox_factor=tail_geography_expansion_factor,
             )
             search_geography=_candidate_partition_geography(
                 route_geography,
