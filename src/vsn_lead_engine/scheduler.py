@@ -163,6 +163,7 @@ def select_candidate_partition(
     cursor: int,
     attempt: int,
     yield_hints: dict[str,dict] | None = None,
+    exhaustion_hints: dict[str,dict] | None = None,
     adaptive_enabled: bool = True,
     exploration_bonus: float = 0.15,
     score_mode: str = "throughput",
@@ -183,8 +184,13 @@ def select_candidate_partition(
     eligible=ordered
     if exhaustion_cooldown_enabled:
         exhausted=[]
+        cooldown_hints=(
+            exhaustion_hints
+            if exhaustion_hints is not None
+            else yield_hints
+        )
         for partition in ordered:
-            hint=yield_hints.get(
+            hint=cooldown_hints.get(
                 partition_yield_hint_key(category,geography,partition)
             )
             if not hint:
