@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vsn-lead-engine"
-version = "0.56.0"
+dynamic = ["version"]
 description = "Zero-paid-API US + Canada business lead engine"
 requires-python = ">=3.11"
 dependencies = [
@@ -24,6 +24,9 @@ vsn-lead-engine = "vsn_lead_engine.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "vsn_lead_engine.__version__"}
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
