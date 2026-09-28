@@ -3,22 +3,22 @@
   "project": {
     "name": "VSN Lead Engine",
     "repository": "Vertex-Systems-Network/vsn-lead-engine",
-    "product_version": "0.61.0"
+    "product_version": "0.62.0"
   },
   "execution": {
-    "status": "verifying",
+    "status": "active",
     "current_phase": "CONTINUOUS-HARDENING",
-    "active_task": "P65-OAUTH-ONBOARDING-AND-CAPABILITY",
-    "last_completed_task": "P64-USER-OAUTH-MY-DRIVE",
-    "next_task": "P66-NEXT-EVIDENCE-BASED-MILESTONE"
+    "active_task": "P66-STRICT-OAUTH-CERTIFICATION",
+    "last_completed_task": "P65-OAUTH-ONBOARDING-AND-CAPABILITY",
+    "next_task": "P67-NEXT-EVIDENCE-BASED-MILESTONE"
   },
-  "observed_main_sha": "200437034ee14d7bb947af804f276b4d050db709",
+  "observed_main_sha": "584bdc8188f8aaa8b0993990911bffdb6ddf75f6",
   "active_issue": null,
-  "active_pr": 112,
-  "active_branch": "feat/p65-google-oauth-onboarding",
-  "current_milestone": "P65-OAUTH-ONBOARDING-AND-CAPABILITY",
-  "milestone_status": "VERIFYING",
-  "last_completed_milestone": "P64 added OAuth-first Google auth with service-account fallback; PR #111 exact-head CI passed 268 tests and merged. Production readiness run #3 succeeded for 2026-09-29 in one attempt on the precreated user-owned workbook.",
+  "active_pr": null,
+  "active_branch": "feat/p66-strict-oauth-certification",
+  "current_milestone": "P66-STRICT-OAUTH-CERTIFICATION",
+  "milestone_status": "IMPLEMENTING",
+  "last_completed_milestone": "P65 added PKCE OAuth onboarding, fail-fast My Drive ownership checks, a Drive create/trash capability probe and manual certification workflow; PR #112 exact-head CI passed 277 tests and merged. Production readiness run #4 remained green for 2026-09-29.",
   "production": {
     "last_certified_date": "2026-09-28",
     "daily_target": 12000,
@@ -29,18 +29,18 @@
     "production_run": 162
   },
   "quality": {
-    "latest_required_ci_run": 214,
+    "latest_required_ci_run": 218,
     "latest_required_ci_result": "success",
-    "pytest": "268 passed",
+    "pytest": "277 passed",
     "node20_deprecation_warning": false
   },
   "blockers": [
-    "GOOGLE_OAUTH_USER_JSON is not yet configured in GitHub. P65 provides the local onboarding helper and manual production create/trash certification workflow needed to remove this blocker."
+    "GOOGLE_OAUTH_USER_JSON is not yet configured in GitHub. P66 makes the production certification gate strictly user-OAuth-only; the blocker closes only after the secret is provisioned and the manual Google Drive Capability create/trash workflow passes."
   ],
   "timeout_control": {
     "tight_polling_forbidden": true,
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Verify PR #112 exact-head Lead Engine CI. If green, squash-merge. P65 tooling is then complete; autonomous My Drive creation remains blocked until GOOGLE_OAUTH_USER_JSON is provisioned and the manual Google Drive Capability create/trash workflow passes."
+  "exact_next_safe_action": "Open P66 PR and verify exact-head Lead Engine CI. If green, squash-merge. After merge, generate the authorized-user JSON locally with scripts/google_oauth_onboard.py, add it as GOOGLE_OAUTH_USER_JSON in GitHub, then run the Google Drive Capability workflow. Do not mark autonomous My Drive creation certified until that strict user-OAuth probe is green."
 }
