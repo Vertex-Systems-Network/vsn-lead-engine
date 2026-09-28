@@ -1381,6 +1381,35 @@ Repository tests enforce exact lock syntax, declared-dependency coverage,
 build-backend pins, constrained editable installs and dependency-integrity
 preflight coverage.
 
+### P59 hash-verified Python dependency artifacts
+
+P58 pinned exact dependency versions. P59 additionally verifies the bytes of
+every external package artifact used by the GitHub-hosted Ubuntu / CPython 3.12
+CI and production paths.
+
+Three reviewed hash surfaces are authoritative:
+
+- `requirements-bootstrap.txt` — pip, setuptools, wheel and packaging;
+- `requirements-runtime.txt` — 30 runtime packages;
+- `requirements-dev.txt` — runtime plus 5 test-only packages.
+
+Each package line is exact-version pinned and carries the SHA-256 of the
+artifact selected on a clean PR #105 GitHub runner. The old unhashed
+`requirements.txt` has been retired so there is no parallel dependency lock.
+
+All project-installing workflows call `scripts/install_locked.py`. That
+installer fails closed unless it is running on Linux + CPython 3.12, installs
+external artifacts with `pip --require-hashes`, then installs the local VSN
+package with `--no-deps --no-build-isolation` and runs `pip check`.
+
+This means normal production execution cannot silently resolve a different
+transitive version or accept different bytes for the selected dependency
+artifacts. Dependency-update PRs must regenerate reviewed hashes when the
+selected artifact set changes.
+
+The main-protection controller is intentionally excluded because it does not
+install the project or third-party Python dependencies.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1725,6 +1754,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P56 persistent AI resume state: **COMPACT STATE + CHECKPOINT + RECOVERY CONTRACT ACTIVE**
 - P57 dependency update automation: **DEPENDABOT ACTIONS + PIP WEEKLY GROUPED PRS ACTIVE**
 - P58 reproducible dependencies: **35-PACKAGE PYTHON 3.12 LOCK + EXACT BUILD BACKEND + PIP CHECK ACTIVE**
+- P59 artifact integrity: **SHA-256 REQUIRE-HASHES BOOTSTRAP/RUNTIME/DEV INSTALLS ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
