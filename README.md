@@ -943,6 +943,28 @@ activation.
 No dedupe semantics, pending-marker recovery, quota target, source limit, paid
 API use or event timeout is changed.
 
+### P39 commit-start deadline guard
+
+Run #104 proved that the event could remain healthy through discovery and still
+reach the P29 watchdog because a new category commit was allowed to start late
+in the event. P38 reduces packed-registry activation time, while P39 prevents a
+new category transaction from starting when the event has too little safe time
+left.
+
+The default commit-start guard is **180 seconds** before the 25-minute event
+deadline. It can never be lower than the existing general event deadline guard.
+When the guard is reached, the current cycle stops before reserving or writing
+the next category and emits a `category_commit_deferred` heartbeat.
+
+Already committed categories remain authoritative. Leads discovered for a
+deferred category are not reserved and are safe to rediscover in the next
+serialized hourly/recovery event. Existing R2 pending-marker recovery continues
+to protect any transaction that had already started before an unexpected
+process failure.
+
+This changes no daily quota, source limit, paid API usage, dedupe authority or
+watchdog duration.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1267,6 +1289,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P36 partition yield routing: **PERSISTED CATEGORY+METRO+PARTITION LEARNING ACTIVE**
 - P37 quota-throughput scoring: **ACCEPTED-PER-SHARD + EXPLORATION ACTIVE**
 - P38 packed commit throughput: **16-WORKER DISTINCT-SHARD MERGE + SUBSTAGE TIMING ACTIVE**
+- P39 commit deadline guard: **180S CLEAN COMMIT-START RESERVE ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
