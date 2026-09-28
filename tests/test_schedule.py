@@ -171,3 +171,15 @@ def test_daily_readiness_workflow_has_evening_next_day_and_morning_recovery():
     assert 'workbook-ready-recover' in workflow
     assert '--attempts 3' in workflow
     assert '--delay-seconds 60' in workflow
+
+
+def test_readiness_target_rejects_non_iso_basic_format():
+    import pytest
+    from vsn_lead_engine.schedule import readiness_target_date
+
+    with pytest.raises(ValueError,match="YYYY-MM-DD"):
+        readiness_target_date(
+            config(),
+            now=datetime(2026,9,28,12,0,tzinfo=timezone.utc),
+            explicit_date="20260929",
+        )
