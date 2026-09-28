@@ -1121,6 +1121,35 @@ starts clean.
 No new object family, provider, paid API, event duration, shard count, Google
 write or permanent lead-state write is introduced.
 
+### P46 independent quota-recovery heartbeat
+
+P45 certification and its follow-up recovery proved the remaining quota can
+continue progressing, but the chain exposed a controller weakness: a
+`workflow_run` supervisor can dispatch one `workflow_dispatch` recovery, yet
+that token-created recovery completion is not a reliable source for another
+supervisor continuation. The dated workbook still had a shortfall while no
+real Lead Engine run remained queued or active.
+
+P46 makes recovery continuation independent of that recursion behavior by
+adding a **10-minute supervisor heartbeat** during the configured Pakistan run
+window. Each heartbeat still performs the existing gates before any dispatch:
+
+- recovery supervisor kill switch must be enabled;
+- current Asia/Karachi time must be inside 08:00-23:59;
+- Google credentials must be ready;
+- live dated workbook must still have category shortfall;
+- no real main-branch Lead Engine run may be queued, in progress, waiting,
+  requested or pending.
+
+Only then is one serialized recovery run dispatched. The existing
+`workflow_run` trigger remains for immediate continuation after ordinary
+eligible runs, while the heartbeat guarantees eventual continuation if
+GitHub's token-recursion protection suppresses that path.
+
+This does not increase per-run shard limits, event duration, source requests,
+Google writes or R2 writes. It only guarantees that the existing bounded
+recovery engine is revisited while quota remains incomplete.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
