@@ -167,11 +167,18 @@ def readiness_health_event(
         })
 
     counts=_safe_counts(result.get("counts",{}))
+    target_kind=_clean_text(result.get("target_kind","today"),40) or "today"
+    origin=(
+        "prestart-next-day"
+        if target_kind=="next-day"
+        else "prestart"
+    )
     return {
-        "event_id":health_event_id("readiness","prestart"),
+        "event_id":health_event_id("readiness",origin),
         "timestamp":timestamp or datetime.now(timezone.utc).isoformat(),
         "kind":"readiness",
-        "origin":"prestart",
+        "origin":origin,
+        "target_kind":target_kind,
         "status":_clean_text(result.get("status","unknown"),80),
         "attempts_used":max(0,int(result.get("attempts_used",0) or 0)),
         "attempts_configured":max(
@@ -332,7 +339,7 @@ class DailyHealthLedgerStore:
             "registry_pending_cache_entries","registry_pending_cache_hits",
             "registry_pending_cache_misses",
             "attempts_used","attempts_configured","workbook_created",
-            "error_type","message",
+            "target_kind","error_type","message",
         }
         result={}
         for key in scalar_fields:
