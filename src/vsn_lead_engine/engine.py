@@ -173,6 +173,8 @@ def _critical_search_geography(
     tail_enabled: bool = False,
     tail_active: bool = False,
     tail_bbox_factor: float = 1.5,
+    tail_high_completion_ratio: float = 0.90,
+    tail_high_bbox_factor: float = 2.0,
 ) -> dict:
     """Widen a metro bbox with a graduated deficit-sensitive search horizon."""
     result=dict(geography)
@@ -188,13 +190,22 @@ def _critical_search_geography(
         min(3.0,float(extreme_bbox_factor)),
     )
     tail_factor=max(1.0,min(3.0,float(tail_bbox_factor)))
+    tail_high_ratio=max(0.0,min(1.0,float(tail_high_completion_ratio)))
+    tail_high_factor=max(
+        tail_factor,
+        min(3.0,float(tail_high_bbox_factor)),
+    )
     ratio=float(completion_ratio)
     if enabled and ratio < extreme_threshold:
         factor=extreme_factor
     elif enabled and ratio < threshold:
         factor=normal_factor
     elif tail_enabled and tail_active and ratio < 1.0:
-        factor=tail_factor
+        factor=(
+            tail_high_factor
+            if ratio >= tail_high_ratio
+            else tail_factor
+        )
     else:
         factor=1.0
 
@@ -702,6 +713,12 @@ def run_once(
     tail_geography_expansion_factor=float(
         runtime.get("tail_geography_expansion_factor",1.5)
     )
+    tail_geography_high_completion_ratio=float(
+        runtime.get("tail_geography_high_completion_ratio",0.90)
+    )
+    tail_geography_high_completion_factor=float(
+        runtime.get("tail_geography_high_completion_factor",2.0)
+    )
     adaptive_cooldown_enabled=bool(
         runtime.get("adaptive_zero_yield_cooldown_enabled",True)
     )
@@ -866,6 +883,12 @@ def run_once(
                 tail_enabled=tail_geography_expansion_enabled,
                 tail_active=tail_geography_active,
                 tail_bbox_factor=tail_geography_expansion_factor,
+                tail_high_completion_ratio=(
+                    tail_geography_high_completion_ratio
+                ),
+                tail_high_bbox_factor=(
+                    tail_geography_high_completion_factor
+                ),
             )
             search_geography=_candidate_partition_geography(
                 route_geography,
