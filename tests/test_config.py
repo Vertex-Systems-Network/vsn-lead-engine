@@ -132,3 +132,38 @@ def test_explicit_enrichment_user_agent_rejects_header_injection(tmp_path, monke
 
     with pytest.raises(ValueError,match="must not contain newlines"):
         config_module.load_config()
+
+
+@pytest.mark.parametrize(
+    "field,value,error",
+    [
+        (
+            "tail_geography_high_completion_ratio",
+            1.0,
+            "tail_geography_high_completion_ratio",
+        ),
+        (
+            "tail_geography_high_completion_factor",
+            1.4,
+            "tail_geography_high_completion_factor",
+        ),
+    ],
+)
+def test_progressive_tail_config_rejects_unsafe_values(
+    tmp_path,
+    monkeypatch,
+    field,
+    value,
+    error,
+):
+    import json
+    import vsn_lead_engine.config as config_module
+
+    production=load_config()
+    production["runtime"][field]=value
+    path=tmp_path/"runtime.json"
+    path.write_text(json.dumps(production),encoding="utf-8")
+    monkeypatch.setenv("VSN_RUNTIME_CONFIG",str(path))
+
+    with pytest.raises(ValueError,match=error):
+        config_module.load_config()
