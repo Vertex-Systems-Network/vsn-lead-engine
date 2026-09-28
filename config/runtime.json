@@ -32,6 +32,8 @@
     "tail_geography_expansion_enabled": true,
     "tail_geography_expansion_incomplete_threshold": 4,
     "tail_geography_expansion_factor": 1.5,
+    "tail_geography_high_completion_ratio": 0.9,
+    "tail_geography_high_completion_factor": 2.0,
     "adaptive_partition_yield_routing": true,
     "partition_exhaustion_cooldown_enabled": true,
     "partition_exhaustion_min_visits": 2,
