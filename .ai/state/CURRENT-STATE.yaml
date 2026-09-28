@@ -8,7 +8,7 @@
   "execution": {
     "status": "stable",
     "current_phase": "PRODUCTION-READY",
-    "active_task": null,
+    "active_task": "PRODUCTION-MONITORING",
     "last_completed_task": "P70-DEPLOYMENT-READINESS-DAY-BOUNDARY",
     "next_task": null
   },
@@ -43,5 +43,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Do not start another development milestone by default. At/after the 2026-09-29 08:00 PKT scheduled production run, verify the live Lead Engine run and daily 12,000 quota. Separately, when a Google authorized-user credential is provisioned, add GOOGLE_OAUTH_USER_JSON and run the strict Google Drive Capability workflow."
+  "exact_next_safe_action": "Monitor the scheduled 2026-09-29 08:00 PKT production run and verify the daily 12,000-lead quota. Do not start another development milestone unless real production evidence identifies a concrete defect. Separately complete GOOGLE_OAUTH_USER_JSON provisioning when human Google authorization is available."
 }
