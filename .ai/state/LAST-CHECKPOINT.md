@@ -5,10 +5,10 @@
 - Snapshot timestamp: `2026-09-28`
 - Observed main: `f769cb5b8f27923ba2a872174c852a46fedfc4bc`
 - Open issues at snapshot: `0`
-- Open PRs at snapshot: `0`
+- Active PR: `#114`
 - Last completed milestone: `P66-STRICT-OAUTH-CERTIFICATION`
 - Current milestone: `P67-MIDNIGHT-SAFE-RECOVERY`
-- Milestone status: `IMPLEMENTING`
+- Milestone status: `VERIFYING`
 - Product version target: `0.63.0`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
@@ -43,4 +43,4 @@
 
 ## Next Action
 
-Open P67 PR and certify exact-head Lead Engine CI. Squash-merge only after midnight-boundary tests, shared supervisor gate tests, execution-start recovery tests, version metadata and the complete suite are green.
+Verify PR #114 exact-head Lead Engine CI. Squash-merge only after midnight-boundary tests, shared supervisor gate tests, execution-start recovery tests, version metadata and the complete suite are green.
