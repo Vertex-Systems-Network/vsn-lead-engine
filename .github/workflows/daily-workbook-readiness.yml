@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: python -m pip install -e .
+      - run: python -m pip install -c requirements.txt -e .
       - name: Runtime config preflight
         run: python -m vsn_lead_engine.cli validate
 

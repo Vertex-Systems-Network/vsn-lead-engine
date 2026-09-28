@@ -1352,6 +1352,35 @@ existing manifest does not already allow the update.
 A repository regression test guards the required ecosystems, weekly schedule,
 timezone, grouping and PR limits.
 
+### P58 reproducible Python dependency installs
+
+P58 removes install-time transitive dependency drift from the Python 3.12
+GitHub-hosted Ubuntu execution path.
+
+A clean `pip --dry-run --ignore-installed --report` resolver run on PR #104
+produced the exact transitive environment. The resulting `requirements.txt`
+locks **35 runtime/dev packages** while `pyproject.toml` remains the source of
+the project's supported direct dependency ranges.
+
+Build isolation is also deterministic:
+
+- `setuptools==84.0.0`;
+- `wheel==0.48.0`.
+
+Every workflow that installs VSN Lead Engine now uses
+`-c requirements.txt`, so the project metadata is still installed normally
+but all resolved runtime/dev packages must match the reviewed lock. The primary
+CI and production workflow also runs `pip check` before application
+validation or lead execution.
+
+Dependabot's pip updater can maintain both PEP 621 `pyproject.toml` metadata
+and `.txt` dependency files; generated update PRs still have to pass protected
+main CI before merge.
+
+Repository tests enforce exact lock syntax, declared-dependency coverage,
+build-backend pins, constrained editable installs and dependency-integrity
+preflight coverage.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1695,6 +1724,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P55 CI supply-chain pinning: **IMMUTABLE CHECKOUT/SETUP-PYTHON RELEASE SHAS ACTIVE**
 - P56 persistent AI resume state: **COMPACT STATE + CHECKPOINT + RECOVERY CONTRACT ACTIVE**
 - P57 dependency update automation: **DEPENDABOT ACTIONS + PIP WEEKLY GROUPED PRS ACTIVE**
+- P58 reproducible dependencies: **35-PACKAGE PYTHON 3.12 LOCK + EXACT BUILD BACKEND + PIP CHECK ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
