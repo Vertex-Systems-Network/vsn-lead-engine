@@ -89,6 +89,20 @@ def load_config() -> dict:
     max_cycles_per_run=int(config["runtime"].get("max_cycles_per_run",3))
     if max_cycles_per_run < 1:
         raise ValueError("max_cycles_per_run must be at least 1.")
+    tail_max_cycles=int(
+        config["runtime"].get("tail_max_cycles_per_run",max_cycles_per_run)
+    )
+    if tail_max_cycles < max_cycles_per_run or tail_max_cycles > 20:
+        raise ValueError(
+            "tail_max_cycles_per_run must be between max_cycles_per_run and 20."
+        )
+    tail_threshold=int(
+        config["runtime"].get("tail_incomplete_category_threshold",4)
+    )
+    if tail_threshold < 1 or tail_threshold > len(config["categories"]):
+        raise ValueError(
+            "tail_incomplete_category_threshold must be between 1 and category count."
+        )
     event_wall=float(
         config["runtime"].get("event_wall_time_seconds",1500)
     )
