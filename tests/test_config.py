@@ -32,6 +32,7 @@ def test_production_free_source_breadth_is_expanded():
     assert config["runtime"]["health_ledger_max_events"]==96
     assert config["runtime"]["start_hour"]==8
     assert config["runtime"]["end_hour"]==23
+    assert config["runtime"]["recovery_supervisor_enabled"] is True
     assert config["runtime"]["timezone"]=="Asia/Karachi"
     assert config["sources"]["overture"]["website_candidate_reserve_fraction"]==0.20
     assert config["enrichment"]["max_candidates_per_run"]==160
