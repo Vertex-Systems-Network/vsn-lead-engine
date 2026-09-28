@@ -107,6 +107,18 @@ def load_config() -> dict:
         raise ValueError(
             "event_deadline_guard_seconds must be less than event_wall_time_seconds."
         )
+    commit_guard=float(
+        config["runtime"].get("commit_deadline_guard_seconds",180)
+    )
+    if commit_guard < event_guard or commit_guard > 600:
+        raise ValueError(
+            "commit_deadline_guard_seconds must be between "
+            "event_deadline_guard_seconds and 600."
+        )
+    if commit_guard >= event_wall:
+        raise ValueError(
+            "commit_deadline_guard_seconds must be less than event_wall_time_seconds."
+        )
     readiness_attempts=int(
         config["runtime"].get("workbook_readiness_attempts",3)
     )
