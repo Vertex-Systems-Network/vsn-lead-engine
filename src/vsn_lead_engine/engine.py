@@ -231,6 +231,8 @@ def _candidate_partition_geography(
     exhaustion_cooldown_enabled: bool = True,
     exhaustion_min_visits: int = 2,
     exhaustion_min_discovered: int = 20,
+    exhaustion_zero_unique_streak: int = 2,
+    exhaustion_recent_discovered: int = 20,
 ) -> dict:
     """Attach an adaptive rotating source cohort to one shard search."""
     count=max(1,int(partition_count))
@@ -248,8 +250,8 @@ def _candidate_partition_geography(
         exhaustion_cooldown_enabled=exhaustion_cooldown_enabled,
         exhaustion_min_visits=exhaustion_min_visits,
         exhaustion_min_discovered=exhaustion_min_discovered,
-        exhaustion_zero_unique_streak=partition_exhaustion_zero_unique_streak,
-        exhaustion_recent_discovered=partition_exhaustion_recent_discovered,
+        exhaustion_zero_unique_streak=exhaustion_zero_unique_streak,
+        exhaustion_recent_discovered=exhaustion_recent_discovered,
     )
     return {
         **geography,
@@ -817,6 +819,12 @@ def run_once(
                 exhaustion_cooldown_enabled=partition_exhaustion_cooldown_enabled,
                 exhaustion_min_visits=partition_exhaustion_min_visits,
                 exhaustion_min_discovered=partition_exhaustion_min_discovered,
+                exhaustion_zero_unique_streak=(
+                    partition_exhaustion_zero_unique_streak
+                ),
+                exhaustion_recent_discovered=(
+                    partition_exhaustion_recent_discovered
+                ),
             )
             source_started_monotonic=time.monotonic()
             emit_progress(
