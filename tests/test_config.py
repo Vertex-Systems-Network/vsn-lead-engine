@@ -36,6 +36,11 @@ def test_production_free_source_breadth_is_expanded():
     assert config["runtime"]["tail_cycle_extension_enabled"] is True
     assert config["runtime"]["tail_max_cycles_per_run"]==8
     assert config["runtime"]["tail_incomplete_category_threshold"]==4
+    assert config["runtime"]["tail_country_yield_routing_enabled"] is True
+    assert config["runtime"]["tail_country_yield_incomplete_threshold"]==4
+    assert config["runtime"]["tail_country_yield_min_visits"]==4
+    assert config["runtime"]["tail_country_yield_preferred_weight"]==2
+    assert config["runtime"]["tail_country_yield_advantage_ratio"]==1.5
     assert config["runtime"]["timezone"]=="Asia/Karachi"
     assert config["sources"]["overture"]["website_candidate_reserve_fraction"]==0.20
     assert config["enrichment"]["max_candidates_per_run"]==160
