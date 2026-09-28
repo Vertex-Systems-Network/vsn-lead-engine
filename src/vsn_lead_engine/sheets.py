@@ -306,7 +306,17 @@ class GoogleSheetsStore:
         ).execute(num_retries=self.api_retries)
         self._ensure_tabs(sid, metadata)
 
-        if not created and self._should_initialize_precreated_workbook(sid):
+        bootstrap_precreated=bool(
+            self.config["runtime"].get(
+                "precreated_workbook_bootstrap_enabled",
+                True,
+            )
+        )
+        if (
+            not created
+            and bootstrap_precreated
+            and self._should_initialize_precreated_workbook(sid)
+        ):
             self._initialize_new_daily_workbook(sid)
             initialized = True
             metadata = self.sheets.spreadsheets().get(
