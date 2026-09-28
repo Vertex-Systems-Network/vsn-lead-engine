@@ -13,6 +13,7 @@ from .health import (
 )
 from .registry import audit_sheet_registry, backfill_sheet_registry, build_registry_index, live_smoke_test
 from .schedule import scheduled_run_window
+from .source_probe import probe_motorbike_source
 from .sheets import GoogleSheetsStore
 from .taxonomy_audit import audit_motorbike_taxonomy
 from .watchdog import supervise_process
@@ -115,6 +116,9 @@ def main() -> int:
     taxonomy_parser=sub.add_parser("taxonomy-audit")
     taxonomy_parser.add_argument("--max-geographies",type=int,default=8)
     taxonomy_parser.add_argument("--rows-per-geography",type=int,default=250)
+    probe_parser=sub.add_parser("source-probe")
+    probe_parser.add_argument("--max-geographies",type=int,default=4)
+    probe_parser.add_argument("--partitions-per-geography",type=int,default=2)
     backfill_parser=sub.add_parser("registry-backfill")
     backfill_parser.add_argument("--dry-run",action="store_true")
     sub.add_parser("registry-stats")
@@ -169,6 +173,17 @@ def main() -> int:
             )
         print(json.dumps(result,indent=2,default=str))
         return int(result.get("exit_code",2) or 0)
+    if args.command=="source-probe":
+        result=probe_motorbike_source(
+            config,
+            max_geographies=max(1,min(12,args.max_geographies)),
+            partitions_per_geography=max(
+                1,
+                min(16,args.partitions_per_geography),
+            ),
+        )
+        print(json.dumps(result,indent=2,default=str))
+        return 0 if result.get("status")=="ok" else 2
     if args.command=="taxonomy-audit":
         result=audit_motorbike_taxonomy(
             config,

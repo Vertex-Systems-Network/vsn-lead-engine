@@ -802,6 +802,31 @@ Therefore this correction is a real coverage fix, but it is not treated as the
 full explanation for the low daily Motorbikes count. P30 heartbeat evidence from
 the next current-main production run remains the next root-cause step.
 
+### P33 production-equivalent Motorbikes source probe
+
+P31 proved that the current Overture release contains hundreds of relevant
+phone-bearing motorcycle businesses in a small metro sample, while the dated
+workbook still showed only a handful of accepted Motorbikes leads. P33 isolates
+the production discovery layer without touching quota state.
+
+The probe calls the same `OverturePlaceSource.search("Motorbikes")` method used
+by real collection, with the same **16-way hash partition**, candidate limit and
+query timeout. It samples four country-balanced metros and two deterministic
+partitions per metro.
+
+The output is aggregate-only:
+
+- candidates returned;
+- source-phone vs website-only candidates;
+- partition and metro;
+- elapsed query time;
+- bounded error type/message.
+
+It never emits lead names or contact payloads and performs **zero Google Sheet
+or R2 operations**. The isolated `Overture Production Source Probe` workflow
+can therefore distinguish partition/query failure from later dedupe/enrichment
+or commit loss before changing production routing.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1120,6 +1145,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P30 live heartbeat telemetry: **SOURCE/ENRICHMENT/R2/COMMIT PHASE TIMING ACTIVE**
 - P31 taxonomy breadth audit: **READ-ONLY MOTORBIKES COVERAGE PROBE ACTIVE**
 - P32 Motorbikes canonical rentals: **MOTORCYCLE RENTAL + SCOOTER RENTAL ACTIVE**
+- P33 production source probe: **EXACT 16-PARTITION MOTORBIKES READ-ONLY PROBE ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
