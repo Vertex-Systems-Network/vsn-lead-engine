@@ -5,10 +5,10 @@
 - Snapshot timestamp: `2026-09-28`
 - Observed main: `21c2e9e0151c00012b98831a46c24ced09eab6dd`
 - Open issues at snapshot: `0`
-- Open PRs at snapshot: `0`
+- Active PR: `#109`
 - Last completed milestone: `P61-DEPENDENCY-UPDATE-CERTIFICATION`
 - Current milestone: `P62-NEXT-DAY-WORKBOOK-PREFLIGHT`
-- Milestone status: `IMPLEMENTING`
+- Milestone status: `VERIFYING`
 - Product version target: `0.59.0`
 - Production quota certification: `2026-09-28 = 12,000 / 12,000`
 
@@ -38,4 +38,4 @@
 
 ## Next Action
 
-Open the P62 PR and verify exact-head Lead Engine CI, including date-boundary tests, workflow contract tests, health telemetry tests, package-version metadata and the complete suite. Squash-merge only when green.
+Verify PR #109 exact-head Lead Engine CI, including date-boundary tests, workflow contract tests, health telemetry tests, package-version metadata and the complete suite. Squash-merge only when green.
