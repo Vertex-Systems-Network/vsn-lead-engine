@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import threading
 from dataclasses import dataclass
 from urllib.parse import quote_plus
 
@@ -121,6 +122,11 @@ COUNTRY_CODES = {
 }
 
 
+class OvertureQueryTimeout(TimeoutError):
+    """Raised when one remote DuckDB/httpfs Overture query exceeds its budget."""
+
+
+
 def _taxonomy_tokens(primary: str = "", basic: str = "", hierarchy=None) -> list[str]:
     tokens: list[str] = []
     for raw in [primary, basic, *(hierarchy or [])]:
@@ -169,6 +175,7 @@ class OverturePlaceSource:
         stac_url: str = "https://stac.overturemaps.org/catalog.json",
         candidate_limit: int = 500,
         website_candidate_reserve_fraction: float = 0.20,
+        query_timeout_seconds: float = 45,
     ):
         self.release = release
         self.stac_url = stac_url
@@ -177,6 +184,7 @@ class OverturePlaceSource:
             0.0,
             min(0.5, float(website_candidate_reserve_fraction)),
         )
+        self.query_timeout_seconds=max(1.0,float(query_timeout_seconds))
         self._resolved_release: str | None = None
         self._connection = None
 
@@ -205,7 +213,7 @@ class OverturePlaceSource:
             response = requests.get(
                 self.stac_url,
                 timeout=20,
-                headers={"User-Agent": "VSN-Lead-Engine/0.32"},
+                headers={"User-Agent": "VSN-Lead-Engine/0.33"},
             )
             response.raise_for_status()
             payload = response.json()
@@ -402,9 +410,34 @@ class OverturePlaceSource:
         if partition_count > 1:
             params.extend([partition_count,partition])
         params.extend([phone_budget,website_budget,row_limit])
-        cursor = connection.execute(sql, params)
-        columns = [item[0] for item in cursor.description]
-        records = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+        timeout_fired=threading.Event()
+
+        def interrupt_query():
+            timeout_fired.set()
+            try:
+                connection.interrupt()
+            except Exception:
+                # The worker query remains authoritative. If interrupt itself
+                # fails, the workflow-level timeout is still the final guard.
+                pass
+
+        timer=threading.Timer(self.query_timeout_seconds,interrupt_query)
+        timer.daemon=True
+        timer.start()
+        try:
+            cursor=connection.execute(sql,params)
+            columns=[item[0] for item in cursor.description]
+            records=[dict(zip(columns,row)) for row in cursor.fetchall()]
+        except Exception as exc:
+            if timeout_fired.is_set():
+                raise OvertureQueryTimeout(
+                    "Overture query exceeded "
+                    f"{self.query_timeout_seconds:g}s timeout."
+                ) from exc
+            raise
+        finally:
+            timer.cancel()
 
         expected_country = COUNTRY_CODES.get(location.get("country", ""))
         leads: list[Lead] = []
