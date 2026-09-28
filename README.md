@@ -1410,6 +1410,37 @@ selected artifact set changes.
 The main-protection controller is intentionally excluded because it does not
 install the project or third-party Python dependencies.
 
+### P60 controlled hash-lock regeneration
+
+P59 made external Python artifacts hash-verified. P60 adds the controlled update
+path required when dependency versions change.
+
+The lock generator is now repository-native:
+
+- `scripts/regenerate_hash_locks.py --check` resolves the current
+  `pyproject.toml` runtime/dev dependency graph and fails with a unified diff
+  when committed SHA-256 locks are stale;
+- `--write` regenerates bootstrap, runtime and dev lock files in one
+  deterministic pass;
+- generation is Linux + CPython 3.12 only;
+- the resolver itself is fixed by
+  `.github/dependency-resolver.txt` at hash-verified `pip==25.2`.
+
+`.github/workflows/dependency-lock.yml` runs the drift check only when the
+dependency surface changes. Its manual regeneration job has job-scoped
+`contents: write`, rejects `main`/`master`, and accepts only an existing
+`dependabot/*` or `deps/*` target branch. It regenerates locks, re-checks
+them, performs a hash-verified dev install, validates runtime configuration,
+runs the full test suite, and only then commits the three generated lock files
+back to that update branch.
+
+There is no automatic merge and no direct-main regeneration path. Normal branch
+protection and PR CI remain the release gate.
+
+The pre-P59 Dependabot PR #103 was closed as stale because it targeted the
+retired unhashed `requirements.txt` model. Future dependency PRs are required
+to reconcile against the P60 generator instead.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1755,6 +1786,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P57 dependency update automation: **DEPENDABOT ACTIONS + PIP WEEKLY GROUPED PRS ACTIVE**
 - P58 reproducible dependencies: **35-PACKAGE PYTHON 3.12 LOCK + EXACT BUILD BACKEND + PIP CHECK ACTIVE**
 - P59 artifact integrity: **SHA-256 REQUIRE-HASHES BOOTSTRAP/RUNTIME/DEV INSTALLS ACTIVE**
+- P60 lock regeneration: **PINNED RESOLVER + PR DRIFT CHECK + MANUAL BRANCH-ONLY REGENERATION ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**

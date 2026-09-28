@@ -11,6 +11,7 @@ WORKFLOWS = [
     "source-probe.yml",
     "taxonomy-audit.yml",
     "main-protection-controller.yml",
+    "dependency-lock.yml",
 ]
 
 CHECKOUT_SHA = "3d3c42e5aac5ba805825da76410c181273ba90b1"
