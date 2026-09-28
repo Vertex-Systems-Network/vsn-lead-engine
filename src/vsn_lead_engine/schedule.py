@@ -120,3 +120,50 @@ def readiness_target_date(
         "timezone":timezone,
         "resolved_at":local_now.isoformat(),
     }
+
+
+
+def deployment_readiness_target(
+    config: dict,
+    *,
+    now: datetime | None = None,
+) -> dict:
+    """Choose today before the evening preflight cutoff, tomorrow at/after it."""
+    runtime=config["runtime"]
+    timezone=str(runtime.get("timezone","Asia/Karachi")).strip()
+    zone=ZoneInfo(timezone)
+    local_now=now or datetime.now(zone)
+    if local_now.tzinfo is None:
+        local_now=local_now.replace(tzinfo=zone)
+    else:
+        local_now=local_now.astimezone(zone)
+
+    cutoff_hour=int(runtime.get("readiness_evening_preflight_hour",20))
+    cutoff_minute=int(runtime.get("readiness_evening_preflight_minute",50))
+    if not 0 <= cutoff_hour <= 23:
+        raise ValueError("readiness_evening_preflight_hour must be 0..23.")
+    if not 0 <= cutoff_minute <= 59:
+        raise ValueError("readiness_evening_preflight_minute must be 0..59.")
+
+    cutoff=local_now.replace(
+        hour=cutoff_hour,
+        minute=cutoff_minute,
+        second=0,
+        microsecond=0,
+    )
+    after_cutoff=local_now >= cutoff
+    result=readiness_target_date(
+        config,
+        now=local_now,
+        next_day=after_cutoff,
+    )
+    result.update({
+        "reason":(
+            "post-evening-preflight-cutoff"
+            if after_cutoff
+            else "same-day-before-evening-preflight"
+        ),
+        "cutoff_local_time":cutoff.isoformat(),
+        "deployment_local_time":local_now.isoformat(),
+    })
+    return result
