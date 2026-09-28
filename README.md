@@ -642,8 +642,9 @@ Operational contract:
 - blank bootstrap refreshes category headers, clears stale template lead rows,
   writes the current Overview schema and enforces the configured spreadsheet
   timezone;
-- an already-populated dated workbook is **never reset or wiped** merely because
-  its Overview is old;
+- an already-populated dated workbook never has category lead rows reset or
+  wiped merely because its Overview is old; only the generated Overview schema
+  is rebuilt, with matching operational counters preserved when available;
 - the behavior can be disabled with
   `runtime.precreated_workbook_bootstrap_enabled=false`.
 
