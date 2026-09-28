@@ -214,7 +214,7 @@ class OverturePlaceSource:
             response = requests.get(
                 self.stac_url,
                 timeout=20,
-                headers={"User-Agent": "VSN-Lead-Engine/0.45"},
+                headers={"User-Agent": "VSN-Lead-Engine/0.46"},
             )
             response.raise_for_status()
             payload = response.json()

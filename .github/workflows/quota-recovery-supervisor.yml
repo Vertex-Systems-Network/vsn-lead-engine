@@ -1,0 +1,120 @@
+name: Lead Engine Recovery Supervisor
+
+on:
+  workflow_run:
+    workflows: ["Lead Engine"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: vsn-lead-engine-recovery-supervisor
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    if: ${{ github.event.workflow_run.event != 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -e .
+
+      - name: Google credential preflight
+        id: google
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        shell: bash
+        run: |
+          if [ -n "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Recovery supervisor skipped: Google credential unavailable."
+          fi
+
+      - name: Recovery window gate
+        id: window
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          with open("config/runtime.json", encoding="utf-8") as handle:
+              runtime=json.load(handle)["runtime"]
+
+          enabled=bool(runtime.get("recovery_supervisor_enabled",True))
+          timezone=str(runtime.get("timezone","Asia/Karachi"))
+          now=datetime.now(ZoneInfo(timezone))
+          start=int(runtime.get("start_hour",8))
+          end=int(runtime.get("end_hour",23))
+          allowed=enabled and start <= now.hour <= end
+
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as output:
+              output.write(f"enabled={str(enabled).lower()}\n")
+              output.write(f"allowed={str(allowed).lower()}\n")
+              output.write(f"local_hour={now.hour}\n")
+              output.write(f"run_date={now.date().isoformat()}\n")
+
+          print(
+              f"Recovery window: enabled={enabled} allowed={allowed} "
+              f"local={now.isoformat()} configured={start}:00-{end}:59"
+          )
+          PY
+
+      - name: Check live daily quota
+        id: quota
+        if: ${{ steps.google.outputs.ready == 'true' && steps.window.outputs.allowed == 'true' }}
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload="$(python -m vsn_lead_engine.cli workbook-ready-recover --attempts 3 --delay-seconds 20)"
+          printf '%s\n' "$payload"
+          complete="$(printf '%s' "$payload" | python -c 'import json,sys; print(str(bool(json.load(sys.stdin).get("quota_complete",False))).lower())')"
+          echo "complete=$complete" >> "$GITHUB_OUTPUT"
+
+      - name: Check for active real Lead Engine run
+        id: active
+        if: ${{ steps.quota.outputs.complete == 'false' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          active="$(
+            gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/lead-engine.yml/runs?per_page=100"               --jq '[.workflow_runs[] | select((.status == "queued" or .status == "in_progress") and .head_branch == "main" and .event != "pull_request")] | length'
+          )"
+          echo "count=$active" >> "$GITHUB_OUTPUT"
+          echo "Active/queued real Lead Engine runs: $active"
+
+      - name: Dispatch shortfall recovery
+        if: ${{ steps.quota.outputs.complete == 'false' && steps.active.outputs.count == '0' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run lead-engine.yml             --repo "$GITHUB_REPOSITORY"             --ref main             -f dry_run=false             -f run_origin=recovery-supervisor
+          echo "Dispatched one serialized recovery run for remaining daily quota."
+
+      - name: Quota complete
+        if: ${{ steps.quota.outputs.complete == 'true' }}
+        run: echo "Daily category quotas are complete; recovery chain stops."
+
+      - name: Recovery already queued
+        if: ${{ steps.quota.outputs.complete == 'false' && steps.active.outputs.count != '0' }}
+        run: echo "A real Lead Engine run is already queued/in progress; duplicate dispatch skipped."

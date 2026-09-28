@@ -69,3 +69,24 @@ def test_github_schedule_contract_matches_pkt_hourly_window():
     assert 'cron: "0 3-18 * * *"' in workflow
     assert "python -m vsn_lead_engine.cli supervised-run --scheduled" in workflow
     assert 'cron: "30 3-17 * * *"' not in workflow
+
+
+def test_recovery_supervisor_dispatches_only_bounded_shortfall_runs():
+    supervisor=Path(".github/workflows/quota-recovery-supervisor.yml").read_text(
+        encoding="utf-8"
+    )
+    lead_workflow=Path(".github/workflows/lead-engine.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'workflows: ["Lead Engine"]' in supervisor
+    assert "actions: write" in supervisor
+    assert "github.event.workflow_run.event != 'pull_request'" in supervisor
+    assert "workbook-ready-recover --attempts 3 --delay-seconds 20" in supervisor
+    assert '.head_branch == "main"' in supervisor
+    assert '.event != "pull_request"' in supervisor
+    assert "gh workflow run lead-engine.yml" in supervisor
+    assert "-f run_origin=recovery-supervisor" in supervisor
+    assert "recovery_supervisor_enabled" in supervisor
+    assert "run_origin:" in lead_workflow
+    assert "VSN_RUN_ORIGIN: ${{ inputs.run_origin }}" in lead_workflow
