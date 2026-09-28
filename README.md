@@ -1175,6 +1175,28 @@ Safety remains unchanged:
 This uses otherwise-idle free runner time to close tail shortfalls faster,
 especially the remaining Motorbikes quota.
 
+### P48 tail country-yield routing
+
+Production logs showed a tail-routing imbalance for Motorbikes. In the
+three-cycle recovery immediately before P47, the scheduler issued exactly
+21 Motorbikes attempts to the United States and 21 to Canada. Both countries
+were productive, but the US attempts returned 35 unique accepted leads versus
+14 from Canada.
+
+P48 preserves country coverage while allowing evidence-backed tail weighting:
+
+- it activates only when 4 or fewer categories remain incomplete;
+- both countries need at least 4 category-specific observed visits before any
+  preference is applied;
+- the stronger country must show at least a 1.5x accepted-per-visit advantage;
+- the preferred country receives at most **2x** weight;
+- every country still receives a guaranteed base layer of attempts.
+
+With insufficient evidence or a small yield difference, routing remains the
+existing balanced sequence. The feature is runtime-configurable and does not
+change per-cycle shard limits, event time, providers, Google writes or R2
+dedupe semantics.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
