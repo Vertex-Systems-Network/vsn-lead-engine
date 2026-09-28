@@ -721,6 +721,33 @@ Scheduled, assistant-triggered and manual **real** runs use
 `supervised-run`. Manual dry runs remain direct because they do not own the
 production write path.
 
+### P30 live execution heartbeat telemetry
+
+Production runs now emit compact flushed JSON heartbeats at expensive execution
+boundaries so a stalled GitHub Actions job can be localized from its last
+completed phase instead of waiting for a final result.
+
+Telemetry includes only operational fields such as phase, category, country,
+region/city, source name, partition number, candidate counts, collision counts,
+retry counts and elapsed time. It does **not** emit business names, phones,
+emails, websites, addresses or other lead payloads.
+
+Instrumented boundaries include:
+
+- event and cycle start/end;
+- dated-workbook/quota state loaded;
+- every source search start/end;
+- R2 prefilter and final collision checks;
+- enrichment start/end;
+- per-category Registry/Sheet commit start/end;
+- event cleanup start/end.
+
+Each line is flushed immediately. If a native call blocks, the final visible
+heartbeat identifies the active boundary while P29 remains the independent
+hard process watchdog. The telemetry is logs-only and adds no R2, Google API,
+paid-source or per-lead storage writes. It can be disabled with
+`runtime.progress_telemetry_enabled=false`.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1036,6 +1063,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P27 Overture query guard: **45S INTERRUPT + NON-RETRYABLE TIMEOUT ACTIVE**
 - P28 graceful event budget: **25-MIN CLEAN STOP + 60S START GUARD ACTIVE**
 - P29 process watchdog: **26-MIN CHILD DEADLINE + 20S KILL GRACE ACTIVE**
+- P30 live heartbeat telemetry: **SOURCE/ENRICHMENT/R2/COMMIT PHASE TIMING ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
