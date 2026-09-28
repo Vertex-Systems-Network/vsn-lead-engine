@@ -993,6 +993,29 @@ Lead Engine concurrency group continues to serialize real execution.
 A runtime kill switch, `recovery_supervisor_enabled`, can stop automatic
 continuation without removing the workflow.
 
+### P41 partition exhaustion cooldown
+
+P40 recovery certification showed a new late-day bottleneck: a recovery event
+discovered 290 Motorbikes candidates but accepted 0 new unique leads, with 268
+duplicate rejections. P36 already stores post-R2 accepted yield for each
+category+metro+partition, so P41 uses that evidence directly instead of adding a
+new store.
+
+A partition is temporarily deferred when all of the following are true:
+
+- it has at least 2 observed visits;
+- it has discovered at least 20 candidates;
+- it has accepted 0 post-R2 unique leads.
+
+The selector only applies the cooldown when at least one alternative partition
+remains. If every partition looks exhausted, normal adaptive-score ordering is
+restored so the category can never be starved.
+
+The thresholds and kill switch are runtime-configurable. P41 does not increase
+event duration, source limits, Google writes, R2 writes or paid API use; it only
+avoids repeatedly spending existing shard budget on cohorts already proven to
+produce no new unique leads.
+
 ## Primary free source
 
 Production discovery uses **Overture Maps Places**, queried directly from its
@@ -1319,6 +1342,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P38 packed commit throughput: **16-WORKER DISTINCT-SHARD MERGE + SUBSTAGE TIMING ACTIVE**
 - P39 commit deadline guard: **180S CLEAN COMMIT-START RESERVE ACTIVE**
 - P40 quota recovery supervisor: **LIVE SHORTFALL CHECK + SINGLE SERIALIZED REDISPATCH ACTIVE**
+- P41 partition exhaustion cooldown: **POST-R2 ZERO-UNIQUE COHORT DEFERRAL ACTIVE**
 - Master Registry cross-day dedupe: **FROZEN MIGRATION/AUDIT SNAPSHOT**
 - Overture Places source: **ENABLED**
 - Country-balanced priority scheduling: **ENABLED**
