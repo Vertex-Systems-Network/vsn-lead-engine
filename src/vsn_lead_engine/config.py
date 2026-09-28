@@ -273,8 +273,14 @@ def load_config() -> dict:
             raise ValueError(f"registry.{key} is required.")
     if not str(registry.get("prefix","")).strip("/"):
         raise ValueError("registry.prefix is required.")
-    if int(registry.get("max_workers",32)) < 4:
+    max_registry_workers=int(registry.get("max_workers",32))
+    if max_registry_workers < 4:
         raise ValueError("registry.max_workers must be at least 4.")
+    pack_commit_workers=int(registry.get("pack_commit_workers",16))
+    if pack_commit_workers < 1 or pack_commit_workers > max_registry_workers:
+        raise ValueError(
+            "registry.pack_commit_workers must be between 1 and max_workers."
+        )
     if int(registry.get("retry_attempts",4)) < 1:
         raise ValueError("registry.retry_attempts must be at least 1.")
 
