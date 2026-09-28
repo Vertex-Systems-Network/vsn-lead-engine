@@ -6,7 +6,7 @@
     "product_version": "0.63.0"
   },
   "execution": {
-    "status": "active",
+    "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
     "active_task": "P67-MIDNIGHT-SAFE-RECOVERY",
     "last_completed_task": "P66-STRICT-OAUTH-CERTIFICATION",
@@ -14,10 +14,10 @@
   },
   "observed_main_sha": "f769cb5b8f27923ba2a872174c852a46fedfc4bc",
   "active_issue": null,
-  "active_pr": null,
+  "active_pr": 114,
   "active_branch": "feat/p67-midnight-runway-guard",
   "current_milestone": "P67-MIDNIGHT-SAFE-RECOVERY",
-  "milestone_status": "IMPLEMENTING",
+  "milestone_status": "VERIFYING",
   "last_completed_milestone": "P66 made autonomous My Drive certification strictly user-OAuth-only; PR #113 exact-head CI #220 passed 280 tests and merged. Merge-push readiness run #5 stayed green for 2026-09-29 in one attempt.",
   "production": {
     "last_certified_date": "2026-09-28",
@@ -42,5 +42,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Open P67 PR and verify exact-head Lead Engine CI. Confirm midnight runway math, recovery supervisor shared gate, execution-start recheck, recovery origin preservation, runtime version 0.63.0 and the full suite. Squash-merge only when green."
+  "exact_next_safe_action": "Verify PR #114 exact-head Lead Engine CI. Confirm midnight runway threshold, shared recovery-supervisor gate, execution-start recheck, recovery origin preservation, runtime version 0.63.0 and the full suite; squash-merge only when green."
 }
