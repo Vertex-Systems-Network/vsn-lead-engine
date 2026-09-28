@@ -6,7 +6,7 @@
     "product_version": "0.60.0"
   },
   "execution": {
-    "status": "active",
+    "status": "verifying",
     "current_phase": "CONTINUOUS-HARDENING",
     "active_task": "P64-USER-OAUTH-MY-DRIVE",
     "last_completed_task": "P63-DEPLOYMENT-READINESS-CATCHUP",
@@ -14,10 +14,10 @@
   },
   "observed_main_sha": "399c7deffb3d25571480bc347ac1810755c8c101",
   "active_issue": null,
-  "active_pr": null,
+  "active_pr": 111,
   "active_branch": "feat/p64-user-oauth-drive",
   "current_milestone": "P64-USER-OAUTH-MY-DRIVE",
-  "milestone_status": "IMPLEMENTING",
+  "milestone_status": "VERIFYING",
   "last_completed_milestone": "P63 added a bounded main-push next-day readiness catch-up; PR #110 exact-head CI passed 262 tests and merged. Production catch-up run #2 correctly targeted 2026-09-29 but failed closed because service-account auth could not create a user-owned My Drive file.",
   "production": {
     "last_certified_date": "2026-09-28",
@@ -42,5 +42,5 @@
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Open P64 PR and certify exact-head Lead Engine CI. If green, squash-merge; the merge push will trigger readiness catch-up. Verify the precreated 2026-09-29 workbook is initialized successfully. Full future autonomous creation additionally requires GOOGLE_OAUTH_USER_JSON."
+  "exact_next_safe_action": "Verify PR #111 exact-head Lead Engine CI. If green, squash-merge. The merge push must trigger Daily Workbook Readiness; verify 2026-09-29 workbook initialization succeeds on the precreated user-owned file. Future missing-file autonomy still requires GOOGLE_OAUTH_USER_JSON."
 }
