@@ -67,5 +67,5 @@ def test_scheduled_window_rejects_before_0800_pkt():
 def test_github_schedule_contract_matches_pkt_hourly_window():
     workflow=Path(".github/workflows/lead-engine.yml").read_text(encoding="utf-8")
     assert 'cron: "0 3-18 * * *"' in workflow
-    assert "python -m vsn_lead_engine.cli run --scheduled" in workflow
+    assert "python -m vsn_lead_engine.cli supervised-run --scheduled" in workflow
     assert 'cron: "30 3-17 * * *"' not in workflow
