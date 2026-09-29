@@ -6,7 +6,8 @@ on:
     types: [completed]
     branches: [main]
   schedule:
-    - cron: "*/10 3-18 * * *"
+    - cron: "17,27,37,47,57 8-23 * * *"
+      timezone: "Asia/Karachi"
 
 permissions:
   actions: write

@@ -23,7 +23,8 @@ on:
           - manual
           - recovery-supervisor
   schedule:
-    - cron: "0 3-18 * * *"
+    - cron: "7 8-23 * * *"
+      timezone: "Asia/Karachi"
 
 permissions:
   contents: read

@@ -103,9 +103,10 @@ def test_scheduled_window_rejects_before_0800_pkt():
 
 def test_github_schedule_contract_matches_pkt_hourly_window():
     workflow=Path(".github/workflows/lead-engine.yml").read_text(encoding="utf-8")
-    assert 'cron: "0 3-18 * * *"' in workflow
+    assert 'cron: "7 8-23 * * *"' in workflow
+    assert 'timezone: "Asia/Karachi"' in workflow
     assert "python -m vsn_lead_engine.cli supervised-run --scheduled" in workflow
-    assert 'cron: "30 3-17 * * *"' not in workflow
+    assert 'cron: "0 3-18 * * *"' not in workflow
 
 
 def test_recovery_supervisor_dispatches_only_bounded_shortfall_runs():
@@ -117,7 +118,9 @@ def test_recovery_supervisor_dispatches_only_bounded_shortfall_runs():
     )
 
     assert 'workflows: ["Lead Engine"]' in supervisor
-    assert 'cron: "*/10 3-18 * * *"' in supervisor
+    assert 'cron: "17,27,37,47,57 8-23 * * *"' in supervisor
+    assert 'timezone: "Asia/Karachi"' in supervisor
+    assert 'cron: "*/10 3-18 * * *"' not in supervisor
     assert "actions: write" in supervisor
     assert "github.event_name == 'schedule'" in supervisor
     assert "github.event.workflow_run.event != 'pull_request'" in supervisor
