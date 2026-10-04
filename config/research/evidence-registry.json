@@ -4,7 +4,7 @@
   "activation_scope": "child_project",
   "entries": [
     {
-      "id": "EVID-LEAD-SAAS-001",
+      "id": "EVID-000001",
       "claim_or_question": "The current lead engine is a production operations system with explicit US/Canada, Overture, phone-required, R2 dedupe, dated Sheets and daily target constraints.",
       "source_type": "repository",
       "source_ref": "https://github.com/Vertex-Systems-Network/vsn-lead-engine/blob/main/README.md",
@@ -13,7 +13,7 @@
       "published_at": null,
       "accessed_at": "2026-10-05",
       "source_revision_or_hash": "main as of ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
-      "evidence_class": "verified_fact_or_supported_inference",
+      "evidence_class": "verified_fact",
       "confidence": "high",
       "summary": "Current runtime and target are already operational; SaaS tenant, subscription and client app capabilities are not evidenced in planning snapshot. Preserve existing invariants.",
       "supports_requirement_ids": [],
@@ -25,14 +25,14 @@
         "MOD-PRODUCTION-RUNTIME",
         "MOD-PRODUCT-DISCOVERY"
       ],
-      "validation_status": "repository_verified",
+      "validation_status": "validated",
       "supersedes": [],
       "notes": [
         "Current-state and README evidence need re-read before each execution."
       ]
     },
     {
-      "id": "EVID-LEAD-SAAS-002",
+      "id": "EVID-000002",
       "claim_or_question": "Places API content generally must not be pre-fetched, cached or stored beyond allowed exceptions; Place IDs are exempt.",
       "source_type": "primary",
       "source_ref": "https://developers.google.com/maps/documentation/places/web-service/policies",
@@ -41,7 +41,7 @@
       "published_at": null,
       "accessed_at": "2026-10-05",
       "source_revision_or_hash": null,
-      "evidence_class": "verified_fact_or_supported_inference",
+      "evidence_class": "supported_inference",
       "confidence": "high",
       "summary": "Any Google Places adapter requires policy-specific storage/display/attribution behavior; user-visible lead database retention cannot assume Places content may be stored.",
       "supports_requirement_ids": [],
@@ -52,14 +52,14 @@
         "MOD-SOURCE-CATALOG",
         "MOD-LEAD-DATA-WORKFLOW"
       ],
-      "validation_status": "primary_source_reviewed_initial",
+      "validation_status": "unverified",
       "supersedes": [],
       "notes": [
         "Re-open current terms/policies with qualified reviewer before any integration."
       ]
     },
     {
-      "id": "EVID-LEAD-SAAS-003",
+      "id": "EVID-000003",
       "claim_or_question": "Google Maps Platform prices services by SKU and billable usage; usage/free events vary by product.",
       "source_type": "primary",
       "source_ref": "https://developers.google.com/maps/billing-and-pricing/pricing",
@@ -68,7 +68,7 @@
       "published_at": null,
       "accessed_at": "2026-10-05",
       "source_revision_or_hash": null,
-      "evidence_class": "verified_fact_or_supported_inference",
+      "evidence_class": "supported_inference",
       "confidence": "high",
       "summary": "A generic paid toggle is inadequate; provider/call-level estimates, budgets and hard caps are required.",
       "supports_requirement_ids": [],
@@ -80,14 +80,14 @@
         "MOD-SAAS-BILLING",
         "MOD-SOURCE-CATALOG"
       ],
-      "validation_status": "primary_source_reviewed_initial",
+      "validation_status": "unverified",
       "supersedes": [],
       "notes": [
         "Re-check live rates during provider evaluation; no rate copied into plan."
       ]
     },
     {
-      "id": "EVID-LEAD-SAAS-004",
+      "id": "EVID-000004",
       "claim_or_question": "Apollo publicly presents prospecting, contact data credits, sequences, AI, and analytics.",
       "source_type": "primary",
       "source_ref": "https://www.apollo.io/pricing",
@@ -96,7 +96,7 @@
       "published_at": null,
       "accessed_at": "2026-10-05",
       "source_revision_or_hash": null,
-      "evidence_class": "verified_fact_or_supported_inference",
+      "evidence_class": "supported_inference",
       "confidence": "medium",
       "summary": "Public product descriptions indicate an integrated outbound workflow and usage-credit model. Marketing claims do not prove internal implementation or independent efficacy.",
       "supports_requirement_ids": [],
@@ -107,14 +107,14 @@
       "supports_module_ids": [
         "MOD-PRODUCT-DISCOVERY"
       ],
-      "validation_status": "primary_source_reviewed_initial",
+      "validation_status": "unverified",
       "supersedes": [],
       "notes": [
         "Detailed UX/pricing/complaint comparison remains pending."
       ]
     },
     {
-      "id": "EVID-LEAD-SAAS-005",
+      "id": "EVID-000005",
       "claim_or_question": "Clay publicly describes enrichment with multiple providers and waterfall ordering.",
       "source_type": "primary",
       "source_ref": "https://university.clay.com/docs/building-a-data-waterfall",
@@ -123,7 +123,7 @@
       "published_at": null,
       "accessed_at": "2026-10-05",
       "source_revision_or_hash": null,
-      "evidence_class": "verified_fact_or_supported_inference",
+      "evidence_class": "supported_inference",
       "confidence": "medium",
       "summary": "Supports evaluation of provider order, field-level provenance, confidence and cost as product requirements; doesn't prove coverage claims.",
       "supports_requirement_ids": [],
@@ -135,14 +135,14 @@
         "MOD-PRODUCT-DISCOVERY",
         "MOD-SOURCE-CATALOG"
       ],
-      "validation_status": "primary_source_reviewed_initial",
+      "validation_status": "unverified",
       "supersedes": [],
       "notes": [
         "Independent and user research still needed."
       ]
     },
     {
-      "id": "EVID-LEAD-SAAS-006",
+      "id": "EVID-000006",
       "claim_or_question": "Hunter publicly offers email finding, verification, API access and credit-based plans.",
       "source_type": "primary",
       "source_ref": "https://hunter.io/pricing",
@@ -151,7 +151,7 @@
       "published_at": null,
       "accessed_at": "2026-10-05",
       "source_revision_or_hash": null,
-      "evidence_class": "verified_fact_or_supported_inference",
+      "evidence_class": "supported_inference",
       "confidence": "medium",
       "summary": "Illustrates focused provider integration and credit-based usage; it does not establish VSN eligibility/resale rights or a selected provider.",
       "supports_requirement_ids": [],
@@ -163,14 +163,14 @@
         "MOD-PRODUCT-DISCOVERY",
         "MOD-SOURCE-CATALOG"
       ],
-      "validation_status": "primary_source_reviewed_initial",
+      "validation_status": "unverified",
       "supersedes": [],
       "notes": [
         "Provider's current API terms/prices must be separately researched."
       ]
     },
     {
-      "id": "EVID-LEAD-SAAS-007",
+      "id": "EVID-000007",
       "claim_or_question": "GitHub Marketplace uses purchase and plan-change webhooks to reconcile app entitlements; it only applies if Marketplace distribution is selected.",
       "source_type": "primary",
       "source_ref": "https://docs.github.com/en/apps/github-marketplace/using-the-github-marketplace-api-in-your-app",
@@ -179,7 +179,7 @@
       "published_at": null,
       "accessed_at": "2026-10-05",
       "source_revision_or_hash": null,
-      "evidence_class": "verified_fact_or_supported_inference",
+      "evidence_class": "supported_inference",
       "confidence": "high",
       "summary": "Billing provider is a product decision; GitHub Marketplace is not a generic consumer SaaS billing substitute.",
       "supports_requirement_ids": [],
@@ -189,14 +189,14 @@
       "supports_module_ids": [
         "MOD-SAAS-BILLING"
       ],
-      "validation_status": "primary_source_reviewed_initial",
+      "validation_status": "unverified",
       "supersedes": [],
       "notes": [
         "Current listing eligibility and terms require re-check if considered."
       ]
     },
     {
-      "id": "EVID-LEAD-SAAS-008",
+      "id": "EVID-000008",
       "claim_or_question": "Apple supports auto-renewable subscription purchases in-app; storefront rules may differ by jurisdiction and current policy.",
       "source_type": "primary",
       "source_ref": "https://developer.apple.com/app-store/review/guidelines/",
@@ -205,7 +205,7 @@
       "published_at": null,
       "accessed_at": "2026-10-05",
       "source_revision_or_hash": null,
-      "evidence_class": "verified_fact_or_supported_inference",
+      "evidence_class": "supported_inference",
       "confidence": "medium",
       "summary": "Mobile monetization/distribution must be decided and re-verified for intended storefronts before checkout design.",
       "supports_requirement_ids": [],
@@ -217,14 +217,14 @@
         "MOD-MOBILE-CLIENT",
         "MOD-SAAS-BILLING"
       ],
-      "validation_status": "primary_source_reviewed_initial",
+      "validation_status": "unverified",
       "supersedes": [],
       "notes": [
         "Region-specific exceptions and requirements need current legal/platform review."
       ]
     },
     {
-      "id": "EVID-LEAD-SAAS-009",
+      "id": "EVID-000009",
       "claim_or_question": "Microsoft Store allows commerce options for non-game PC products and offers its own store commerce path.",
       "source_type": "primary",
       "source_ref": "https://learn.microsoft.com/en-us/windows/apps/publish/get-started",
@@ -233,7 +233,7 @@
       "published_at": null,
       "accessed_at": "2026-10-05",
       "source_revision_or_hash": null,
-      "evidence_class": "verified_fact_or_supported_inference",
+      "evidence_class": "supported_inference",
       "confidence": "medium",
       "summary": "Desktop packaging and payments/distribution model are separate decisions; current Store terms must be checked before selecting a route.",
       "supports_requirement_ids": [],
@@ -245,7 +245,7 @@
         "MOD-DESKTOP-CLIENT",
         "MOD-SAAS-BILLING"
       ],
-      "validation_status": "primary_source_reviewed_initial",
+      "validation_status": "unverified",
       "supersedes": [],
       "notes": [
         "Windows Store eligibility and current policy remain unverified for VSN."
