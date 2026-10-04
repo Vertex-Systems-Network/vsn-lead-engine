@@ -2,120 +2,67 @@
 
 ## Snapshot
 
-- Reconciled repository: `Vertex-Systems-Network/vsn-lead-engine`
-- Reconciled main: `ca87ea081c4d461e275aeb720cf7f8cf82ad32cf`
-- Snapshot evidence time: `2026-10-04T18:13:02Z`
+- Repository: `Vertex-Systems-Network/vsn-lead-engine`
+- Fully inspected main before this reconciliation mutation: `8922bc8c3e7e331c88e6506625e4d9cca5ea9173`
+- Evidence time: `2026-10-04T19:12:35Z`
 - Product version: **0.66.1**
 - ANPOS protocol: **1.4.0**
-- Open PRs at reconciliation start: **0**
-- Open issues at reconciliation start: **0**
 - Product lifecycle: **PRODUCTION OPERATIONS**
-- Current product work: **daily quota monitoring/recovery**
-- Current ANPOS next work unit: **REQ-83–96 applicability/evidence classification**
+- ANPOS repository-side hardening: **COMPLETE**
+- Product runtime work: **daily quota monitoring/recovery continues independently**
 
-The stored main SHA is the repository head that was fully inspected before this
-state mutation. The reconciliation commit/merge itself will naturally advance
-`main`; future sessions must always re-read live GitHub before relying on this
-checkpoint.
+This snapshot intentionally records the inspected main immediately before its own reconciliation merge. Future sessions must re-read live GitHub before mutating state.
 
-## Verified
+## Verified ANPOS state
 
-### Repository baseline
+- ANPOS child adoption: PR #120.
+- Main governance alignment: PRs #122 and #123.
+- Production-state reconciliation: PR #124.
+- Assurance/security hardening: PR #125.
+- Governance audit fix: PR #127.
+- Repository settings self-heal: PR #129.
+- Controller dispatch fix: PR #130.
+- Governance audit privileged-read fix: PR #131.
+- Live ruleset `VSN Main Protection` ID `24086362`: active.
+- Required checks: `validate`, `repository-integrity`, `analyze-actions`.
+- Main ruleset bypass: none.
+- Repository merge settings: merge/rebase disabled; squash, auto-merge, update-branch and delete-branch-on-merge enabled.
+- Main Protection Controller self-heal path: verified.
+- Governance audit run `37227345426`: success.
+- Governance drift Issue #128: closed.
+- CodeQL run `37227345382`: success.
+- OpenSSF Scorecard run `37226403498`: success.
+- ANPOS repository-integrity run `37227345400`: success.
+- Vendor/operator-only ANPOS leakage: none identified in the adopted child boundary.
 
-The historical P01–P70 engineering program remains the accepted product
-baseline. The repository was not reset when ANPOS was introduced.
+## Assurance closure
 
-ANPOS child adoption is verified through:
+- Not applicable: REQ-83, REQ-84, REQ-86, REQ-89, REQ-92.
+- Passed: REQ-85, REQ-87, REQ-88, REQ-91, REQ-93, REQ-94, REQ-95, REQ-96.
+- REQ-90 remains verification-required because qualified privacy/compliance review is external; technical controls are implemented and legal conclusions are not fabricated.
 
-- PR #120 — ANPOS 1.4.0 child control-plane adoption;
-- PR #122 — live main protection aligned with `repository-integrity`;
-- PR #123 — verified governance evidence reconciled into machine state;
-- live ruleset `VSN Main Protection` ID `24086362`;
-- required live checks: `validate` and `repository-integrity`;
-- Main Protection Controller apply + verify: **success**;
-- latest post-merge ANPOS `repository-integrity` run #37223542864: **success**;
-- PR #123 product validation: **305 passed**.
+## Production evidence remains separate
 
-Vendor/operator-only ANPOS assets are not present in the child repository.
+Latest retained production snapshot:
+- date: **2026-10-04**;
+- accepted: **6,855 / 12,000**;
+- shortfall: **5,145**;
+- run: **37213320765**;
+- R2 unresolved pending recovery: **0**.
 
-### Latest verified production evidence
+Do not turn workflow success or ANPOS completion into a false quota-complete claim.
 
-Latest inspected successful production execution:
+## Explicit external/deferred gates
 
-- workflow run: **37213320765**;
-- origin: **recovery-supervisor**;
-- run date: **2026-10-04**;
-- completion: **success / exit code 0**;
-- R2 pending recovery unresolved: **0**;
-- dated workbook: **US + Canada Business Leads — 2026-10-04**;
-- accepted total after the run: **6,855 / 12,000**;
-- verified shortfall after the run: **5,145**.
+- Strict user-OAuth My Drive create→trash certification requires real Google authorization/evidence.
+- Qualified privacy/compliance review is required before REQ-90 can be passed.
+- Dependency Review remains inactive while GitHub Dependency graph is disabled.
+- Independent CODEOWNER/one-review/last-push enforcement remains deferred until an independent reviewer/team exists.
+- Distributed Worker/Supervisor claims remain disabled until a persistent verified runtime identity exists.
+- PM provider and Development AI pool remain unselected/unverified rather than fabricated.
 
-Therefore the repository is production-ready, but the latest verified daily
-quota snapshot is **not complete**. Do not convert workflow success into a
-false quota-complete claim.
+## Next safe work
 
-## Not Verified
-
-- The latest verified 2026-10-04 production snapshot is not quota-complete: **6,855 / 12,000**.
-- Strict user-OAuth create → trash autonomy has no recent successful certification evidence.
-- No Development AI/Supervisor runtime identity is verified in ANPOS.
-- Independent CODEOWNER review and coordination-ref namespace enforcement are not yet verified live.
-
-## Known Risk
-
-- A genuinely missing My Drive workbook still depends on future strict user-OAuth certification.
-- Treating successful workflow execution as quota completion would overstate production status.
-- Enabling distributed Worker claims without verified runtime identity would violate ANPOS control-plane rules.
-
-## ANPOS execution boundary
-
-ANPOS machine state is now reconciled to the existing production project rather
-than left at `not_started`.
-
-- Historical product baseline: complete.
-- ANPOS adoption/governance alignment: complete.
-- Production daily quota operations: in progress.
-- Strict My Drive user-OAuth autonomy: blocked pending real external
-  authorization/certification evidence.
-- REQ-83–96 assurance classification: ready as the next ANPOS work unit.
-- Independent CODEOWNER/one-review/last-push enforcement: deferred until a
-  genuinely independent reviewer/team exists.
-- Coordination `claims/**` / `supervisor/**` ref hardening: deferred until
-  trusted runtime/capability evidence exists.
-- PM provider: not selected.
-- Development AI pool / Supervisor identity: not verified.
-
-Because no Supervisor runtime identity is verified, the ANPOS agent queue is a
-planning mirror only. No Worker claim/lease should be created.
-
-## Preserved product invariants
-
-- phone-only accepted-lead semantics;
-- exact R2 cross-day dedupe authority;
-- US + Canada scope;
-- 1,000 accepted unique leads/category/day target;
-- 12,000 total daily target across 12 categories;
-- taxonomy precision is not weakened merely to fill quota;
-- no paid discovery dependency is introduced;
-- GitHub Actions dependencies remain immutable-SHA pinned where required.
-
-## External blocker
-
-There is still no recent successful strict Google Drive user-OAuth create →
-trash certification evidence. Do not mark missing-workbook My Drive autonomy
-complete until that probe is actually green.
-
-This blocker does not invalidate existing/precreated workbook production
-operations.
-
-## Next Action
-
-1. Let normal production scheduling/recovery continue toward the daily 12,000
-   target; verify quota from real workbook/runtime evidence.
-2. Execute ANPOS P1: classify REQ-83–96 by actual applicability and attach
-   project-specific evidence/reasons.
-3. Keep PM selection and Development AI identity unresolved until a real
-   provider/runtime is explicitly selected and verified.
-4. Do not enable independent-review or coordination-ref protections without the
-   required independent identity/runtime capability evidence.
+1. Continue real production scheduling/recovery and verify quota from workbook/health evidence.
+2. Complete external gates only when their real identity/platform/legal authorization is available.
+3. Do not replay completed ANPOS adoption/hardening work.
