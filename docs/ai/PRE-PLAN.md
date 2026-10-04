@@ -33,7 +33,7 @@ Evolve VSN's lead-generation capability into a multi-tenant subscription product
 - Current implementation is a Python lead engine oriented to US + Canada, Overture free discovery, phone-required accepted records, R2 packed fingerprint dedupe and dated Google Sheets.
 - Latest persisted snapshot before this planning request recorded 6,855/12,000 for 2026-10-04 and shortfall 5,145; this is historical evidence only, not today's status. Re-read live runtime/workbook before operational claims.
 - P01–P70 and production controls are historical/current baseline and are not reset.
-- SaaS foundation (auth/tenancy/billing/user schedules/client apps) is not evidenced as implemented in this codebase.
+- SaaS foundation (auth/tenancy/billing/user schedules/client apps) is not implemented in the audited repository tree. The detailed read-only component/reuse/gap map is in `docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md`.
 - Repository write plan is documentation/planning only. New product implementation must wait for research, system design, technology consent, and repo-boundary decision.
 
 ## 4. Primary Actors and Workflows
