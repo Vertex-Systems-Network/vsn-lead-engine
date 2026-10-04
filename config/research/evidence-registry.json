@@ -619,6 +619,126 @@
       "notes": [
         "Accessed 2026-10-05; captured Launch card $167/mo vs summary $185/mo, Growth card $446/mo vs summary $495/mo."
       ]
+    },
+    {
+      "id": "EVID-000023",
+      "claim_or_question": "Seamless.AI Prospector describes real-time B2B contact discovery and dynamic AI-enhanced filters; its official FAQ advertises 50 free search credits with no credit card commitment, while further plan details are sales-customized.",
+      "source_type": "primary",
+      "source_ref": "https://seamless.ai/products/prospector",
+      "source_title": "Seamless.AI Prospector",
+      "publisher_or_owner": "Seamless.AI",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Contact-first prospecting comparator with an advertised 50-search-credit free start. It does not validate VSN demand, independently verify contact quality, or establish VSN resale/storage rights. Official pricing page text was not accessible in this capture.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Official product FAQ states 50 free search credits without credit-card commitment; further plans are customized.",
+        "Keep business/place discovery distinct from named-contact prospecting."
+      ]
+    },
+    {
+      "id": "EVID-000024",
+      "claim_or_question": "Outscraper markets Google Maps crawling by location/category with parameter selection, task start and file download; its pricing page shows metered prices for business/place, contact and enrichment products.",
+      "source_type": "primary",
+      "source_ref": "https://outscraper.com/pricing/",
+      "source_title": "Outscraper pricing",
+      "publisher_or_owner": "Outscraper",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Relevant comparator for map/business scraping workflow and usage-meter presentation. The vendor markets Google Maps crawling; price does not establish source permission, end-customer distribution rights, legal compliance, accuracy, or VSN eligibility. Do not select or integrate without qualified source-specific review and written rights confirmation.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Pricing page observed $2 per 1,000 businesses for first 5k in the displayed B2B Lead Generation Database tier; page contains other products/tiers and may change.",
+        "Google Maps crawler guide says select location/category, parameters, run task, download result.",
+        "Comparator observation only; no permission or legal conclusion."
+      ]
+    },
+    {
+      "id": "EVID-000025",
+      "claim_or_question": "Outscraper Terms of Service say a payment method is required before first usage; terms also require lawful/authorized use, note prices may change, and point to a separate Global Services Agreement available by request or during signup.",
+      "source_type": "primary",
+      "source_ref": "https://outscraper.com/terms-of-service/",
+      "source_title": "Outscraper Terms of Service",
+      "publisher_or_owner": "Outscraper",
+      "published_at": "2025-07-10",
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Advertised free usage thresholds are not necessarily a no-payment-method path. Full commercial/API conditions are not established by the public short terms; obtain and review the Global Services Agreement and exact distribution rights before any evaluation or use.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "ToS lines 69-75 describe payment method and billing; lines 124-129 explain Global Services Agreement availability.",
+        "This is a vendor-stated term, not legal advice or a conclusion about third-party source rights."
+      ]
+    },
+    {
+      "id": "EVID-000026",
+      "claim_or_question": "Google Places API (New) usage documentation says Place Details, Nearby Search and Text Search require field masks, and a request containing fields across Essentials and Pro is billed at the highest applicable SKU.",
+      "source_type": "primary",
+      "source_ref": "https://developers.google.com/maps/documentation/places/web-service/usage-and-billing",
+      "source_title": "Places API Usage and Billing",
+      "publisher_or_owner": "Google for Developers",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Field selection changes billable SKU, so provider/call estimates must use the exact field mask and be recalculated if requested fields change. This does not itself establish a suitable storage/export design.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Official usage/billing doc explicitly describes field masks and highest applicable SKU."
+      ]
     }
   ],
   "entry_contract": {

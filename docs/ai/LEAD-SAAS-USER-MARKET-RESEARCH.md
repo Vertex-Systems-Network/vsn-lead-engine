@@ -38,6 +38,16 @@ Do not pick a launch segment from this table without observed interviews and sam
 
 Apollo's official guidance documents AND logic across filters and OR logic among values in one filter; its workflows include saved lists/searches, enrichment and optional outreach. Clay documents reorderable/skip-enabled provider waterfalls, run conditions and optional successful-provider output. Hunter documents company discovery filters, saved leads, email finding/verification and CSV export. These observations guide question design; they are not comparative usability tests or customer evidence.
 
+## 3A. Relevant alternatives added to desk review (official documentation, accessed 2026-10-05)
+
+| Alternative | Documented workflow/commercial detail | Research implication | Boundary |
+|---|---|---|---|
+| Seamless.AI Prospector | Contact-first B2B prospecting with AI-enhanced filters; official FAQ advertises 50 free search credits without a card, then directs users to sales for customized plans. | Compare named-contact search as a distinct optional job, and test whether users want it alongside place/business discovery. | Official pricing page did not expose usable price text in this capture. Free credits and product claims do not validate VSN demand, contact quality, or VSN redistribution rights. |
+| Outscraper | Markets a Google Maps crawler flow: choose location/category, set parameters, run a task, download results. Pricing page shows a displayed B2B database initial tier at $2/1,000 businesses for first 5k records; its short terms require a payment method before first use and reference a separate Global Services Agreement. | Cost per record, payment-method requirement, recurring use, and rights must be separate filters in any free/paid comparison. A nominal free threshold may still require a card. | This is scraping of Google Maps according to Outscraper's own product description. Published price is not permission from the upstream data source or a distribution/license clearance. Keep unselected pending qualified review and written exact rights. |
+| Google Places API (New) | Search/details returns depend on requested fields; field masks control response fields and mixing Essentials + Pro fields bills at the highest applicable SKU. | Cost preview must be generated from the exact field mask and refresh when users add/remove fields; broad “paid source” toggles are insufficient. | Field-mask billing documentation does not resolve Places storage/display restrictions; see source-feasibility matrix and re-check current policies before use. |
+
+This is competitor/source workflow desk research only. It does not constitute customer validation, comparative testing, a legal determination, or source selection. Evidence IDs EVID-000023–000026 are in the registry.
+
 ## 4. Competitor pricing and commercial shape (official pages, 2026-10-05)
 
 Prices below are vendor-published retail plan observations, not wholesale API rates and not a recommendation for VSN prices.
@@ -111,3 +121,6 @@ After that, take WU-SAAS-MVP-DECISIONS and record owner decisions as ANPOS ADRs.
 - Apollo pricing and external-product restrictions: https://www.apollo.io/pricing
 - Hunter plans and API-only Data Platform: https://hunter.io/pricing
 - Clay plans/actions/data credits: https://www.clay.com/pricing
+- Seamless.AI Prospector and pricing: https://seamless.ai/products/prospector and https://seamless.ai/pricing
+- Outscraper Google Maps crawler, pricing and Terms of Service: https://outscraper.com/google-maps-crawler/, https://outscraper.com/pricing/, https://outscraper.com/terms-of-service/
+- Google Places API usage and billing: https://developers.google.com/maps/documentation/places/web-service/usage-and-billing
