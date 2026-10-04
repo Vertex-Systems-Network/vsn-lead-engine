@@ -5,8 +5,8 @@
   "integrity": {
     "mode": "sha256_hash_chain",
     "genesis_hash": "e71007fe4f42051ed2513b8f1fdfbc220571965a02e0d689ff424ee0d1ba37b2",
-    "latest_entry_hash": "c7b1cdc2f9473cf52950a913c1719f2ef9f76082e10790ef95b6716d9527c987",
-    "last_verified_at": null
+    "latest_entry_hash": "08c69972715b8914d52f8e463a8537a9694faefe1c0def7c69474db1b4f47ff3",
+    "last_verified_at": "2026-10-04T19:12:35Z"
   },
   "entries": [
     {
@@ -80,6 +80,24 @@
       "risk_class": "normal",
       "previous_entry_hash": "5c47e24d748bd158fcae5eb2fe5edc701a26f7b8f0a2878bc8a518c3dc045638",
       "entry_hash": "c7b1cdc2f9473cf52950a913c1719f2ef9f76082e10790ef95b6716d9527c987"
+    },
+    {
+      "id": "AUDIT-000005",
+      "actor_identity_ref": "github-user:wpessential",
+      "role": "repository-operator",
+      "action": "anpos_assurance_and_governance_hardening_verified",
+      "target": "Vertex-Systems-Network/vsn-lead-engine",
+      "tool_or_provider": "GitHub",
+      "base_ref": "commit:ec525a1faac7e4e8b6e736ddc40261bde0275c26",
+      "result_ref": "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173 / PRs #125,#127,#129,#130,#131 / ruleset:24086362 / Actions runs 37226403498,37227345426,37227345382",
+      "consent_ref": "user instruction: continue until total implementation is complete",
+      "sanitized_input_hash": null,
+      "sanitized_output_or_artifact_hash": null,
+      "occurred_at": "2026-10-04T19:12:35Z",
+      "result": "success",
+      "risk_class": "high",
+      "previous_entry_hash": "c7b1cdc2f9473cf52950a913c1719f2ef9f76082e10790ef95b6716d9527c987",
+      "entry_hash": "08c69972715b8914d52f8e463a8537a9694faefe1c0def7c69474db1b4f47ff3"
     }
   ],
   "entry_template": {
