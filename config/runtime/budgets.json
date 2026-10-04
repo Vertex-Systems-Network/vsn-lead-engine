@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "status": "active_guardrails",
+  "activation_scope": "child_project",
+  "limits": {
+    "max_parallel_agents": 4,
+    "max_delegation_depth": 2,
+    "max_same_error_retries": 3,
+    "max_tool_retry_attempts": 4,
+    "max_destructive_actions_without_reapproval": 1,
+    "token_budget": null,
+    "model_cost_budget": null,
+    "ci_minutes_budget": null,
+    "cloud_cost_budget": null
+  },
+  "policy": {
+    "exponential_backoff_for_retryable_external_failures": true,
+    "circuit_breaker_after_repeated_identical_failure": true,
+    "stop_on_budget_exhaustion": true,
+    "require_owner_approval_to_raise_material_cost_limits": true,
+    "never_recursively_delegate_without_bounded_depth": true
+  },
+  "notes": "Null monetary/token values mean the child project must set a limit when cost-sensitive autonomous execution is enabled; they do not mean unlimited budget."
+}

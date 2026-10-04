@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "status": "pending_operational_applicability",
+  "activation_scope": "child_project",
+  "runbooks": [],
+  "drills": [],
+  "runbook_template": {
+    "id": "RUNBOOK-0001",
+    "scenario": "",
+    "owner": null,
+    "preconditions": [],
+    "detection": [],
+    "containment_steps": [],
+    "recovery_steps": [],
+    "verification_steps": [],
+    "rollback_or_fallback": [],
+    "escalation": [],
+    "last_verified_at": null,
+    "evidence_refs": []
+  },
+  "drill_template": {
+    "id": "DRILL-0001",
+    "runbook_id": "",
+    "environment": "",
+    "performed_at": null,
+    "expected_behavior": [],
+    "actual_behavior": [],
+    "recovery_time": null,
+    "data_loss": null,
+    "findings": [],
+    "follow_up_refs": [],
+    "result": "not_run"
+  },
+  "rules": {
+    "critical_state_restore_or_recovery_runbooks_required": true,
+    "production_critical_runbooks_require_periodic_or_risk_triggered_verification": true,
+    "unsafe_failure_injection_forbidden": true,
+    "drill_failure_must_create_follow_up_work": true
+  }
+}

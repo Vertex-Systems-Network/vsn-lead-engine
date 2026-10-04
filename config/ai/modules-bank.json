@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "modules": [],
+  "status_values": [
+    "not_started",
+    "ready",
+    "in_progress",
+    "blocked",
+    "needs_update",
+    "needs_removal",
+    "verification_required",
+    "complete",
+    "deferred",
+    "deprecated"
+  ],
+  "module_template": {
+    "id": "MOD-EXAMPLE",
+    "name": "Example module",
+    "objective": "Coherent product or engineering responsibility.",
+    "scope": [],
+    "boundaries": [],
+    "dependencies": [],
+    "option_ids": [],
+    "data_entities": [],
+    "contracts": [],
+    "ui_surfaces": [],
+    "security_responsibilities": [],
+    "acceptance_criteria": [],
+    "quality_gates": [],
+    "status": "not_started",
+    "completion_evidence": [],
+    "update_notes": [],
+    "removal_or_deprecation_notes": []
+  }
+}

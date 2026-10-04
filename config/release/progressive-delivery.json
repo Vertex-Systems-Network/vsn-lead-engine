@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "status": "pending_applicability_detection",
+  "activation_scope": "child_project",
+  "supported_strategies": [
+    "direct_low_risk_release",
+    "preview_or_staging_promotion",
+    "feature_flag",
+    "canary",
+    "percentage_rollout",
+    "blue_green",
+    "shadow_or_read_only_comparison"
+  ],
+  "required_controls_when_applicable": {
+    "selected_rollout_strategy_recorded": true,
+    "health_and_error_guardrails": true,
+    "rollback_or_stop_thresholds": true,
+    "mixed_version_migration_compatibility": true,
+    "kill_switch_or_emergency_disable_when_justified": true,
+    "post_release_verification": true
+  },
+  "feature_flag_policy": {
+    "owner_required": true,
+    "purpose_required": true,
+    "cleanup_or_review_date_required": true,
+    "client_side_flag_is_not_authorization_boundary": true
+  }
+}

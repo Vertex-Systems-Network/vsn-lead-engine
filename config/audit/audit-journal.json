@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "status": "active_journal",
+  "activation_scope": "child_project",
+  "integrity": {
+    "mode": "sha256_hash_chain",
+    "genesis_hash": null,
+    "latest_entry_hash": null,
+    "last_verified_at": null
+  },
+  "entries": [],
+  "entry_template": {
+    "id": "AUDIT-000001",
+    "actor_identity_ref": "",
+    "role": "",
+    "action": "",
+    "target": "",
+    "tool_or_provider": null,
+    "base_ref": null,
+    "result_ref": null,
+    "consent_ref": null,
+    "sanitized_input_hash": null,
+    "sanitized_output_or_artifact_hash": null,
+    "occurred_at": null,
+    "result": "",
+    "risk_class": "normal",
+    "previous_entry_hash": null,
+    "entry_hash": null
+  },
+  "rules": {
+    "append_or_equivalent_tamper_evident_semantics_required_for_privileged_actions": true,
+    "secrets_credentials_and_sensitive_full_prompts_forbidden": true,
+    "audit_evidence_is_not_authorization": true,
+    "integrity_break_requires_investigation_before_trusting_later_entries": true
+  }
+}

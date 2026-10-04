@@ -1,0 +1,27 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://anpos.local/schemas/deprecation-policy.schema.json",
+  "title":"ANPOS Deprecation Policy",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","status","activation_scope","supported_versions","deprecations","deprecation_template","rules"],
+  "properties":{
+    "schema_version":{"const":1},
+    "status":{"type":"string"},
+    "activation_scope":{"type":"string"},
+    "supported_versions":{"type":"array","items":{"type":"object"}},
+    "deprecations":{"type":"array","items":{"type":"object"}},
+    "deprecation_template":{"type":"object"},
+    "rules":{
+      "type":"object","additionalProperties":false,
+      "required":["consumer_impact_analysis_required","approved_support_window_required_before_removal_when_material","migration_path_required_when_replacement_exists","expired_upstream_runtime_or_framework_support_must_be_tracked","emergency_security_exception_requires_authenticated_authority"],
+      "properties":{
+        "consumer_impact_analysis_required":{"const":true},
+        "approved_support_window_required_before_removal_when_material":{"const":true},
+        "migration_path_required_when_replacement_exists":{"const":true},
+        "expired_upstream_runtime_or_framework_support_must_be_tracked":{"const":true},
+        "emergency_security_exception_requires_authenticated_authority":{"const":true}
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "pending_applicability_detection",
+  "activation_scope": "child_project",
+  "jurisdictions": [],
+  "applicable_frameworks": [],
+  "data_processing_activities": [],
+  "privacy_assessment": {
+    "assessment_required": "pending_detection",
+    "assessment_type": null,
+    "status": "not_started",
+    "evidence_refs": [],
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "review_expires_at": null
+  },
+  "controls": {
+    "data_purpose_and_category_mapping_required": true,
+    "residency_or_localization_assessed_when_relevant": true,
+    "retention_and_deletion_basis_required_when_relevant": true,
+    "subject_or_user_right_workflows_required_when_applicable": true,
+    "subprocessor_or_external_provider_inventory_required_when_relevant": true,
+    "cross_border_transfer_constraints_assessed_when_relevant": true,
+    "legal_or_compliance_review_required_for_qualified_regulatory_conclusions": true
+  },
+  "rules": [
+    "Unknown regulatory applicability remains explicit.",
+    "ANPOS must not invent a legal conclusion.",
+    "Evidence and review expiry must be preserved for material compliance claims."
+  ]
+}

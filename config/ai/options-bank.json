@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "options": [],
+  "status_values": [
+    "candidate",
+    "selected",
+    "rejected",
+    "deferred",
+    "deprecated"
+  ],
+  "option_template": {
+    "id": "OPT-EXAMPLE",
+    "name": "Example option",
+    "category": "example",
+    "description": "Reusable capability definition.",
+    "status": "candidate",
+    "requirement_source": [],
+    "priority": null,
+    "dependencies": [],
+    "conflicts": [],
+    "technical_implications": [],
+    "ux_implications": [],
+    "data_implications": [],
+    "security_implications": [],
+    "qa_implications": [],
+    "rationale": null
+  }
+}

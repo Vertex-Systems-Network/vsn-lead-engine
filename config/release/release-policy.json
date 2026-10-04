@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "status": "pending_environment_configuration",
+  "activation_scope": "child_project",
+  "environment_template": {
+    "name": "production",
+    "deployment_authority": [],
+    "required_checks": [],
+    "approval_required": true,
+    "secret_scope": "environment_scoped",
+    "data_classification_allowed": [],
+    "migration_preflight_required": true,
+    "smoke_test_required": true,
+    "rollback_or_rollforward_plan_required": true,
+    "observability_required": true
+  },
+  "release_candidate": {
+    "immutable_commit_required": true,
+    "required_quality_and_security_checks": true,
+    "migration_preflight_required": true,
+    "release_notes_required": true,
+    "deployment_plan_required": true,
+    "rollback_or_rollforward_plan_required": true,
+    "post_deploy_verification_required": true,
+    "artifact_digest_required_when_artifacts_exist": true,
+    "sbom_required_for_production_artifacts_when_supported": true,
+    "provenance_or_attestation_preferred_when_supported": true
+  },
+  "deployment_security": {
+    "prefer_oidc_short_lived_identity": true,
+    "long_lived_cloud_credentials_discouraged": true,
+    "untrusted_prs_must_not_access_production_credentials": true,
+    "environment_secret_separation_required": true
+  },
+  "completion_rule": "A release is complete only after deployment outcome and post-deploy verification are recorded against the immutable commit/artifact."
+}

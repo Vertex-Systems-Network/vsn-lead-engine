@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/requirements-traceability.schema.json",
+  "title": "ANPOS Requirements Traceability",
+  "type": "object",
+  "required": ["schema_version", "links", "status_values", "verification_status_values"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 2},
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["requirement_id", "status", "verification_status"],
+        "properties": {
+          "requirement_id": {"type": "string", "minLength": 1},
+          "option_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "module_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "work_unit_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "design_surface_refs": {"type": "array", "items": {"type": "string"}},
+          "test_evidence": {"type": "array"},
+          "visual_evidence_refs": {"type": "array", "items": {"type": "string"}},
+          "accessibility_evidence_refs": {"type": "array", "items": {"type": "string"}},
+          "security_evidence_refs": {"type": "array", "items": {"type": "string"}},
+          "release_refs": {"type": "array", "items": {"type": "string"}},
+          "status": {"enum": ["proposed", "planned", "in_progress", "implemented", "verified", "released", "deprecated"]},
+          "verification_status": {"enum": ["unverified", "partially_verified", "verified", "failed", "risk_accepted"]}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

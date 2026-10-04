@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "pending_capability_detection",
+  "activation_scope": "child_project",
+  "required_detection": {
+    "detect_ai_ml_llm_rag_agentic_behavior": true,
+    "record_not_applicable_with_reason": true
+  },
+  "evaluation_dimensions": [
+    "task_correctness",
+    "structured_output_correctness",
+    "groundedness_and_citation_correctness_when_applicable",
+    "retrieval_quality_when_applicable",
+    "hallucination_or_factuality_failure",
+    "tool_call_correctness_when_applicable",
+    "multi_step_task_completion_when_applicable",
+    "safety_and_policy_behavior",
+    "prompt_injection_resistance",
+    "latency",
+    "token_and_inference_cost",
+    "provider_degradation_and_retry_behavior"
+  ],
+  "dataset_policy": {
+    "versioned_evaluation_set_required": true,
+    "provenance_required": true,
+    "representative_and_adversarial_cases_required": true,
+    "sensitive_data_policy_must_be_respected": true
+  },
+  "change_policy": {
+    "material_model_change_requires_targeted_reevaluation": true,
+    "material_prompt_or_system_instruction_change_requires_targeted_reevaluation": true,
+    "material_retrieval_or_tool_change_requires_targeted_reevaluation": true
+  },
+  "release_gate": {
+    "project_specific_thresholds_required": true,
+    "critical_failure_classes_cannot_be_hidden_by_average_score": true,
+    "unknown_or_missing_required_evidence_blocks_ai_behavior_certification": true
+  }
+}

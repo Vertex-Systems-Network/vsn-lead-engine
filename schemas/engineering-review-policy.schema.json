@@ -1,0 +1,33 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://anpos.local/schemas/engineering-review-policy.schema.json",
+  "title":"ANPOS Engineering Review Policy",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","status","activation_scope","review_dimensions","finding_contract","completion_rules"],
+  "properties":{
+    "schema_version":{"const":1},
+    "status":{"type":"string"},
+    "activation_scope":{"type":"string"},
+    "review_dimensions":{"type":"array","minItems":8,"items":{"type":"string","minLength":1},"uniqueItems":true},
+    "finding_contract":{
+      "type":"object","additionalProperties":false,
+      "required":["severity_required","evidence_required","affected_paths_or_modules_required","disposition_required"],
+      "properties":{
+        "severity_required":{"const":true},
+        "evidence_required":{"const":true},
+        "affected_paths_or_modules_required":{"const":true},
+        "disposition_required":{"const":true}
+      }
+    },
+    "completion_rules":{
+      "type":"object","additionalProperties":false,
+      "required":["critical_correctness_security_or_data_integrity_defect_blocks_completion","material_debt_must_be_fixed_deferred_with_rationale_or_tracked","superficial_metrics_must_not_replace_contextual_review"],
+      "properties":{
+        "critical_correctness_security_or_data_integrity_defect_blocks_completion":{"const":true},
+        "material_debt_must_be_fixed_deferred_with_rationale_or_tracked":{"const":true},
+        "superficial_metrics_must_not_replace_contextual_review":{"const":true}
+      }
+    }
+  }
+}

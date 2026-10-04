@@ -1,0 +1,28 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://anpos.local/schemas/risk-register.schema.json",
+  "title":"ANPOS Risk Register",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","status","activation_scope","risks","risk_template","allowed_categories","allowed_dispositions","rules"],
+  "properties":{
+    "schema_version":{"const":1},
+    "status":{"type":"string"},
+    "activation_scope":{"type":"string"},
+    "risks":{"type":"array","items":{"type":"object"}},
+    "risk_template":{"type":"object"},
+    "allowed_categories":{"type":"array","items":{"enum":["security","privacy","ai","product","operational","financial","compliance","architecture"]},"uniqueItems":true},
+    "allowed_dispositions":{"type":"array","items":{"enum":["open","mitigating","accepted","resolved","expired_acceptance"]},"uniqueItems":true},
+    "rules":{
+      "type":"object","additionalProperties":false,
+      "required":["material_risk_requires_owner","risk_acceptance_requires_authenticated_consent_when_policy_requires","accepted_risk_requires_review_or_expiry","expired_acceptance_reopens_review","critical_release_blockers_cannot_be_hidden_by_generic_acceptance"],
+      "properties":{
+        "material_risk_requires_owner":{"const":true},
+        "risk_acceptance_requires_authenticated_consent_when_policy_requires":{"const":true},
+        "accepted_risk_requires_review_or_expiry":{"const":true},
+        "expired_acceptance_reopens_review":{"const":true},
+        "critical_release_blockers_cannot_be_hidden_by_generic_acceptance":{"const":true}
+      }
+    }
+  }
+}

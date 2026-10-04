@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "phases": [],
+  "work_units": [],
+  "status_values": [
+    "not_started",
+    "ready",
+    "in_progress",
+    "blocked",
+    "needs_update",
+    "needs_removal",
+    "verification_required",
+    "complete",
+    "deferred",
+    "deprecated"
+  ],
+  "phase_template": {
+    "id": "PHASE-EXAMPLE",
+    "name": "Example phase",
+    "objective": "Outcome boundary for a group of modules/work units.",
+    "module_ids": [],
+    "dependencies": [],
+    "status": "not_started",
+    "exit_criteria": []
+  },
+  "work_unit_template": {
+    "id": "WU-EXAMPLE",
+    "phase_id": "PHASE-EXAMPLE",
+    "module_id": "MOD-EXAMPLE",
+    "title": "Small independently executable and verifiable slice",
+    "objective": "Clear outcome",
+    "dependencies": [],
+    "priority": null,
+    "status": "not_started",
+    "blockers": [],
+    "acceptance_criteria": [],
+    "required_checks": [],
+    "completion_evidence": []
+  }
+}

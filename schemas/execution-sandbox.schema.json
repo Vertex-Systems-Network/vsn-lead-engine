@@ -1,0 +1,384 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/execution-sandbox.schema.json",
+  "title": "ANPOS Repository Supervisor Execution Sandbox Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "implementation_scope",
+    "driver_required",
+    "allowed_isolation",
+    "local_process_fallback",
+    "workspace_mode",
+    "network",
+    "command",
+    "environment",
+    "limits",
+    "production_driver",
+    "evidence",
+    "rules",
+    "workspace_base_modes",
+    "artifacts",
+    "runtime_requirements"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 4
+    },
+    "status": {
+      "const": "vercel_gateway_source_implemented_live_gateway_evidence_pending"
+    },
+    "implementation_scope": {
+      "const": "repository_supervisor_execution"
+    },
+    "driver_required": {
+      "const": true
+    },
+    "allowed_isolation": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "container",
+          "microvm",
+          "remote_ephemeral"
+        ]
+      }
+    },
+    "local_process_fallback": {
+      "const": false
+    },
+    "workspace_mode": {
+      "const": "ephemeral_copy_on_write"
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default",
+        "allowed"
+      ],
+      "properties": {
+        "default": {
+          "const": "deny"
+        },
+        "allowed": {
+          "type": "array",
+          "items": {
+            "const": "deny"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      }
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shell_interpolation",
+        "max_args",
+        "max_arg_bytes"
+      ],
+      "properties": {
+        "shell_interpolation": {
+          "const": false
+        },
+        "max_args": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "max_arg_bytes": {
+          "type": "integer",
+          "minimum": 256,
+          "maximum": 65536
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_contains_names_only",
+        "max_names",
+        "secret_values_resolved_server_side"
+      ],
+      "properties": {
+        "request_contains_names_only": {
+          "const": true
+        },
+        "max_names": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "secret_values_resolved_server_side": {
+          "const": true
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_timeout_seconds",
+        "max_timeout_seconds",
+        "default_output_bytes",
+        "max_output_bytes",
+        "default_artifact_bytes",
+        "max_artifact_bytes"
+      ],
+      "properties": {
+        "default_timeout_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "default_output_bytes": {
+          "type": "integer",
+          "minimum": 1024
+        },
+        "max_output_bytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 8388608
+        },
+        "default_artifact_bytes": {
+          "const": 16777216
+        },
+        "max_artifact_bytes": {
+          "const": 33554432
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 13,
+      "items": {
+        "enum": [
+          "driver_id",
+          "isolation",
+          "exit_code",
+          "timed_out",
+          "output_truncated",
+          "duration_ms",
+          "immutable_source_identity",
+          "workspace_destroyed",
+          "network_denied",
+          "signed_request_response",
+          "artifact_input_integrity",
+          "artifact_output_allowlist",
+          "artifact_output_integrity"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 17,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "production_driver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "readiness_endpoint",
+        "transport",
+        "request_authentication",
+        "response_authentication",
+        "replay_contract",
+        "workspace_source_binding",
+        "workspace_destroy_after_execution",
+        "redirects",
+        "source_ready",
+        "live_gateway_evidence",
+        "protocol_version",
+        "artifact_channel",
+        "runtime_requirements",
+        "gateway_source",
+        "gateway_route",
+        "gateway_runtime",
+        "gateway_isolation",
+        "gateway_network_policy",
+        "gateway_replay_ledger",
+        "gateway_live_execution_timeout_seconds",
+        "gateway_function_max_duration_seconds",
+        "gateway_workspace_base_modes_live",
+        "gateway_workspace_base_modes_protocol_pending",
+        "environment_variable_forwarding_live"
+      ],
+      "properties": {
+        "id": {
+          "const": "remote_ephemeral_signed_gateway_v1"
+        },
+        "source": {
+          "const": "commercial-service/lib/remote-sandbox-driver.ts"
+        },
+        "readiness_endpoint": {
+          "const": "/api/ready/sandbox"
+        },
+        "transport": {
+          "const": "https_post"
+        },
+        "request_authentication": {
+          "const": "hmac_sha256_exact_body_hash_plus_timestamp_nonce"
+        },
+        "response_authentication": {
+          "const": "hmac_sha256_request_id_plus_exact_body_hash"
+        },
+        "replay_contract": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspace_source_binding": {
+          "const": "github_repository_full_name_plus_immutable_commit_sha_or_explicit_empty"
+        },
+        "workspace_destroy_after_execution": {
+          "const": true
+        },
+        "redirects": {
+          "const": "forbidden"
+        },
+        "source_ready": {
+          "const": true
+        },
+        "live_gateway_evidence": {
+          "const": "pending"
+        },
+        "protocol_version": {
+          "const": 2
+        },
+        "artifact_channel": {
+          "const": "signed_bounded_input_files_plus_exact_output_allowlist"
+        },
+        "runtime_requirements": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "const": "python3>=3.12"
+          }
+        },
+        "gateway_source": {
+          "const": "commercial-service/lib/vercel-sandbox-gateway.ts"
+        },
+        "gateway_route": {
+          "const": "/v1/execute"
+        },
+        "gateway_runtime": {
+          "const": "vercel_sandbox_python3.13"
+        },
+        "gateway_isolation": {
+          "const": "firecracker_microvm"
+        },
+        "gateway_network_policy": {
+          "const": "deny-all"
+        },
+        "gateway_replay_ledger": {
+          "const": "sandbox_gateway_request_nonces"
+        },
+        "gateway_live_execution_timeout_seconds": {
+          "const": 240
+        },
+        "gateway_function_max_duration_seconds": {
+          "const": 300
+        },
+        "gateway_workspace_base_modes_live": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "const": "empty"
+          }
+        },
+        "gateway_workspace_base_modes_protocol_pending": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "const": "github_commit"
+          }
+        },
+        "environment_variable_forwarding_live": {
+          "const": false
+        }
+      }
+    },
+    "workspace_base_modes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "github_commit",
+          "empty"
+        ]
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_files_max",
+        "output_paths_max",
+        "default_bytes",
+        "max_bytes",
+        "canonical_base64",
+        "sha256_required",
+        "exact_output_allowlist",
+        "git_metadata_paths_forbidden"
+      ],
+      "properties": {
+        "input_files_max": {
+          "const": 5000
+        },
+        "output_paths_max": {
+          "const": 5000
+        },
+        "default_bytes": {
+          "const": 16777216
+        },
+        "max_bytes": {
+          "const": 33554432
+        },
+        "canonical_base64": {
+          "const": true
+        },
+        "sha256_required": {
+          "const": true
+        },
+        "exact_output_allowlist": {
+          "const": true
+        },
+        "git_metadata_paths_forbidden": {
+          "const": true
+        }
+      }
+    },
+    "runtime_requirements": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "python3>=3.12"
+        ]
+      }
+    }
+  }
+}

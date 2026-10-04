@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "updated_at": null,
+  "next_alert_sequence": 1,
+  "alerts": [],
+  "alert_schema": {
+    "id": "ALERT-000001",
+    "sequence": 1,
+    "type": "main_merged_reconcile_required",
+    "severity": "required_action",
+    "created_at": null,
+    "created_by": "supervisor",
+    "merge_generation": 1,
+    "main_sha": null,
+    "source_review_reference": null,
+    "affected_slots": [],
+    "recipients": [
+      "ACTIVE_WORKERS"
+    ],
+    "message": "Main advanced. Integrate current main, resolve conflicts, rerun impacted verification, acknowledge this alert, then continue development.",
+    "acknowledgements": [],
+    "status": "open"
+  },
+  "acknowledgement_schema": {
+    "agent_id": null,
+    "slot_id": null,
+    "acknowledged_at": null,
+    "integrated_main_sha": null,
+    "acknowledged_merge_generation": 0,
+    "verification_status": "pending"
+  },
+  "status_values": [
+    "open",
+    "partially_acknowledged",
+    "acknowledged",
+    "superseded",
+    "closed"
+  ]
+}

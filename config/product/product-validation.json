@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "status": "pending_applicability_detection",
+  "activation_scope": "child_project",
+  "problem_validation": {
+    "target_users_or_jobs_to_be_done_required": true,
+    "problem_hypotheses_must_separate_evidence_from_assumption": true,
+    "critical_user_journeys_required": true,
+    "success_criteria_required": true
+  },
+  "ux_validation": {
+    "prototype_or_flow_validation_when_material": true,
+    "usability_tasks_and_observable_signals_required_when_material": true,
+    "accessibility_inclusive_validation_when_applicable": true,
+    "findings_must_link_to_design_or_work_updates": true
+  },
+  "evidence": {
+    "source_and_date_required": true,
+    "sample_and_context_must_be_recorded": true,
+    "qualitative_feedback_is_not_automatically_generalizable": true
+  },
+  "skip_rule": {
+    "allowed_for_low_risk_or_non_user_facing_scope": true,
+    "reason_must_be_recorded": true
+  }
+}

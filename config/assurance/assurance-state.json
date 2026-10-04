@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "status": "pending_assurance_classification",
+  "activation_scope": "child_project",
+  "last_reconciled_at": null,
+  "last_reconciled_ref": null,
+  "requirements": [
+    {
+      "requirement_id": "REQ-83",
+      "name": "AI / LLM Evaluation and Model Assurance",
+      "applicability": "pending_detection",
+      "state": "not_started",
+      "reason": null,
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-84",
+      "name": "User Research, Problem Validation and UX Validation",
+      "applicability": "pending_detection",
+      "state": "not_started",
+      "reason": null,
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-85",
+      "name": "Product Analytics and Outcome Evidence",
+      "applicability": "pending_detection",
+      "state": "not_started",
+      "reason": null,
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-86",
+      "name": "Experimentation and Hypothesis Lifecycle",
+      "applicability": "optional",
+      "state": "not_started",
+      "reason": "Activate only when a bounded experiment is justified.",
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-87",
+      "name": "Progressive Delivery and Feature Safety",
+      "applicability": "pending_detection",
+      "state": "not_started",
+      "reason": null,
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-88",
+      "name": "AI-Generated Engineering Quality and Maintainability Review",
+      "applicability": "applicable",
+      "state": "not_started",
+      "reason": "Engineering-quality review is part of major module completion/release readiness.",
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-89",
+      "name": "Responsible AI and Human Oversight",
+      "applicability": "pending_detection",
+      "state": "not_started",
+      "reason": null,
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-90",
+      "name": "Privacy, Regulatory and Compliance Evidence",
+      "applicability": "pending_detection",
+      "state": "not_started",
+      "reason": null,
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-91",
+      "name": "Architecture Decision Records",
+      "applicability": "applicable",
+      "state": "not_started",
+      "reason": "Material architecture decisions require durable decision traceability.",
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-92",
+      "name": "AI Asset and Configuration Registry",
+      "applicability": "pending_detection",
+      "state": "not_started",
+      "reason": null,
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-93",
+      "name": "Compatibility, Deprecation and End-of-Life Management",
+      "applicability": "pending_detection",
+      "state": "not_started",
+      "reason": null,
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-94",
+      "name": "Operational Runbooks and Resilience Drills",
+      "applicability": "pending_detection",
+      "state": "not_started",
+      "reason": null,
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-95",
+      "name": "Tamper-Evident Audit Journal",
+      "applicability": "pending_detection",
+      "state": "not_started",
+      "reason": null,
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    },
+    {
+      "requirement_id": "REQ-96",
+      "name": "Unified Risk and Exception Register",
+      "applicability": "applicable",
+      "state": "not_started",
+      "reason": "Material project risks and time-bounded exceptions require unified lifecycle tracking.",
+      "evidence_refs": [],
+      "last_verified_ref": null,
+      "last_verified_at": null,
+      "blocking_findings": []
+    }
+  ],
+  "allowed_applicability": [
+    "pending_detection",
+    "applicable",
+    "not_applicable",
+    "optional"
+  ],
+  "allowed_states": [
+    "not_started",
+    "in_progress",
+    "blocked",
+    "verification_required",
+    "passed",
+    "failed",
+    "not_applicable"
+  ],
+  "rules": [
+    "A passed state requires project-specific evidence and a verified repository/runtime reference.",
+    "not_applicable requires a non-empty project-specific reason.",
+    "A blueprint or policy file is never pass evidence.",
+    "Blocking findings must be cleared or explicitly risk-accepted through normal authenticated consent before release where policy permits.",
+    "Requirements 89-96 use the same evidence rule as Requirements 83-88: policy presence alone is never pass evidence.",
+    "Expired risk/compliance/decision evidence must be reconciled before relying on it for release or privileged automation."
+  ]
+}

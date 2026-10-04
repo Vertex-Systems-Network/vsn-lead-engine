@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/design-intake.schema.json",
+  "title": "ANPOS Design Intake",
+  "type": "object",
+  "required": ["schema_version", "status", "audit_status", "approval_status", "node_ids"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 2},
+    "status": {"type": "string"},
+    "source_url": {"type": ["string", "null"]},
+    "node_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "version_or_revision": {"type": ["string", "null"]},
+    "snapshot_ref": {"type": ["string", "null"]},
+    "approval_status": {"enum": ["not_approved", "approved", "rejected", "superseded"]},
+    "approved_by": {"type": ["string", "null"]},
+    "approved_at": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"approval_status": {"const": "approved"}}, "required": ["approval_status"]},
+      "then": {
+        "properties": {
+          "approved_by": {"type": "string", "minLength": 1},
+          "approved_at": {"type": "string", "minLength": 1}
+        },
+        "required": ["approved_by", "approved_at"],
+        "anyOf": [
+          {"properties": {"version_or_revision": {"type": "string", "minLength": 1}}, "required": ["version_or_revision"]},
+          {"properties": {"snapshot_ref": {"type": "string", "minLength": 1}}, "required": ["snapshot_ref"]}
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/project-state.schema.json",
+  "title": "ANPOS Project State",
+  "type": "object",
+  "required": ["schema_version", "lifecycle_stage", "progress", "outstanding_updates", "outstanding_removals", "unresolved_decisions", "critical_defects"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 1},
+    "lifecycle_stage": {"type": ["string", "null"]},
+    "current_phase": {"type": ["string", "null"]},
+    "current_module": {"type": ["string", "null"]},
+    "current_work_unit": {"type": ["string", "null"]},
+    "progress": {"type": "object"},
+    "outstanding_updates": {"type": "array"},
+    "outstanding_removals": {"type": "array"},
+    "unresolved_decisions": {"type": "array"},
+    "critical_defects": {"type": "array"},
+    "last_reconciled_repository_ref": {"type": ["string", "null"]},
+    "last_reconciled_at": {"type": ["string", "null"]}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "status": "not_requested",
+  "source_type": null,
+  "source_url": null,
+  "provider": null,
+  "file_or_project_id": null,
+  "node_ids": [],
+  "version_or_revision": null,
+  "snapshot_ref": null,
+  "captured_at": null,
+  "provided_by_user": false,
+  "audit_status": "not_started",
+  "audit_findings": [],
+  "approval_status": "not_approved",
+  "approved_by": null,
+  "approved_at": null,
+  "design_authority": "validated_product_and_system_requirements",
+  "fallback": "If no usable design is supplied, the AI creates the professional UI/UX design from validated requirements.",
+  "change_policy": {
+    "material_change_after_approval_requires_impact_analysis": true,
+    "never_mix_untracked_revisions": true,
+    "affected_work_units_must_be_reconciled": true
+  },
+  "ui": {
+    "label": "Figma / Existing Design Link",
+    "primary_action": "Add Figma Design",
+    "skip_action": "Skip Design Link"
+  }
+}

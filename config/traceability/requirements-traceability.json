@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "links": [],
+  "link_template": {
+    "requirement_id": "REQ-001",
+    "source": null,
+    "source_provenance_ref": null,
+    "option_ids": [],
+    "module_ids": [],
+    "work_unit_ids": [],
+    "design_surface_refs": [],
+    "design_component_refs": [],
+    "branch_refs": [],
+    "pull_request_refs": [],
+    "test_evidence": [],
+    "visual_evidence_refs": [],
+    "accessibility_evidence_refs": [],
+    "security_evidence_refs": [],
+    "threat_model_refs": [],
+    "migration_refs": [],
+    "artifact_refs": [],
+    "sbom_refs": [],
+    "attestation_refs": [],
+    "release_refs": [],
+    "status": "planned",
+    "verification_status": "unverified"
+  },
+  "status_values": ["proposed", "planned", "in_progress", "implemented", "verified", "released", "deprecated"],
+  "verification_status_values": ["unverified", "partially_verified", "verified", "failed", "risk_accepted"],
+  "rule": "A requirement is not verified merely because code exists; verification requires linked acceptance/test evidence plus applicable design, accessibility, security, migration and release evidence."
+}

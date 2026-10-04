@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "status": "pending_project_threat_model",
+  "activation_scope": "child_project",
+  "methodology": "project_specific_threat_model_with_OWASP_ASVS_or_equivalent_verification_when_applicable",
+  "assets": [],
+  "actors": [],
+  "trust_boundaries": [],
+  "entry_points": [],
+  "threats": [],
+  "threat_template": {
+    "id": "THREAT-001",
+    "title": "",
+    "asset_ids": [],
+    "actor_ids": [],
+    "entry_point": null,
+    "abuse_case": "",
+    "likelihood": "unknown",
+    "impact": "unknown",
+    "controls": [],
+    "verification_refs": [],
+    "residual_risk": "unknown",
+    "status": "open"
+  },
+  "release_gate": {
+    "critical_unresolved_blocks_release": true,
+    "high_unresolved_requires_authorized_risk_acceptance_or_remediation": true,
+    "risk_acceptance_must_reference_authenticated_consent": true
+  }
+}

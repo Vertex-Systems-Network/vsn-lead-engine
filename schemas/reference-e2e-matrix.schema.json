@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/reference-e2e-matrix.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "activation_scope",
+    "protocol_version",
+    "scenarios",
+    "execution_rule"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "const": "reference_blueprint"
+    },
+    "activation_scope": {
+      "const": "child_and_repository_supervisor_acceptance_reference"
+    },
+    "protocol_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "scenarios": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "source_state",
+          "required_operations",
+          "expected_invariants",
+          "required_evidence",
+          "failure_gates",
+          "certification_status"
+        ],
+        "properties": {
+          "id": {
+            "enum": [
+              "E2E-FRESH-CHILD",
+              "E2E-EXISTING-ADOPTION",
+              "E2E-PRE14-UPGRADE"
+            ]
+          },
+          "name": {
+            "enum": [
+              "fresh_child_bootstrap",
+              "existing_repository_adoption",
+              "pre_1_4_child_upgrade"
+            ]
+          },
+          "source_state": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required_operations": {
+            "type": "array",
+            "minItems": 5,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "expected_invariants": {
+            "type": "array",
+            "minItems": 4,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required_evidence": {
+            "type": "array",
+            "minItems": 5,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "failure_gates": {
+            "type": "array",
+            "minItems": 4,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "certification_status": {
+            "const": "reference_only"
+          }
+        }
+      }
+    },
+    "execution_rule": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

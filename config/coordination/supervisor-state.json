@@ -1,0 +1,39 @@
+{
+  "schema_version": 4,
+  "coordination_epoch": 0,
+  "supervisor": {
+    "status": "unassigned",
+    "agent_id": null,
+    "agent_type": null,
+    "identity_ref": null,
+    "branch": null,
+    "active_module_id": null,
+    "active_work_unit_id": null,
+    "started_at": null,
+    "heartbeat_at": null,
+    "lease_id": null,
+    "lease_status": "not_acquired",
+    "lease_expires_at": null,
+    "fencing_token": null,
+    "election_ref": null
+  },
+  "lease_policy": {
+    "authority": "epoch_fenced_github_ref_plus_authenticated_runtime",
+    "election_ref_pattern": "supervisor/epoch-{next_coordination_epoch}",
+    "stale_supervisor_becomes_read_only": true,
+    "every_shared_write_must_verify_fencing_token": true,
+    "failover_requires_expired_or_relinquished_lease": true,
+    "heartbeat_renew_release_recovery_required": true,
+    "orphan_election_ref_requires_recovery": true,
+    "lock_namespace_requires_trusted_runtime_protection_when_supported": true
+  },
+  "merge_generation": 0,
+  "last_merge_sha": null,
+  "last_merge_at": null,
+  "active_worker_count": 0,
+  "open_required_action_alert_count": 0,
+  "last_pm_sync_at": null,
+  "last_readme_dashboard_update_at": null,
+  "last_reconciled_main_sha": null,
+  "status": "unassigned"
+}

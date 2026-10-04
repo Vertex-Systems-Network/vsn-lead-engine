@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/agent-work-queue.schema.json",
+  "title": "ANPOS Agent Work Queue",
+  "type": "object",
+  "required": ["schema_version", "coordination_mode", "slots", "status_values", "lease_status_values"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 4},
+    "coordination_mode": {"const": "multi_agent"},
+    "updated_at": {"type": ["string", "null"]},
+    "slots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "work_unit_id", "priority", "risk_classification", "delegation_depth", "status", "dependencies", "eligibility",
+          "required_roles", "required_capabilities", "allowed_paths", "denied_paths", "allowed_tools", "network_policy",
+          "network_allowlist", "pm_scope", "secret_scope", "deployment_scope", "acceptance_criteria", "required_checks", "lease_status"
+        ],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "work_unit_id": {"type": "string", "minLength": 1},
+          "requirement_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "priority": {"type": "integer"},
+          "risk_classification": {"type": "string", "minLength": 1},
+          "delegation_depth": {"type": "integer", "minimum": 0},
+          "status": {"enum": ["free", "claimed", "in_progress", "blocked", "submitted_for_review", "changes_requested", "approved", "merged", "completed", "canceled"]},
+          "dependencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "eligibility": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+          "required_roles": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+          "required_capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "allowed_paths": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+          "denied_paths": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "allowed_tools": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "network_policy": {"type": "string", "minLength": 1},
+          "network_allowlist": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "pm_scope": {"type": "string", "minLength": 1},
+          "secret_scope": {"type": "string", "minLength": 1},
+          "deployment_scope": {"type": "string", "minLength": 1},
+          "acceptance_criteria": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1},
+          "required_checks": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1},
+          "claim_ref": {"type": ["string", "null"]},
+          "claimant": {"type": ["string", "null"]},
+          "claimant_identity_ref": {"type": ["string", "null"]},
+          "claim_id": {"type": ["string", "null"]},
+          "claim_nonce": {"type": ["string", "null"]},
+          "claim_branch": {"type": ["string", "null"]},
+          "coordination_epoch": {"type": ["integer", "null"], "minimum": 0},
+          "fencing_token": {"type": ["string", "null"]},
+          "lease_status": {"enum": ["not_acquired", "active", "expired", "released", "revoked", "orphaned", "recovered"]},
+          "lease_expires_at": {"type": ["string", "null"]},
+          "base_sha": {"type": ["string", "null"]},
+          "pm_reference": {"type": ["string", "null"]}
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {"status": {"enum": ["claimed", "in_progress", "blocked", "submitted_for_review", "changes_requested", "approved"]}},
+              "required": ["status"]
+            },
+            "then": {
+              "required": ["claim_ref", "claimant", "claimant_identity_ref", "claim_id", "claim_branch", "coordination_epoch", "fencing_token", "lease_expires_at", "base_sha"],
+              "properties": {"lease_status": {"const": "active"}}
+            }
+          }
+        ],
+        "additionalProperties": true
+      }
+    },
+    "status_values": {"type": "array", "items": {"type": "string"}},
+    "lease_status_values": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}

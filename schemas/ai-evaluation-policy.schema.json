@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/ai-evaluation-policy.schema.json",
+  "title": "ANPOS AI Evaluation Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","status","activation_scope","required_detection","evaluation_dimensions","dataset_policy","change_policy","release_gate"],
+  "properties": {
+    "schema_version":{"const":1},
+    "status":{"type":"string"},
+    "activation_scope":{"type":"string"},
+    "required_detection":{
+      "type":"object","additionalProperties":false,
+      "required":["detect_ai_ml_llm_rag_agentic_behavior","record_not_applicable_with_reason"],
+      "properties":{
+        "detect_ai_ml_llm_rag_agentic_behavior":{"const":true},
+        "record_not_applicable_with_reason":{"const":true}
+      }
+    },
+    "evaluation_dimensions":{"type":"array","minItems":6,"items":{"type":"string","minLength":1},"uniqueItems":true},
+    "dataset_policy":{
+      "type":"object","additionalProperties":false,
+      "required":["versioned_evaluation_set_required","provenance_required","representative_and_adversarial_cases_required","sensitive_data_policy_must_be_respected"],
+      "properties":{
+        "versioned_evaluation_set_required":{"const":true},
+        "provenance_required":{"const":true},
+        "representative_and_adversarial_cases_required":{"const":true},
+        "sensitive_data_policy_must_be_respected":{"const":true}
+      }
+    },
+    "change_policy":{
+      "type":"object","additionalProperties":false,
+      "required":["material_model_change_requires_targeted_reevaluation","material_prompt_or_system_instruction_change_requires_targeted_reevaluation","material_retrieval_or_tool_change_requires_targeted_reevaluation"],
+      "properties":{
+        "material_model_change_requires_targeted_reevaluation":{"const":true},
+        "material_prompt_or_system_instruction_change_requires_targeted_reevaluation":{"const":true},
+        "material_retrieval_or_tool_change_requires_targeted_reevaluation":{"const":true}
+      }
+    },
+    "release_gate":{
+      "type":"object","additionalProperties":false,
+      "required":["project_specific_thresholds_required","critical_failure_classes_cannot_be_hidden_by_average_score","unknown_or_missing_required_evidence_blocks_ai_behavior_certification"],
+      "properties":{
+        "project_specific_thresholds_required":{"const":true},
+        "critical_failure_classes_cannot_be_hidden_by_average_score":{"const":true},
+        "unknown_or_missing_required_evidence_blocks_ai_behavior_certification":{"const":true}
+      }
+    }
+  }
+}

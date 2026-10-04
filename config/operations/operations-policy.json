@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "status": "pending_operational_configuration",
+  "activation_scope": "child_project",
+  "service_objective_template": {
+    "service": "",
+    "sli": "",
+    "target": null,
+    "window": null,
+    "error_budget_policy": null
+  },
+  "incident_policy": {
+    "severity_levels": [
+      "sev1",
+      "sev2",
+      "sev3",
+      "sev4"
+    ],
+    "roles_required_for_major_incident": [
+      "incident_commander",
+      "technical_lead",
+      "communications_owner"
+    ],
+    "record_timeline": true,
+    "preserve_evidence": true,
+    "post_incident_review_required_for_major_incidents": true,
+    "hotfix_must_rejoin_normal_traceability": true
+  },
+  "telemetry": {
+    "logs_metrics_traces_as_applicable": true,
+    "sensitive_data_redaction_required": true,
+    "alert_actionability_required": true
+  },
+  "recovery": {
+    "rto": null,
+    "rpo": null,
+    "backup_policy_required_when_stateful": true,
+    "restore_test_required_before_production_for_critical_state": true,
+    "disaster_recovery_exercise_frequency": null
+  }
+}

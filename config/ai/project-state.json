@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "lifecycle_stage": "not_started",
+  "current_phase": null,
+  "current_module": null,
+  "current_work_unit": null,
+  "last_verified_completion": null,
+  "next_valid_work_unit": null,
+  "progress": {
+    "total_work_units": 0,
+    "complete": 0,
+    "in_progress": 0,
+    "blocked": 0,
+    "deferred": 0,
+    "needs_update": 0,
+    "needs_removal": 0
+  },
+  "outstanding_updates": [],
+  "outstanding_removals": [],
+  "unresolved_decisions": [
+    "Choose a Project Management System or explicitly skip PM integration.",
+    "Choose and identity-verify the Development AI agent pool available in the current host.",
+    "Apply the user-approved recommended GitHub Rules without weakening existing main protection.",
+    "Resolve capability-dependent GitHub security checks before making them required."
+  ],
+  "critical_defects": [],
+  "qa_readiness": "not_assessed",
+  "security_readiness": "not_assessed",
+  "last_reconciled_repository_ref": null,
+  "last_reconciled_at": null,
+  "notes": "AI must reconcile this file against actual repository/Git/test reality before relying on it."
+}

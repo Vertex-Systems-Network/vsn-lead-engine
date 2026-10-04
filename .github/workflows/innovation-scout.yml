@@ -1,0 +1,70 @@
+name: AI Native - Optional Innovation Scout
+
+on:
+  schedule:
+    - cron: '11 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ai-native-innovation-scout
+  cancel-in-progress: false
+
+jobs:
+  due-check-and-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Read scout configuration
+        id: gate
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          cfg = json.loads(Path('config/maintenance/innovation-scout.json').read_text())
+          print(f"enabled={'true' if bool(cfg.get('enabled')) else 'false'}")
+          print(f"interval_hours={int(cfg.get('interval_hours', 25))}")
+          PY
+
+      - name: Create scout request only when due
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INTERVAL_HOURS: ${{ steps.gate.outputs.interval_hours }}
+        shell: bash
+        run: |
+          TITLE='[AI-NATIVE] Innovation Scout Due'
+          OPEN="$(gh issue list --state open --limit 100 --json number,title --jq '.[] | select(.title == "[AI-NATIVE] Innovation Scout Due") | .number' | head -n 1)"
+          if [ -n "$OPEN" ]; then exit 0; fi
+          LAST_CREATED="$(gh issue list --state all --limit 100 --json title,createdAt --jq '[.[] | select(.title == "[AI-NATIVE] Innovation Scout Due") | .createdAt] | sort | last // ""')"
+          DUE="$(python - "$LAST_CREATED" "$INTERVAL_HOURS" <<'PY'
+          from datetime import datetime, timezone
+          import sys
+          last = sys.argv[1].strip(); interval = int(sys.argv[2])
+          if not last:
+              print('true'); raise SystemExit
+          then = datetime.fromisoformat(last.replace('Z', '+00:00'))
+          print('true' if (datetime.now(timezone.utc) - then).total_seconds() >= interval * 3600 else 'false')
+          PY
+          )"
+          if [ "$DUE" != 'true' ]; then exit 0; fi
+          cat > /tmp/ai-native-innovation-scout.md <<EOF
+          ## Optional market/options/modules innovation scout is due
+
+          This request permits research and suggestions only. It does not approve scope or code changes.
+
+          Follow CONTINUOUS-IMPROVEMENT.md requirement 32, record candidates as proposed, present owner choices, and route approved items back through planning/architecture/security/QA before implementation.
+          EOF
+          gh issue create --title "$TITLE" --body-file /tmp/ai-native-innovation-scout.md
+
+      - name: Explain disabled scout
+        if: steps.gate.outputs.enabled != 'true'
+        run: echo "Innovation Scout is disabled until explicit owner consent enables it."

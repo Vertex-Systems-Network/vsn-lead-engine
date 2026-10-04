@@ -1,0 +1,580 @@
+{
+  "schema_version": 5,
+  "default_owner_role": "worker",
+  "protected_control_plane_default_owner_roles": [
+    "supervisor",
+    "security",
+    "architecture",
+    "devops"
+  ],
+  "rules": [
+    {
+      "pattern": "/.gitignore",
+      "owner_roles": [
+        "supervisor",
+        "devops",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/AGENTS.md",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/.ai/**",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/CLAUDE.md",
+      "owner_roles": [
+        "supervisor",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/GEMINI.md",
+      "owner_roles": [
+        "supervisor",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/.cursor/**",
+      "owner_roles": [
+        "supervisor",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/.windsurf/**",
+      "owner_roles": [
+        "supervisor",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/.github/**",
+      "owner_roles": [
+        "supervisor",
+        "devops",
+        "security"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/blueprints/**",
+      "owner_roles": [
+        "supervisor",
+        "devops",
+        "security"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/START-HERE.md",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/PROJECT-INITIALIZATION.md",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/PROJECT-MANAGEMENT.md",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/AI-NATIVE-EXECUTION.md",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/MULTI-AGENT-ORCHESTRATION.md",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/AUTO-AGENT.md",
+      "owner_roles": [
+        "supervisor",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/SUPERVISOR.md",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/ORCHESTRATOR.md",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture",
+        "devops"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/DEVELOPMENT-LIFECYCLE.md",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security",
+        "qa"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/CONTINUOUS-IMPROVEMENT.md",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/GITHUB-GOVERNANCE.md",
+      "owner_roles": [
+        "supervisor",
+        "devops",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/CODE-QUALITY.md",
+      "owner_roles": [
+        "supervisor",
+        "qa",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/SECURITY.md",
+      "owner_roles": [
+        "security",
+        "supervisor"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/CONTROL-PLANE-SECURITY.md",
+      "owner_roles": [
+        "security",
+        "supervisor"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/PRODUCTION-ASSURANCE.md",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "devops",
+        "architecture"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/DESIGN-DATA-OPERATIONS.md",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security",
+        "qa"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/AI-NATIVE-PRODUCT-ASSURANCE.md",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security",
+        "qa",
+        "devops"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/AI-NATIVE-GOVERNANCE-ASSURANCE.md",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security",
+        "qa",
+        "devops"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/COMMERCIAL-LICENSING.md",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture",
+        "devops"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/commercial-service/**",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture",
+        "devops"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/config/ai/agent-catalog.json",
+      "owner_roles": [
+        "supervisor",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/ai/memory-provenance.json",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/ai/ai-evaluation-policy.json",
+      "owner_roles": [
+        "supervisor",
+        "qa",
+        "security",
+        "architecture"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/ai/responsible-ai-policy.json",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "qa",
+        "architecture"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/config/ai/asset-registry.json",
+      "owner_roles": [
+        "supervisor",
+        "qa",
+        "architecture",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/coordination/**",
+      "owner_roles": [
+        "supervisor"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/protocol/**",
+      "owner_roles": [
+        "supervisor",
+        "architecture"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/security/**",
+      "owner_roles": [
+        "security",
+        "supervisor"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/consent/**",
+      "owner_roles": [
+        "supervisor",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/github/**",
+      "owner_roles": [
+        "supervisor",
+        "devops",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/quality/**",
+      "owner_roles": [
+        "supervisor",
+        "qa",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/runtime/**",
+      "owner_roles": [
+        "supervisor",
+        "devops",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/release/**",
+      "owner_roles": [
+        "supervisor",
+        "devops",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/data/**",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/product/**",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "qa"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/assurance/**",
+      "owner_roles": [
+        "supervisor",
+        "qa",
+        "security",
+        "architecture"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/research/**",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "qa"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/compliance/**",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/config/architecture/**",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/audit/**",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "devops"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/config/risk/**",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture",
+        "qa"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/config/operations/**",
+      "owner_roles": [
+        "supervisor",
+        "devops",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/contracts/**",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/integrations/**",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/design/**",
+      "owner_roles": [
+        "supervisor",
+        "qa",
+        "architecture"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/testing/**",
+      "owner_roles": [
+        "supervisor",
+        "qa",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/traceability/**",
+      "owner_roles": [
+        "supervisor",
+        "qa",
+        "architecture"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/config/licensing/**",
+      "owner_roles": [
+        "supervisor",
+        "security",
+        "architecture",
+        "devops"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/schemas/**",
+      "owner_roles": [
+        "supervisor",
+        "architecture",
+        "security"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/scripts/**",
+      "owner_roles": [
+        "supervisor",
+        "devops",
+        "security"
+      ],
+      "review_required": true,
+      "independent_review_required": true
+    },
+    {
+      "pattern": "/tests/**",
+      "owner_roles": [
+        "supervisor",
+        "qa",
+        "security"
+      ],
+      "review_required": true
+    },
+    {
+      "pattern": "/requirements-anpos.txt",
+      "owner_roles": [
+        "supervisor",
+        "devops",
+        "security"
+      ],
+      "review_required": true
+    }
+  ],
+  "codeowners_policy": "Bootstrap must render repository-valid CODEOWNERS identities from authorized GitHub users/teams. Role names are policy identities, not literal GitHub handles. Control-plane, assurance, commercial licensing, and commercial service paths must not inherit ordinary Worker ownership."
+}

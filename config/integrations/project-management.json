@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "status": "selection_required",
+  "activation_scope": "child_project",
+  "canonical_code_system": "github",
+  "selection": {
+    "status": "not_selected",
+    "selected_provider_id": null,
+    "selected_provider_name": null,
+    "workspace_or_org_id": null,
+    "workspace_or_org_name": null,
+    "external_project_id": null,
+    "external_project_name": null,
+    "external_project_url": null,
+    "connected_at": null,
+    "verified_at": null,
+    "sync_enabled": false
+  },
+  "selection_flow": {
+    "preferred_prompt": "Choose Project Management System",
+    "recommended_provider_id": "linear",
+    "allow_skip": true,
+    "only_selectable_when_real_connection_path_exists": true,
+    "connection_modes": [
+      "host_connector",
+      "oauth",
+      "mcp",
+      "authenticated_api",
+      "git_native"
+    ],
+    "never_collect_raw_password_or_session_cookie_in_chat": true
+  },
+  "providers": [
+    {
+      "id": "linear",
+      "name": "Linear",
+      "recommended": true,
+      "connection_modes": [
+        "host_connector",
+        "oauth",
+        "mcp",
+        "authenticated_api"
+      ],
+      "availability": "discover_at_runtime"
+    },
+    {
+      "id": "github_projects",
+      "name": "GitHub Projects",
+      "recommended": false,
+      "connection_modes": [
+        "host_connector",
+        "git_native",
+        "authenticated_api",
+        "mcp"
+      ],
+      "availability": "discover_at_runtime"
+    },
+    {
+      "id": "jira",
+      "name": "Jira / Atlassian",
+      "recommended": false,
+      "connection_modes": [
+        "host_connector",
+        "oauth",
+        "mcp",
+        "authenticated_api"
+      ],
+      "availability": "discover_at_runtime"
+    },
+    {
+      "id": "clickup",
+      "name": "ClickUp",
+      "recommended": false,
+      "connection_modes": [
+        "host_connector",
+        "oauth",
+        "mcp",
+        "authenticated_api"
+      ],
+      "availability": "discover_at_runtime"
+    },
+    {
+      "id": "gitlab",
+      "name": "GitLab Issues / Boards",
+      "recommended": false,
+      "connection_modes": [
+        "oauth",
+        "mcp",
+        "authenticated_api",
+        "git_native"
+      ],
+      "availability": "discover_at_runtime"
+    },
+    {
+      "id": "azure_devops",
+      "name": "Azure DevOps Boards",
+      "recommended": false,
+      "connection_modes": [
+        "oauth",
+        "mcp",
+        "authenticated_api"
+      ],
+      "availability": "discover_at_runtime"
+    },
+    {
+      "id": "plane",
+      "name": "Plane",
+      "recommended": false,
+      "connection_modes": [
+        "mcp",
+        "authenticated_api"
+      ],
+      "availability": "discover_at_runtime"
+    },
+    {
+      "id": "asana",
+      "name": "Asana",
+      "recommended": false,
+      "connection_modes": [
+        "host_connector",
+        "oauth",
+        "mcp",
+        "authenticated_api"
+      ],
+      "availability": "discover_at_runtime"
+    },
+    {
+      "id": "monday",
+      "name": "monday.com",
+      "recommended": false,
+      "connection_modes": [
+        "oauth",
+        "mcp",
+        "authenticated_api"
+      ],
+      "availability": "discover_at_runtime"
+    },
+    {
+      "id": "notion",
+      "name": "Notion",
+      "recommended": false,
+      "connection_modes": [
+        "host_connector",
+        "oauth",
+        "mcp",
+        "authenticated_api"
+      ],
+      "availability": "discover_at_runtime"
+    }
+  ],
+  "adapter_contract": [
+    "create_project",
+    "update_project",
+    "create_phase_or_milestone",
+    "create_module",
+    "create_task",
+    "update_task",
+    "assign_agent",
+    "set_status",
+    "set_priority",
+    "set_blocker",
+    "clear_blocker",
+    "link_branch",
+    "link_pull_or_merge_request",
+    "sync_review_state",
+    "sync_merge_state",
+    "sync_progress",
+    "complete_task",
+    "archive_or_deprecate_task"
+  ],
+  "sync_policy": {
+    "sync_on_startup": true,
+    "sync_on_plan_revision": true,
+    "sync_on_assignment": true,
+    "sync_on_priority_change": true,
+    "sync_on_blocker": true,
+    "sync_on_review_submission": true,
+    "sync_on_changes_requested": true,
+    "sync_on_merge": true,
+    "sync_on_module_completion": true,
+    "sync_on_phase_completion": true,
+    "sync_on_release_change": true,
+    "sync_on_material_governance_or_quality_change": true,
+    "hourly_only_when_persistent_runtime_exists": true,
+    "catch_up_on_resume": true
+  },
+  "switching_policy": {
+    "allowed": true,
+    "repository_reality_first": true,
+    "verify_new_provider_before_disabling_old": true,
+    "preserve_external_id_history": true
+  },
+  "source_template_invariant": "The canonical source must remain unselected, unmapped, unsynchronized, and credential-free."
+}

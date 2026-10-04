@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/research-evidence.schema.json",
+  "title": "ANPOS Research Evidence Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "activation_scope", "entries", "entry_contract", "rules"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "status": {"type": "string"},
+    "activation_scope": {"type": "string"},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "claim_or_question", "source_type", "source_ref", "evidence_class", "confidence", "summary", "supports_requirement_ids", "validation_status", "supersedes", "notes"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^EVID-[0-9]{6}$"},
+          "claim_or_question": {"type": "string", "minLength": 1},
+          "source_type": {"enum": ["primary", "secondary", "user", "repository"]},
+          "source_ref": {"type": "string", "minLength": 1},
+          "source_title": {"type": ["string", "null"]},
+          "publisher_or_owner": {"type": ["string", "null"]},
+          "published_at": {"type": ["string", "null"]},
+          "accessed_at": {"type": ["string", "null"]},
+          "source_revision_or_hash": {"type": ["string", "null"]},
+          "evidence_class": {"enum": ["verified_fact", "supported_inference", "unknown"]},
+          "confidence": {"enum": ["low", "medium", "high"]},
+          "summary": {"type": "string", "minLength": 1},
+          "supports_requirement_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "supports_option_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "supports_module_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "validation_status": {"enum": ["unverified", "validated", "rejected", "superseded", "conflicting"]},
+          "supersedes": {"type": "array", "items": {"type": "string", "pattern": "^EVID-[0-9]{6}$"}, "uniqueItems": true},
+          "notes": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "entry_contract": {"type": "object"},
+    "rules": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

@@ -1,0 +1,89 @@
+name: GitHub Governance Audit
+
+on:
+  schedule:
+    - cron: '43 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  governance-audit:
+    name: governance-audit
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Audit rulesets and merge settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPO="${GITHUB_REPOSITORY}"
+          TITLE='[AI-NATIVE] GitHub Governance Drift'
+          REPORT=/tmp/governance-drift.md
+          : > "$REPORT"
+
+          RULESET_COUNT="$(gh api "repos/${REPO}/rulesets" --jq '[.[] | select(.enforcement == "active")] | length')"
+          SETTINGS="$(gh api "repos/${REPO}")"
+
+          ALLOW_MERGE="$(jq -r '.allow_merge_commit' <<<"$SETTINGS")"
+          ALLOW_REBASE="$(jq -r '.allow_rebase_merge' <<<"$SETTINGS")"
+          ALLOW_SQUASH="$(jq -r '.allow_squash_merge' <<<"$SETTINGS")"
+          ALLOW_AUTO="$(jq -r '.allow_auto_merge' <<<"$SETTINGS")"
+          ALLOW_UPDATE="$(jq -r '.allow_update_branch' <<<"$SETTINGS")"
+
+          DRIFT=0
+          {
+            echo '## GitHub governance drift detected'
+            echo
+            echo 'Desired policy: `config/github/ruleset-policy.json`'
+            echo
+          } >> "$REPORT"
+
+          if [ "$RULESET_COUNT" -lt 1 ]; then
+            echo '- No active repository ruleset is currently visible.' >> "$REPORT"
+            DRIFT=1
+          fi
+          if [ "$ALLOW_MERGE" != 'false' ]; then
+            echo '- Merge commits are enabled; desired multi-agent policy is squash-only.' >> "$REPORT"
+            DRIFT=1
+          fi
+          if [ "$ALLOW_REBASE" != 'false' ]; then
+            echo '- Rebase merges are enabled; desired multi-agent policy is squash-only.' >> "$REPORT"
+            DRIFT=1
+          fi
+          if [ "$ALLOW_SQUASH" != 'true' ]; then
+            echo '- Squash merging is disabled.' >> "$REPORT"
+            DRIFT=1
+          fi
+          if [ "$ALLOW_AUTO" != 'true' ]; then
+            echo '- Auto-merge is disabled.' >> "$REPORT"
+            DRIFT=1
+          fi
+          if [ "$ALLOW_UPDATE" != 'true' ]; then
+            echo '- Update-branch support is disabled.' >> "$REPORT"
+            DRIFT=1
+          fi
+
+          OPEN="$(gh issue list --state open --limit 100 --json number,title --jq '.[] | select(.title == "[AI-NATIVE] GitHub Governance Drift") | .number' | head -n 1)"
+
+          if [ "$DRIFT" -eq 1 ]; then
+            {
+              echo
+              echo 'An authenticated repository/organization administrator should apply the desired rules, verify required check names after successful CI runs, then close this item.'
+              echo
+              echo "Audit run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            } >> "$REPORT"
+
+            if [ -n "$OPEN" ]; then
+              gh issue edit "$OPEN" --body-file "$REPORT"
+            else
+              gh issue create --title "$TITLE" --body-file "$REPORT"
+            fi
+          else
+            if [ -n "$OPEN" ]; then
+              gh issue close "$OPEN" --comment 'Automated governance audit now sees the configured project repository aligned.'
+            fi
+          fi

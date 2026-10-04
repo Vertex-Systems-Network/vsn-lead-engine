@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "required_for_major_module_or_release_review",
+  "activation_scope": "child_project",
+  "review_dimensions": [
+    "correctness_and_acceptance_coverage",
+    "architecture_and_module_boundary_conformance",
+    "unnecessary_complexity",
+    "duplication_and_inconsistent_abstractions",
+    "dead_stale_or_temporary_code",
+    "dependency_quality",
+    "api_and_contract_consistency",
+    "data_ownership_and_migration_discipline",
+    "error_handling_and_observability",
+    "security_and_privacy_adherence",
+    "performance_and_resource_impact",
+    "test_quality_and_determinism",
+    "documentation_and_persistent_state_consistency",
+    "technical_debt"
+  ],
+  "finding_contract": {
+    "severity_required": true,
+    "evidence_required": true,
+    "affected_paths_or_modules_required": true,
+    "disposition_required": true
+  },
+  "completion_rules": {
+    "critical_correctness_security_or_data_integrity_defect_blocks_completion": true,
+    "material_debt_must_be_fixed_deferred_with_rationale_or_tracked": true,
+    "superficial_metrics_must_not_replace_contextual_review": true
+  }
+}

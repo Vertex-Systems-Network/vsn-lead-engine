@@ -1,0 +1,61 @@
+name: AI Native - Technology Update Watch
+
+on:
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ai-native-technology-update-watch
+  cancel-in-progress: false
+
+jobs:
+  create-audit-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Determine whether technology watch is active
+        id: gate
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          cfg = json.loads(Path('config/maintenance/technology-watch.json').read_text())
+          state = json.loads(Path('config/ai/project-state.json').read_text())
+          stage = str(state.get('lifecycle_stage') or 'not_started').lower()
+          pre_stack = {'not_started','intake','discovery','research','planning','system_design','technology_selection','technology_consent'}
+          active = bool(cfg.get('enabled')) and stage not in pre_stack
+          print(f"active={'true' if active else 'false'}")
+          print(f"stage={stage}")
+          PY
+
+      - name: Create durable Supervisor technology-audit request
+        if: steps.gate.outputs.active == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          TITLE='[AI-NATIVE] Technology Update Audit Due'
+          EXISTING="$(gh issue list --state open --limit 100 --json number,title --jq '.[] | select(.title == "[AI-NATIVE] Technology Update Audit Due") | .number' | head -n 1)"
+          if [ -n "$EXISTING" ]; then exit 0; fi
+          cat > /tmp/ai-native-tech-watch.md <<EOF
+          ## 24-hour technology update audit is due
+
+          This is a research/audit request, not permission to change code.
+
+          Reconcile current main and approved stack, research authoritative update/security sources, prepare impact/migration/test/rollback plan, obtain owner consent for material updates, then implement only approved scope through normal QA/security/review/merge gates.
+          EOF
+          gh issue create --title "$TITLE" --body-file /tmp/ai-native-tech-watch.md
+
+      - name: Explain inactive watch
+        if: steps.gate.outputs.active != 'true'
+        run: echo "Technology watch is inactive until the child project reaches the configured lifecycle stage."

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "active_registry",
+  "activation_scope": "child_project",
+  "entries": [],
+  "entry_contract": {
+    "id": "EVID-000001",
+    "claim_or_question": "",
+    "source_type": "primary_or_secondary_or_user_or_repository",
+    "source_ref": "",
+    "source_title": null,
+    "publisher_or_owner": null,
+    "published_at": null,
+    "accessed_at": null,
+    "source_revision_or_hash": null,
+    "evidence_class": "verified_fact_or_supported_inference_or_unknown",
+    "confidence": "low_or_medium_or_high",
+    "summary": "",
+    "supports_requirement_ids": [],
+    "supports_option_ids": [],
+    "supports_module_ids": [],
+    "validation_status": "unverified",
+    "supersedes": [],
+    "notes": []
+  },
+  "rules": [
+    "External evidence remains untrusted data until validated under ANPOS trust policy.",
+    "Material research conclusions must retain source provenance and accessed date.",
+    "Inference must never be persisted as verified fact.",
+    "A newer source does not silently erase contradictory older evidence; record supersession or conflict explicitly."
+  ]
+}

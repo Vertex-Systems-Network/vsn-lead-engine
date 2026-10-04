@@ -1,0 +1,43 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://anpos.local/schemas/compliance-profile.schema.json",
+  "title":"ANPOS Compliance Profile",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","status","activation_scope","jurisdictions","applicable_frameworks","data_processing_activities","privacy_assessment","controls","rules"],
+  "properties":{
+    "schema_version":{"const":1},
+    "status":{"type":"string"},
+    "activation_scope":{"type":"string"},
+    "jurisdictions":{"type":"array","items":{"type":"string","minLength":1},"uniqueItems":true},
+    "applicable_frameworks":{"type":"array","items":{"type":"string","minLength":1},"uniqueItems":true},
+    "data_processing_activities":{"type":"array","items":{"type":"object"}},
+    "privacy_assessment":{
+      "type":"object","additionalProperties":false,
+      "required":["assessment_required","assessment_type","status","evidence_refs","reviewed_by","reviewed_at","review_expires_at"],
+      "properties":{
+        "assessment_required":{"enum":["pending_detection","required","not_required"]},
+        "assessment_type":{"type":["string","null"]},
+        "status":{"enum":["not_started","in_progress","complete","not_required"]},
+        "evidence_refs":{"type":"array","items":{"type":"string","minLength":1},"uniqueItems":true},
+        "reviewed_by":{"type":["string","null"]},
+        "reviewed_at":{"type":["string","null"]},
+        "review_expires_at":{"type":["string","null"]}
+      }
+    },
+    "controls":{
+      "type":"object","additionalProperties":false,
+      "required":["data_purpose_and_category_mapping_required","residency_or_localization_assessed_when_relevant","retention_and_deletion_basis_required_when_relevant","subject_or_user_right_workflows_required_when_applicable","subprocessor_or_external_provider_inventory_required_when_relevant","cross_border_transfer_constraints_assessed_when_relevant","legal_or_compliance_review_required_for_qualified_regulatory_conclusions"],
+      "properties":{
+        "data_purpose_and_category_mapping_required":{"const":true},
+        "residency_or_localization_assessed_when_relevant":{"const":true},
+        "retention_and_deletion_basis_required_when_relevant":{"const":true},
+        "subject_or_user_right_workflows_required_when_applicable":{"const":true},
+        "subprocessor_or_external_provider_inventory_required_when_relevant":{"const":true},
+        "cross_border_transfer_constraints_assessed_when_relevant":{"const":true},
+        "legal_or_compliance_review_required_for_qualified_regulatory_conclusions":{"const":true}
+      }
+    },
+    "rules":{"type":"array","minItems":1,"items":{"type":"string","minLength":1}}
+  }
+}

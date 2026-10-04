@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "status": "active_registry",
+  "activation_scope": "child_project",
+  "risks": [],
+  "risk_template": {
+    "id": "RISK-0001",
+    "category": "security",
+    "title": "",
+    "description": "",
+    "evidence_refs": [],
+    "likelihood": "unknown",
+    "impact": "unknown",
+    "owner": null,
+    "mitigations": [],
+    "residual_risk": "unknown",
+    "linked_requirements": [],
+    "linked_modules_or_findings": [],
+    "disposition": "open",
+    "consent_ref": null,
+    "accepted_at": null,
+    "review_or_expiry_at": null
+  },
+  "allowed_categories": [
+    "security",
+    "privacy",
+    "ai",
+    "product",
+    "operational",
+    "financial",
+    "compliance",
+    "architecture"
+  ],
+  "allowed_dispositions": [
+    "open",
+    "mitigating",
+    "accepted",
+    "resolved",
+    "expired_acceptance"
+  ],
+  "rules": {
+    "material_risk_requires_owner": true,
+    "risk_acceptance_requires_authenticated_consent_when_policy_requires": true,
+    "accepted_risk_requires_review_or_expiry": true,
+    "expired_acceptance_reopens_review": true,
+    "critical_release_blockers_cannot_be_hidden_by_generic_acceptance": true
+  }
+}

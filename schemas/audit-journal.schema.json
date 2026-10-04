@@ -1,0 +1,35 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://anpos.local/schemas/audit-journal.schema.json",
+  "title":"ANPOS Audit Journal",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","status","activation_scope","integrity","entries","entry_template","rules"],
+  "properties":{
+    "schema_version":{"const":1},
+    "status":{"type":"string"},
+    "activation_scope":{"type":"string"},
+    "integrity":{
+      "type":"object","additionalProperties":false,
+      "required":["mode","genesis_hash","latest_entry_hash","last_verified_at"],
+      "properties":{
+        "mode":{"const":"sha256_hash_chain"},
+        "genesis_hash":{"type":["string","null"]},
+        "latest_entry_hash":{"type":["string","null"]},
+        "last_verified_at":{"type":["string","null"]}
+      }
+    },
+    "entries":{"type":"array","items":{"type":"object"}},
+    "entry_template":{"type":"object"},
+    "rules":{
+      "type":"object","additionalProperties":false,
+      "required":["append_or_equivalent_tamper_evident_semantics_required_for_privileged_actions","secrets_credentials_and_sensitive_full_prompts_forbidden","audit_evidence_is_not_authorization","integrity_break_requires_investigation_before_trusting_later_entries"],
+      "properties":{
+        "append_or_equivalent_tamper_evident_semantics_required_for_privileged_actions":{"const":true},
+        "secrets_credentials_and_sensitive_full_prompts_forbidden":{"const":true},
+        "audit_evidence_is_not_authorization":{"const":true},
+        "integrity_break_requires_investigation_before_trusting_later_entries":{"const":true}
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://anpos.local/schemas/runbooks-and-drills.schema.json",
+  "title":"ANPOS Runbooks and Drills",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","status","activation_scope","runbooks","drills","runbook_template","drill_template","rules"],
+  "properties":{
+    "schema_version":{"const":1},
+    "status":{"type":"string"},
+    "activation_scope":{"type":"string"},
+    "runbooks":{"type":"array","items":{"type":"object"}},
+    "drills":{"type":"array","items":{"type":"object"}},
+    "runbook_template":{"type":"object"},
+    "drill_template":{"type":"object"},
+    "rules":{
+      "type":"object","additionalProperties":false,
+      "required":["critical_state_restore_or_recovery_runbooks_required","production_critical_runbooks_require_periodic_or_risk_triggered_verification","unsafe_failure_injection_forbidden","drill_failure_must_create_follow_up_work"],
+      "properties":{
+        "critical_state_restore_or_recovery_runbooks_required":{"const":true},
+        "production_critical_runbooks_require_periodic_or_risk_triggered_verification":{"const":true},
+        "unsafe_failure_injection_forbidden":{"const":true},
+        "drill_failure_must_create_follow_up_work":{"const":true}
+      }
+    }
+  }
+}

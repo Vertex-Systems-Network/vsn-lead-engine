@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "status": "pending_ai_asset_detection",
+  "activation_scope": "child_project",
+  "assets": [],
+  "asset_template": {
+    "id": "AI-ASSET-0001",
+    "type": "model_or_prompt_or_tool_or_retrieval_or_embedding_or_policy",
+    "provider": null,
+    "name": "",
+    "version": null,
+    "configuration_hash": null,
+    "source_or_artifact_ref": null,
+    "environment_bindings": [],
+    "evaluation_dataset_version": null,
+    "last_certified_evaluation_ref": null,
+    "last_certified_at": null,
+    "contains_secret": false,
+    "status": "unverified"
+  },
+  "rules": {
+    "secrets_forbidden": true,
+    "material_behavior_configuration_requires_stable_identity_or_hash": true,
+    "material_configuration_change_invalidates_stale_assurance_when_policy_requires": true,
+    "unknown_provider_internal_version_must_remain_explicit_unknown": true
+  }
+}
