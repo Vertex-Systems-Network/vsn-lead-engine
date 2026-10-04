@@ -68,15 +68,22 @@
     "shared_coordination_state_requires_supervisor_review": true
   },
   "notes": [
-    "VSN Main Protection is live and verified active.",
-    "The validate and repository-integrity contexts have both completed successfully on the ANPOS adoption pull request.",
-    "CODEOWNER/one-review enforcement remains deferred until an independent reviewer or team is configured; enabling it with only the PR author as CODEOWNER can deadlock self-authored changes.",
+    "Live VSN Main Protection ruleset 24086362 is active and was re-read after controller enforcement.",
+    "Both validate and repository-integrity are required status checks and have successful observed runs.",
+    "PR-only changes, squash-only merging, strict up-to-date checks, conversation resolution, linear history, deletion protection and non-fast-forward protection are live.",
+    "CODEOWNER/one-review/last-push approval enforcement remains deferred until an independent reviewer or team is configured; current_user_can_bypass is never.",
     "Coordination-ref namespace restrictions remain a separate capability/application gap and must not be claimed as enforced until verified."
   ],
   "setup_state": {
     "user_decision": "approved",
-    "application_status": "main_checks_alignment_pending_merge_and_controller_verification",
+    "application_status": "main_checks_verified_review_and_coordination_extensions_pending",
     "enforcement_verified": false,
-    "governance_audit_installed": false
+    "governance_audit_installed": false,
+    "verified_main_ruleset_id": 24086362,
+    "verified_required_status_checks": [
+      "validate",
+      "repository-integrity"
+    ],
+    "verified_at": "2026-10-04T18:11:06Z"
   }
 }
