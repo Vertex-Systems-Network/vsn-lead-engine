@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "status": "partial_existing_enforcement",
+  "status": "active_main_enforcement_verified_external_extensions_deferred",
   "activation_scope": "child_project",
   "template_source_enforcement": "not_applicable",
   "scope": "default_branch_and_coordination_refs",
@@ -68,40 +68,44 @@
     "shared_coordination_state_requires_supervisor_review": true
   },
   "notes": [
-    "Live VSN Main Protection ruleset 24086362 is active and was re-read after controller enforcement.",
-    "Both validate and repository-integrity are required status checks and have successful observed runs.",
-    "PR-only changes, squash-only merging, strict up-to-date checks, conversation resolution, linear history, deletion protection and non-fast-forward protection are live.",
-    "CODEOWNER/one-review/last-push approval enforcement remains deferred until an independent reviewer or team is configured; current_user_can_bypass is never.",
-    "Coordination-ref namespace restrictions remain a separate capability/application gap and must not be claimed as enforced until verified.",
-    "Dependency Review was live-probed on PR #125 and is unavailable while GitHub Dependency graph is disabled; the active PR workflow was removed to avoid knowingly red CI.",
-    "CodeQL for GitHub Actions was verified successful on PR #125 run 37226172430 and is now proposed as a required main check; live enforcement awaits merge/controller verification.",
-    "OpenSSF Scorecard remains a non-PR capability and will be verified after activation on main."
+    "Live VSN Main Protection ruleset 24086362 is active on main and was re-read after enforcement.",
+    "Required checks verified live: validate, repository-integrity, analyze-actions.",
+    "Main protection live: PR-only, squash-only, strict up-to-date checks, conversation resolution, linear history, deletion protection, non-fast-forward protection, no bypass.",
+    "Repository merge settings verified: merge/rebase disabled; squash, auto-merge, update-branch and delete-branch-on-merge enabled.",
+    "Main Protection Controller completed ruleset + repository-settings self-heal; governance audit dispatch path was repaired and verified.",
+    "GitHub Governance Audit run 37227345426 succeeded and drift Issue #128 is closed.",
+    "CodeQL main run 37227345382 succeeded; OpenSSF Scorecard main run 37226403498 succeeded.",
+    "Dependency Review remains capability-blocked because GitHub Dependency graph is disabled; knowingly-red CI is not installed/required.",
+    "CODEOWNER/one-review/last-push approval remains deferred until a genuinely independent reviewer/team exists; current_user_can_bypass is never.",
+    "Coordination claims/** and supervisor/** protection remains intentionally deferred until a verified persistent Supervisor/trusted runtime exists."
   ],
   "setup_state": {
     "user_decision": "approved",
-    "application_status": "codeql_required_check_pending_merge_and_live_verification",
+    "application_status": "active_main_governance_verified_external_identity_and_platform_extensions_deferred",
     "enforcement_verified": false,
-    "governance_audit_installed": false,
+    "governance_audit_installed": true,
     "verified_main_ruleset_id": 24086362,
     "verified_required_status_checks": [
       "validate",
-      "repository-integrity"
+      "repository-integrity",
+      "analyze-actions"
     ],
-    "verified_at": "2026-10-04T18:11:06Z",
+    "verified_at": "2026-10-04T19:12:35Z",
     "security_check_capabilities": {
       "dependency_review": {
         "status": "unavailable",
-        "reason": "Observed PR run 37226110820 reported Dependency review is not supported because Dependency graph is disabled.",
-        "activation_condition": "Enable Dependency graph in GitHub repository security settings, then obtain a successful child PR run before requiring dependency-review."
+        "reason": "PR #125 Actions run 37226110820 reported Dependency Review unsupported because GitHub Dependency graph is disabled.",
+        "activation_condition": "Enable Dependency graph, install the active dependency-review workflow, obtain a successful child PR run, then promote it only if verified."
       },
       "codeql_actions": {
-        "status": "verified_supported",
-        "evidence": "PR #125 Actions run 37226172430 completed CodeQL / analyze-actions successfully.",
-        "activation_condition": "Promote analyze-actions into live required main checks after this PR merges and Main Protection Controller verifies the live ruleset."
+        "status": "verified_live",
+        "evidence": "PR #125 run 37226172430 and main run 37227345382 completed CodeQL / analyze-actions successfully.",
+        "activation_condition": "already_active_and_required"
       },
       "ossf_scorecard": {
-        "status": "pending_post_merge_verification",
-        "activation_condition": "Keep non-required; verify scheduled/push execution after workflow activation."
+        "status": "verified_live_non_required",
+        "evidence": "Main run 37226403498 completed OpenSSF Scorecard / analysis successfully.",
+        "activation_condition": "remain non-required scheduled/push assurance unless policy changes"
       }
     }
   }
