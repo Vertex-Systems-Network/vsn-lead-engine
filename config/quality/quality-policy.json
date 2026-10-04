@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "status": "baseline_verified_capabilities_pending",
+  "status": "baseline_verified_security_workflows_installing",
   "activation_scope": "child_project",
   "apply_to_template_source": false,
   "setup_flow": {
@@ -77,13 +77,13 @@
       "dependabot.yml"
     ],
     "baseline_verification": "verified_on_child_repository",
-    "github_security_capability": "unknown",
+    "github_security_capability": "public_repository_candidate_verification_in_progress",
     "capability_dependent_workflows": [
       "codeql-actions.yml",
       "dependency-review.yml",
       "scorecard.yml"
     ],
-    "capability_resolution": "pending_runtime_detection",
+    "capability_resolution": "pending_observed_child_workflow_results_on_this_change",
     "stack_specific_tooling": "existing_project_stack_already_operational; future material stack changes require approval",
     "verified_main_ref": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
     "verified_at": "2026-10-04T18:13:02Z",
@@ -91,6 +91,12 @@
       "validate",
       "repository-integrity"
     ],
-    "verified_product_test_evidence": "PR #123: 305 passed"
+    "verified_product_test_evidence": "PR #123: 305 passed",
+    "installed_child_security_workflows": [
+      "codeql-actions.yml",
+      "dependency-review.yml",
+      "scorecard.yml",
+      "governance-audit.yml"
+    ]
   }
 }
