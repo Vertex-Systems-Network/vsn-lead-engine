@@ -845,7 +845,14 @@
         "No production-ready claim from static/unit tests alone."
       ],
       "dependencies": [
-        "All SaaS runtime modules"
+        "MOD-SAAS-IDENTITY",
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG",
+        "MOD-JOB-ORCHESTRATION",
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-SAAS-ADMIN",
+        "MOD-AI-ASSISTANT",
+        "MOD-WEB-EXPERIENCE"
       ],
       "option_ids": [
         "OPT-COST-CONTROLS",
