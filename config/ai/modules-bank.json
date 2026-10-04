@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
+  "reconciliation_base_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
   "modules": [
     {
       "id": "MOD-HISTORICAL-ROADMAP",
@@ -65,16 +65,31 @@
       ],
       "quality_gates": [
         "validate",
-        "repository-integrity"
+        "repository-integrity",
+        "analyze-actions",
+        "governance-audit",
+        "OpenSSF Scorecard (non-required)"
       ],
       "status": "complete",
       "completion_evidence": [
         "PR #120",
         "PR #122",
         "PR #123",
-        "ruleset 24086362"
+        "PR #125",
+        "PR #127",
+        "PR #129",
+        "PR #130",
+        "PR #131",
+        "ruleset 24086362",
+        "main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345426",
+        "Actions run 37227345382",
+        "Actions run 37226403498"
       ],
-      "update_notes": [],
+      "update_notes": [
+        "Active main governance and repository merge settings are self-healing and verified.",
+        "Independent human/team review and distributed coordination extensions remain deferred until real identities exist."
+      ],
       "removal_or_deprecation_notes": []
     },
     {
@@ -203,10 +218,18 @@
       "quality_gates": [
         "repository-integrity"
       ],
-      "status": "in_progress",
-      "completion_evidence": [],
+      "status": "complete",
+      "completion_evidence": [
+        "PR #125",
+        "main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345400",
+        "Actions run 37227345382",
+        "config/assurance/assurance-state.json",
+        "docs/ai/ASSURANCE-EVIDENCE.md"
+      ],
       "update_notes": [
-        "REQ-83-96 classified against the actual non-AI production Lead Engine; project evidence/runbooks/ADRs/risk/audit/threat state populated before immutable verification."
+        "REQ-83-96 classified and reconciled against the actual non-AI production Lead Engine.",
+        "Evidence-backed requirements are verified; REQ-90 remains externally blocked on qualified privacy/compliance review rather than being falsely passed."
       ],
       "removal_or_deprecation_notes": []
     },
