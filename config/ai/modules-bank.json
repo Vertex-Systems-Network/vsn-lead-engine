@@ -323,7 +323,8 @@
         "Initial official-source desk research recorded in config/research/evidence-registry.json"
       ],
       "update_notes": [
-        "Initial discovery only; user validation and deeper terms review remain open."
+        "Initial discovery only; user validation and deeper terms review remain open.",
+        "WU-SAAS-CURRENT-ENGINE-AUDIT completed against main ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2; audit confirms production worker candidates and that SaaS auth/billing/API/client capabilities are net-new. See docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md. Next: source feasibility; user/job validation remains open."
       ],
       "removal_or_deprecation_notes": []
     },
