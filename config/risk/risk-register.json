@@ -1,8 +1,172 @@
 {
   "schema_version": 1,
-  "status": "active_registry",
+  "status": "active_project_risk_register",
   "activation_scope": "child_project",
-  "risks": [],
+  "risks": [
+    {
+      "id": "RISK-0001",
+      "category": "operational",
+      "title": "Daily quota may remain incomplete before date boundary",
+      "description": "Free-source yield, duplicate saturation and bounded runtime can leave categories below target before midnight.",
+      "evidence_refs": [
+        ".ai/state/CURRENT-STATE.yaml",
+        "Actions run 37225162383"
+      ],
+      "likelihood": "medium",
+      "impact": "medium",
+      "owner": "VSN repository owner/operator",
+      "mitigations": [
+        "Adaptive routing/geography expansion.",
+        "Serialized recovery supervisor.",
+        "Hard budgets and midnight guard.",
+        "Health/yield telemetry."
+      ],
+      "residual_risk": "Quota may remain incomplete when safe runtime or public-source yield is insufficient.",
+      "linked_requirements": [
+        "REQ-85",
+        "REQ-87",
+        "REQ-94",
+        "REQ-96"
+      ],
+      "linked_modules_or_findings": [
+        "MOD-PRODUCTION-RUNTIME"
+      ],
+      "disposition": "mitigating",
+      "consent_ref": null,
+      "accepted_at": null,
+      "review_or_expiry_at": null
+    },
+    {
+      "id": "RISK-0002",
+      "category": "operational",
+      "title": "Autonomous creation of missing My Drive workbook not certified",
+      "description": "Existing/precreated workbooks operate, but strict user-OAuth create→trash evidence is absent.",
+      "evidence_refs": [
+        ".github/workflows/google-drive-capability.yml",
+        ".ai/state/CURRENT-STATE.yaml"
+      ],
+      "likelihood": "medium",
+      "impact": "medium",
+      "owner": "VSN repository owner/operator",
+      "mitigations": [
+        "Precreate workbooks.",
+        "Service-account writer fallback for existing files.",
+        "Fail safely without credentials.",
+        "Strict OAuth capability workflow."
+      ],
+      "residual_risk": "A missing workbook may need human OAuth provisioning.",
+      "linked_requirements": [
+        "REQ-90",
+        "REQ-94",
+        "REQ-96"
+      ],
+      "linked_modules_or_findings": [
+        "MOD-MYDRIVE-AUTONOMY"
+      ],
+      "disposition": "open",
+      "consent_ref": null,
+      "accepted_at": null,
+      "review_or_expiry_at": null
+    },
+    {
+      "id": "RISK-0003",
+      "category": "privacy",
+      "title": "Qualified privacy/compliance applicability for compiled B2B contact data is pending",
+      "description": "System compiles publicly listed business contact data across US/Canada while operated in Pakistan; ANPOS must not invent legal conclusions.",
+      "evidence_refs": [
+        "DATA_SOURCES.md",
+        "config/data/data-governance.json",
+        "config/compliance/compliance-profile.json"
+      ],
+      "likelihood": "medium",
+      "impact": "high",
+      "owner": "VSN management / qualified privacy-compliance reviewer",
+      "mitigations": [
+        "Public-source-only discovery.",
+        "Purpose-limited fields.",
+        "R2 hashed fingerprints instead of full rows.",
+        "Secret/log controls.",
+        "Qualified review remains explicit."
+      ],
+      "residual_risk": "Jurisdiction-specific obligations may require additional controls.",
+      "linked_requirements": [
+        "REQ-90",
+        "REQ-96"
+      ],
+      "linked_modules_or_findings": [
+        "MOD-PRODUCTION-RUNTIME"
+      ],
+      "disposition": "open",
+      "consent_ref": null,
+      "accepted_at": null,
+      "review_or_expiry_at": null
+    },
+    {
+      "id": "RISK-0004",
+      "category": "security",
+      "title": "Independent CODEOWNER review cannot yet be enforced without self-review deadlock",
+      "description": "Protected main has CI/no bypass, but the only verified owner identity is also the author identity.",
+      "evidence_refs": [
+        "config/github/ruleset-policy.json",
+        ".github/CODEOWNERS"
+      ],
+      "likelihood": "medium",
+      "impact": "medium",
+      "owner": "VSN repository owner/operator",
+      "mitigations": [
+        "PR-only protected main.",
+        "Strict required checks.",
+        "Squash/conversation/linear/no-bypass protections.",
+        "Defer independent approval until real reviewer/team exists."
+      ],
+      "residual_risk": "Control-plane changes lack a distinct approval identity.",
+      "linked_requirements": [
+        "REQ-88",
+        "REQ-91",
+        "REQ-95",
+        "REQ-96"
+      ],
+      "linked_modules_or_findings": [
+        "MOD-ANPOS-GOVERNANCE",
+        "MOD-ANPOS-COORDINATION"
+      ],
+      "disposition": "mitigating",
+      "consent_ref": null,
+      "accepted_at": null,
+      "review_or_expiry_at": null
+    },
+    {
+      "id": "RISK-0005",
+      "category": "security",
+      "title": "ANPOS coordination ref namespaces are not live-protected",
+      "description": "claims/** and supervisor/** are defined as locks, but no persistent verified Supervisor exists and namespace restrictions are not verified live.",
+      "evidence_refs": [
+        "config/github/ruleset-policy.json",
+        "config/coordination/supervisor-state.json",
+        "config/coordination/agent-work-queue.json"
+      ],
+      "likelihood": "low",
+      "impact": "medium",
+      "owner": "VSN repository owner/operator",
+      "mitigations": [
+        "Worker dispatch disabled until verified identity.",
+        "No claimable slots emitted.",
+        "Control-plane guard requires identity/fencing."
+      ],
+      "residual_risk": "Namespace enforcement/gateway verification is required before future distributed execution.",
+      "linked_requirements": [
+        "REQ-95",
+        "REQ-96"
+      ],
+      "linked_modules_or_findings": [
+        "MOD-ANPOS-COORDINATION"
+      ],
+      "disposition": "mitigating",
+      "consent_ref": null,
+      "accepted_at": null,
+      "review_or_expiry_at": null
+    }
+  ],
   "risk_template": {
     "id": "RISK-0001",
     "category": "security",
