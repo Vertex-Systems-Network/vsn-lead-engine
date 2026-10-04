@@ -1,6 +1,601 @@
 {
   "schema_version": 1,
-  "options": [],
+  "options": [
+    {
+      "id": "OPT-WEB-CLIENT",
+      "name": "Responsive web client",
+      "category": "client_platform",
+      "description": "Browser-based user product and account workflows.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P0",
+      "dependencies": [
+        "OPT-IDENTITY-WORKSPACES"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Responsive app and versioned API"
+      ],
+      "ux_implications": [
+        "WCAG 2.2 AA; keyboard/focus and reduced motion"
+      ],
+      "data_implications": [
+        "Tenant-scoped API"
+      ],
+      "security_implications": [
+        "Session security and tenant authorization"
+      ],
+      "qa_implications": [
+        "Browser E2E and accessibility"
+      ],
+      "rationale": "Explicitly requested web version; stack remains undecided."
+    },
+    {
+      "id": "OPT-DESKTOP-CLIENT",
+      "name": "Desktop client",
+      "category": "client_platform",
+      "description": "Installable desktop experience consuming shared product APIs.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P2",
+      "dependencies": [
+        "OPT-VERSIONED-API"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Packaging, updates, signing, OS support"
+      ],
+      "ux_implications": [
+        "Native desktop conventions"
+      ],
+      "data_implications": [
+        "Secure token storage"
+      ],
+      "security_implications": [
+        "Code signing, update integrity, local secret protection"
+      ],
+      "qa_implications": [
+        "Package and signature verification"
+      ],
+      "rationale": "Explicit request; OS matrix and release model unresolved."
+    },
+    {
+      "id": "OPT-MOBILE-CLIENT",
+      "name": "Mobile app",
+      "category": "client_platform",
+      "description": "Mobile client for schedule/job status and lead workflows.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P2",
+      "dependencies": [
+        "OPT-VERSIONED-API"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "iOS/Android support and store workflows"
+      ],
+      "ux_implications": [
+        "Mobile-first navigation and accessibility"
+      ],
+      "data_implications": [
+        "Secure device token storage and notification tokens"
+      ],
+      "security_implications": [
+        "Store policy, auth/session protection"
+      ],
+      "qa_implications": [
+        "Device matrix and store sandbox billing when applicable"
+      ],
+      "rationale": "User says app version; intended OS definition remains open."
+    },
+    {
+      "id": "OPT-IDENTITY-WORKSPACES",
+      "name": "Accounts, workspaces and roles",
+      "category": "identity",
+      "description": "Secure sign-in with user/workspace and least-privilege roles.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P0",
+      "dependencies": [],
+      "conflicts": [],
+      "technical_implications": [
+        "Auth provider and tenant model selection"
+      ],
+      "ux_implications": [
+        "Signup, recovery, workspace switching"
+      ],
+      "data_implications": [
+        "Identity, workspace and membership records"
+      ],
+      "security_implications": [
+        "Tenant isolation, MFA/admin controls, session lifecycle"
+      ],
+      "qa_implications": [
+        "Auth and cross-tenant authorization tests"
+      ],
+      "rationale": "Login and shared-user product are explicit; provider/roles remain design choices."
+    },
+    {
+      "id": "OPT-SUBSCRIPTIONS-ENTITLEMENTS",
+      "name": "Subscription entitlements and quotas",
+      "category": "commercial",
+      "description": "Enforce plan feature access, job/lead/provider/AI budgets and lifecycle.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P0",
+      "dependencies": [
+        "OPT-IDENTITY-WORKSPACES"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Billing adapters and authoritative entitlement ledger"
+      ],
+      "ux_implications": [
+        "Plan state, usage, upgrade/cancel clarity"
+      ],
+      "data_implications": [
+        "Subscription events, usage ledger"
+      ],
+      "security_implications": [
+        "Signed webhooks, replay protection, no client-authoritative entitlement"
+      ],
+      "qa_implications": [
+        "Purchase/change/cancel/refund/replay tests"
+      ],
+      "rationale": "Subscriptions are explicit; gateway, tiers, price and store billing unresolved."
+    },
+    {
+      "id": "OPT-MARKET-SEARCH",
+      "name": "Country, status and niche configuration",
+      "category": "search",
+      "description": "User-configurable market and business category criteria.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P0",
+      "dependencies": [
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Geographic/taxonomy model and source capability mapping"
+      ],
+      "ux_implications": [
+        "Search builder and supported-value feedback"
+      ],
+      "data_implications": [
+        "Versioned saved search"
+      ],
+      "security_implications": [
+        "Validate scope and query budgets"
+      ],
+      "qa_implications": [
+        "Taxonomy and source coverage contracts"
+      ],
+      "rationale": "Explicitly requested; only source-supported status fields may be offered."
+    },
+    {
+      "id": "OPT-USER-SCHEDULES",
+      "name": "User-local recurring lead schedules",
+      "category": "automation",
+      "description": "Daily jobs at chosen user-local time with timezone/DST-aware durable execution.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P0",
+      "dependencies": [
+        "OPT-JOB-ORCHESTRATION"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Durable queue, scheduler, retries, idempotency"
+      ],
+      "ux_implications": [
+        "Timezone selection, next-run preview, pause/edit/history"
+      ],
+      "data_implications": [
+        "Schedule/job/event state"
+      ],
+      "security_implications": [
+        "Per-tenant concurrency and budgets"
+      ],
+      "qa_implications": [
+        "DST and duplicate-event tests"
+      ],
+      "rationale": "Daily chosen-time jobs are explicit; scheduler service not selected."
+    },
+    {
+      "id": "OPT-FREE-SOURCE-MODE",
+      "name": "Free source mode",
+      "category": "integrations",
+      "description": "User may select eligible free sources with disclosed coverage/limits.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P0",
+      "dependencies": [
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Source adapters, provider policy checks"
+      ],
+      "ux_implications": [
+        "Explain yield and coverage uncertainty"
+      ],
+      "data_implications": [
+        "Per-source provenance and retention"
+      ],
+      "security_implications": [
+        "Rate limits and safe access"
+      ],
+      "qa_implications": [
+        "Adapter contract and policy tests"
+      ],
+      "rationale": "Explicit; free does not mean unrestricted or guaranteed output."
+    },
+    {
+      "id": "OPT-PAID-SOURCE-MODE",
+      "name": "Paid source mode",
+      "category": "integrations",
+      "description": "Admin-approved paid providers can be used only with visible estimated cost and budgets.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P1",
+      "dependencies": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-COST-CONTROLS"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Provider accounts, metering and billing"
+      ],
+      "ux_implications": [
+        "Pre-run estimate and explicit confirmation"
+      ],
+      "data_implications": [
+        "Provider-specific allowed fields/storage"
+      ],
+      "security_implications": [
+        "Encrypted keys, no over-budget execution"
+      ],
+      "qa_implications": [
+        "Cost cap, timeout, failure and webhook tests"
+      ],
+      "rationale": "Paid options explicit; vendors and platform-funded vs BYOK unresolved."
+    },
+    {
+      "id": "OPT-CUSTOM-SOURCE-OPTIONS",
+      "name": "Custom source and field options",
+      "category": "extensibility",
+      "description": "Extensible custom fields/filters and controlled provider adapter onboarding.",
+      "status": "candidate",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P2",
+      "dependencies": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-ADMIN-CONTROLS"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Versioned adapter contract; no user-supplied executable code in MVP"
+      ],
+      "ux_implications": [
+        "Validate unsupported fields clearly"
+      ],
+      "data_implications": [
+        "Schema evolution and provenance"
+      ],
+      "security_implications": [
+        "Admin review, sandboxing, SSRF defenses"
+      ],
+      "qa_implications": [
+        "Contract, abuse and compatibility tests"
+      ],
+      "rationale": "User requested custom options; exact scope needs system design."
+    },
+    {
+      "id": "OPT-SOURCE-POLICY-CATALOG",
+      "name": "Provider policy and capability catalog",
+      "category": "governance",
+      "description": "Every provider records terms/use rights, fields, countries, storage/retention, attribution, rate and cost limits.",
+      "status": "selected",
+      "requirement_source": [
+        "ANPOS source-trust/security policies",
+        "User request 2026-10-05"
+      ],
+      "priority": "P0",
+      "dependencies": [],
+      "conflicts": [],
+      "technical_implications": [
+        "Policy metadata and fail-closed adapter activation"
+      ],
+      "ux_implications": [
+        "Source transparency"
+      ],
+      "data_implications": [
+        "Source lineage and retention class"
+      ],
+      "security_implications": [
+        "No access-control evasion; emergency kill switch"
+      ],
+      "qa_implications": [
+        "Policy presence and enforcement tests"
+      ],
+      "rationale": "Necessary to implement user-requested source choices safely."
+    },
+    {
+      "id": "OPT-LEAD-FILTER-EXPORT",
+      "name": "Lead filtering, sorting and export",
+      "category": "data_workflow",
+      "description": "User-controlled filters/sorting and entitlement-aware export with provenance.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P1",
+      "dependencies": [
+        "OPT-LEAD-PROVENANCE"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Search/index/query and export pipeline"
+      ],
+      "ux_implications": [
+        "Saved views and clear empty/partial states"
+      ],
+      "data_implications": [
+        "Export/deletion/retention controls"
+      ],
+      "security_implications": [
+        "Tenant authorization and export audit"
+      ],
+      "qa_implications": [
+        "Filter correctness, injection and access tests"
+      ],
+      "rationale": "Filtering explicit; exact filter list refined from research."
+    },
+    {
+      "id": "OPT-AI-ASSIST",
+      "name": "Bounded AI search assistant",
+      "category": "ai",
+      "description": "Assist search setup, filter interpretation and summaries with provenance and user confirmation.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P1",
+      "dependencies": [
+        "OPT-IDENTITY-WORKSPACES",
+        "OPT-LEAD-PROVENANCE",
+        "OPT-COST-CONTROLS"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Provider/model abstraction and evaluation harness"
+      ],
+      "ux_implications": [
+        "Explain suggestions and confidence; confirm actions"
+      ],
+      "data_implications": [
+        "Minimal authorized context and retention controls"
+      ],
+      "security_implications": [
+        "Prompt-injection defenses, tenant scoping, no secret access"
+      ],
+      "qa_implications": [
+        "Task, privacy, hallucination and cost evaluations"
+      ],
+      "rationale": "AI help is explicit; autonomous paid actions are excluded."
+    },
+    {
+      "id": "OPT-ADMIN-CONTROLS",
+      "name": "Administrative control plane",
+      "category": "admin",
+      "description": "Manage providers, users, entitlements, quotas, jobs, cost, incidents and audit.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P1",
+      "dependencies": [
+        "OPT-IDENTITY-WORKSPACES",
+        "OPT-SUBSCRIPTIONS-ENTITLEMENTS"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "RBAC and audited control APIs"
+      ],
+      "ux_implications": [
+        "Clear operational overview"
+      ],
+      "data_implications": [
+        "Admin audit and support access logs"
+      ],
+      "security_implications": [
+        "Least privilege, MFA/step-up for sensitive actions"
+      ],
+      "qa_implications": [
+        "Authorization and mutation audit tests"
+      ],
+      "rationale": "Admin-side integrations/control are explicit."
+    },
+    {
+      "id": "OPT-COST-CONTROLS",
+      "name": "Usage metering and hard cost guards",
+      "category": "billing_operations",
+      "description": "Estimate and meter source/AI usage; enforce per-job and per-tenant hard limits.",
+      "status": "selected",
+      "requirement_source": [
+        "ANPOS runtime budgets",
+        "User request 2026-10-05"
+      ],
+      "priority": "P0",
+      "dependencies": [
+        "OPT-SUBSCRIPTIONS-ENTITLEMENTS"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Atomic budget reservation/settlement"
+      ],
+      "ux_implications": [
+        "Usage/cost preview and alerts"
+      ],
+      "data_implications": [
+        "Append-only usage records"
+      ],
+      "security_implications": [
+        "Prevent cost amplification and replay"
+      ],
+      "qa_implications": [
+        "Concurrency/race and cap tests"
+      ],
+      "rationale": "Paid provider option makes spend control essential."
+    },
+    {
+      "id": "OPT-LANDING-SITE",
+      "name": "Product marketing landing site",
+      "category": "marketing",
+      "description": "Public feature pages with useful visuals, explanations, motion and accessible performance.",
+      "status": "selected",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P2",
+      "dependencies": [
+        "OPT-WEB-CLIENT"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "SEO, media/performance and analytics"
+      ],
+      "ux_implications": [
+        "Reduced-motion, accessible interactions"
+      ],
+      "data_implications": [
+        "Consent-aware analytics"
+      ],
+      "security_implications": [
+        "Content/lead-form protection"
+      ],
+      "qa_implications": [
+        "Visual, responsive, SEO and accessibility checks"
+      ],
+      "rationale": "Explicit request; design follows validated MVP."
+    },
+    {
+      "id": "OPT-LEAD-PROVENANCE",
+      "name": "Lead lineage, freshness and dedupe",
+      "category": "data_quality",
+      "description": "Track source, collected time, field-level provenance/freshness, confidence and dedupe identity.",
+      "status": "selected",
+      "requirement_source": [
+        "Existing lead-engine invariants",
+        "Market research synthesis"
+      ],
+      "priority": "P0",
+      "dependencies": [
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Normalized schema and duplicate authority"
+      ],
+      "ux_implications": [
+        "Explain data origins and stale fields"
+      ],
+      "data_implications": [
+        "Retention/deletion by source"
+      ],
+      "security_implications": [
+        "Avoid unnecessary PII and raw sensitive logs"
+      ],
+      "qa_implications": [
+        "Duplicate, freshness and lineage tests"
+      ],
+      "rationale": "Protects trust and aligns with incumbent R2 dedupe discipline."
+    },
+    {
+      "id": "OPT-VERSIONED-API",
+      "name": "Shared versioned client API",
+      "category": "architecture",
+      "description": "Stable API contracts shared by web, desktop and mobile clients.",
+      "status": "candidate",
+      "requirement_source": [
+        "User request 2026-10-05"
+      ],
+      "priority": "P0",
+      "dependencies": [
+        "OPT-IDENTITY-WORKSPACES"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "API versioning and compatibility policy"
+      ],
+      "ux_implications": [
+        "Consistent cross-platform behavior"
+      ],
+      "data_implications": [
+        "Client sync contracts"
+      ],
+      "security_implications": [
+        "Per-client auth scopes and rate limits"
+      ],
+      "qa_implications": [
+        "Contract and backward compatibility tests"
+      ],
+      "rationale": "Recommended architecture, not approved."
+    },
+    {
+      "id": "OPT-JOB-ORCHESTRATION",
+      "name": "Durable scheduled job orchestration",
+      "category": "architecture",
+      "description": "Persistent queue/scheduler with idempotency, retry, backoff, fairness and circuit breaker.",
+      "status": "candidate",
+      "requirement_source": [
+        "User request 2026-10-05",
+        "ANPOS operational assurance"
+      ],
+      "priority": "P0",
+      "dependencies": [
+        "OPT-COST-CONTROLS"
+      ],
+      "conflicts": [],
+      "technical_implications": [
+        "Queue/scheduler options and failure model"
+      ],
+      "ux_implications": [
+        "Visible job lifecycle and recovery"
+      ],
+      "data_implications": [
+        "Schedule and execution ledger"
+      ],
+      "security_implications": [
+        "Tenant-scoped job payloads and limits"
+      ],
+      "qa_implications": [
+        "Failure injection and DST tests"
+      ],
+      "rationale": "Recommended over ephemeral cron, pending system design."
+    }
+  ],
   "status_values": [
     "candidate",
     "selected",
@@ -24,5 +619,9 @@
     "security_implications": [],
     "qa_implications": [],
     "rationale": null
-  }
+  },
+  "reconciliation_base_ref": "ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+  "update_notes": [
+    "Added candidate SaaS direction options from user intake; selections indicate requested capabilities, not implementation or vendor approval."
+  ]
 }

@@ -1,39 +1,45 @@
 {
   "schema_version": 1,
-  "lifecycle_stage": "production_operations",
-  "current_phase": "PHASE-PRODUCTION-OPERATIONS",
-  "current_module": "MOD-PRODUCTION-RUNTIME",
-  "current_work_unit": "WU-OPS-DAILY-QUOTA",
+  "lifecycle_stage": "discovery_planning",
+  "current_phase": "PHASE-SAAS-DISCOVERY",
+  "current_module": "MOD-PRODUCT-DISCOVERY",
+  "current_work_unit": "WU-SAAS-CURRENT-ENGINE-AUDIT",
   "last_verified_completion": "ANPOS 1.4.0 hardening verified through main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173: required validate/repository-integrity/analyze-actions, Scorecard, governance audit, repository merge settings and ruleset enforcement are evidenced; REQ-83-96 classification/verification is complete except external qualified privacy/compliance review for REQ-90.",
-  "next_valid_work_unit": "WU-OPS-DAILY-QUOTA",
+  "next_valid_work_unit": "WU-SAAS-CURRENT-ENGINE-AUDIT",
   "progress": {
-    "total_work_units": 8,
+    "total_work_units": 21,
     "complete": 4,
-    "ready": 0,
-    "in_progress": 1,
-    "blocked": 1,
+    "ready": 2,
+    "in_progress": 2,
+    "blocked": 4,
     "deferred": 2,
+    "not_started": 7,
     "needs_update": 0,
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Continue live daily quota operations from real workbook/health evidence; do not equate workflow success with quota completion.",
-    "Certify strict user-OAuth My Drive create→trash autonomy when external Google authorization is available.",
-    "Obtain qualified privacy/compliance review before marking REQ-90 jurisdiction-specific legal conclusions complete.",
-    "Enable Dependency graph only if/when Dependency Review should become an active required capability.",
-    "Configure a genuinely independent reviewer/team and verified persistent Supervisor runtime before activating the corresponding deferred governance extensions."
+    "Continue existing WU-OPS-DAILY-QUOTA independently from current real workbook/health evidence; do not reset or claim complete.",
+    "Perform repo-relative SaaS code/runtime audit and compare current product boundary.",
+    "Complete user/job validation and deeper source/competitor research before fixing MVP.",
+    "Resolve whether SaaS code remains in this production repository or moves to a dedicated application repository.",
+    "Resolve market, source funding model, provider shortlist, fields, plans/prices, platform order and monthly budget.",
+    "Keep stack approval pending until system design and costed alternatives are reviewed."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
-    "Choose a Project Management System or explicitly skip PM integration.",
-    "Choose and identity-verify the Development AI agent pool available in the current host.",
-    "Configure a genuinely independent GitHub reviewer/team before enforcing CODEOWNER, one-review and last-push approval."
+    "SaaS implementation repository boundary (current repository vs dedicated SaaS app repository).",
+    "Initial user segment, countries/niches and validated MVP success criteria.",
+    "Allowed source providers, free/paid/BYOK model and provider-specific rights/costs.",
+    "Lead field requirements and status taxonomy.",
+    "Plans, quotas, trial, overages, billing currency/provider and store billing.",
+    "Desktop OS and mobile platforms/distribution order.",
+    "Hosting/AI/API monthly budget and payment availability."
   ],
   "critical_defects": [],
-  "qa_readiness": "verified_current",
-  "security_readiness": "active_main_governance_verified_external_identity_and_compliance_gates_explicit",
-  "last_reconciled_repository_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
-  "last_reconciled_at": "2026-10-04T19:12:35Z",
+  "qa_readiness": "planning_gates_pending",
+  "security_readiness": "planning_only_tenant_and_provider_controls_required",
+  "last_reconciled_repository_ref": "ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+  "last_reconciled_at": "2026-10-04T19:24:05Z",
   "reconciliation": {
     "source_of_truth_order": [
       "live GitHub repository and Actions evidence",
@@ -50,5 +56,5 @@
     },
     "no_verified_supervisor": true
   },
-  "notes": "Existing production implementation is authoritative. ANPOS overlays governance/state management and must not reset or replay completed P01-P70 work."
+  "notes": "SaaS is a new planned product direction from the 2026-10-05 user intake. Existing production runtime and WU-OPS-DAILY-QUOTA remain active concurrently; no code, deployment or provider billing is changed by this plan."
 }

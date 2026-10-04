@@ -183,6 +183,43 @@
       "decided_at": "2026-10-04T15:30:52Z",
       "supersedes": [],
       "superseded_by": null
+    },
+    {
+      "id": "ADR-0006",
+      "title": "Treat multi-platform lead SaaS as a new product direction while preserving the existing production engine",
+      "status": "proposed",
+      "context": "User requested subscription web/desktop/mobile experiences, configurable sources and scheduled user jobs in the existing ANPOS-enabled VSN Lead Engine repository. The repository already runs a production daily lead workflow.",
+      "alternatives": [
+        "Replace/rewrite the existing engine immediately",
+        "Plan SaaS as an additive product direction and preserve production operations",
+        "Move implementation into a dedicated SaaS repository before code work"
+      ],
+      "evidence_refs": [
+        "PROJECT-IDEA.md",
+        "docs/ai/PRE-PLAN.md",
+        "config/ai/project-state.json",
+        "config/ai/execution-plan.json"
+      ],
+      "decision": "For this planning milestone, record the SaaS direction in the current repository's ANPOS memory bank, keep production runtime/quotas independent, and defer implementation-repository choice until system design.",
+      "consequences": [
+        "No current production runtime change.",
+        "Planning can proceed without falsely claiming SaaS features exist.",
+        "A boundary decision is mandatory before application code/hosting work."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "Avoids accidental disruption to production lead flow.",
+        "Future SaaS requires tenant isolation, provider rights, cost caps and new privacy/retention controls."
+      ],
+      "reversibility": "Reversible before code implementation; moving plans/source to a dedicated repo requires traceability migration.",
+      "affected_modules_or_contracts": [
+        "MOD-PRODUCTION-RUNTIME",
+        "MOD-PRODUCT-DISCOVERY",
+        "PHASE-SAAS-DISCOVERY"
+      ],
+      "decided_by": "Proposed from explicit user intake; owner decision pending",
+      "decided_at": null,
+      "supersedes": [],
+      "superseded_by": null
     }
   ],
   "decision_template": {

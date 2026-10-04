@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+  "reconciliation_base_ref": "ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
   "phases": [
     {
       "id": "PHASE-HISTORICAL-BASELINE",
@@ -65,6 +65,112 @@
         "REQ-83-96 applicability classified with project-specific reasons/evidence.",
         "Evidence-backed applicable requirements verified; REQ-90 external qualified review remains explicitly non-passed.",
         "Supported GitHub governance/security capabilities are live and verified; identity/platform-dependent extensions remain explicitly deferred."
+      ]
+    },
+    {
+      "id": "PHASE-SAAS-DISCOVERY",
+      "name": "SaaS Product Discovery and Validation",
+      "objective": "Validate users, permitted sources, costs, product boundary and MVP before designing implementation.",
+      "module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "dependencies": [],
+      "status": "in_progress",
+      "exit_criteria": [
+        "User/problem evidence and launch segment recorded.",
+        "First-source policy/cost/coverage matrix reviewed.",
+        "MVP and success criteria approved."
+      ]
+    },
+    {
+      "id": "PHASE-SAAS-SYSTEM-DESIGN",
+      "name": "SaaS System and Product Design",
+      "objective": "Define tenant, billing, source, job, data, AI, UX and operational boundaries.",
+      "module_ids": [
+        "MOD-SAAS-SYSTEM-DESIGN"
+      ],
+      "dependencies": [
+        "PHASE-SAAS-DISCOVERY"
+      ],
+      "status": "not_started",
+      "exit_criteria": [
+        "Threat/data flows and module/API contracts reviewed.",
+        "Repository boundary and rollout model decided.",
+        "Technology alternatives submitted for owner approval."
+      ]
+    },
+    {
+      "id": "PHASE-SAAS-WEB-MVP",
+      "name": "Web SaaS MVP",
+      "objective": "Build safe core subscription, workspace, source/job and lead workflows after stack approval.",
+      "module_ids": [
+        "MOD-SAAS-IDENTITY",
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG",
+        "MOD-JOB-ORCHESTRATION",
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "dependencies": [
+        "PHASE-SAAS-SYSTEM-DESIGN"
+      ],
+      "status": "not_started",
+      "exit_criteria": [
+        "Tenant isolation, billing entitlements and job lifecycle verified.",
+        "First permitted source accepted.",
+        "Web MVP acceptance and accessibility pass."
+      ]
+    },
+    {
+      "id": "PHASE-SAAS-ADMIN-AI",
+      "name": "Admin Operations and Bounded AI",
+      "objective": "Add operational control plane and evaluated assistant after core contracts stabilize.",
+      "module_ids": [
+        "MOD-SAAS-ADMIN",
+        "MOD-AI-ASSISTANT"
+      ],
+      "dependencies": [
+        "PHASE-SAAS-WEB-MVP"
+      ],
+      "status": "not_started",
+      "exit_criteria": [
+        "Privileged actions audited.",
+        "AI eval/cost/security gates pass."
+      ]
+    },
+    {
+      "id": "PHASE-SAAS-CLIENT-EXPANSION",
+      "name": "Desktop and Mobile Clients",
+      "objective": "Deliver client apps against stable API after target OS/storefront decisions.",
+      "module_ids": [
+        "MOD-DESKTOP-CLIENT",
+        "MOD-MOBILE-CLIENT"
+      ],
+      "dependencies": [
+        "PHASE-SAAS-WEB-MVP"
+      ],
+      "status": "not_started",
+      "exit_criteria": [
+        "OS/store policies and billing route decided.",
+        "Client/store acceptance passes."
+      ]
+    },
+    {
+      "id": "PHASE-SAAS-LAUNCH",
+      "name": "SaaS Production Readiness",
+      "objective": "Stage and verify production rollout, recovery, security, privacy and outcomes.",
+      "module_ids": [
+        "MOD-PRODUCTION-ASSURANCE-SAAS"
+      ],
+      "dependencies": [
+        "PHASE-SAAS-ADMIN-AI",
+        "PHASE-SAAS-CLIENT-EXPANSION"
+      ],
+      "status": "not_started",
+      "exit_criteria": [
+        "Applicable assurance evidence passes.",
+        "Restore/rollback and progressive delivery verified.",
+        "Production release evidence and owner go-live decision recorded."
       ]
     }
   ],
@@ -274,6 +380,302 @@
         "Actions run 37227345426 governance audit success",
         "Issue #128 closed"
       ]
+    },
+    {
+      "id": "WU-SAAS-CURRENT-ENGINE-AUDIT",
+      "phase_id": "PHASE-SAAS-DISCOVERY",
+      "module_id": "MOD-PRODUCT-DISCOVERY",
+      "title": "Audit current engine and product boundary",
+      "objective": "Map existing runtime, integrations, data, tests and production invariants to candidate SaaS scope.",
+      "dependencies": [],
+      "priority": 10,
+      "status": "in_progress",
+      "blockers": [],
+      "acceptance_criteria": [
+        "Code/runtime map cites files and observed checks.",
+        "Shared vs isolated capabilities identified.",
+        "No production behavior changed."
+      ],
+      "required_checks": [
+        "Read-only repository/runtime audit"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-USER-MARKET-RESEARCH",
+      "phase_id": "PHASE-SAAS-DISCOVERY",
+      "module_id": "MOD-PRODUCT-DISCOVERY",
+      "title": "Validate users, workflows and market",
+      "objective": "Compare user jobs and competitor journeys/pricing; record evidence and uncertainty.",
+      "dependencies": [],
+      "priority": 20,
+      "status": "ready",
+      "blockers": [],
+      "acceptance_criteria": [
+        "User segment/jobs and MVP outcome metrics have evidence.",
+        "Apollo/Clay/Hunter and relevant alternatives compared beyond marketing snippets."
+      ],
+      "required_checks": [
+        "Evidence registry review",
+        "User/problem validation"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-SOURCE-FEASIBILITY",
+      "phase_id": "PHASE-SAAS-DISCOVERY",
+      "module_id": "MOD-PRODUCT-DISCOVERY",
+      "title": "Build permitted source feasibility matrix",
+      "objective": "Research candidate sources by country, fields, rights, storage, attribution, rate, price and coverage.",
+      "dependencies": [],
+      "priority": 15,
+      "status": "ready",
+      "blockers": [],
+      "acceptance_criteria": [
+        "No adapter is selected without source-specific evidence.",
+        "Paid/free model and usage economics are explicit."
+      ],
+      "required_checks": [
+        "Provider documentation/terms review",
+        "Qualified compliance input where needed"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-MVP-DECISIONS",
+      "phase_id": "PHASE-SAAS-DISCOVERY",
+      "module_id": "MOD-PRODUCT-DISCOVERY",
+      "title": "Resolve MVP and commercial decisions",
+      "objective": "Decide product boundary, initial market/niches/fields, source funding model, plans, platforms and budget.",
+      "dependencies": [
+        "WU-SAAS-USER-MARKET-RESEARCH",
+        "WU-SAAS-SOURCE-FEASIBILITY"
+      ],
+      "priority": 30,
+      "status": "blocked",
+      "blockers": [
+        "Requires product/business decisions and current source/legal/cost research"
+      ],
+      "acceptance_criteria": [
+        "Owner decisions recorded as durable ADRs.",
+        "MVP exclusions and success metrics approved."
+      ],
+      "required_checks": [
+        "ANPOS decision/consent evidence"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-SYSTEM-DESIGN",
+      "phase_id": "PHASE-SAAS-SYSTEM-DESIGN",
+      "module_id": "MOD-SAAS-IDENTITY",
+      "title": "Design tenancy, billing, data, scheduler and client contracts",
+      "objective": "Create system context, trust boundaries, tenant data flow, job state model and client API contracts.",
+      "dependencies": [
+        "WU-SAAS-MVP-DECISIONS"
+      ],
+      "priority": 40,
+      "status": "blocked",
+      "blockers": [
+        "MVP and repository-boundary decisions pending"
+      ],
+      "acceptance_criteria": [
+        "Threat/data-flow diagrams and contracts reviewed.",
+        "Scheduler DST/idempotency/failure semantics specified."
+      ],
+      "required_checks": [
+        "Architecture review",
+        "Threat model",
+        "Contract review"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-STACK-CONSENT",
+      "phase_id": "PHASE-SAAS-SYSTEM-DESIGN",
+      "module_id": "MOD-PRODUCT-DISCOVERY",
+      "title": "Evaluate and request technology stack approval",
+      "objective": "Compare viable stack/hosting/queue/database/payment/AI choices by skills, cost, capability and risk.",
+      "dependencies": [
+        "WU-SAAS-SYSTEM-DESIGN"
+      ],
+      "priority": 50,
+      "status": "blocked",
+      "blockers": [
+        "Owner technology and ongoing cost approval required"
+      ],
+      "acceptance_criteria": [
+        "Alternatives and budget impact documented.",
+        "Explicit Approve Technology Stack recorded before stack-specific implementation."
+      ],
+      "required_checks": [
+        "ANPOS consent guard"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-FOUNDATION",
+      "phase_id": "PHASE-SAAS-WEB-MVP",
+      "module_id": "MOD-SAAS-IDENTITY",
+      "title": "Implement tenant-safe SaaS foundation",
+      "objective": "Build identity/workspaces/roles, billing entitlements and usage primitives after approval.",
+      "dependencies": [
+        "WU-SAAS-STACK-CONSENT"
+      ],
+      "priority": 60,
+      "status": "not_started",
+      "blockers": [],
+      "acceptance_criteria": [
+        "Cross-tenant access tests pass.",
+        "Billing entitlement changes reconcile idempotently.",
+        "No raw provider secrets in client/log."
+      ],
+      "required_checks": [
+        "Lint/type/test/build",
+        "Tenant isolation",
+        "Billing sandbox"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-COLLECTION",
+      "phase_id": "PHASE-SAAS-WEB-MVP",
+      "module_id": "MOD-JOB-ORCHESTRATION",
+      "title": "Implement first permitted source and durable jobs",
+      "objective": "Build source policy registry, one approved adapter and scheduler/queue with limits.",
+      "dependencies": [
+        "WU-SAAS-FOUNDATION",
+        "WU-SAAS-SOURCE-FEASIBILITY"
+      ],
+      "priority": 70,
+      "status": "not_started",
+      "blockers": [],
+      "acceptance_criteria": [
+        "Cost/source policy preflight blocks disallowed work.",
+        "DST, replay, retry, pause/cancel and duplicate execution tests pass."
+      ],
+      "required_checks": [
+        "Adapter contract",
+        "Scheduler/failure tests",
+        "Cost cap tests"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-LEAD-WEB",
+      "phase_id": "PHASE-SAAS-WEB-MVP",
+      "module_id": "MOD-LEAD-DATA-WORKFLOW",
+      "title": "Deliver web search, lead filters and export",
+      "objective": "Ship saved search, job status/history, provenance-aware lead table, filters and guarded exports.",
+      "dependencies": [
+        "WU-SAAS-COLLECTION"
+      ],
+      "priority": 80,
+      "status": "not_started",
+      "blockers": [],
+      "acceptance_criteria": [
+        "Product workflows meet validated tasks.",
+        "Source lineage/freshness visible.",
+        "Retention/deletion behavior verified."
+      ],
+      "required_checks": [
+        "Browser E2E",
+        "Accessibility",
+        "Data contract/privacy tests"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-ADMIN-AI",
+      "phase_id": "PHASE-SAAS-ADMIN-AI",
+      "module_id": "MOD-AI-ASSISTANT",
+      "title": "Add admin controls and evaluated AI assistance",
+      "objective": "Add auditable provider/admin controls and assistant for search setup/summaries with user confirmation.",
+      "dependencies": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "priority": 90,
+      "status": "not_started",
+      "blockers": [],
+      "acceptance_criteria": [
+        "Admin mutations least privilege/audited.",
+        "AI evaluation and cost/privacy gates pass."
+      ],
+      "required_checks": [
+        "AI eval/red-team",
+        "Admin authorization",
+        "Audit validation"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-MARKETING",
+      "phase_id": "PHASE-SAAS-WEB-MVP",
+      "module_id": "MOD-WEB-EXPERIENCE",
+      "title": "Build feature-rich public landing site",
+      "objective": "Create accessible page structure, explanatory feature sections, approved images/motion and conversion analytics.",
+      "dependencies": [
+        "WU-SAAS-MVP-DECISIONS"
+      ],
+      "priority": 85,
+      "status": "not_started",
+      "blockers": [],
+      "acceptance_criteria": [
+        "Marketing claims map to delivered/roadmapped states.",
+        "Reduced-motion and performance requirements pass."
+      ],
+      "required_checks": [
+        "Responsive visual",
+        "Accessibility",
+        "SEO/performance"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-DESKTOP-MOBILE",
+      "phase_id": "PHASE-SAAS-CLIENT-EXPANSION",
+      "module_id": "MOD-DESKTOP-CLIENT",
+      "title": "Deliver desktop and mobile clients",
+      "objective": "Build selected OS/mobile clients on stable shared API and approved billing/distribution model.",
+      "dependencies": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "priority": 100,
+      "status": "not_started",
+      "blockers": [],
+      "acceptance_criteria": [
+        "Signing/store sandbox/restore/cancel flows verified as applicable."
+      ],
+      "required_checks": [
+        "Platform-specific QA",
+        "API compatibility"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-SAAS-RELEASE-ASSURANCE",
+      "phase_id": "PHASE-SAAS-LAUNCH",
+      "module_id": "MOD-PRODUCTION-ASSURANCE-SAAS",
+      "title": "Verify SaaS release readiness and progressive rollout",
+      "objective": "Complete security/privacy/performance/restore/rollback/SLO and staged production evidence.",
+      "dependencies": [
+        "WU-SAAS-ADMIN-AI",
+        "WU-SAAS-DESKTOP-MOBILE"
+      ],
+      "priority": 110,
+      "status": "not_started",
+      "blockers": [],
+      "acceptance_criteria": [
+        "All applicable ANPOS gates have project evidence.",
+        "Production readiness and residual risks reviewed."
+      ],
+      "required_checks": [
+        "Full CI",
+        "Security/privacy",
+        "Load/restore/rollback",
+        "Staging acceptance"
+      ],
+      "completion_evidence": []
     }
   ],
   "status_values": [
@@ -288,5 +690,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "ANPOS 1.4.0 adoption, assurance classification, supported security capabilities and active main governance are verified. Production quota work continues independently; identity/platform/legal external gates remain explicit."
+  "progress_note": "New SaaS scope is in discovery only. Existing daily quota operations remain concurrently in progress; no product runtime or paid integration is claimed."
 }

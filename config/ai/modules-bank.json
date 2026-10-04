@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+  "reconciliation_base_ref": "ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
   "modules": [
     {
       "id": "MOD-HISTORICAL-ROADMAP",
@@ -275,6 +275,664 @@
       "completion_evidence": [],
       "update_notes": [
         "Deferred safely; no persistent verified Supervisor exists."
+      ],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-PRODUCT-DISCOVERY",
+      "name": "Lead SaaS Product Discovery and Validation",
+      "objective": "Validate user jobs, launch segment, provider feasibility and MVP scope before major implementation.",
+      "scope": [
+        "User/job interviews",
+        "Comparable workflow review",
+        "Source rights/cost/country research",
+        "MVP success metrics"
+      ],
+      "boundaries": [
+        "No public legal claims or provider authorization inferred from desk research."
+      ],
+      "dependencies": [
+        "MOD-PRODUCTION-RUNTIME"
+      ],
+      "option_ids": [
+        "OPT-MARKET-SEARCH",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "data_entities": [
+        "Research evidence",
+        "Validated requirements"
+      ],
+      "contracts": [],
+      "ui_surfaces": [
+        "Discovery prototype"
+      ],
+      "security_responsibilities": [
+        "Treat external research as untrusted until validated and attributed."
+      ],
+      "acceptance_criteria": [
+        "User/problem evidence and sample/context recorded.",
+        "First launch market and MVP prioritized.",
+        "Source candidates have evidence-backed capability/rights/cost profile."
+      ],
+      "quality_gates": [
+        "ANPOS research/evidence registry validation"
+      ],
+      "status": "in_progress",
+      "completion_evidence": [
+        "User-provided intake 2026-10-05",
+        "Initial official-source desk research recorded in config/research/evidence-registry.json"
+      ],
+      "update_notes": [
+        "Initial discovery only; user validation and deeper terms review remain open."
+      ],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-SAAS-IDENTITY",
+      "name": "SaaS Identity, Workspaces and Tenant Isolation",
+      "objective": "Provide secure user/workspace identity and tenant-scoped authorization.",
+      "scope": [
+        "Authentication",
+        "Workspace membership",
+        "RBAC",
+        "Tenant boundaries"
+      ],
+      "boundaries": [
+        "No cross-tenant data access.",
+        "Avoid duplicating identity into lead payloads."
+      ],
+      "dependencies": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "option_ids": [
+        "OPT-IDENTITY-WORKSPACES",
+        "OPT-VERSIONED-API"
+      ],
+      "data_entities": [
+        "User",
+        "Workspace",
+        "Membership",
+        "Session"
+      ],
+      "contracts": [
+        "Versioned auth/API"
+      ],
+      "ui_surfaces": [
+        "Signup",
+        "Sign-in",
+        "Workspace settings"
+      ],
+      "security_responsibilities": [
+        "Tenant isolation, session lifecycle, least privilege, audit."
+      ],
+      "acceptance_criteria": [
+        "Every data/query/job/export path proves tenant membership.",
+        "Cross-tenant regression suite passes."
+      ],
+      "quality_gates": [
+        "Security review",
+        "Auth/tenant integration tests"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-SAAS-BILLING",
+      "name": "Subscription, Entitlement and Usage Metering",
+      "objective": "Enforce subscription entitlements and hard provider/AI/job quotas.",
+      "scope": [
+        "Plan catalog",
+        "Billing adapter",
+        "Entitlement state",
+        "Usage ledger",
+        "Limits"
+      ],
+      "boundaries": [
+        "External billing provider state is authoritative.",
+        "No final price/payment gateway selected."
+      ],
+      "dependencies": [
+        "MOD-SAAS-IDENTITY",
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "option_ids": [
+        "OPT-SUBSCRIPTIONS-ENTITLEMENTS",
+        "OPT-COST-CONTROLS"
+      ],
+      "data_entities": [
+        "Plan",
+        "Subscription",
+        "Entitlement",
+        "UsageEvent"
+      ],
+      "contracts": [
+        "Signed billing webhook",
+        "Entitlement resolver"
+      ],
+      "ui_surfaces": [
+        "Plan selection",
+        "Usage page",
+        "Admin billing"
+      ],
+      "security_responsibilities": [
+        "Webhook signature/replay protection; no client-authoritative plan state."
+      ],
+      "acceptance_criteria": [
+        "Purchase/change/cancel/refund reconcile idempotently.",
+        "Usage hard caps hold under concurrency."
+      ],
+      "quality_gates": [
+        "Billing sandbox conformance",
+        "Race/replay tests"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [
+        "Payment provider/tiers and storefront routes unresolved."
+      ],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-SOURCE-CATALOG",
+      "name": "Source Policy Catalog and Provider Adapters",
+      "objective": "Register only source adapters with verified rights, capabilities, limits and cost.",
+      "scope": [
+        "Provider contracts",
+        "Policy metadata",
+        "Free/paid/BYOK adapters",
+        "Kill switch"
+      ],
+      "boundaries": [
+        "No arbitrary user executable code.",
+        "No access-control or anti-bot bypass."
+      ],
+      "dependencies": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-BILLING"
+      ],
+      "option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-FREE-SOURCE-MODE",
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-CUSTOM-SOURCE-OPTIONS"
+      ],
+      "data_entities": [
+        "Provider",
+        "SourcePolicy",
+        "CredentialReference",
+        "UsageCost"
+      ],
+      "contracts": [
+        "Adapter capability/policy interface"
+      ],
+      "ui_surfaces": [
+        "Source selection",
+        "Admin provider setup"
+      ],
+      "security_responsibilities": [
+        "Encrypted scoped credentials; SSRF and rate-limit defenses; source policy."
+      ],
+      "acceptance_criteria": [
+        "Every enabled adapter has reviewed purpose, region, field, storage, attribution, rate, cost and deletion behavior."
+      ],
+      "quality_gates": [
+        "Adapter contract tests",
+        "Security/license review"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-JOB-ORCHESTRATION",
+      "name": "Search Configuration and Scheduled Job Orchestration",
+      "objective": "Run user searches manually and on durable daily schedules at configured local times.",
+      "scope": [
+        "Search criteria",
+        "Timezone/DST",
+        "Queue workers",
+        "Retry/pause/cancel/history"
+      ],
+      "boundaries": [
+        "Never guarantee yield.",
+        "Paid fallback requires explicit user authorization."
+      ],
+      "dependencies": [
+        "MOD-SAAS-IDENTITY",
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "option_ids": [
+        "OPT-MARKET-SEARCH",
+        "OPT-USER-SCHEDULES",
+        "OPT-JOB-ORCHESTRATION",
+        "OPT-COST-CONTROLS"
+      ],
+      "data_entities": [
+        "SavedSearch",
+        "Schedule",
+        "Job",
+        "JobAttempt"
+      ],
+      "contracts": [
+        "Job lifecycle and idempotency"
+      ],
+      "ui_surfaces": [
+        "Search builder",
+        "Schedule editor",
+        "Run history"
+      ],
+      "security_responsibilities": [
+        "Per-tenant fair use, concurrency, cost caps and authorization."
+      ],
+      "acceptance_criteria": [
+        "DST transitions, duplicate events, retries, pause/cancel and failed provider are deterministic and observable."
+      ],
+      "quality_gates": [
+        "Scheduler conformance",
+        "Failure injection",
+        "Queue fairness tests"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-LEAD-DATA-WORKFLOW",
+      "name": "Lead Normalization, Provenance, Dedupe and Export",
+      "objective": "Present normalized, source-attributed, deduplicated leads with filters and controlled exports.",
+      "scope": [
+        "Field normalization",
+        "Provenance/freshness",
+        "Dedupe",
+        "Filters/sorts",
+        "Exports",
+        "Retention/deletion"
+      ],
+      "boundaries": [
+        "Provider rights control storage/export; legacy R2 behavior preserved until migration is approved."
+      ],
+      "dependencies": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-LEAD-FILTER-EXPORT"
+      ],
+      "data_entities": [
+        "Lead",
+        "LeadFieldProvenance",
+        "ExportJob"
+      ],
+      "contracts": [
+        "Lead schema and provider field mapping"
+      ],
+      "ui_surfaces": [
+        "Lead table",
+        "Filters",
+        "Detail drawer",
+        "Export"
+      ],
+      "security_responsibilities": [
+        "Tenant-scoped access, safe exports, minimal PII, deletion propagation."
+      ],
+      "acceptance_criteria": [
+        "Dedupe and filters are testable; users can see source/freshness and export only authorized fields."
+      ],
+      "quality_gates": [
+        "Data contract/property tests",
+        "Privacy/deletion tests"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-SAAS-ADMIN",
+      "name": "Administrative Operations and Audit",
+      "objective": "Safely operate accounts, adapters, entitlements, jobs, limits and incidents.",
+      "scope": [
+        "Admin RBAC",
+        "Provider configuration",
+        "Support access",
+        "Audit",
+        "Abuse/incident controls"
+      ],
+      "boundaries": [
+        "Admin access is least-privilege and audited."
+      ],
+      "dependencies": [
+        "MOD-SAAS-IDENTITY",
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "option_ids": [
+        "OPT-ADMIN-CONTROLS"
+      ],
+      "data_entities": [
+        "AdminAction",
+        "Incident",
+        "ProviderConfig"
+      ],
+      "contracts": [
+        "Admin API and audit record"
+      ],
+      "ui_surfaces": [
+        "Admin console"
+      ],
+      "security_responsibilities": [
+        "Step-up access for sensitive operations and immutable audit evidence."
+      ],
+      "acceptance_criteria": [
+        "Sensitive changes are attributable, reversible where possible, and observable."
+      ],
+      "quality_gates": [
+        "Privilege/abuse tests",
+        "Audit integrity verification"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-AI-ASSISTANT",
+      "name": "AI Search Assistance and Evaluation",
+      "objective": "Help users express search intent and understand results within explicit data/cost boundaries.",
+      "scope": [
+        "Natural-language to query draft",
+        "Filter/source explanation",
+        "Selected lead summaries",
+        "Evaluation"
+      ],
+      "boundaries": [
+        "No autonomous paid spend, outreach, or unsupported legal/source claims."
+      ],
+      "dependencies": [
+        "MOD-SAAS-IDENTITY",
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-SAAS-BILLING"
+      ],
+      "option_ids": [
+        "OPT-AI-ASSIST"
+      ],
+      "data_entities": [
+        "AIRequestMetadata",
+        "EvaluationCase"
+      ],
+      "contracts": [
+        "Tool allowlist and model/provider identity"
+      ],
+      "ui_surfaces": [
+        "Search assistant",
+        "Result explanation"
+      ],
+      "security_responsibilities": [
+        "Prompt-injection defense, minimal authorized context, tenant separation and human oversight."
+      ],
+      "acceptance_criteria": [
+        "Evaluation covers quality, attribution, privacy, prompt injection and spend limits; users approve executable changes."
+      ],
+      "quality_gates": [
+        "AI evaluation suite",
+        "Red-team cases",
+        "Cost caps"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-WEB-EXPERIENCE",
+      "name": "Web Product and Marketing Experience",
+      "objective": "Deliver accessible responsive user workflows and public product explanation.",
+      "scope": [
+        "Web app",
+        "Landing site",
+        "Feature visuals/content",
+        "Motion/analytics"
+      ],
+      "boundaries": [
+        "Marketing claims trace to verified capability."
+      ],
+      "dependencies": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-IDENTITY"
+      ],
+      "option_ids": [
+        "OPT-WEB-CLIENT",
+        "OPT-LANDING-SITE"
+      ],
+      "data_entities": [
+        "ConsentAwareAnalytics"
+      ],
+      "contracts": [
+        "Web API client"
+      ],
+      "ui_surfaces": [
+        "Public site",
+        "User app"
+      ],
+      "security_responsibilities": [
+        "Accessible consent, safe forms and privacy-aware analytics."
+      ],
+      "acceptance_criteria": [
+        "Approved user flows pass responsive visual and WCAG 2.2 AA review; motion respects reduced-motion."
+      ],
+      "quality_gates": [
+        "E2E",
+        "Accessibility",
+        "Performance/SEO"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-DESKTOP-CLIENT",
+      "name": "Desktop Application",
+      "objective": "Provide desktop access through stable shared APIs and secure packaging.",
+      "scope": [
+        "OS packaging",
+        "Authentication",
+        "Updates",
+        "Notifications"
+      ],
+      "boundaries": [
+        "Supported OS and distribution channel are undecided."
+      ],
+      "dependencies": [
+        "MOD-WEB-EXPERIENCE",
+        "MOD-SAAS-IDENTITY"
+      ],
+      "option_ids": [
+        "OPT-DESKTOP-CLIENT",
+        "OPT-VERSIONED-API"
+      ],
+      "data_entities": [
+        "Secure local session state"
+      ],
+      "contracts": [
+        "Versioned API"
+      ],
+      "ui_surfaces": [
+        "Desktop app"
+      ],
+      "security_responsibilities": [
+        "Code signing/update integrity and secure token storage."
+      ],
+      "acceptance_criteria": [
+        "Selected OS builds install/update/verify securely and meet usability/accessibility checks."
+      ],
+      "quality_gates": [
+        "Package/signature checks",
+        "Desktop E2E"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-MOBILE-CLIENT",
+      "name": "Mobile Applications",
+      "objective": "Provide mobile workflows after API and billing/distribution model are settled.",
+      "scope": [
+        "iOS/Android clients",
+        "Notifications",
+        "Store integration when required"
+      ],
+      "boundaries": [
+        "Storefront and purchase path undecided."
+      ],
+      "dependencies": [
+        "MOD-WEB-EXPERIENCE",
+        "MOD-SAAS-IDENTITY",
+        "MOD-SAAS-BILLING"
+      ],
+      "option_ids": [
+        "OPT-MOBILE-CLIENT",
+        "OPT-VERSIONED-API"
+      ],
+      "data_entities": [
+        "Secure device tokens",
+        "Push notification token"
+      ],
+      "contracts": [
+        "Versioned API and platform billing adapter if applicable"
+      ],
+      "ui_surfaces": [
+        "iOS app",
+        "Android app"
+      ],
+      "security_responsibilities": [
+        "Store policy, secure sessions, privacy disclosures."
+      ],
+      "acceptance_criteria": [
+        "Store sandbox purchase/restore/cancel and cross-client entitlement reconciliation pass when in scope."
+      ],
+      "quality_gates": [
+        "Device/accessibility matrix",
+        "Store sandbox tests"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-PRODUCTION-ASSURANCE-SAAS",
+      "name": "SaaS Release and Operations Assurance",
+      "objective": "Prove security, privacy, reliability, release and recovery before launch.",
+      "scope": [
+        "Threat model",
+        "SLO/monitoring",
+        "Backup/restore",
+        "Migration/rollback",
+        "Progressive delivery"
+      ],
+      "boundaries": [
+        "No production-ready claim from static/unit tests alone."
+      ],
+      "dependencies": [
+        "All SaaS runtime modules"
+      ],
+      "option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-LEAD-PROVENANCE"
+      ],
+      "data_entities": [
+        "Operational metrics",
+        "Audit evidence"
+      ],
+      "contracts": [
+        "Release readiness and incident runbooks"
+      ],
+      "ui_surfaces": [
+        "Status/ops views"
+      ],
+      "security_responsibilities": [
+        "Security/privacy review, response drills and audit integrity."
+      ],
+      "acceptance_criteria": [
+        "Applicable ANPOS REQ-83–96 evidenced; external legal review remains external until performed."
+      ],
+      "quality_gates": [
+        "Full CI/security/accessibility/performance/restore/release verification"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-SAAS-SYSTEM-DESIGN",
+      "name": "SaaS System, Data and UX Design",
+      "objective": "Convert validated MVP requirements into reviewed system, data, API, schedule and UX contracts before stack-specific implementation.",
+      "scope": [
+        "System context and boundaries",
+        "Tenant threat model and data flows",
+        "API and job lifecycle contracts",
+        "UX journeys and design assurance",
+        "Costed technology alternatives"
+      ],
+      "boundaries": [
+        "Does not approve or implement a technology stack.",
+        "Provider/legal claims require primary evidence and qualified review where needed."
+      ],
+      "dependencies": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "option_ids": [
+        "OPT-VERSIONED-API",
+        "OPT-JOB-ORCHESTRATION",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "data_entities": [
+        "Architecture decisions",
+        "Threat model",
+        "API contracts",
+        "Approved design revision"
+      ],
+      "contracts": [
+        "Versioned API",
+        "Tenant and job lifecycle contracts"
+      ],
+      "ui_surfaces": [
+        "User journeys",
+        "Admin journeys",
+        "Responsive design system"
+      ],
+      "security_responsibilities": [
+        "Tenant boundaries",
+        "Data minimization",
+        "Secrets and provider trust boundaries",
+        "AI human oversight"
+      ],
+      "acceptance_criteria": [
+        "System/data-flow and threat models reviewed.",
+        "API/job/source contracts are versioned and migration-safe.",
+        "Technology alternatives include total cost, team fit and external gates."
+      ],
+      "quality_gates": [
+        "Architecture review",
+        "Threat model review",
+        "Accessibility/design review"
+      ],
+      "status": "not_started",
+      "completion_evidence": [],
+      "update_notes": [
+        "Required before technology consent and stack-specific code."
       ],
       "removal_or_deprecation_notes": []
     }
