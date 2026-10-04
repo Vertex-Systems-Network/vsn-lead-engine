@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "pending_applicability_detection",
+  "status": "active_verified_instrumentation_pending_assurance_merge",
   "activation_scope": "child_project",
   "metric_examples": [
     "activation",
