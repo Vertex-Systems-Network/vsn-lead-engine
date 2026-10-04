@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "pending_capability_detection",
+  "status": "not_applicable_no_runtime_ai_behavior",
   "activation_scope": "child_project",
   "required_detection": {
     "detect_ai_ml_llm_rag_agentic_behavior": true,
