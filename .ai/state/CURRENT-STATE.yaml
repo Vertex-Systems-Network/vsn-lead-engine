@@ -11,17 +11,17 @@
     "lifecycle_stage": "production_operations",
     "current_phase": "PHASE-PRODUCTION-OPERATIONS",
     "active_task": "WU-OPS-DAILY-QUOTA",
-    "last_completed_task": "WU-ANPOS-ADOPTION",
-    "next_control_plane_task": "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+    "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
+    "next_control_plane_task": "external_gates_only"
   },
-  "observed_main_sha": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
+  "observed_main_sha": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
   "observed_main_semantics": "Last fully reconciled repository head before this snapshot mutation.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": null,
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
-  "last_completed_milestone": "P01-P70 production baseline preserved; ANPOS 1.4.0 adoption/governance alignment verified through PRs #120, #122 and #123.",
+  "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
   "production": {
     "latest_observed_date": "2026-10-04",
     "last_full_quota_certified_date": "2026-09-28",
@@ -38,33 +38,67 @@
   },
   "quality": {
     "product_version": "0.66.1",
-    "latest_product_pr_validation": "PR #123",
-    "pytest": "305 passed",
+    "latest_product_pr_validation": "PR #131 / run 37227281327",
+    "pytest": "success; earlier retained full-suite evidence 305 passed",
     "anpos_repository_integrity": "success",
-    "anpos_main_run_id": 37223542864,
+    "anpos_main_run_id": 37227345400,
+    "codeql": "success",
+    "codeql_main_run_id": 37227345382,
+    "scorecard": "success",
+    "scorecard_main_run_id": 37226403498,
+    "governance_audit": "success",
+    "governance_audit_main_run_id": 37227345426,
     "main_protection_controller": "success",
-    "main_protection_run_id": 37223412749,
+    "main_protection_run_id": 37227184146,
     "required_status_checks": [
       "validate",
-      "repository-integrity"
+      "repository-integrity",
+      "analyze-actions"
     ]
   },
   "governance": {
     "main_ruleset_id": 24086362,
     "main_ruleset_enforcement": "active",
-    "independent_codeowner_review": "pending_independent_reviewer_or_team",
-    "coordination_ref_namespace_protection": "pending_capability_and_runtime_verification"
+    "repository_merge_settings": "verified_aligned",
+    "governance_drift_issue_128": "closed",
+    "dependency_review": "inactive_dependency_graph_disabled",
+    "independent_codeowner_review": "deferred_until_independent_reviewer_or_team",
+    "coordination_ref_namespace_protection": "deferred_until_verified_persistent_runtime"
+  },
+  "assurance": {
+    "status": "repository_side_hardening_complete_external_review_pending",
+    "passed": [
+      "REQ-85",
+      "REQ-87",
+      "REQ-88",
+      "REQ-91",
+      "REQ-93",
+      "REQ-94",
+      "REQ-95",
+      "REQ-96"
+    ],
+    "not_applicable": [
+      "REQ-83",
+      "REQ-84",
+      "REQ-86",
+      "REQ-89",
+      "REQ-92"
+    ],
+    "verification_required": [
+      "REQ-90"
+    ]
   },
   "blockers": [
-    "Strict user-OAuth My Drive create/trash autonomy has no recent successful certification evidence; existing/precreated workbooks remain operational through the current production path.",
-    "2026-10-04 daily quota is not yet complete in the latest verified production evidence: 6,855 / 12,000.",
-    "No Development AI/Supervisor runtime identity is verified in ANPOS; multi-agent dispatch must remain disabled."
+    "Strict user-OAuth My Drive create/trash autonomy requires external Google authorization/certification evidence.",
+    "2026-10-04 latest retained quota evidence remains 6,855 / 12,000; ANPOS completion does not change this production fact.",
+    "REQ-90 requires qualified privacy/compliance review before jurisdiction-specific legal conclusions are certified.",
+    "No Development AI/Supervisor runtime identity is verified; distributed multi-agent claims remain disabled."
   ],
   "timeout_control": {
     "tight_polling_forbidden": true,
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Continue normal production scheduling/recovery toward the 2026-10-04 12,000-lead quota without weakening dedupe/taxonomy controls. For ANPOS development, classify Requirements 83-96 next; keep PM selection, verified AI identity, independent review, and coordination-ref hardening explicit until real evidence exists.",
-  "last_reconciled_at": "2026-10-04T18:13:02Z"
+  "exact_next_safe_action": "Continue normal production quota operations from real runtime/workbook evidence. Treat ANPOS repository-side hardening as complete; only pursue external OAuth, qualified compliance review, Dependency graph, independent reviewer/team, or persistent Supervisor identity when real capability/authorization exists.",
+  "last_reconciled_at": "2026-10-04T19:12:35Z"
 }
