@@ -41,6 +41,9 @@
         "required_status_checks": [
           {
             "context": "validate"
+          },
+          {
+            "context": "repository-integrity"
           }
         ],
         "strict_required_status_checks_policy": true
