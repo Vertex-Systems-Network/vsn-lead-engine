@@ -33,6 +33,7 @@ jobs:
           ALLOW_SQUASH="$(jq -r '.allow_squash_merge' <<<"$SETTINGS")"
           ALLOW_AUTO="$(jq -r '.allow_auto_merge' <<<"$SETTINGS")"
           ALLOW_UPDATE="$(jq -r '.allow_update_branch' <<<"$SETTINGS")"
+          DELETE_BRANCH="$(jq -r '.delete_branch_on_merge' <<<"$SETTINGS")"
 
           DRIFT=0
           {
@@ -64,6 +65,10 @@ jobs:
           fi
           if [ "$ALLOW_UPDATE" != 'true' ]; then
             echo '- Update-branch support is disabled.' >> "$REPORT"
+            DRIFT=1
+          fi
+          if [ "$DELETE_BRANCH" != 'true' ]; then
+            echo '- Delete-branch-on-merge is disabled.' >> "$REPORT"
             DRIFT=1
           fi
 
