@@ -32,7 +32,9 @@
     "latest_observed_run_id": 37213320765,
     "latest_observed_run_origin": "recovery-supervisor",
     "latest_observed_run_result": "success",
-    "r2_pending_recovery_unresolved": 0
+    "r2_pending_recovery_unresolved": 0,
+    "accepted": 6855,
+    "shortfall": 5145
   },
   "quality": {
     "product_version": "0.66.1",
