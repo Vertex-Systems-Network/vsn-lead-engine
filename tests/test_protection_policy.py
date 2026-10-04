@@ -25,7 +25,7 @@ def test_main_protection_policy_targets_main_only():
     }
 
 
-def test_main_protection_requires_pr_and_strict_validate_check():
+def test_main_protection_requires_pr_and_strict_validate_and_anpos_checks():
     value=policy()
     rules={item["type"]:item for item in value["rules"]}
 
@@ -44,7 +44,10 @@ def test_main_protection_requires_pr_and_strict_validate_check():
     checks=rules["required_status_checks"]["parameters"]
     assert checks["strict_required_status_checks_policy"] is True
     assert checks["do_not_enforce_on_create"] is True
-    assert checks["required_status_checks"]==[{"context":"validate"}]
+    assert checks["required_status_checks"]==[
+        {"context":"validate"},
+        {"context":"repository-integrity"},
+    ]
 
 
 def test_lead_engine_pr_check_name_matches_required_context():
