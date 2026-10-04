@@ -94,6 +94,6 @@ jobs:
             fi
           else
             if [ -n "$OPEN" ]; then
-              gh issue close "$OPEN" --comment 'Automated governance audit now sees the configured project repository aligned.'
+              gh issue close "$OPEN" --repo "$REPO" --comment 'Automated governance audit now sees the configured project repository aligned.'
             fi
           fi
