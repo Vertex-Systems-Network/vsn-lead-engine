@@ -389,7 +389,7 @@
       "objective": "Map existing runtime, integrations, data, tests and production invariants to candidate SaaS scope.",
       "dependencies": [],
       "priority": 10,
-      "status": "in_progress",
+      "status": "complete",
       "blockers": [],
       "acceptance_criteria": [
         "Code/runtime map cites files and observed checks.",
@@ -399,7 +399,13 @@
       "required_checks": [
         "Read-only repository/runtime audit"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md (read-only source/config/runtime audit against main ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2)",
+        "Verified source adapter boundary, 56 US/Canada geographies, 12 fixed categories and free-only mode from config/runtime.json and src/vsn_lead_engine/config.py",
+        "Verified fixed GitHub Actions cron and CLI job model from .github/workflows/lead-engine.yml, src/vsn_lead_engine/schedule.py, and src/vsn_lead_engine/cli.py",
+        "Verified Python CLI/package shape, no SaaS auth/billing/API/client application in audited repository tree; see pyproject.toml and src/vsn_lead_engine/identity.py",
+        "Latest PR head 630206671fa89d891845ecc375ce2eff93f20541: AI Native Quality Gates run 37234315573, Lead Engine run 37234315568, CodeQL run 37234315625 succeeded"
+      ]
     },
     {
       "id": "WU-SAAS-USER-MARKET-RESEARCH",
@@ -429,7 +435,7 @@
       "objective": "Research candidate sources by country, fields, rights, storage, attribution, rate, price and coverage.",
       "dependencies": [],
       "priority": 15,
-      "status": "ready",
+      "status": "in_progress",
       "blockers": [],
       "acceptance_criteria": [
         "No adapter is selected without source-specific evidence.",
