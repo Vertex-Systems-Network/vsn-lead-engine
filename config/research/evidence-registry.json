@@ -250,6 +250,45 @@
       "notes": [
         "Windows Store eligibility and current policy remain unverified for VSN."
       ]
+    },
+    {
+      "id": "EVID-000010",
+      "claim_or_question": "The audited main ref is a Python CLI production lead pipeline with fixed US/Canada, 12-category and free-mode constraints, Overture plus optional self-hosted Overpass, GitHub Actions scheduling, Google Sheets output and R2 dedupe; SaaS identity/billing/API/client runtime is not present in the audited repository tree.",
+      "source_type": "repository",
+      "source_ref": "https://github.com/Vertex-Systems-Network/vsn-lead-engine/commit/ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+      "source_title": "VSN Lead Engine source and runtime configuration audit",
+      "publisher_or_owner": "VSN",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": "ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Code/config/workflow inspection completed read-only; detailed evidence and component reuse/gap assessment are in docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md. This is not a live yield, privacy/security certification, or architecture selection.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-IDENTITY-WORKSPACES",
+        "OPT-SUBSCRIPTIONS-ENTITLEMENTS",
+        "OPT-USER-SCHEDULES",
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-LEAD-PROVENANCE",
+        "OPT-WEB-CLIENT"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCTION-RUNTIME",
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-IDENTITY",
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG",
+        "MOD-JOB-ORCHESTRATION",
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Read-only audit; no production workflow, source, credentials or runtime behavior changed.",
+        "Repository boundary remains unresolved."
+      ]
     }
   ],
   "entry_contract": {
