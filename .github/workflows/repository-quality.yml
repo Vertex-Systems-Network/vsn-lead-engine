@@ -68,12 +68,13 @@ jobs:
             echo "Base branch predates ANPOS validator; protected-base validation begins after this adoption merge."
           fi
 
-          if git cat-file -e "${BASE_SHA}:scripts/validate_commercial_licensing.py" 2>/dev/null; then
+          if git cat-file -e "${BASE_SHA}:scripts/validate_commercial_licensing.py" 2>/dev/null && \
+             git cat-file -e "${BASE_SHA}:config/licensing/commercial-policy.json" 2>/dev/null; then
             git show "${BASE_SHA}:scripts/validate_commercial_licensing.py" > scripts/.trusted-base-commercial-validator.py
             python scripts/.trusted-base-commercial-validator.py
             rm -f scripts/.trusted-base-commercial-validator.py
           else
-            echo 'Base branch predates commercial validator; current commercial validator and protected review remain required for this migration.'
+            echo 'Commercial distribution is inactive or predates commercial validation on the protected base; commercial protected-base validation is not applicable.'
           fi
 
       - name: Report control-plane changes for review evidence
