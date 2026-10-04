@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "pending_ai_asset_detection",
+  "status": "not_applicable_no_runtime_ai_assets",
   "activation_scope": "child_project",
   "assets": [],
   "asset_template": {
