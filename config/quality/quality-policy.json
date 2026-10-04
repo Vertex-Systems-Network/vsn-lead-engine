@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "status": "installed_pending_verification",
+  "status": "baseline_verified_capabilities_pending",
   "activation_scope": "child_project",
   "apply_to_template_source": false,
   "setup_flow": {
@@ -76,7 +76,7 @@
       "protocol-update-watch.yml",
       "dependabot.yml"
     ],
-    "baseline_verification": "pending_first_child_run",
+    "baseline_verification": "verified_on_child_repository",
     "github_security_capability": "unknown",
     "capability_dependent_workflows": [
       "codeql-actions.yml",
@@ -84,6 +84,13 @@
       "scorecard.yml"
     ],
     "capability_resolution": "pending_runtime_detection",
-    "stack_specific_tooling": "awaiting_technology_approval"
+    "stack_specific_tooling": "existing_project_stack_already_operational; future material stack changes require approval",
+    "verified_main_ref": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
+    "verified_at": "2026-10-04T18:13:02Z",
+    "verified_required_checks": [
+      "validate",
+      "repository-integrity"
+    ],
+    "verified_product_test_evidence": "PR #123: 305 passed"
   }
 }

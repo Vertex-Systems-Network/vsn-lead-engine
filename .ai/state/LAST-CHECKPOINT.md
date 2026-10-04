@@ -1,71 +1,121 @@
 # Last Checkpoint
 
-## State
+## Snapshot
 
-- Snapshot timestamp: `2026-09-29`
-- Observed main: `ee79c6d1a4ab502fc366e22a4aa368f305a6c74f`
-- Open issues at snapshot: `0`
-- Open PRs at snapshot: `0`
-- Last completed milestone: `P70-DEPLOYMENT-READINESS-DAY-BOUNDARY`
-- Current status: `PRODUCTION-READY`
-- Active development milestone: `NONE`
-- Product version: `0.66.0`
-- Last fully certified production quota: `2026-09-28 = 12,000 / 12,000`
-- 2026-09-29 workbook: `READY`
-- 2026-09-30 workbook: `USER-OWNED PRECREATED`
+- Reconciled repository: `Vertex-Systems-Network/vsn-lead-engine`
+- Reconciled main: `ca87ea081c4d461e275aeb720cf7f8cf82ad32cf`
+- Snapshot evidence time: `2026-10-04T18:13:02Z`
+- Product version: **0.66.1**
+- ANPOS protocol: **1.4.0**
+- Open PRs at reconciliation start: **0**
+- Open issues at reconciliation start: **0**
+- Product lifecycle: **PRODUCTION OPERATIONS**
+- Current product work: **daily quota monitoring/recovery**
+- Current ANPOS next work unit: **REQ-83–96 applicability/evidence classification**
+
+The stored main SHA is the repository head that was fully inspected before this
+state mutation. The reconciliation commit/merge itself will naturally advance
+`main`; future sessions must always re-read live GitHub before relying on this
+checkpoint.
 
 ## Verified
 
-- P70 merged through PR #117 on main `ee79c6d1a4ab502fc366e22a4aa368f305a6c74f`.
-- P70 exact-head Lead Engine CI #231 passed 305 tests.
-- P70 merge-push Daily Workbook Readiness run #9 passed.
-- Run #9 resolved at about 00:34 PKT with:
-  - target kind: `today`;
-  - run date: `2026-09-29`;
-  - reason: `same-day-before-evening-preflight`;
-  - readiness status: `ready`;
-  - attempts used: `1`.
-- Lead Engine production schedule remains configured from 08:00 PKT onward.
-- Open pull requests are zero.
+### Repository baseline
+
+The historical P01–P70 engineering program remains the accepted product
+baseline. The repository was not reset when ANPOS was introduced.
+
+ANPOS child adoption is verified through:
+
+- PR #120 — ANPOS 1.4.0 child control-plane adoption;
+- PR #122 — live main protection aligned with `repository-integrity`;
+- PR #123 — verified governance evidence reconciled into machine state;
+- live ruleset `VSN Main Protection` ID `24086362`;
+- required live checks: `validate` and `repository-integrity`;
+- Main Protection Controller apply + verify: **success**;
+- latest post-merge ANPOS `repository-integrity` run #37223542864: **success**;
+- PR #123 product validation: **305 passed**.
+
+Vendor/operator-only ANPOS assets are not present in the child repository.
+
+### Latest verified production evidence
+
+Latest inspected successful production execution:
+
+- workflow run: **37213320765**;
+- origin: **recovery-supervisor**;
+- run date: **2026-10-04**;
+- completion: **success / exit code 0**;
+- R2 pending recovery unresolved: **0**;
+- dated workbook: **US + Canada Business Leads — 2026-10-04**;
+- accepted total after the run: **6,855 / 12,000**;
+- verified shortfall after the run: **5,145**.
+
+Therefore the repository is production-ready, but the latest verified daily
+quota snapshot is **not complete**. Do not convert workflow success into a
+false quota-complete claim.
 
 ## Not Verified
 
-- The 2026-09-29 real 08:00 PKT Lead Engine production run has not happened yet.
-- The 2026-09-29 daily 12,000-lead quota is therefore not yet certified.
-- Autonomous creation of a genuinely missing My Drive workbook is not certified because `GOOGLE_OAUTH_USER_JSON` is not yet provisioned.
+- The latest verified 2026-10-04 production snapshot is not quota-complete: **6,855 / 12,000**.
+- Strict user-OAuth create → trash autonomy has no recent successful certification evidence.
+- No Development AI/Supervisor runtime identity is verified in ANPOS.
+- Independent CODEOWNER review and coordination-ref namespace enforcement are not yet verified live.
 
 ## Known Risk
 
-- Existing/precreated workbooks are operational, but a future genuinely missing My Drive workbook still depends on the pending user-OAuth authorization.
-- No new development milestone should be started solely to remove hypothetical risks; use production evidence as the trigger.
+- A genuinely missing My Drive workbook still depends on future strict user-OAuth certification.
+- Treating successful workflow execution as quota completion would overstate production status.
+- Enabling distributed Worker claims without verified runtime identity would violate ANPOS control-plane rules.
 
-## Production-Ready Boundary
+## ANPOS execution boundary
 
-The repository should not automatically start another P71/P72 hardening
-milestone without evidence from a real production problem.
+ANPOS machine state is now reconciled to the existing production project rather
+than left at `not_started`.
 
-The next operational proof is the scheduled 2026-09-29 08:00 PKT Lead Engine
-run and its 12,000-lead daily quota result.
+- Historical product baseline: complete.
+- ANPOS adoption/governance alignment: complete.
+- Production daily quota operations: in progress.
+- Strict My Drive user-OAuth autonomy: blocked pending real external
+  authorization/certification evidence.
+- REQ-83–96 assurance classification: ready as the next ANPOS work unit.
+- Independent CODEOWNER/one-review/last-push enforcement: deferred until a
+  genuinely independent reviewer/team exists.
+- Coordination `claims/**` / `supervisor/**` ref hardening: deferred until
+  trusted runtime/capability evidence exists.
+- PM provider: not selected.
+- Development AI pool / Supervisor identity: not verified.
 
-## Remaining External Blocker
+Because no Supervisor runtime identity is verified, the ANPOS agent queue is a
+planning mirror only. No Worker claim/lease should be created.
 
-`GOOGLE_OAUTH_USER_JSON` is not configured in GitHub.
+## Preserved product invariants
 
-Existing and precreated user-owned workbooks remain operational through
-service-account writer access. Fully autonomous creation of a genuinely missing
-My Drive workbook requires:
+- phone-only accepted-lead semantics;
+- exact R2 cross-day dedupe authority;
+- US + Canada scope;
+- 1,000 accepted unique leads/category/day target;
+- 12,000 total daily target across 12 categories;
+- taxonomy precision is not weakened merely to fill quota;
+- no paid discovery dependency is introduced;
+- GitHub Actions dependencies remain immutable-SHA pinned where required.
 
-1. generate Google authorized-user JSON with
-   `scripts/google_oauth_onboard.py`;
-2. add the complete JSON as GitHub secret `GOOGLE_OAUTH_USER_JSON`;
-3. run the strict **Google Drive Capability** workflow;
-4. require a green create → trash production-folder probe before marking My
-   Drive creation autonomy complete.
+## External blocker
+
+There is still no recent successful strict Google Drive user-OAuth create →
+trash certification evidence. Do not mark missing-workbook My Drive autonomy
+complete until that probe is actually green.
+
+This blocker does not invalidate existing/precreated workbook production
+operations.
 
 ## Next Action
 
-Do not create another development milestone by default.
-
-At/after 08:00 PKT, verify the real 2026-09-29 production run, quota result,
-workbook state, and health ledger. Separately, complete OAuth provisioning when
-the human Google authorization step is available.
+1. Let normal production scheduling/recovery continue toward the daily 12,000
+   target; verify quota from real workbook/runtime evidence.
+2. Execute ANPOS P1: classify REQ-83–96 by actual applicability and attach
+   project-specific evidence/reasons.
+3. Keep PM selection and Development AI identity unresolved until a real
+   provider/runtime is explicitly selected and verified.
+4. Do not enable independent-review or coordination-ref protections without the
+   required independent identity/runtime capability evidence.
