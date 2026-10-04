@@ -1,6 +1,519 @@
 {
   "schema_version": 2,
-  "links": [],
+  "links": [
+    {
+      "requirement_id": "REQ-83",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-PRODUCT-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "src/vsn_lead_engine/",
+        "config/runtime.json",
+        "config/ai/agent-catalog.json"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "verified",
+      "verification_status": "verified"
+    },
+    {
+      "requirement_id": "REQ-84",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-PRODUCT-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "config/product/product-validation.json",
+        "src/vsn_lead_engine/sheets.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "verified",
+      "verification_status": "verified"
+    },
+    {
+      "requirement_id": "REQ-85",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-PRODUCT-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "src/vsn_lead_engine/health.py",
+        "src/vsn_lead_engine/sheets.py",
+        "docs/ai/ASSURANCE-EVIDENCE.md",
+        "Actions run 37213320765",
+        "Actions run 37225162383"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "REQ-86",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-PRODUCT-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "config/product/experimentation-policy.json"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "REQ-87",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-PRODUCT-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        ".github/workflows/lead-engine.yml",
+        ".github/workflows/quota-recovery-supervisor.yml",
+        ".github/main-protection-ruleset.json",
+        "docs/ai/ASSURANCE-EVIDENCE.md"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "REQ-88",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-PRODUCT-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Lead Engine product suite: 305 passed",
+        "docs/ai/ENGINEERING-QUALITY-REVIEW-2026-10-04.md"
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "docs/ai/ENGINEERING-QUALITY-REVIEW-2026-10-04.md",
+        "tests/",
+        "Actions run 37224678510"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "REQ-89",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-GOVERNANCE-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "config/security/threat-model.json"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "src/vsn_lead_engine/",
+        "config/ai/responsible-ai-policy.json"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "verified",
+      "verification_status": "verified"
+    },
+    {
+      "requirement_id": "REQ-90",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-GOVERNANCE-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "config/security/threat-model.json"
+      ],
+      "threat_model_refs": [
+        "config/security/threat-model.json"
+      ],
+      "migration_refs": [],
+      "artifact_refs": [
+        "DATA_SOURCES.md",
+        "config/data/data-governance.json",
+        "config/compliance/compliance-profile.json",
+        "docs/ai/ASSURANCE-EVIDENCE.md"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "REQ-91",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-GOVERNANCE-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "config/security/threat-model.json"
+      ],
+      "threat_model_refs": [
+        "config/security/threat-model.json"
+      ],
+      "migration_refs": [],
+      "artifact_refs": [
+        "config/architecture/decision-records.json",
+        "README.md",
+        "docs/ai/ASSURANCE-EVIDENCE.md"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "REQ-92",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-GOVERNANCE-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "config/security/threat-model.json"
+      ],
+      "threat_model_refs": [
+        "config/security/threat-model.json"
+      ],
+      "migration_refs": [],
+      "artifact_refs": [
+        "config/ai/asset-registry.json",
+        "config/ai/agent-catalog.json"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "verified",
+      "verification_status": "verified"
+    },
+    {
+      "requirement_id": "REQ-93",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-GOVERNANCE-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "config/security/threat-model.json"
+      ],
+      "threat_model_refs": [
+        "config/security/threat-model.json"
+      ],
+      "migration_refs": [
+        "config/contracts/migration-policy.json"
+      ],
+      "artifact_refs": [
+        "config/contracts/deprecation-policy.json",
+        "pyproject.toml",
+        "requirements.lock",
+        ".github/dependabot.yml"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "REQ-94",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-GOVERNANCE-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "config/security/threat-model.json"
+      ],
+      "threat_model_refs": [
+        "config/security/threat-model.json"
+      ],
+      "migration_refs": [],
+      "artifact_refs": [
+        "config/operations/runbooks-and-drills.json",
+        ".ai/state/RECOVERY-PROTOCOL.md",
+        "Actions run 37225162383",
+        "README.md"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "REQ-95",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-GOVERNANCE-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "config/security/threat-model.json"
+      ],
+      "threat_model_refs": [
+        "config/security/threat-model.json"
+      ],
+      "migration_refs": [],
+      "artifact_refs": [
+        "config/audit/audit-journal.json",
+        "scripts/verify_audit_journal.py",
+        "tests/test_governance_assurance.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "REQ-96",
+      "source": "ANPOS 1.4.0 assurance requirement",
+      "source_provenance_ref": "AI-NATIVE-GOVERNANCE-ASSURANCE.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "work_unit_ids": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "anpos/p1-p3-assurance-hardening"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "config/security/threat-model.json"
+      ],
+      "threat_model_refs": [
+        "config/security/threat-model.json"
+      ],
+      "migration_refs": [],
+      "artifact_refs": [
+        "config/risk/risk-register.json",
+        "config/security/threat-model.json",
+        "docs/ai/ASSURANCE-EVIDENCE.md"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    }
+  ],
   "link_template": {
     "requirement_id": "REQ-001",
     "source": null,
@@ -25,7 +538,21 @@
     "status": "planned",
     "verification_status": "unverified"
   },
-  "status_values": ["proposed", "planned", "in_progress", "implemented", "verified", "released", "deprecated"],
-  "verification_status_values": ["unverified", "partially_verified", "verified", "failed", "risk_accepted"],
+  "status_values": [
+    "proposed",
+    "planned",
+    "in_progress",
+    "implemented",
+    "verified",
+    "released",
+    "deprecated"
+  ],
+  "verification_status_values": [
+    "unverified",
+    "partially_verified",
+    "verified",
+    "failed",
+    "risk_accepted"
+  ],
   "rule": "A requirement is not verified merely because code exists; verification requires linked acceptance/test evidence plus applicable design, accessibility, security, migration and release evidence."
 }
