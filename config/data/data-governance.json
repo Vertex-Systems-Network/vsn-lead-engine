@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "pending_project_data_classification",
+  "status": "active_project_data_governance",
   "activation_scope": "child_project",
   "classification_levels": [
     "public",
@@ -38,5 +38,92 @@
     "sensitive_logs_must_be_redacted": true,
     "production_data_copy_to_lower_environment_requires_approval": true,
     "retention_and_deletion_must_be_defined_before_production_for_sensitive_data": true
-  }
+  },
+  "data_records": [
+    {
+      "id": "DATA-001",
+      "name": "Dated business lead records",
+      "classification": "internal",
+      "tags": [
+        "pii"
+      ],
+      "owners": [
+        "VSN repository owner/operator"
+      ],
+      "storage_locations": [
+        "Google Sheets dated workbooks"
+      ],
+      "encryption_required": true,
+      "log_policy": "Do not emit full lead rows or credentials into CI logs; operational metrics only.",
+      "ai_access": "No runtime AI access; development AI must not receive secrets.",
+      "retention": "Retained as dated business lead records until an authorized VSN retention/deletion decision changes policy.",
+      "deletion_method": "Authorized workbook/row deletion in Google Drive/Sheets when required.",
+      "backup_policy": "Google-hosted workbook durability; no lower-environment raw production copy.",
+      "non_production_policy": "no_raw_production_copy_without_approved_protected_process"
+    },
+    {
+      "id": "DATA-002",
+      "name": "R2 permanent duplicate fingerprints",
+      "classification": "internal",
+      "tags": [
+        "security_sensitive"
+      ],
+      "owners": [
+        "VSN repository owner/operator"
+      ],
+      "storage_locations": [
+        "Cloudflare R2"
+      ],
+      "encryption_required": true,
+      "log_policy": "Only compact counts/object keys; never raw source values.",
+      "ai_access": "No raw lead values are stored in the fingerprint keyspace.",
+      "retention": "Permanent accepted-history dedupe fingerprints unless an authorized migration/deletion changes policy.",
+      "deletion_method": "Controlled registry maintenance/migration only.",
+      "backup_policy": "Objects-v1 read compatibility plus pending-marker crash reconciliation.",
+      "non_production_policy": "Use isolated smoke prefixes/transactions; do not clone raw production leads."
+    },
+    {
+      "id": "DATA-003",
+      "name": "Google/R2/GitHub credentials",
+      "classification": "secret",
+      "tags": [
+        "credentials",
+        "security_sensitive"
+      ],
+      "owners": [
+        "VSN repository owner/operator"
+      ],
+      "storage_locations": [
+        "GitHub Actions/provider secret stores"
+      ],
+      "encryption_required": true,
+      "log_policy": "Never print credential values.",
+      "ai_access": "forbidden",
+      "retention": "Provider/operational lifetime with rotation or revocation on exposure/account change.",
+      "deletion_method": "Revoke/delete in provider and GitHub secrets.",
+      "backup_policy": "Do not back up into repository, PM, logs or AI memory.",
+      "non_production_policy": "No secret injection into untrusted PR execution."
+    },
+    {
+      "id": "DATA-004",
+      "name": "Operational health/yield telemetry",
+      "classification": "internal",
+      "tags": [],
+      "owners": [
+        "VSN repository owner/operator"
+      ],
+      "storage_locations": [
+        "Cloudflare R2 health/yield objects",
+        "Google Sheets Overview",
+        "GitHub Actions logs"
+      ],
+      "encryption_required": true,
+      "log_policy": "Metrics/incident summaries only; redact sensitive data.",
+      "ai_access": "Authorized development AI may inspect repository/runtime evidence without secrets.",
+      "retention": "Operational history retained until an authorized lifecycle policy changes.",
+      "deletion_method": "Controlled object/workbook cleanup when approved.",
+      "backup_policy": "Provider durability plus reproducible telemetry schema in repository.",
+      "non_production_policy": "Synthetic/test telemetry should use isolated stores or mocks."
+    }
+  ]
 }
