@@ -65,6 +65,13 @@ def test_protection_controller_never_embeds_admin_token():
     assert "secrets.GH_ADMIN_TOKEN" in workflow
     assert "apply_main_protection.py --confirm" in workflow
     assert "verify_main_protection.py" in workflow
+    assert "allow_merge_commit=false" in workflow
+    assert "allow_rebase_merge=false" in workflow
+    assert "allow_squash_merge=true" in workflow
+    assert "allow_auto_merge=true" in workflow
+    assert "allow_update_branch=true" in workflow
+    assert "delete_branch_on_merge=true" in workflow
+    assert "gh workflow run governance-audit.yml" in workflow
     assert 'echo "::error::GH_ADMIN_TOKEN is required before P12 live enforcement can be certified."' in workflow
     assert "exit 2" in workflow
     assert "permissions:\n  contents: read" in workflow
