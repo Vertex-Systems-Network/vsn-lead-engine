@@ -74,7 +74,7 @@ jobs:
             DRIFT=1
           fi
 
-          OPEN="$(gh issue list --state open --limit 100 --json number,title --jq '.[] | select(.title == "[AI-NATIVE] GitHub Governance Drift") | .number' | head -n 1)"
+          OPEN="$(gh issue list --repo "$REPO" --state open --limit 100 --json number,title --jq '.[] | select(.title == "[AI-NATIVE] GitHub Governance Drift") | .number' | head -n 1)"
           if [ "$DRIFT" -eq 1 ]; then
             {
               echo
@@ -83,10 +83,10 @@ jobs:
               echo "Audit run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
             } >> "$REPORT"
             if [ -n "$OPEN" ]; then
-              gh issue edit "$OPEN" --body-file "$REPORT"
+              gh issue edit "$OPEN" --repo "$REPO" --body-file "$REPORT"
             else
-              gh issue create --title "$TITLE" --body-file "$REPORT"
+              gh issue create --repo "$REPO" --title "$TITLE" --body-file "$REPORT"
             fi
           elif [ -n "$OPEN" ]; then
-            gh issue close "$OPEN" --comment 'Automated governance audit now sees the configured repository aligned.'
+            gh issue close "$OPEN" --repo "$REPO" --comment 'Automated governance audit now sees the configured repository aligned.'
           fi

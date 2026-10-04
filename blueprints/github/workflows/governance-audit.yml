@@ -67,7 +67,7 @@ jobs:
             DRIFT=1
           fi
 
-          OPEN="$(gh issue list --state open --limit 100 --json number,title --jq '.[] | select(.title == "[AI-NATIVE] GitHub Governance Drift") | .number' | head -n 1)"
+          OPEN="$(gh issue list --repo "$REPO" --state open --limit 100 --json number,title --jq '.[] | select(.title == "[AI-NATIVE] GitHub Governance Drift") | .number' | head -n 1)"
 
           if [ "$DRIFT" -eq 1 ]; then
             {
@@ -78,9 +78,9 @@ jobs:
             } >> "$REPORT"
 
             if [ -n "$OPEN" ]; then
-              gh issue edit "$OPEN" --body-file "$REPORT"
+              gh issue edit "$OPEN" --repo "$REPO" --body-file "$REPORT"
             else
-              gh issue create --title "$TITLE" --body-file "$REPORT"
+              gh issue create --repo "$REPO" --title "$TITLE" --body-file "$REPORT"
             fi
           else
             if [ -n "$OPEN" ]; then
