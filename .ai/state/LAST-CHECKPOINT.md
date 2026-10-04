@@ -13,7 +13,7 @@
 
 This snapshot intentionally records the inspected main immediately before its own reconciliation merge. Future sessions must re-read live GitHub before mutating state.
 
-## Verified ANPOS state
+## Verified
 
 - ANPOS child adoption: PR #120.
 - Main governance alignment: PRs #122 and #123.
@@ -52,7 +52,7 @@ Latest retained production snapshot:
 
 Do not turn workflow success or ANPOS completion into a false quota-complete claim.
 
-## Explicit external/deferred gates
+## Not Verified
 
 - Strict user-OAuth My Drive create→trash certification requires real Google authorization/evidence.
 - Qualified privacy/compliance review is required before REQ-90 can be passed.
@@ -61,7 +61,14 @@ Do not turn workflow success or ANPOS completion into a false quota-complete cla
 - Distributed Worker/Supervisor claims remain disabled until a persistent verified runtime identity exists.
 - PM provider and Development AI pool remain unselected/unverified rather than fabricated.
 
-## Next safe work
+## Known Risk
+
+- Daily production quota can remain incomplete when free-source yield or safe runtime is insufficient; quality/taxonomy/dedupe controls must not be weakened to fill quota.
+- A genuinely missing My Drive workbook is not autonomously certified until strict user-OAuth create→trash evidence exists.
+- Jurisdiction-specific privacy/compliance obligations may require additional controls after qualified review.
+- Enabling independent-review or distributed coordination protections without real independent/runtime identities could deadlock or create false authority.
+
+## Next Action
 
 1. Continue real production scheduling/recovery and verify quota from workbook/health evidence.
 2. Complete external gates only when their real identity/platform/legal authorization is available.
