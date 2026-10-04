@@ -1,0 +1,24 @@
+{
+  "schema_version": 2,
+  "status": "template_blueprint",
+  "enabled": false,
+  "activation_scope": "child_project_only",
+  "activation_consent_required": true,
+  "interval_hours": 25,
+  "scheduler": "github_actions_hourly_due_gate",
+  "workflow_blueprint": "blueprints/github/workflows/innovation-scout.yml",
+  "active_child_path": ".github/workflows/innovation-scout.yml",
+  "request_title": "[AI-NATIVE] Innovation Scout Due",
+  "selection_mode": "owner_selects_suggestions",
+  "consent_required_before_scope_promotion": true,
+  "last_completed_at": null,
+  "last_request_reference": null,
+  "last_result": null,
+  "preferred_actions": [
+    "Approve Selected Suggestions",
+    "Review Suggestions",
+    "No Changes This Cycle",
+    "Disable Innovation Scout"
+  ],
+  "fallback_enable_command": "ENABLE 25-HOUR INNOVATION SCOUT"
+}

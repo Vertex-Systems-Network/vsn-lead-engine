@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "status": "pending_applicability_detection",
+  "activation_scope": "child_project",
+  "supported_versions": [],
+  "deprecations": [],
+  "deprecation_template": {
+    "id": "DEP-0001",
+    "subject": "",
+    "current_version": null,
+    "replacement_or_target": null,
+    "announced_at": null,
+    "support_until": null,
+    "removal_or_eol_at": null,
+    "affected_consumers": [],
+    "migration_steps": [],
+    "notification_refs": [],
+    "exception_refs": [],
+    "status": "planned"
+  },
+  "rules": {
+    "consumer_impact_analysis_required": true,
+    "approved_support_window_required_before_removal_when_material": true,
+    "migration_path_required_when_replacement_exists": true,
+    "expired_upstream_runtime_or_framework_support_must_be_tracked": true,
+    "emergency_security_exception_requires_authenticated_authority": true
+  }
+}

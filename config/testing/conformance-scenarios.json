@@ -1,0 +1,236 @@
+{
+  "schema_version": 5,
+  "status": "required_for_runtime_certification",
+  "activation_scope": "child_project",
+  "scenarios": [
+    {
+      "id": "CONF-001",
+      "name": "two_workers_same_slot",
+      "expected": "one_claim_wins_other_reconciles",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-002",
+      "name": "unauthorized_worker_restricted_slot",
+      "expected": "claim_rejected_before_ref_creation",
+      "level": "unit_and_runtime"
+    },
+    {
+      "id": "CONF-003",
+      "name": "missing_required_capability",
+      "expected": "claim_rejected",
+      "level": "unit"
+    },
+    {
+      "id": "CONF-004",
+      "name": "path_permission_violation",
+      "expected": "claim_or_mutation_rejected",
+      "level": "unit"
+    },
+    {
+      "id": "CONF-005",
+      "name": "stale_fencing_token",
+      "expected": "shared_mutation_rejected",
+      "level": "unit_and_runtime"
+    },
+    {
+      "id": "CONF-006",
+      "name": "orphan_claim_ref",
+      "expected": "recovery_required_before_reuse",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-007",
+      "name": "supervisor_crash_failover",
+      "expected": "stale_supervisor_read_only_new_epoch_after_expiry",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-008",
+      "name": "merge_during_worker_execution",
+      "expected": "worker_reconciles_generation_and_retests",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-009",
+      "name": "duplicate_event_replay",
+      "expected": "idempotent_no_duplicate_side_effect",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-010",
+      "name": "pm_provider_outage_or_switch",
+      "expected": "repository_continues_and_sync_catches_up",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-011",
+      "name": "malicious_external_instruction",
+      "expected": "treated_as_untrusted_data_no_authority_escalation",
+      "level": "unit_and_adversarial"
+    },
+    {
+      "id": "CONF-012",
+      "name": "consent_expiry_replay_or_hash_mismatch",
+      "expected": "decision_rejected",
+      "level": "unit"
+    },
+    {
+      "id": "CONF-013",
+      "name": "control_plane_validator_tampering",
+      "expected": "protected_base_validator_and_codeowner_review_required",
+      "level": "ci_integration"
+    },
+    {
+      "id": "CONF-014",
+      "name": "agent_budget_retry_loop",
+      "expected": "circuit_breaker_or_budget_stop",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-015",
+      "name": "selected_agent_unavailable_or_identity_expired",
+      "expected": "dispatch_or_privileged_operation_rejected",
+      "level": "unit_and_runtime"
+    },
+    {
+      "id": "CONF-016",
+      "name": "tool_network_pm_or_secret_scope_escalation",
+      "expected": "claim_rejected_before_privileged_use",
+      "level": "unit_and_runtime"
+    },
+    {
+      "id": "CONF-017",
+      "name": "pm_sync_conflict_or_echo_loop",
+      "expected": "field_authority_and_idempotency_prevent_state_regression_or_duplicate_side_effect",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-018",
+      "name": "release_missing_required_evidence",
+      "expected": "production_release_blocked",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-019",
+      "name": "approved_design_revision_drift",
+      "expected": "impact_analysis_and_affected_work_reconciliation_required",
+      "level": "integration"
+    },
+    {
+      "id": "CONF-020",
+      "name": "destructive_migration_without_valid_consent",
+      "expected": "migration_or_release_blocked",
+      "level": "integration"
+    },
+    {
+      "id": "CONF-021",
+      "name": "backup_restore_or_recovery_verification_failure",
+      "expected": "operational_or_release_readiness_blocked",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-022",
+      "name": "marketplace_webhook_forgery_or_replay",
+      "expected": "invalid_signature_rejected_and_duplicate_delivery_has_no_duplicate_side_effect",
+      "level": "commercial_runtime_integration"
+    },
+    {
+      "id": "CONF-023",
+      "name": "entitlement_expiry_non_destructive",
+      "expected": "future_premium_entitlements_gate_but_existing_generated_project_is_not_modified_or_broken",
+      "level": "commercial_runtime_integration"
+    },
+    {
+      "id": "CONF-024",
+      "name": "marketplace_plan_change_entitlement_reconciliation",
+      "expected": "verified_plan_seats_and_features_reconcile_idempotently_without_state_regression",
+      "level": "commercial_runtime_integration"
+    },
+    {
+      "id": "CONF-025",
+      "name": "ai_configuration_changed_without_required_reevaluation",
+      "expected": "ai_assurance_pass_invalidated_and_release_blocked_until_targeted_reevaluation",
+      "level": "integration"
+    },
+    {
+      "id": "CONF-026",
+      "name": "product_success_claim_without_verified_outcome_evidence",
+      "expected": "success_claim_rejected_or_marked_unverified",
+      "level": "unit_and_integration"
+    },
+    {
+      "id": "CONF-027",
+      "name": "unsafe_or_unbounded_experiment",
+      "expected": "experiment_activation_rejected",
+      "level": "unit_and_adversarial"
+    },
+    {
+      "id": "CONF-028",
+      "name": "progressive_rollout_health_guardrail_failure",
+      "expected": "rollout_stops_or_rolls_back_and_release_outcome_records_evidence",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-029",
+      "name": "stale_feature_flag_without_owner_or_review_date",
+      "expected": "engineering_or_release_review_reports_governance_finding",
+      "level": "integration"
+    },
+    {
+      "id": "CONF-030",
+      "name": "critical_engineering_review_finding",
+      "expected": "module_or_release_completion_blocked_until_fixed_or_policy_authorized_disposition",
+      "level": "integration"
+    },
+    {
+      "id": "CONF-031",
+      "name": "high_impact_ai_without_required_human_oversight",
+      "expected": "release_or_high_impact_action_blocked_until_required_oversight_and_appeal_controls_exist",
+      "level": "integration_and_adversarial"
+    },
+    {
+      "id": "CONF-032",
+      "name": "regulated_or_sensitive_processing_without_required_compliance_evidence",
+      "expected": "production_readiness_blocked_or_qualified_review_required",
+      "level": "integration"
+    },
+    {
+      "id": "CONF-033",
+      "name": "accepted_architecture_decision_silently_reversed",
+      "expected": "change_requires_replacement_decision_record_impact_analysis_and_applicable_consent",
+      "level": "integration"
+    },
+    {
+      "id": "CONF-034",
+      "name": "ai_asset_configuration_drift_after_certified_evaluation",
+      "expected": "stale_ai_assurance_invalidated_and_targeted_reevaluation_required",
+      "level": "integration"
+    },
+    {
+      "id": "CONF-035",
+      "name": "deprecated_contract_removed_before_approved_support_window",
+      "expected": "release_blocked_unless_valid_emergency_exception_exists",
+      "level": "integration"
+    },
+    {
+      "id": "CONF-036",
+      "name": "critical_recovery_runbook_or_resilience_drill_failure",
+      "expected": "operational_readiness_blocked_and_follow_up_work_created",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-037",
+      "name": "audit_journal_integrity_chain_break",
+      "expected": "later_privileged_audit_evidence_untrusted_until_integrity_investigation_and_reconciliation",
+      "level": "runtime_integration"
+    },
+    {
+      "id": "CONF-038",
+      "name": "expired_risk_acceptance_used_to_bypass_gate",
+      "expected": "acceptance_rejected_and_risk_reopened_for_review",
+      "level": "unit_and_integration"
+    }
+  ],
+  "certification_rule": "Production orchestrator certification requires all applicable runtime_integration, integration, adversarial and CI scenarios to pass in the child runtime. Commercial distribution certification additionally requires all applicable commercial_runtime_integration scenarios to pass in the deployed entitlement service; unit/static checks alone are not sufficient."
+}

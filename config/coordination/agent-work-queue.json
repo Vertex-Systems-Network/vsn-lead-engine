@@ -1,0 +1,102 @@
+{
+  "schema_version": 4,
+  "coordination_mode": "multi_agent",
+  "updated_at": "2026-10-04T15:04:00Z",
+  "slots": [],
+  "slot_schema": {
+    "id": "SLOT-001",
+    "phase_id": "PHASE-001",
+    "module_id": "MOD-001",
+    "work_unit_id": "WU-001",
+    "requirement_ids": [],
+    "title": "Example bounded work unit",
+    "description": "",
+    "priority": 100,
+    "risk_classification": "normal",
+    "delegation_depth": 0,
+    "dependencies": [],
+    "eligibility": [
+      "ANY"
+    ],
+    "required_roles": [
+      "worker"
+    ],
+    "required_capabilities": [
+      "repository_write"
+    ],
+    "allowed_paths": [
+      "src/**"
+    ],
+    "denied_paths": [],
+    "allowed_tools": [],
+    "network_policy": "project_policy",
+    "network_allowlist": [],
+    "pm_scope": "none",
+    "secret_scope": "none",
+    "deployment_scope": "none",
+    "acceptance_criteria": [
+      "Define concrete acceptance criteria before dispatch."
+    ],
+    "required_checks": [
+      "Define concrete verification before dispatch."
+    ],
+    "status": "free",
+    "claim_ref": null,
+    "claim_branch": null,
+    "claimant": null,
+    "claimant_identity_ref": null,
+    "agent_type": null,
+    "base_sha": null,
+    "claim_id": null,
+    "claim_nonce": null,
+    "coordination_epoch": null,
+    "fencing_token": null,
+    "lease_status": "not_acquired",
+    "lease_expires_at": null,
+    "acknowledged_merge_generation": 0,
+    "claimed_at": null,
+    "heartbeat_at": null,
+    "released_at": null,
+    "submitted_at": null,
+    "review_reference": null,
+    "pm_reference": null,
+    "blockers": [],
+    "notes": []
+  },
+  "claim_protocol": {
+    "authority": "deterministic_github_ref_plus_authenticated_guard",
+    "ref_pattern": "claims/epoch-{coordination_epoch}/{slot_id}",
+    "first_successful_ref_creation_wins": true,
+    "json_is_mirror_not_lock": true,
+    "requires_live_supervisor": true,
+    "selected_verified_agent_required": true,
+    "eligibility_and_capability_enforced_before_ref_creation": true,
+    "handoff_envelope_required_before_dispatch": true,
+    "path_tool_network_pm_secret_deployment_scope_enforced_before_ref_creation": true,
+    "budget_and_delegation_limits_enforced_before_claim": true,
+    "expired_lease_requires_supervisor_evidence_reconciliation": true,
+    "orphan_ref_requires_recovery_before_reuse": true,
+    "lock_namespace_requires_trusted_runtime_protection_when_supported": true
+  },
+  "lease_status_values": [
+    "not_acquired",
+    "active",
+    "expired",
+    "released",
+    "revoked",
+    "orphaned",
+    "recovered"
+  ],
+  "status_values": [
+    "free",
+    "claimed",
+    "in_progress",
+    "blocked",
+    "submitted_for_review",
+    "changes_requested",
+    "approved",
+    "merged",
+    "completed",
+    "canceled"
+  ]
+}

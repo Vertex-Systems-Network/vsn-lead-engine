@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/extension-contract.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "activation_scope",
+    "protocol_version",
+    "current_core_requirement_ceiling",
+    "core_requirement_rule",
+    "extension_namespace_rule",
+    "extension_contract",
+    "schema_evolution",
+    "deprecation",
+    "registry_rule"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "const": "active_contract"
+    },
+    "activation_scope": {
+      "const": "canonical_protocol_evolution"
+    },
+    "protocol_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "current_core_requirement_ceiling": {
+      "const": 96
+    },
+    "core_requirement_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "next_requirement_id",
+        "new_normative_core_requirement_requires",
+        "requirement_ids_are_append_only",
+        "requirement_ids_must_not_be_reused"
+      ],
+      "properties": {
+        "next_requirement_id": {
+          "const": "REQ-97"
+        },
+        "new_normative_core_requirement_requires": {
+          "type": "array",
+          "minItems": 6,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "requirement_ids_are_append_only": {
+          "const": true
+        },
+        "requirement_ids_must_not_be_reused": {
+          "const": true
+        }
+      }
+    },
+    "extension_namespace_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "core_prefixes_reserved",
+        "extensions_must_not_claim_core_requirement_numbers",
+        "registered_extensions"
+      ],
+      "properties": {
+        "format": {
+          "const": "EXT-<publisher>-<capability>-<major>"
+        },
+        "core_prefixes_reserved": {
+          "type": "array",
+          "contains": {
+            "const": "REQ-"
+          },
+          "minItems": 3,
+          "uniqueItems": true
+        },
+        "extensions_must_not_claim_core_requirement_numbers": {
+          "const": true
+        },
+        "registered_extensions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "extension_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_fields",
+        "compatibility_rule",
+        "isolation_rule",
+        "evidence_rule",
+        "removal_rule"
+      ],
+      "properties": {
+        "required_fields": {
+          "type": "array",
+          "minItems": 8,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "compatibility_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "isolation_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "removal_rule": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "schema_evolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "additive_compatible_change",
+        "breaking_change",
+        "core_schema_breaking_change"
+      ],
+      "properties": {
+        "additive_compatible_change": {
+          "type": "string",
+          "minLength": 1
+        },
+        "breaking_change": {
+          "type": "string",
+          "minLength": 1
+        },
+        "core_schema_breaking_change": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "deprecation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "announcement_required",
+        "migration_path_required_when_replacement_exists",
+        "support_window_or_explicit_emergency_exception_required",
+        "removal_must_not_reuse_old_identity"
+      ],
+      "properties": {
+        "announcement_required": {
+          "const": true
+        },
+        "migration_path_required_when_replacement_exists": {
+          "const": true
+        },
+        "support_window_or_explicit_emergency_exception_required": {
+          "const": true
+        },
+        "removal_must_not_reuse_old_identity": {
+          "const": true
+        }
+      }
+    },
+    "registry_rule": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

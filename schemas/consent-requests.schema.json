@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/consent-requests.schema.json",
+  "title": "ANPOS Consent Requests",
+  "type": "object",
+  "required": ["schema_version", "next_sequence", "requests", "status_values", "security_rules"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 2},
+    "next_sequence": {"type": "integer", "minimum": 1},
+    "requests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "requested_at", "request_hash", "nonce", "expires_at", "status"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^CONSENT-[0-9]{6}$"},
+          "type": {"type": "string", "minLength": 1},
+          "requested_at": {"type": "string", "minLength": 1},
+          "request_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "nonce": {"type": "string", "minLength": 16},
+          "expires_at": {"type": "string", "minLength": 1},
+          "nonce_consumed_at": {"type": ["string", "null"]},
+          "status": {"enum": ["pending", "approved", "partially_approved", "rejected", "expired", "implemented", "verified", "closed"]},
+          "decision_by": {"type": ["string", "null"]},
+          "decision_identity_evidence_ref": {"type": ["string", "null"]},
+          "decision_at": {"type": ["string", "null"]},
+          "decision_evidence": {"type": ["string", "null"]},
+          "decision_request_hash": {"type": ["string", "null"]}
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {"status": {"enum": ["approved", "partially_approved", "rejected"]}},
+              "required": ["status"]
+            },
+            "then": {
+              "properties": {
+                "decision_by": {"type": "string", "minLength": 1},
+                "decision_identity_evidence_ref": {"type": "string", "minLength": 1},
+                "decision_at": {"type": "string", "minLength": 1},
+                "decision_evidence": {"type": "string", "minLength": 1},
+                "decision_request_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                "nonce_consumed_at": {"type": "string", "minLength": 1}
+              },
+              "required": ["decision_by", "decision_identity_evidence_ref", "decision_at", "decision_evidence", "decision_request_hash", "nonce_consumed_at"]
+            }
+          }
+        ],
+        "additionalProperties": true
+      }
+    },
+    "security_rules": {
+      "type": "object",
+      "required": ["decision_must_match_exact_request_hash", "nonce_is_single_use", "expired_request_cannot_be_approved", "authorized_identity_evidence_required", "replayed_decision_rejected"],
+      "properties": {
+        "decision_must_match_exact_request_hash": {"const": true},
+        "nonce_is_single_use": {"const": true},
+        "expired_request_cannot_be_approved": {"const": true},
+        "authorized_identity_evidence_required": {"const": true},
+        "replayed_decision_rejected": {"const": true}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

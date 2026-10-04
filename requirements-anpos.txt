@@ -1,0 +1,3 @@
+# ANPOS repository-control validation dependency.
+# Version verified against the upstream PyPI release during ANPOS hardening.
+jsonschema==4.26.0

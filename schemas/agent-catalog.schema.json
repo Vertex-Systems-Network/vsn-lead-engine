@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/agent-catalog.schema.json",
+  "title": "ANPOS Agent Catalog",
+  "type": "object",
+  "required": ["schema_version", "selection_status", "available_agents", "selected_agents", "role_assignments"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 3},
+    "selection_status": {"type": "string", "minLength": 1},
+    "available_agents": {"type": "array"},
+    "selected_agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "name", "provider", "capabilities", "roles", "available", "identity_verified",
+          "runtime_identity", "permissions", "privacy_profile"
+        ],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "name": {"type": "string", "minLength": 1},
+          "provider": {"type": "string", "minLength": 1},
+          "capabilities": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "roles": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1, "uniqueItems": true},
+          "available": {"const": true},
+          "attachable": {"type": "boolean"},
+          "invokable": {"type": "boolean"},
+          "identity_verified": {"const": true},
+          "runtime_identity": {
+            "type": "object",
+            "required": ["principal_type", "principal_id", "provider", "evidence_ref", "verified_at", "expires_at"],
+            "properties": {
+              "principal_type": {"type": "string", "minLength": 1},
+              "principal_id": {"type": "string", "minLength": 1},
+              "provider": {"type": "string", "minLength": 1},
+              "evidence_ref": {"type": "string", "minLength": 1},
+              "verified_at": {"type": "string", "minLength": 1},
+              "expires_at": {"type": ["string", "null"]}
+            },
+            "additionalProperties": true
+          },
+          "permissions": {
+            "type": "object",
+            "required": [
+              "allowed_paths", "denied_paths", "allowed_tools", "network_policy", "network_allowlist",
+              "secret_scope", "pm_scope", "deployment_scope", "repository_admin", "destructive_actions"
+            ],
+            "properties": {
+              "allowed_paths": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1, "uniqueItems": true},
+              "denied_paths": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+              "allowed_tools": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+              "network_policy": {"type": "string", "minLength": 1},
+              "network_allowlist": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+              "secret_scope": {"type": ["string", "array"]},
+              "pm_scope": {"type": ["string", "array"]},
+              "deployment_scope": {"type": ["string", "array"]},
+              "repository_admin": {"type": "boolean"},
+              "destructive_actions": {"type": "boolean"}
+            },
+            "additionalProperties": true
+          },
+          "privacy_profile": {
+            "type": "object",
+            "required": ["repository_data_scope", "external_network_enabled", "data_retention", "training_use", "geography_or_enterprise_constraints", "sensitive_data_allowed"],
+            "properties": {
+              "repository_data_scope": {"type": ["string", "null"]},
+              "external_network_enabled": {"type": ["boolean", "null"]},
+              "data_retention": {"type": "string", "minLength": 1},
+              "training_use": {"type": "string", "minLength": 1},
+              "geography_or_enterprise_constraints": {"type": "array", "items": {"type": "string"}},
+              "sensitive_data_allowed": {"type": "boolean"}
+            },
+            "additionalProperties": true
+          }
+        },
+        "anyOf": [
+          {"properties": {"attachable": {"const": true}}, "required": ["attachable"]},
+          {"properties": {"invokable": {"const": true}}, "required": ["invokable"]}
+        ],
+        "additionalProperties": true
+      }
+    },
+    "role_assignments": {
+      "type": "object",
+      "required": ["supervisor_agent_id", "worker_agent_ids"],
+      "properties": {
+        "supervisor_agent_id": {"type": ["string", "null"]},
+        "worker_agent_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

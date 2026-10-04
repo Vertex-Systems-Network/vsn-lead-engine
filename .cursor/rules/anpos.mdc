@@ -1,0 +1,5 @@
+---
+description: Route Cursor agents through the ANPOS repository protocol
+alwaysApply: true
+---
+Read `AGENTS.md` and `.ai/manifest.json`. Determine the active role and load the common + role-specific files only. Repository/Git/tests are authoritative. Respect atomic claims, Supervisor fencing, consent, CI/security gates, and GitHub governance. Worker mode: `AUTO-AGENT.md`. Supervisor mode: `SUPERVISOR.md` + `ORCHESTRATOR.md`.

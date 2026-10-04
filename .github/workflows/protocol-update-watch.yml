@@ -1,0 +1,83 @@
+name: AI Native - Protocol Update Watch
+
+on:
+  schedule:
+    - cron: '23 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ai-native-protocol-update-watch
+  cancel-in-progress: false
+
+jobs:
+  compare-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Read local protocol metadata safely
+        id: local
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          instance = json.loads(Path('config/protocol/instance.json').read_text())
+          version = json.loads(Path('config/protocol/version.json').read_text())
+          values = {
+              'instance_status': str(instance.get('instance_status', 'unknown')),
+              'local_version': str(version['version']),
+              'upstream': str(version['upstream']['repository']),
+          }
+          for key, value in values.items():
+              if '\n' in value or '\r' in value:
+                  raise SystemExit(f'Invalid newline in protocol metadata field {key}')
+              print(f'{key}={value}')
+          PY
+
+      - name: Compare protocol version with upstream
+        if: steps.local.outputs.instance_status != 'template_source'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LOCAL_VERSION: ${{ steps.local.outputs.local_version }}
+          UPSTREAM: ${{ steps.local.outputs.upstream }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/${UPSTREAM}/contents/config/protocol/version.json?ref=main" --jq '.content' \
+            | tr -d '\n' | base64 -d > /tmp/upstream-version.json
+          UPSTREAM_VERSION="$(python - <<'PY'
+          import json
+          print(json.load(open('/tmp/upstream-version.json'))['version'])
+          PY
+          )"
+          NEWER="$(python - "$LOCAL_VERSION" "$UPSTREAM_VERSION" <<'PY'
+          import sys
+          def v(s):
+              parts = s.split('.')
+              if len(parts) < 3 or not all(p.isdigit() for p in parts[:3]):
+                  raise SystemExit('Protocol version must use numeric major.minor.patch')
+              return tuple(int(x) for x in parts[:3])
+          print('true' if v(sys.argv[2]) > v(sys.argv[1]) else 'false')
+          PY
+          )"
+          if [ "$NEWER" != "true" ]; then exit 0; fi
+          TITLE="[AI-NATIVE] Protocol Update Available: ${LOCAL_VERSION} -> ${UPSTREAM_VERSION}"
+          EXISTING="$(gh issue list --state open --limit 100 --json number,title --jq ".[] | select(.title == \"$TITLE\") | .number" | head -n1)"
+          if [ -n "$EXISTING" ]; then exit 0; fi
+          cat > /tmp/body.md <<EOF
+          A newer ANPOS control-plane version is available from **${UPSTREAM}**.
+
+          - current project protocol: ${LOCAL_VERSION}
+          - upstream protocol: ${UPSTREAM_VERSION}
+
+          This is not permission to overwrite project code. Analyze impact, record migration state, resolve project-specific conflicts, obtain consent for material behavior changes, migrate incrementally, and run all relevant gates.
+          EOF
+          gh issue create --title "$TITLE" --body-file /tmp/body.md

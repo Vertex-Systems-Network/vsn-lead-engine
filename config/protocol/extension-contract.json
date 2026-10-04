@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "status": "active_contract",
+  "activation_scope": "canonical_protocol_evolution",
+  "protocol_version": "1.4.0",
+  "current_core_requirement_ceiling": 96,
+  "core_requirement_rule": {
+    "next_requirement_id": "REQ-97",
+    "new_normative_core_requirement_requires": [
+      "explicit_next_release_plan",
+      "protocol_version_change",
+      "migration_record",
+      "authoritative_documentation",
+      "machine_control_or_explicit_document_only_rationale",
+      "verification_or_conformance_evidence",
+      "child_upgrade_impact_analysis"
+    ],
+    "requirement_ids_are_append_only": true,
+    "requirement_ids_must_not_be_reused": true
+  },
+  "extension_namespace_rule": {
+    "format": "EXT-<publisher>-<capability>-<major>",
+    "core_prefixes_reserved": [
+      "REQ-",
+      "CONF-",
+      "ANPOS-"
+    ],
+    "extensions_must_not_claim_core_requirement_numbers": true,
+    "registered_extensions": []
+  },
+  "extension_contract": {
+    "required_fields": [
+      "id",
+      "publisher",
+      "capability",
+      "version",
+      "compatibility",
+      "entrypoints",
+      "schemas",
+      "migration_policy",
+      "deprecation_policy",
+      "evidence_contract"
+    ],
+    "compatibility_rule": "Extensions must declare supported ANPOS protocol ranges and fail closed when the active protocol is outside that range.",
+    "isolation_rule": "An extension must not silently mutate canonical core semantics, project-owned application state, or another extension namespace.",
+    "evidence_rule": "Extension installation or configuration presence is never completion evidence for a project capability.",
+    "removal_rule": "Removing an extension must preserve project-generated source/data unless an explicit project migration authorizes otherwise."
+  },
+  "schema_evolution": {
+    "additive_compatible_change": "may remain within the same extension major when consumers can ignore new optional fields",
+    "breaking_change": "requires a new extension major and migration path",
+    "core_schema_breaking_change": "requires an ANPOS protocol release and migration"
+  },
+  "deprecation": {
+    "announcement_required": true,
+    "migration_path_required_when_replacement_exists": true,
+    "support_window_or_explicit_emergency_exception_required": true,
+    "removal_must_not_reuse_old_identity": true
+  },
+  "registry_rule": "Future extensions are registered only after validation of identity, compatibility, entrypoints, schema references, migration behavior, deprecation behavior and evidence boundaries."
+}

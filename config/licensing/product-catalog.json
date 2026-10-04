@@ -1,0 +1,107 @@
+{
+  "schema_version": 3,
+  "status": "template_blueprint",
+  "activation_scope": "commercial_distribution_only",
+  "pricing_is_external_to_repository": true,
+  "catalog_authority": "commercial_entitlement_service",
+  "feature_catalog_ref": "config/licensing/feature-catalog.json",
+  "package_architecture_ref": "docs/commercial/package-architecture.md",
+  "legal_approval_ref": "config/licensing/legal-approval.json",
+  "productization_status": "community_and_developer_source_value_implemented_external_activation_and_higher_tiers_pending",
+  "free_acquisition_plan": {
+    "id": "community",
+    "display_name": "ANPOS Community",
+    "status": "implemented_source_not_active",
+    "catalog_relation": "kept_outside_paid_plans_until_real_marketplace_e2e_and_operator_activation_are_verified",
+    "marketplace_plan_id": null,
+    "monthly_price_usd": 0,
+    "annual_price_usd": 0,
+    "proposed_marketplace_value": "read_only_repository_readiness_and_conformance_audit",
+    "implementation_status": "implemented_source_pending_real_marketplace_e2e_and_operator_activation",
+    "capabilities": ["community_repository_readiness_audit"],
+    "entitlements": [],
+    "rule": "Source implementation is not Marketplace activation. Do not publish or count this as an active free product until the real public Marketplace App Setup URL -> PKCE OAuth -> installation-bound repository discovery -> bounded read-only audit flow passes production E2E and the operator explicitly activates the plan/listing."
+  },
+  "plans": [
+    {
+      "id": "developer",
+      "display_name": "ANPOS Developer",
+      "sale_status": "draft",
+      "commercial_readiness": "source_value_implemented_blocked_on_external_marketplace_legal_pricing_private_vendor_and_production_e2e_gates",
+      "billing_model": "operator_configurable",
+      "marketplace_plan_id": null,
+      "monthly_price_usd": null,
+      "annual_price_usd": null,
+      "seat_limit": 1,
+      "project_limit": null,
+      "entitlements": [
+        "private_template_access",
+        "protocol_update_channel"
+      ]
+    },
+    {
+      "id": "pro",
+      "display_name": "ANPOS Pro",
+      "sale_status": "draft",
+      "commercial_readiness": "blocked_on_premium_blueprints_premium_adapters_and_any_hosted_orchestrator_claim",
+      "recommended": true,
+      "billing_model": "operator_configurable",
+      "marketplace_plan_id": null,
+      "monthly_price_usd": null,
+      "annual_price_usd": null,
+      "seat_limit": 1,
+      "project_limit": null,
+      "entitlements": [
+        "private_template_access",
+        "protocol_update_channel",
+        "premium_blueprints",
+        "premium_provider_adapters",
+        "hosted_orchestrator_when_offered"
+      ]
+    },
+    {
+      "id": "team",
+      "display_name": "ANPOS Team",
+      "sale_status": "draft",
+      "commercial_readiness": "blocked_on_pro_readiness_customer_team_billing_admin_experience_and_support_definition",
+      "billing_model": "flat_rate_or_per_unit",
+      "marketplace_plan_id": null,
+      "monthly_price_usd": null,
+      "annual_price_usd": null,
+      "seat_limit": null,
+      "project_limit": null,
+      "entitlements": [
+        "private_template_access",
+        "protocol_update_channel",
+        "premium_blueprints",
+        "premium_provider_adapters",
+        "hosted_orchestrator_when_offered",
+        "organization_team_features",
+        "commercial_support"
+      ]
+    },
+    {
+      "id": "enterprise",
+      "display_name": "ANPOS Enterprise",
+      "sale_status": "draft",
+      "commercial_readiness": "future_contract_led_until_enterprise_controls_orchestration_distribution_and_sla_are_productized",
+      "billing_model": "custom_or_marketplace_plan",
+      "marketplace_plan_id": null,
+      "monthly_price_usd": null,
+      "annual_price_usd": null,
+      "seat_limit": null,
+      "project_limit": null,
+      "entitlements": [
+        "private_template_access",
+        "protocol_update_channel",
+        "premium_blueprints",
+        "premium_provider_adapters",
+        "hosted_or_self_hosted_orchestrator_when_offered",
+        "organization_team_features",
+        "enterprise_policy_controls",
+        "priority_support_or_sla_when_contracted"
+      ]
+    }
+  ],
+  "rule": "Plan names, prices, Marketplace plan IDs, limits, trials, discounts, taxes and commercial promises are operator-controlled business configuration. Repository defaults are drafts and never create a billing obligation. A draft entitlement label is not a launch-ready marketing claim; consult feature_catalog_ref, package_architecture_ref, and legal_approval_ref before presenting package capabilities or sale readiness."
+}

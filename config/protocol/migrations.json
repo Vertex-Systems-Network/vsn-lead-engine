@@ -1,0 +1,588 @@
+{
+  "schema_version": 1,
+  "current_protocol_version": "1.4.0",
+  "applied_migrations": [
+    {
+      "id": "ANPOS-1.0.0-to-1.0.1",
+      "from_version": "1.0.0",
+      "to_version": "1.0.1",
+      "detected_at": "2026-09-02T16:00:30Z",
+      "impact": [
+        "Separate canonical template-source state from child-project runtime state",
+        "Remove source-template Linear mapping and runtime sync timestamps",
+        "Move child GitHub Actions and Dependabot configuration into inactive blueprints",
+        "Make GitHub Rules a child-project user-approved setup step",
+        "Make Code Quality a child-project auto-install/setup responsibility",
+        "Cancel the mistakenly-created source-template Linear project mirror",
+        "Close the source-template governance drift issue as not planned"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "status": "applied",
+      "applied_at": "2026-09-02T16:00:30Z",
+      "verification_evidence": [
+        "config/protocol/version.json reports 1.0.1",
+        "config/integrations/linear-sync.json is an unconnected template blueprint",
+        "config/github/ruleset-policy.json is template_blueprint/pending_child_setup",
+        "config/quality/quality-policy.json is child_project_only/template_blueprint",
+        "active child runtime workflows removed from canonical .github/workflows",
+        "inactive runtime workflows are stored under blueprints/github/workflows",
+        "README.md and PROJECT-INITIALIZATION.md define the source-vs-child boundary"
+      ]
+    },
+    {
+      "id": "ANPOS-1.0.1-to-1.1.0",
+      "from_version": "1.0.1",
+      "to_version": "1.1.0",
+      "detected_at": "2026-09-03T00:00:00+05:00",
+      "impact": [
+        "Replace mandatory Linear-first setup with provider-agnostic Project Management selection",
+        "Keep Linear as the recommended optional adapter rather than a hard dependency",
+        "Add common PM adapter contract and provider switching policy",
+        "Add runtime-discovered Choose Development AI step during child initialization",
+        "Persist selected AI pool and Supervisor/Worker role assignments only in child projects",
+        "Generalize Supervisor, Worker, and orchestrator PM synchronization",
+        "Reset PM provider and AI selection state during child bootstrap",
+        "Strengthen template-source validation against live PM/AI attachment state",
+        "Generalize coordination mirror fields from Linear-only to PM-provider-neutral names"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "status": "applied",
+      "applied_at": "2026-09-03T00:00:00+05:00",
+      "verification_evidence": [
+        "PROJECT-MANAGEMENT.md defines provider-agnostic selection, mapping, adapter, sync, and switching behavior",
+        "config/integrations/project-management.json contains an unselected source provider catalog",
+        "config/integrations/linear-sync.json is an optional Linear adapter",
+        "config/ai/agent-catalog.json defines runtime-discovered Development AI selection and role assignment",
+        "PROJECT-INITIALIZATION.md and START-HERE.md include PM provider selection followed by Development AI selection",
+        "scripts/bootstrap_instance.py resets PM and AI selection for child projects",
+        "coordination state uses last_pm_sync_at and pm_reference rather than Linear-specific fields",
+        "scripts/validate_ai_native_repo.py checks PM and AI source-template invariants"
+      ]
+    },
+    {
+      "id": "ANPOS-1.1.0-to-1.2.0",
+      "from_version": "1.1.0",
+      "to_version": "1.2.0",
+      "detected_at": "2026-09-03T01:42:00+05:00",
+      "impact": [
+        "Requirements 45-56: protect the AI control plane, authenticate agent/runtime identity, enforce eligibility and least privilege, complete Worker/Supervisor lease lifecycle, protect coordination namespaces, add fencing/CAS mutation gateway, trusted-base CI, trust firewall, replay-resistant consent, memory provenance, and conformance/chaos testing",
+        "Requirements 57-66: make quality bootstrap capability-aware, validate workflow permissions/features, generate stack-adaptive dependency management, enforce Draft 2020-12 JSON Schema, add release/environment and OIDC/secrets policy, SBOM/provenance/attestation evidence, PM conflict/idempotency authority, typed agent handoff, and AI-provider privacy/data boundaries",
+        "Requirements 67-74: lock approved design revisions, add visual/accessibility traceability with WCAG 2.2 AA web default, data classification/privacy lifecycle, persistent threat modeling, API/database migration safety, observability/SLO/incident/DR policy, and bounded agent budgets/retries/delegation",
+        "Require selected agent identity evidence and runtime principal matching before privileged Worker/Supervisor authority",
+        "Require path/tool/network/PM/secret/deployment scope checks before Worker claim creation",
+        "Add heartbeat/release/recovery scripts for Worker and Supervisor leases and orphan-lock recovery behavior",
+        "Add authenticated consent hash/nonce/expiry/evidence enforcement",
+        "Expand protected CODEOWNERS/control-plane paths to all assurance/security/design/data/operations/testing/traceability surfaces",
+        "Run current validator, protected-base validator, JSON Schema validation and control-plane unit/conformance tests in the child quality blueprint",
+        "Keep canonical source inert while child projects activate project-specific security, quality, design, release, data and operations state"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Existing child projects must impact-analyze this control-plane upgrade. Require owner consent if applying it materially changes approved project behavior, permissions, paid services, environments, destructive migration behavior, or deployment policy.",
+      "status": "applied",
+      "applied_at": "2026-09-03T01:42:00+05:00",
+      "verification_evidence": [
+        "CONTROL-PLANE-SECURITY.md maps requirements 45-56",
+        "PRODUCTION-ASSURANCE.md maps requirements 57-66",
+        "DESIGN-DATA-OPERATIONS.md maps requirements 67-74",
+        "config/coordination/agent-work-queue.json and supervisor-state.json use hardened schema version 4",
+        "scripts/anpos_guard.py enforces selected identity, principal, role, capability, path, tool, network, PM, secret and deployment scope",
+        "scripts/lease_control.py and scripts/coordination_mutation.py implement lease lifecycle and shared mutation guards",
+        "scripts/consent_guard.py and consent schema enforce request hash, nonce, expiry and authenticated decision evidence",
+        "config/testing/conformance-scenarios.json defines unit/runtime/CI/adversarial certification scenarios",
+        "tests/test_control_plane.py covers identity, eligibility, permission escalation, mutation, consent, design and source-boundary cases",
+        "config/quality/quality-policy.json separates universal and capability-dependent checks",
+        "blueprints/github/workflows/repository-quality.yml runs pinned dependencies, compile, unit tests, current validator and protected-base validator",
+        "config/release, config/data, config/operations, config/contracts, config/security and config/design contain reusable child assurance policy",
+        "scripts/validate_ai_native_repo.py certifies source-boundary and hardening invariants"
+      ]
+    },
+    {
+      "id": "ANPOS-1.2.0-to-1.2.1",
+      "from_version": "1.2.0",
+      "to_version": "1.2.1",
+      "detected_at": "2026-09-03T03:37:55+05:00",
+      "impact": [
+        "Remove stale duplicate FINAL-CORE.md after its requirements were absorbed into current control-plane, orchestration, initialization, schema, traceability and ownership contracts",
+        "Remove obsolete FINAL-CORE references from bootstrap, validator, control-plane protection, path ownership and CODEOWNERS",
+        "Add a minimal template-safe .gitignore for ANPOS Python tooling caches, local environments/secrets, OS/editor residue and temporary/backup files",
+        "Protect .gitignore through control-plane policy, path ownership, source CODEOWNERS, child CODEOWNERS generation and repository validation",
+        "Keep stack-specific ignore rules deferred until each child project approves its actual technology stack",
+        "No project-management, AI-provider, application runtime, release or child-project behavior is activated on the canonical source"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Existing child projects may adopt the hygiene file and stale-document cleanup after impact analysis. Preserve project-specific .gitignore rules and merge rather than overwrite them blindly.",
+      "status": "applied",
+      "applied_at": "2026-09-03T03:37:55+05:00",
+      "verification_evidence": [
+        "FINAL-CORE.md removed after reference/uniqueness audit",
+        ".gitignore exists and is protected by control-plane policy, path ownership and CODEOWNERS",
+        "scripts/bootstrap_instance.py generates explicit child ownership for .gitignore",
+        "scripts/validate_ai_native_repo.py requires and protects .gitignore and no longer requires FINAL-CORE.md",
+        "Full post-cleanup compile, unit/conformance and repository-validator certification passed before final source inertness was restored"
+      ]
+    },
+    {
+      "id": "ANPOS-1.2.1-to-1.3.0",
+      "from_version": "1.2.1",
+      "to_version": "1.3.0",
+      "detected_at": "2026-09-03T04:15:00+05:00",
+      "impact": [
+        "Requirements 75-82: add optional commercial distribution/licensing architecture without making core child-project execution a paid runtime dependency",
+        "Add GitHub Marketplace as the recommended GitHub-native commercial adapter with provider-agnostic fallback distribution modes",
+        "Define server-side entitlement authority and non-authoritative repository entitlement references",
+        "Require asymmetrically signed portable entitlement claims while keeping signing private keys and webhook secrets outside repositories",
+        "Require marketplace_purchase purchased/changed/cancelled handling, X-Hub-Signature-256 verification, X-GitHub-Delivery deduplication, idempotency and API reconciliation",
+        "Define non-destructive cancellation/expiry that may gate future premium provisioning/updates/services/support but may not delete or sabotage generated customer projects",
+        "Add draft external-pricing product catalog for Developer, Pro, Team and Enterprise plans without creating billing commitments in repository code",
+        "Add commercial customer-data minimization and cancelled-trial cleanup policy",
+        "Add commercial launch gates for publisher/listing/financial onboarding, key management, entitlement ledger backup/recovery, support/refund/cancellation, privacy and operator-supplied legal terms",
+        "Protect commercial policies/configs/blueprints/schemas/tests/validators through ANPOS control-plane ownership",
+        "Add commercial runtime conformance scenarios and a dedicated commercial licensing validator to the repository quality blueprint",
+        "Keep canonical source commercial runtime disabled and free of customer records, live plan IDs, payment data, webhook secrets, App private keys and entitlement-signing private keys"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Commercial licensing remains optional for existing child projects. Do not introduce billing checks into normal build/test/runtime paths merely by adopting ANPOS 1.3.0. Customer entitlement references may be added only when the operator intentionally enables commercial distribution/update/service access, and existing generated project functionality must remain non-destructive on expiry.",
+      "status": "applied",
+      "applied_at": "2026-09-03T04:15:00+05:00",
+      "verification_evidence": [
+        "COMMERCIAL-LICENSING.md maps requirements 75-82 and defines source-vs-commercial-runtime boundary",
+        "config/licensing/commercial-policy.json remains disabled template_blueprint/commercial_distribution_only",
+        "config/licensing/marketplace-adapter.json remains unconfigured and defines verified/idempotent Marketplace event handling",
+        "config/licensing/entitlement-reference.json remains unbound and explicitly non-authoritative",
+        "schemas/license-entitlement.schema.json defines portable signed entitlement/reference structure",
+        "blueprints/commercial/marketplace-webhook-contract.json defines signature, replay, reconciliation, idempotency and non-destructive cancellation behavior",
+        "config/testing/conformance-scenarios.json includes commercial webhook replay, non-destructive expiry and plan-change reconciliation scenarios",
+        "tests/test_commercial_licensing.py and scripts/validate_commercial_licensing.py validate commercial source/security invariants",
+        "blueprints/github/workflows/repository-quality.yml runs both core and commercial validators",
+        ".ai/manifest.json exposes commercial_distribution as an isolated role",
+        "AGENTS.md, control-plane policy, path ownership and CODEOWNERS protect commercial licensing assets"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.0-to-1.3.1",
+      "from_version": "1.3.0",
+      "to_version": "1.3.1",
+      "detected_at": "2026-09-03T19:43:19+05:00",
+      "impact": [
+        "Production-harden the vendor-only GitHub Marketplace commercial service without changing core child-project execution into a billing dependency",
+        "Add durable database-backed rate limits, bounded request/webhook bodies, sanitized request IDs and race-safe idempotency controls",
+        "Make Marketplace webhook deliveries retry-safe with processing/completed/error state, stale-claim recovery, attempt tracking and delivery-id payload-hash conflict detection",
+        "Add explicit organization seat assignment/capacity enforcement and principal-bound format-v2 signed entitlements so organization membership alone never grants paid access",
+        "Prefer short-lived private GitHub archive delivery for scalable template distribution while keeping collaborator provisioning optional and disabled by default",
+        "Add reference-counted template-access grants, revocation reconciliation jobs and least-privilege GitHub App installation-token scopes",
+        "Replace request-path DDL with explicit checksum-locked PostgreSQL migrations and fail readiness when required migrations are absent or modified",
+        "Strengthen readiness validation for secrets, identifiers, Marketplace plan maps, organization seat limits, RSA/Ed25519 key types and database state",
+        "Commit a deterministic npm package-lock and certify installation with npm ci, TypeScript typecheck, commercial security unit tests and Next.js production build",
+        "Keep scripts/bootstrap_child.py as the canonical vendor-safe child entrypoint that strips commercial-service from initialized customer/child repositories"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "This patch hardens the optional vendor-side commercial distribution service. Existing child projects do not need or receive commercial-service. Adopt only protocol/reference changes that are relevant to a child, preserve project-specific behavior, and never introduce billing checks into normal child build/test/runtime merely by upgrading ANPOS.",
+      "status": "applied",
+      "applied_at": "2026-09-03T19:43:19+05:00",
+      "verification_evidence": [
+        "GitHub Actions run 33767978427 completed successfully with Python compile/tests, core validator, commercial licensing validator, commercial service validator, npm ci, TypeScript typecheck, commercial security unit tests, Next.js production build and source-boundary verification",
+        "ANPOS Python suite passed 28 tests on the certified source snapshot",
+        "commercial-service/package-lock.json is committed as lockfileVersion 3 and npm ci succeeded against the locked dependency graph",
+        "scripts/validate_commercial_service.py verifies rate limiting, webhook retry/idempotency, organization seats, archive-first distribution, access revocation, migration gating, readiness and vendor-safe child bootstrap invariants",
+        "Canonical source retained no active .github/workflows runtime files or active .github/dependabot.yml after certification"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.1-to-1.3.2",
+      "from_version": "1.3.1",
+      "to_version": "1.3.2",
+      "detected_at": "2026-09-03T23:09:16+05:00",
+      "impact": [
+        "Add deterministic vendor repository export tooling that reads committed Git blobs from HEAD rather than working-tree bytes",
+        "Define anpos-commercial-service export with the commercial-service/ prefix stripped for a future vendor-private backend repository",
+        "Define anpos-commercial-template export that excludes commercial-service/ for a future customer-facing private template repository",
+        "Fail closed on tracked secret-like files, committed symlinks, generated/runtime paths, unsupported Git modes, dirty tracked trees by default, in-repository outputs and existing export targets",
+        "Generate deterministic EXPORT-MANIFEST.json provenance with source revision/tree plus per-file Git object, mode, size and SHA-256 evidence",
+        "Add dedicated vendor-export unit tests and static validation while preserving canonical source inertness and canonical child bootstrap vendor stripping",
+        "Do not create private repositories, activate commercial runtime, attach Marketplace/GitHub App state, or introduce billing checks into child-project runtime"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Existing child projects do not need this vendor-side export tooling and must not receive commercial-service/. This patch does not introduce billing/runtime dependencies into children. Preserve project-specific behavior and adopt vendor-export tooling only in the canonical/vendor source-management context.",
+      "status": "applied",
+      "applied_at": "2026-09-03T23:09:16+05:00",
+      "verification_evidence": [
+        "GitHub Actions certification run 33788462032 completed successfully on the vendor-export implementation before protocol bookkeeping",
+        "ANPOS Python suite passed 36 tests including eight vendor repository export safety tests",
+        "Core, commercial licensing, commercial service and vendor repository export validators all passed",
+        "Two independent vendor exports were byte-for-byte identical and their manifests matched the certified source revision",
+        "Node 22/npm 11.19.1 locked npm ci and npm audit completed with 0 reported vulnerabilities",
+        "Commercial TypeScript typecheck, four security unit tests, Next.js 16.3.4 production build and final tracked clean-tree gate passed"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.2-to-1.3.3",
+      "from_version": "1.3.2",
+      "to_version": "1.3.3",
+      "detected_at": "2026-09-03T23:41:00+05:00",
+      "impact": [
+        "Add an inactive GitHub App configuration blueprint with archive-first least-privilege permissions and explicit operator-supplied identifiers",
+        "Add a GitHub Marketplace listing draft with plan positioning but no repository-defined prices, plan IDs, tax/refund/SLA promises or legal commitments",
+        "Add a fail-closed machine-readable production launch checklist whose source state can never authorize sales or pre-verify external launch gates",
+        "Add a legal document template pack for Terms, EULA/license, Privacy, Refund/Cancellation and Support/SLA while explicitly requiring operator/legal/accounting review",
+        "Add a production smoke verifier for health/readiness/public keys plus optional customer/operator checks using environment-variable secret references rather than raw secret CLI values",
+        "Add launch-package unit/static validation and integrate the launch validator into the inactive repository-quality blueprint including protected-base validation",
+        "Preserve core/child non-destructive license expiry and source-template inertness; no production credentials, prices, customer records or live launch evidence are added",
+        "Add config/licensing/vendor-source-boundary.json as the shared machine-readable classification for vendor-only service, export, launch/legal/App/operator and vendor-quality assets",
+        "Drive scripts/bootstrap_child.py vendor stripping from the shared source-boundary policy instead of a one-path hardcoded tuple",
+        "Exclude every vendor-only source-boundary path from anpos-commercial-template while continuing to source the vendor service only from committed commercial-service/ Git blobs",
+        "Move vendor repository export and commercial launch validation out of the child repository-quality blueprint into a separate vendor-only quality blueprint so customer children never depend on stripped vendor tooling"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Existing child projects do not require vendor commercial runtime, export tooling, launch/legal/App/operator assets, or vendor-only tests/validators. New child initialization strips all paths classified by config/licensing/vendor-source-boundary.json. Do not introduce billing, legal, Marketplace, vendor source-management, or production-launch dependencies into normal child execution merely by adopting ANPOS 1.3.3.",
+      "status": "applied",
+      "applied_at": "2026-09-03T23:41:00+05:00",
+      "verification_evidence": [
+        "Commercial launch package certification must pass before publishing this migration to canonical main",
+        "Source launch checklist remains launch_authorized=false and carries no live external evidence",
+        "GitHub App blueprint contains no credentials or final runtime identifiers",
+        "Marketplace listing/legal files remain explicit drafts/templates rather than billing/legal authority",
+        "Production verifier does not synthesize or claim real Marketplace purchase evidence",
+        "Customer-template export tests verify all configured vendor-only paths are excluded using the committed source-boundary policy",
+        "Vendor-only source-management and launch validators are routed through blueprints/commercial/vendor-launch-quality.yml rather than the child repository-quality blueprint",
+        "Child bootstrap and vendor exporter consume the same vendor-source-boundary classification"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.3-to-1.3.4",
+      "from_version": "1.3.3",
+      "to_version": "1.3.4",
+      "detected_at": "2026-09-04T00:00:00+05:00",
+      "impact": [
+        "Add a vendor-only machine-readable GitHub Marketplace compliance baseline checked against official GitHub documentation on 2026-09-04 and require re-verification before submission",
+        "Record the current paid GitHub App baseline that the app is organization-owned, an organization owner controls listing submission, publisher verification prerequisites include verified domain/contact email/organization 2FA, and financial onboarding is required",
+        "Record the current paid-listing minimum of 100 GitHub App installations as an external evidence gate rather than invented repository state",
+        "Record Marketplace listing requirements for contact information, relevant description, pricing, privacy/support/working links, integration value beyond authentication, public availability, plan-change/cancellation webhook configuration, logo, feature card and screenshots",
+        "Record paid-plan constraints including monthly and annual USD pricing, maximum 10 plans, supported flat-rate/per-unit models, and no repository-defined live prices",
+        "Require customer-facing billing visibility for current plan/price, purchase/change/cancellation/trial state, billing cycle and usage/remaining resources where applicable",
+        "Record the 2026-09-04 Marketplace free-trial baseline of 14 days and deletion of private customer data within 30 days after a cancelled trial, with mandatory re-verification before publication",
+        "Expand the fail-closed production checklist, listing draft, legal template, unit tests and launch validator around these current Marketplace requirements",
+        "Keep all Marketplace compliance assets vendor-only and preserve core child-project execution without billing, legal, listing, or launch dependencies"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Existing child projects do not need GitHub Marketplace listing/compliance assets. New child initialization and customer-facing commercial-template export strip these vendor-only files through config/licensing/vendor-source-boundary.json. Do not introduce Marketplace billing, legal, trial-retention, listing, or launch dependencies into normal child execution merely by adopting ANPOS 1.3.4.",
+      "status": "applied",
+      "applied_at": "2026-09-04T00:00:00+05:00",
+      "verification_evidence": [
+        "blueprints/commercial/github-marketplace-compliance.json records official docs.github.com sources and source_checked_at=2026-09-04",
+        "Production launch checklist remains launch_authorized=false and all new Marketplace gates remain unverified without external evidence",
+        "Launch validator and unit tests enforce publisher, installation-threshold, listing, pricing, billing-UX and trial-privacy baseline fields",
+        "config/licensing/vendor-source-boundary.json classifies the Marketplace compliance baseline as vendor-only",
+        "Customer-template deterministic export must exclude every vendor-only path including the Marketplace compliance baseline",
+        "Full ANPOS/commercial/vendor certification must pass before this migration is promoted to canonical main"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.4-to-1.3.5",
+      "from_version": "1.3.4",
+      "to_version": "1.3.5",
+      "detected_at": "2026-09-04T00:30:00+05:00",
+      "impact": [
+        "Add a vendor-only fail-closed free-first-to-paid GitHub Marketplace staged publication strategy sourced from official GitHub documentation checked on 2026-09-04",
+        "Recommend a genuine free Marketplace listing as a compliant installation-acquisition path while paid-listing eligibility evidence is missing, without making the recommendation mandatory",
+        "Require real GitHub-integrated user value beyond authentication, general listing compliance, public availability and purchase/cancellation event handling before any free listing",
+        "Keep the free plan definition operator-controlled with no repository-invented catalog plan ID, Marketplace plan ID or entitlement set",
+        "Preserve the existing Developer/Pro/Team/Enterprise paid draft catalog unchanged and explicitly prohibit this strategy from silently creating a Community/free product tier",
+        "Record that current GitHub documentation allows paid plans to be added to an existing free listing after paid requirements, verified publisher and financial onboarding are satisfied",
+        "Keep the current 100-install paid GitHub App threshold as real external evidence and prohibit artificial/deceptive installation generation",
+        "Add dedicated staged-launch validation/tests and route them only through the vendor source-quality boundary",
+        "Keep staged Marketplace assets excluded from normal child repositories and customer-facing commercial-template exports"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Existing child projects do not need Marketplace staged-publication strategy, tests, or validators. New child initialization and customer-facing commercial-template export strip these vendor-only files through config/licensing/vendor-source-boundary.json. ANPOS 1.3.5 must not introduce a free plan, Marketplace acquisition logic, billing, listing, or paid-conversion dependency into normal child execution.",
+      "status": "applied",
+      "applied_at": "2026-09-04T00:30:00+05:00",
+      "verification_evidence": [
+        "marketplace-staged-launch.json records official docs.github.com sources and source_checked_at=2026-09-04",
+        "Free plan definition remains operator_decision_required with null catalog/Marketplace IDs and an empty entitlement list",
+        "Existing product-catalog plan IDs remain developer/pro/team/enterprise with no free/community tier introduced by this patch",
+        "Production launch checklist remains launch_authorized=false and references the staged route only as an operator-overridable recommendation",
+        "Dedicated staged-launch validator rejects automatic paid conversion, repository-authorized paid conversion and staged-plan mutation of the paid catalog",
+        "Full ANPOS/commercial/vendor certification must pass before this migration is promoted to canonical main"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.5-to-1.3.6",
+      "from_version": "1.3.5",
+      "to_version": "1.3.6",
+      "detected_at": "2026-09-04T00:00:00+05:00",
+      "impact": [
+        "Separate the public/customer-facing GitHub Marketplace App trust boundary from the private Vendor Distribution GitHub App used for vendor-template access",
+        "Require the Marketplace App to be public/installable for Marketplace publication while keeping the Vendor Distribution App private and vendor-only",
+        "Move Marketplace reconciliation to GITHUB_MARKETPLACE_APP_ID/GITHUB_MARKETPLACE_APP_PRIVATE_KEY and vendor template access to GITHUB_VENDOR_APP_ID/GITHUB_VENDOR_APP_PRIVATE_KEY",
+        "Fail closed when Marketplace and Vendor App IDs are equal or their private keys are reused",
+        "Reject legacy GITHUB_APP_ID/GITHUB_APP_PRIVATE_KEY as production substitutes instead of silently collapsing App roles",
+        "Keep vendor repository Administration permission off the customer-facing Marketplace App; optional collaborator Administration permission remains Vendor-App-only",
+        "Add separate Marketplace/Vendor App blueprints and deprecate the legacy single-App blueprint",
+        "Bind free-first Marketplace staged publication and launch gates to public App installability plus App-role separation",
+        "Bump the commercial service contract from 0.2.1 to 0.3.0 because production environment configuration changes are intentionally non-backward-compatible",
+        "Preserve customer child/template vendor-source stripping and the existing Developer/Pro/Team/Enterprise paid catalog"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Existing customer child projects do not receive vendor-only GitHub App or commercial runtime assets. No child code migration is required. Vendor operators upgrading the commercial service must create/configure two distinct GitHub Apps and replace legacy single-App environment variables before 0.3.0 readiness can pass.",
+      "status": "applied",
+      "applied_at": "2026-09-04T00:00:00+05:00",
+      "verification_evidence": [
+        "Official GitHub documentation checked on 2026-09-04 confirms public Apps can be installed by other accounts and Marketplace publication is associated with public Apps",
+        "commercial-service configuration fails closed on equal Marketplace/Vendor App IDs and reused App private keys",
+        "commercial-service Marketplace reconciliation and vendor-template installation-token calls use separate App JWT roles",
+        "Production readiness validates both App private keys as RSA and legacy single-App credentials do not satisfy required configuration",
+        "Separate Marketplace and Vendor App blueprints are vendor-only and customer-template exports exclude them",
+        "Full ANPOS/commercial/vendor certification must pass before this migration is promoted to canonical main"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.6-to-1.3.7",
+      "from_version": "1.3.6",
+      "to_version": "1.3.7",
+      "detected_at": "2026-09-04T00:00:00+05:00",
+      "impact": [
+        "Add a vendor-only secret-safe operator launch bootstrap renderer for the external commercial setup handoff",
+        "Generate prefilled organization-owned GitHub App registration URLs for the public Marketplace App and private Vendor Distribution App",
+        "Keep Vendor Administration: write absent by default and add it only through an explicit collaborator-provisioning switch",
+        "Emit the commercial service 0.3.0 split Marketplace/Vendor environment-key contract without accepting or printing credential values",
+        "Add behavioral unit tests and a dedicated validator that reject secret-bearing CLI flags, legacy single-App configuration and trust-boundary collapse",
+        "Route commercial-distribution agents through the operator bootstrap assets and classify all bootstrap files as vendor-only",
+        "Correct stale README current-protocol metadata and document the 1.3.7 operator launch flow",
+        "Do not create GitHub repositories, GitHub Apps, Marketplace listings, credentials, plan IDs, pricing, installation evidence or launch authority"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Operator launch bootstrap assets are vendor-only and must remain stripped from customer child repositories and customer-facing commercial-template exports. Existing child projects do not need this helper and must not gain a commercial runtime dependency merely by adopting protocol metadata.",
+      "status": "applied",
+      "applied_at": "2026-09-04T00:00:00+05:00",
+      "verification_evidence": [
+        "scripts/render_operator_launch_bootstrap.py accepts only non-secret registration inputs and emits fail-closed JSON handoff data",
+        "tests/test_operator_launch_bootstrap.py covers Marketplace/Vendor visibility, permissions, explicit collaborator escalation, URL validation, split environment keys and secret-safety invariants",
+        "scripts/validate_operator_launch_bootstrap.py behaviorally verifies generated registration URLs and vendor/customer boundary enforcement",
+        "blueprints/commercial/vendor-launch-quality.yml runs the operator bootstrap tests and validator",
+        "config/licensing/vendor-source-boundary.json strips operator bootstrap assets from customer-template exports",
+        "Full temporary certification workflow must pass before canonical main promotion"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.7-to-1.3.8",
+      "from_version": "1.3.7",
+      "to_version": "1.3.8",
+      "detected_at": "2026-09-04T00:00:00+05:00",
+      "impact": [
+        "Add a public secret-free /api/version endpoint to the commercial service so deployment identity is observable independently of health/readiness",
+        "Embed source_protocol_version and split-github-app-v1 runtime-contract identity in the exported commercial-service package metadata",
+        "Require exact expected service/protocol versions whenever the production verifier is run with --require-ready so stale healthy artifacts cannot be certified",
+        "Correct production verifier customer/operator paths from stale /v1/* URLs to the actual Next.js /api/v1/* routes",
+        "Add deployment identity tests and a dedicated validator covering route identity, stale-version rejection, route-prefix correctness and vendor/customer boundary enforcement",
+        "Bump commercial service from 0.3.0 to 0.3.1 because the public operational API gains deployment identity and the production verifier contract is hardened",
+        "Do not add secrets, live Marketplace state, pricing, plan IDs, customer data or production authorization"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Deployment identity tooling and the commercial service remain vendor-only. Customer child repositories must not receive the commercial runtime or vendor verifier merely by adopting protocol metadata.",
+      "status": "applied",
+      "applied_at": "2026-09-04T00:00:00+05:00",
+      "verification_evidence": [
+        "commercial-service/app/api/version/route.ts derives non-secret identity from package metadata and uses Cache-Control: no-store",
+        "scripts/verify_commercial_production.py requires exact expected artifact identity with --require-ready and uses /api/v1 route prefixes",
+        "tests/test_deployment_identity.py covers exact identity, stale-version rejection, route-prefix regression and contract invariants",
+        "scripts/validate_deployment_identity.py behaviorally verifies the pre-network production readiness identity gate",
+        "Deterministic vendor export retains service 0.3.1 identity while customer-template export strips vendor-only identity-verification tooling",
+        "Full temporary certification workflow must pass before canonical main promotion"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.8-to-1.3.9",
+      "from_version": "1.3.8",
+      "to_version": "1.3.9",
+      "detected_at": "2026-09-04T00:00:00+05:00",
+      "impact": [
+        "Bind operator launch handoff artifact identity to committed commercial-service package metadata instead of copied release numbers",
+        "Cross-check the package embedded source protocol version against canonical protocol metadata and fail closed on drift",
+        "Emit exact production verifier service/protocol arguments from the same artifact identity used by /api/version",
+        "Remove hard-coded commercial release numbers from operator launch instructions and deployment examples",
+        "Make deployment identity tests/validator version-agnostic so future patch releases do not require stale literal maintenance",
+        "Bump commercial service from 0.3.1 to 0.3.2 so exported /api/version identity visibly attests the 1.3.9 vendor handoff contract",
+        "Preserve split-github-app-v1, all secret boundaries, paid catalog drafts, and fail-closed launch authorization"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Operator bootstrap, deployment verifier, and commercial runtime remain vendor-only. Customer child repositories do not receive these assets and gain no billing/runtime dependency from this metadata/tooling correction.",
+      "status": "applied",
+      "applied_at": "2026-09-04T00:00:00+05:00",
+      "verification_evidence": [
+        "Operator renderer artifact_identity is derived from commercial-service/package.json and checked against config/protocol/version.json",
+        "Operator handoff production_verifier_arguments are generated from the same package-derived service/protocol identity",
+        "Operator bootstrap unit tests cover package/protocol mismatch fail-closed behavior and reject hard-coded prior service versions",
+        "Deployment identity tests and validator derive the current service version dynamically while preserving exact runtime-contract checks",
+        "Deterministic vendor export must retain service 0.3.2 / protocol 1.3.9 identity while customer-template export strips vendor-only operator/deployment tooling",
+        "Full temporary certification workflow must pass before canonical main promotion"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.9-to-1.3.10",
+      "from_version": "1.3.9",
+      "to_version": "1.3.10",
+      "detected_at": "2026-09-04T00:00:00+05:00",
+      "impact": [
+        "Add a vendor-only handoff verifier that reconstructs the approved service/template export from committed canonical Git blobs and compares the complete target byte set",
+        "Verify clean private Git checkouts from committed HEAD blobs so newline-converted working-tree bytes cannot create false mismatches",
+        "Reject extra, missing, dirty, stale, tampered, wrong-mode, symlinked or wrong-identity vendor repository content before private-source acceptance",
+        "Emit deterministic verification receipts with canonical source revision/tree, target repository revision, manifest SHA-256 and content-set SHA-256",
+        "Upgrade operator handoff schema to bind both vendor repositories to canonical source revision/tree and generate exact service/template verifier arguments",
+        "Route exporter and handoff verifier explicitly to commercial-distribution agents and keep all new verification tooling vendor-only",
+        "Bump commercial service from 0.3.2 to 0.3.3 because exported package source_protocol_version changes to 1.3.10 and /api/version must attest the exact certified source identity",
+        "Preserve split-github-app-v1, paid draft catalog, secret boundaries, fail-closed launch authorization and non-destructive cancellation behavior"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Vendor export/handoff verification is vendor-only source-management tooling. Customer child repositories and customer-facing commercial-template exports must strip it and gain no commercial runtime dependency from this migration.",
+      "status": "applied",
+      "applied_at": "2026-09-04T00:00:00+05:00",
+      "verification_evidence": [
+        "scripts/verify_vendor_handoff.py reconstructs expected exports from committed canonical blobs and compares exact target files/bytes",
+        "Target Git checkout verification reads committed HEAD blobs and requires a clean checkout including untracked files",
+        "tests/test_vendor_handoff.py covers valid service/template handoff, private-style Git checkout, tampering, extra files, stale source identity, dirty checkout and service identity mismatch",
+        "Operator handoff schema_version=3 emits canonical source revision/tree plus exact service/template verification argument lists",
+        "Vendor source boundary strips verifier/tests from customer templates and .ai commercial_distribution routing includes exporter/verifier",
+        "Deterministic double export, full ANPOS/commercial/vendor tests and commercial service certification must pass before canonical main promotion"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.10-to-1.3.11",
+      "from_version": "1.3.10",
+      "to_version": "1.3.11",
+      "detected_at": "2026-09-04T00:00:00+05:00",
+      "impact": [
+        "Make clean private vendor-repository verification include ignored untracked files instead of relying on default git status visibility",
+        "Use explicit porcelain-v1 status with all untracked files and matching ignored paths before committed-blob comparison",
+        "Add regression coverage proving a file hidden only by .git/info/exclude cannot pass private checkout acceptance",
+        "Strengthen the vendor-export static validator so future changes cannot silently remove ignored-file cleanliness enforcement",
+        "Bump commercial service from 0.3.3 to 0.3.4 because exported package source_protocol_version changes to 1.3.11 and /api/version must attest the exact certified source identity",
+        "Preserve deterministic export receipts, split-github-app-v1, paid draft catalog, secret boundaries, fail-closed launch authorization and non-destructive cancellation behavior"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Vendor checkout cleanliness verification is vendor-only source-management tooling. Customer child repositories and customer-facing commercial-template exports must strip it and gain no commercial runtime dependency from this migration.",
+      "status": "applied",
+      "applied_at": "2026-09-04T00:00:00+05:00",
+      "verification_evidence": [
+        "scripts/verify_vendor_handoff.py uses git status --porcelain=v1 --untracked-files=all --ignored=matching before accepting a target Git checkout",
+        "tests/test_vendor_handoff.py proves an ignored untracked file hidden from default git status is rejected",
+        "scripts/validate_vendor_repository_export.py requires both ignored-file status flags and the regression test marker",
+        "Deterministic service/template export verification and receipt generation remain unchanged after the cleanliness preflight",
+        "Full ANPOS/commercial/vendor certification must pass before canonical main promotion"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.11-to-1.3.12",
+      "from_version": "1.3.11",
+      "to_version": "1.3.12",
+      "detected_at": "2026-09-04T02:49:00+05:00",
+      "impact": [
+        "Bind optional customer entitlement smoke verification to the canonical x-anpos-account-id request contract instead of sending only a bearer token",
+        "Require generic or route-missing 404 responses to fail while preserving the canonical structured entitlement_not_found outcome for accounts without an entitlement",
+        "Replace the stale operator reconciliation dry_run/github_account_id payload with a non-mutating authenticated contract probe that sends an empty JSON object and requires the canonical valid_account_id_required response",
+        "Reject operator 404 and generic 400 responses so explicitly requested authenticated smoke checks cannot pass when the route is missing or behavior has drifted",
+        "Validate GitHub account IDs locally as positive JavaScript-safe integers before any network request when a customer token smoke check is requested",
+        "Add behavioral regression tests and static deployment-identity validation for authenticated smoke request headers, bodies and error contracts",
+        "Bump commercial service from 0.3.4 to 0.3.5 because exported package source_protocol_version changes to 1.3.12 and /api/version must attest the exact certified source identity"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "This is vendor/operator production-verification hardening. Existing child projects do not receive the vendor-only verifier or commercial service. Preserve project behavior and do not introduce billing/runtime dependencies merely by adopting ANPOS 1.3.12.",
+      "status": "applied",
+      "applied_at": "2026-09-04T02:49:00+05:00",
+      "verification_evidence": [
+        "scripts/verify_commercial_production.py binds authenticated customer requests to X-Anpos-Account-Id and validates structured entitlement_not_found responses",
+        "scripts/verify_commercial_production.py uses a non-mutating authenticated empty-body operator probe and requires valid_account_id_required",
+        "tests/test_commercial_launch_package.py behaviorally verifies request headers/body, structured errors, route-missing rejection and pre-network account-ID validation",
+        "tests/test_deployment_identity.py plus scripts/validate_deployment_identity.py prevent authenticated smoke contract drift",
+        "commercial-service/package.json embeds source_protocol_version 1.3.12 and service version 0.3.5 for exact /api/version attestation"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.12-to-1.3.13",
+      "from_version": "1.3.12",
+      "to_version": "1.3.13",
+      "detected_at": "2026-09-04T00:00:00+05:00",
+      "impact": [
+        "Add a permanent canonical-source GitHub Actions certification workflow for pull requests targeting main and pushes to main instead of relying only on temporary release workflows",
+        "Keep the source certification workflow read-only, repository-guarded, concurrency-bounded and pinned to immutable GitHub Action commit SHAs",
+        "Run the complete Python test/validator suite, deterministic vendor export and exact handoff verification, locked npm audit, TypeScript tests and Next.js build on every source certification run",
+        "Add a dedicated validator and regression tests so the persistent source CI contract cannot silently lose core gates, gain write/secrets authority, or use floating Action refs",
+        "Classify the persistent source CI workflow/validator/tests as canonical-vendor-source-only so customer child repositories and anpos-commercial-template exports do not inherit source maintenance automation",
+        "Replace the previous source test that required zero workflows with an exact allowlist for the single guarded source certification workflow",
+        "Bump deployable commercial service identity because /api/version must attest the canonical ANPOS 1.3.13 source protocol identity",
+        "Do not claim or fabricate GitHub branch protection/ruleset enforcement; authenticated repository settings currently remain an external governance control"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "The persistent certification workflow is canonical-source-only and is stripped from customer/template exports. Existing child repositories keep their normal child workflow model and should not copy this source-maintenance workflow merely by adopting protocol 1.3.13.",
+      "status": "applied",
+      "applied_at": "2026-09-04T00:00:00+05:00",
+      "verification_evidence": [
+        ".github/workflows/source-continuous-certification.yml is committed only on the canonical source and triggers on pull_request/main plus push/main",
+        "scripts/validate_source_continuous_certification.py fails on write permissions, secret references, floating Action refs, missing certification gates, or missing vendor-boundary exclusions",
+        "tests/test_source_continuous_certification.py covers read-only repository guard, immutable Action refs, full certification markers, and source-only stripping",
+        "config/licensing/vendor-source-boundary.json strips all three source continuous-certification assets from customer/template exports",
+        "GitHub branch protection/ruleset enforcement remains external evidence and is not marked verified by this migration"
+      ]
+    },
+    {
+      "id": "ANPOS-1.3.13-to-1.4.0",
+      "from_version": "1.3.13",
+      "to_version": "1.4.0",
+      "detected_at": "2026-09-24T00:00:00+05:00",
+      "impact": [
+        "Promote capability-aware product assurance Requirements 83-88 into the active ANPOS protocol baseline",
+        "Promote governance assurance Requirements 89-96 covering responsible AI/human oversight, compliance evidence, ADRs, AI asset identity, deprecation/EOL, resilience runbooks/drills, tamper-evident audit evidence and unified risk/exception lifecycle",
+        "Expand persistent assurance state to Requirements 83-96 while keeping provider-neutral runtime executor contracts scoped to executable product-assurance Requirements 83-88",
+        "Add specialized Draft 2020-12 schemas and dedicated regression tests for product/governance assurance state and policy contracts",
+        "Extend conformance catalog through CONF-038",
+        "Initialize new assurance/governance registries and policies safely during child bootstrap without inheriting source evidence or claiming pass state",
+        "Bump deployable commercial service identity from 0.3.9 to 0.4.0 so /api/version and deterministic vendor handoff attest ANPOS 1.4.0 exactly",
+        "Preserve historical 1.3.x release/migration evidence and keep external publication/production provenance fail-closed"
+      ],
+      "project_conflicts": [],
+      "requires_owner_consent": false,
+      "child_migration_rule": "Existing child projects must adopt 1.4.0 non-destructively: preserve application code, approved architecture, CI/deployment behavior, project legal/commercial terms and project-specific state; add or reconcile missing 83-96 control files; reset no verified project evidence; classify each new assurance/governance requirement as applicable, optional, pending_detection or not_applicable with project-specific rationale; do not infer legal conclusions, AI pass status, production readiness or product success from the protocol upgrade itself.",
+      "status": "applied",
+      "applied_at": "2026-09-24T00:00:00+05:00",
+      "verification_evidence": [
+        "Requirements 83-96 are routed through the ANPOS lifecycle/agent manifest and protected ownership model",
+        "config/assurance/assurance-state.json plus specialized schemas validate the active 83-96 template blueprint",
+        "tests/test_product_assurance.py and tests/test_governance_assurance.py cover schema, bootstrap, evidence and governance invariants",
+        "config/testing/conformance-scenarios.json includes CONF-025 through CONF-038",
+        "commercial-service/package.json and package-lock.json attest service 0.4.0 / protocol 1.4.0 / split-github-app-v1",
+        "Source continuous certification, deterministic vendor export/handoff verification and commercial service certification must pass on the exact release candidate head before promotion"
+      ]
+    }
+  ],
+  "pending_migrations": [],
+  "migration_record_template": {
+    "id": "ANPOS-1.4.0-to-NEXT",
+    "from_version": "1.4.0",
+    "to_version": "NEXT",
+    "detected_at": null,
+    "impact": [],
+    "project_conflicts": [],
+    "requires_owner_consent": false,
+    "status": "pending",
+    "applied_at": null,
+    "verification_evidence": []
+  },
+  "rule": "Protocol migrations modify control-plane/runtime/commercial contracts incrementally. They must not overwrite project-specific implementation, approved architecture, customer code, or legal/commercial terms without impact analysis and applicable consent."
+}

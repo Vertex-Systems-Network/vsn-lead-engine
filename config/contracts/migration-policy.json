@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "active_policy",
+  "activation_scope": "child_project",
+  "breaking_change_policy": {
+    "impact_analysis_required": true,
+    "consumer_compatibility_required": true,
+    "prefer_expand_migrate_verify_contract": true,
+    "destructive_step_requires_explicit_approval_when_material": true,
+    "irreversible_step_must_be_labeled": true
+  },
+  "migration_template": {
+    "id": "MIG-001",
+    "affected_contracts": [],
+    "affected_data": [],
+    "backward_compatibility_window": null,
+    "expand_steps": [],
+    "backfill_or_migrate_steps": [],
+    "verification_steps": [],
+    "contract_steps": [],
+    "rollback_or_rollforward": [],
+    "backup_prerequisites": [],
+    "runtime_and_locking_impact": null,
+    "status": "planned"
+  },
+  "rules": {
+    "migration_must_be_idempotent_when_practical": true,
+    "large_data_migrations_require_runtime_impact_analysis": true,
+    "empty_dev_database_success_is_not_production_evidence": true
+  }
+}

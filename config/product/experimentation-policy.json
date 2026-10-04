@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "optional_inactive",
+  "activation_scope": "child_project",
+  "experiment_contract": [
+    "hypothesis",
+    "target_population_or_environment",
+    "intervention_or_variant",
+    "primary_success_metric",
+    "guardrail_metrics",
+    "observation_or_evidence_rule",
+    "privacy_security_and_ethical_constraints",
+    "rollout_plan",
+    "rollback_plan",
+    "stopping_criteria",
+    "analysis_result",
+    "decision"
+  ],
+  "allowed_decisions": [
+    "adopt",
+    "revise",
+    "reject",
+    "inconclusive"
+  ],
+  "supported_modes": [
+    "prototype_validation",
+    "usability_test",
+    "staged_pilot",
+    "ab_test",
+    "shadow_comparison",
+    "model_evaluation",
+    "controlled_production_variant"
+  ],
+  "safety": {
+    "no_security_or_privacy_weakening_for_experiment": true,
+    "no_material_undisclosed_user_risk": true,
+    "legal_or_consent_requirements_cannot_be_bypassed": true
+  }
+}

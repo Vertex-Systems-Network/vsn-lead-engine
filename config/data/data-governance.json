@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "status": "pending_project_data_classification",
+  "activation_scope": "child_project",
+  "classification_levels": [
+    "public",
+    "internal",
+    "confidential",
+    "restricted",
+    "secret"
+  ],
+  "sensitivity_tags": [
+    "pii",
+    "financial",
+    "health",
+    "credentials",
+    "security_sensitive",
+    "regulated",
+    "customer_content"
+  ],
+  "data_record_template": {
+    "id": "DATA-001",
+    "name": "",
+    "classification": "internal",
+    "tags": [],
+    "owners": [],
+    "storage_locations": [],
+    "encryption_required": true,
+    "log_policy": "redact_or_omit_sensitive_fields",
+    "ai_access": "project_policy_required",
+    "retention": null,
+    "deletion_method": null,
+    "backup_policy": null,
+    "non_production_policy": "no_raw_production_copy_without_approved_protected_process"
+  },
+  "rules": {
+    "secrets_never_in_pm_or_ai_memory": true,
+    "sensitive_logs_must_be_redacted": true,
+    "production_data_copy_to_lower_environment_requires_approval": true,
+    "retention_and_deletion_must_be_defined_before_production_for_sensitive_data": true
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/config-base.schema.json",
+  "title": "ANPOS Machine Config Base",
+  "type": "object",
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 1}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": 3,
+  "status": "not_selected",
+  "provider_id": "linear",
+  "managed_by": "config/integrations/project-management.json",
+  "enabled": false,
+  "activation_scope": "child_project_only_when_selected",
+  "role": "planning_progress_mirror_adapter",
+  "canonical_code_system": "github",
+  "connection": {
+    "required_only_when_linear_selected": true,
+    "method": "host_connector_or_oauth_or_mcp",
+    "never_collect_raw_password": true,
+    "preferred_action": "Connect Linear",
+    "fallback": "Ask the user to connect/authenticate Linear in the host UI, then resume setup."
+  },
+  "project": {
+    "name": null,
+    "id": null,
+    "url": null
+  },
+  "mapping_policy": {
+    "attach_existing_project_when_selected": true,
+    "create_project_when_needed_and_authorized": true,
+    "persist_mapping_only_in_child_project": true,
+    "template_source_must_remain_unmapped": true
+  },
+  "sync_policy": {
+    "active_hourly_interval_minutes": 60,
+    "sync_on_startup": true,
+    "sync_on_assignment": true,
+    "sync_on_blocker": true,
+    "sync_on_review_submission": true,
+    "sync_on_changes_requested": true,
+    "sync_on_merge": true,
+    "sync_on_module_completion": true,
+    "sync_on_phase_completion": true,
+    "sync_on_plan_revision": true,
+    "sync_on_governance_or_quality_change": true,
+    "sync_on_protocol_orchestration_change": true,
+    "catch_up_on_resume": true,
+    "hourly_only_when_persistent_runtime_exists": true
+  },
+  "last_successful_sync_at": null,
+  "last_attempt_at": null,
+  "last_error": null,
+  "last_reconciled_main_sha": null,
+  "last_linear_status_update_id": null,
+  "sync_result": "provider_not_selected",
+  "degraded_mode": "If Linear is selected but unavailable, keep GitHub/repository state canonical, mark provider sync degraded, and catch up when connectivity returns."
+}

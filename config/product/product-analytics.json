@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "status": "pending_applicability_detection",
+  "activation_scope": "child_project",
+  "metric_examples": [
+    "activation",
+    "task_completion",
+    "feature_adoption",
+    "conversion",
+    "retention",
+    "churn",
+    "funnel_completion",
+    "reliability_impact",
+    "support_contact_rate",
+    "user_experienced_latency",
+    "satisfaction"
+  ],
+  "metric_contract": {
+    "definition_required": true,
+    "source_of_truth_required": true,
+    "event_or_data_schema_required": true,
+    "privacy_classification_required": true,
+    "collection_purpose_required": true,
+    "retention_policy_required": true,
+    "instrumentation_verification_required": true,
+    "baseline_and_target_when_justified": true
+  },
+  "interpretation_rules": {
+    "deployment_is_not_product_success": true,
+    "synthetic_traffic_is_not_user_outcome_evidence": true,
+    "vanity_metrics_must_not_replace_outcome_metrics": true,
+    "segmentation_and_confounding_caveats_must_be_considered": true
+  },
+  "feedback_loop": "Verified product evidence may create proposed options/modules/work units through normal ANPOS planning and consent rules."
+}

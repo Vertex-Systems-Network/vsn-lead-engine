@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "current_merge_generation": 0,
+  "events": [],
+  "event_schema": {
+    "generation": 1,
+    "merged_at": null,
+    "merge_sha": null,
+    "review_reference": null,
+    "slot_id": null,
+    "module_id": null,
+    "summary": "",
+    "affected_slots": [],
+    "required_worker_action": "sync_main_and_reverify"
+  }
+}

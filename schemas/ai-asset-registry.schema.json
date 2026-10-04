@@ -1,0 +1,46 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://anpos.local/schemas/ai-asset-registry.schema.json",
+  "title":"ANPOS AI Asset Registry",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","status","activation_scope","assets","asset_template","rules"],
+  "properties":{
+    "schema_version":{"const":1},
+    "status":{"type":"string"},
+    "activation_scope":{"type":"string"},
+    "assets":{
+      "type":"array",
+      "items":{
+        "type":"object","additionalProperties":false,
+        "required":["id","type","provider","name","version","configuration_hash","source_or_artifact_ref","environment_bindings","evaluation_dataset_version","last_certified_evaluation_ref","last_certified_at","contains_secret","status"],
+        "properties":{
+          "id":{"type":"string","pattern":"^AI-ASSET-[0-9]{4}$"},
+          "type":{"type":"string","minLength":1},
+          "provider":{"type":["string","null"]},
+          "name":{"type":"string","minLength":1},
+          "version":{"type":["string","null"]},
+          "configuration_hash":{"type":["string","null"]},
+          "source_or_artifact_ref":{"type":["string","null"]},
+          "environment_bindings":{"type":"array","items":{"type":"string"},"uniqueItems":true},
+          "evaluation_dataset_version":{"type":["string","null"]},
+          "last_certified_evaluation_ref":{"type":["string","null"]},
+          "last_certified_at":{"type":["string","null"]},
+          "contains_secret":{"const":false},
+          "status":{"enum":["unverified","active","deprecated","retired"]}
+        }
+      }
+    },
+    "asset_template":{"type":"object"},
+    "rules":{
+      "type":"object","additionalProperties":false,
+      "required":["secrets_forbidden","material_behavior_configuration_requires_stable_identity_or_hash","material_configuration_change_invalidates_stale_assurance_when_policy_requires","unknown_provider_internal_version_must_remain_explicit_unknown"],
+      "properties":{
+        "secrets_forbidden":{"const":true},
+        "material_behavior_configuration_requires_stable_identity_or_hash":{"const":true},
+        "material_configuration_change_invalidates_stale_assurance_when_policy_requires":{"const":true},
+        "unknown_provider_internal_version_must_remain_explicit_unknown":{"const":true}
+      }
+    }
+  }
+}

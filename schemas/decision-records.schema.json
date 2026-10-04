@@ -1,0 +1,40 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://anpos.local/schemas/decision-records.schema.json",
+  "title":"ANPOS Architecture Decision Records",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","status","activation_scope","decisions","decision_template","allowed_statuses","rules"],
+  "properties":{
+    "schema_version":{"const":1},
+    "status":{"type":"string"},
+    "activation_scope":{"type":"string"},
+    "decisions":{
+      "type":"array",
+      "items":{
+        "type":"object","additionalProperties":false,
+        "required":["id","title","status","context","alternatives","evidence_refs","decision","consequences","security_privacy_data_operational_cost_impact","reversibility","affected_modules_or_contracts","decided_by","decided_at","supersedes","superseded_by"],
+        "properties":{
+          "id":{"type":"string","pattern":"^ADR-[0-9]{4}$"},
+          "title":{"type":"string","minLength":1},
+          "status":{"enum":["proposed","accepted","rejected","superseded"]},
+          "context":{"type":"string"},
+          "alternatives":{"type":"array","items":{"type":"string"}},
+          "evidence_refs":{"type":"array","items":{"type":"string"},"uniqueItems":true},
+          "decision":{"type":"string"},
+          "consequences":{"type":"array","items":{"type":"string"}},
+          "security_privacy_data_operational_cost_impact":{"type":"array","items":{"type":"string"}},
+          "reversibility":{"type":"string"},
+          "affected_modules_or_contracts":{"type":"array","items":{"type":"string"},"uniqueItems":true},
+          "decided_by":{"type":["string","null"]},
+          "decided_at":{"type":["string","null"]},
+          "supersedes":{"type":"array","items":{"type":"string","pattern":"^ADR-[0-9]{4}$"},"uniqueItems":true},
+          "superseded_by":{"type":["string","null"],"pattern":"^ADR-[0-9]{4}$"}
+        }
+      }
+    },
+    "decision_template":{"type":"object"},
+    "allowed_statuses":{"type":"array","items":{"enum":["proposed","accepted","rejected","superseded"]},"uniqueItems":true},
+    "rules":{"type":"array","items":{"type":"string","minLength":1}}
+  }
+}

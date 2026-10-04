@@ -1,0 +1,93 @@
+name: AI Native Quality Gates
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-native-quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository-integrity:
+    name: repository-integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository with base history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install pinned ANPOS validation dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-anpos.txt
+
+      - name: Compile repository scripts and tests
+        run: python -m compileall -q scripts tests
+
+      - name: Run control-plane and child-safe commercial conformance unit tests
+        run: python -m unittest discover -s tests -p 'test_*.py'
+
+      - name: Validate current AI-native state and workflow safety
+        run: python scripts/validate_ai_native_repo.py
+
+      - name: Validate commercial distribution and licensing blueprint
+        run: python scripts/validate_commercial_licensing.py
+
+      - name: Run protected-base validators against proposed tree
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git show "${BASE_SHA}:scripts/validate_ai_native_repo.py" > scripts/.trusted-base-validator.py
+          python scripts/.trusted-base-validator.py
+          rm -f scripts/.trusted-base-validator.py
+
+          if git cat-file -e "${BASE_SHA}:scripts/validate_commercial_licensing.py" 2>/dev/null; then
+            git show "${BASE_SHA}:scripts/validate_commercial_licensing.py" > scripts/.trusted-base-commercial-validator.py
+            python scripts/.trusted-base-commercial-validator.py
+            rm -f scripts/.trusted-base-commercial-validator.py
+          else
+            echo 'Base branch predates commercial validator; current commercial validator and protected review remain required for this migration.'
+          fi
+
+      - name: Report control-plane changes for review evidence
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --name-only "$BASE_SHA" HEAD -- \
+            AGENTS.md .ai .github blueprints scripts schemas tests config/coordination config/protocol \
+            config/security config/consent config/github config/quality config/runtime config/release \
+            config/licensing COMMERCIAL-LICENSING.md \
+            CONTROL-PLANE-SECURITY.md PRODUCTION-ASSURANCE.md DESIGN-DATA-OPERATIONS.md \
+            AUTO-AGENT.md SUPERVISOR.md ORCHESTRATOR.md MULTI-AGENT-ORCHESTRATION.md || true
+
+      - name: Validate YAML syntax
+        shell: bash
+        run: |
+          ruby -e 'require "yaml"; ARGV.each { |f| YAML.load_file(f); puts "valid yaml: #{f}" }' \
+            .github/dependabot.yml .github/workflows/*.yml
+
+      - name: Reject trailing whitespace in machine/code files
+        shell: bash
+        run: |
+          if git grep -nE '[[:blank:]]+$' -- '*.py' '*.json' '*.yml' '*.yaml'; then
+            echo 'Trailing whitespace found in machine/code files.' >&2
+            exit 1
+          fi
+
+      - name: Show repository integrity success
+        run: echo 'Repository integrity, conformance tests, JSON Schema, core/commercial validators, protected-base validation, workflow pinning, JSON, and YAML checks passed.'

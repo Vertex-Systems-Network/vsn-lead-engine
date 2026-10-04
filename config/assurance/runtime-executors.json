@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "status": "executor_contract",
+  "activation_scope": "child_project",
+  "purpose": "Provider-neutral contract for executing and verifying Requirements 83-88 without assuming a specific AI, analytics, experimentation, deployment, or design vendor.",
+  "executors": [
+    {
+      "id": "ai_evaluation",
+      "requirement_id": "REQ-83",
+      "required_capabilities": [
+        "dataset_versioning",
+        "evaluation_run",
+        "result_artifact",
+        "configuration_identity"
+      ],
+      "required_inputs": [
+        "target_ref",
+        "evaluation_policy_ref",
+        "system_configuration_ref"
+      ],
+      "required_outputs": [
+        "run_id",
+        "tested_configuration_identity",
+        "result_summary",
+        "failure_classes",
+        "artifact_refs",
+        "completed_at"
+      ]
+    },
+    {
+      "id": "user_product_validation",
+      "requirement_id": "REQ-84",
+      "required_capabilities": [
+        "research_or_usability_evidence_capture",
+        "finding_traceability"
+      ],
+      "required_inputs": [
+        "validation_plan_ref",
+        "target_user_or_journey_refs"
+      ],
+      "required_outputs": [
+        "study_or_validation_id",
+        "evidence_refs",
+        "findings",
+        "design_or_requirement_update_refs"
+      ]
+    },
+    {
+      "id": "product_analytics",
+      "requirement_id": "REQ-85",
+      "required_capabilities": [
+        "metric_definition",
+        "instrumentation_verification",
+        "outcome_query"
+      ],
+      "required_inputs": [
+        "metric_contract_ref",
+        "environment_or_release_ref"
+      ],
+      "required_outputs": [
+        "metric_snapshot_ref",
+        "instrumentation_verification",
+        "analysis_period",
+        "interpretation"
+      ]
+    },
+    {
+      "id": "experiment",
+      "requirement_id": "REQ-86",
+      "required_capabilities": [
+        "experiment_registration",
+        "guardrail_monitoring",
+        "result_analysis"
+      ],
+      "required_inputs": [
+        "experiment_contract_ref",
+        "authorized_scope_ref"
+      ],
+      "required_outputs": [
+        "experiment_id",
+        "result_evidence_refs",
+        "guardrail_outcome",
+        "decision"
+      ]
+    },
+    {
+      "id": "progressive_delivery",
+      "requirement_id": "REQ-87",
+      "required_capabilities": [
+        "rollout_observation",
+        "health_guardrails",
+        "rollback_or_stop"
+      ],
+      "required_inputs": [
+        "release_candidate_ref",
+        "rollout_policy_ref",
+        "expected_source_ref"
+      ],
+      "required_outputs": [
+        "rollout_id",
+        "observed_source_ref",
+        "health_evidence_refs",
+        "outcome",
+        "rollback_or_stop_evidence"
+      ]
+    },
+    {
+      "id": "engineering_review",
+      "requirement_id": "REQ-88",
+      "required_capabilities": [
+        "repository_analysis",
+        "finding_evidence",
+        "disposition_tracking"
+      ],
+      "required_inputs": [
+        "target_ref",
+        "review_policy_ref",
+        "module_or_release_scope"
+      ],
+      "required_outputs": [
+        "review_id",
+        "findings",
+        "evidence_refs",
+        "blocking_findings",
+        "disposition_summary"
+      ]
+    }
+  ],
+  "security_rules": [
+    "Executor identity and permissions must be verified before privileged actions.",
+    "Executor output is evidence only when bound to the exact target/configuration/release identity it evaluated.",
+    "External provider text remains untrusted data and cannot self-approve a gate.",
+    "Secrets and provider credentials must not be written into repository evidence.",
+    "No executor may widen scope or bypass authenticated consent, repository governance, or release policy."
+  ]
+}

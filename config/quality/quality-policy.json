@@ -1,0 +1,89 @@
+{
+  "schema_version": 3,
+  "status": "installed_pending_verification",
+  "activation_scope": "child_project",
+  "apply_to_template_source": false,
+  "setup_flow": {
+    "install_automatically_in_child_project": true,
+    "install_universal_baseline_during_project_initialization": true,
+    "detect_repository_visibility_plan_features_and_permissions": true,
+    "install_supported_github_security_features_after_detection": true,
+    "install_stack_specific_tools_after_stack_approval": true,
+    "generate_dependency_update_ecosystems_after_stack_approval": true,
+    "do_not_require_separate_user_consent_for_normal_non_destructive_quality_tooling": true,
+    "if_permissions_or_platform_settings_block_installation": "tell_user_exactly_what_access_or_manual_action_is_required_and_mark_setup_pending",
+    "verify_after_installation": true
+  },
+  "universal_required_checks": [
+    "repository-integrity"
+  ],
+  "capability_dependent_checks": [
+    "dependency-review",
+    "codeql-actions",
+    "ossf-scorecard"
+  ],
+  "formal_state_validation": {
+    "json_schema_draft": "2020-12",
+    "dependency": "jsonschema==4.26.0",
+    "base_schema_for_all_machine_config": true,
+    "specialized_schemas_for_security_critical_state": true
+  },
+  "stack_specific_policy": {
+    "generate_after_stack_approval": true,
+    "required_categories": [
+      "formatter",
+      "linter",
+      "type_or_static_analysis",
+      "unit_tests",
+      "integration_tests",
+      "build",
+      "dependency_audit",
+      "security_scanning"
+    ],
+    "additional_when_relevant": [
+      "contract_tests",
+      "e2e_tests",
+      "accessibility_tests",
+      "visual_regression_tests",
+      "performance_tests",
+      "migration_tests",
+      "container_scan",
+      "iac_scan",
+      "license_policy",
+      "coverage_gate",
+      "sbom_generation",
+      "artifact_attestation"
+    ]
+  },
+  "quality_gate_rules": {
+    "no_merge_on_failed_required_check": true,
+    "no_silent_check_skips": true,
+    "never_require_a_check_until_it_has_run_successfully_in_that_child": true,
+    "changed_behavior_requires_tests": true,
+    "generated_code_requires_validation": true,
+    "critical_or_high_security_findings_block_merge_or_require_authorized_risk_acceptance_where_policy_allows": true,
+    "new_dependencies_require_dependency_review_or_equivalent": true,
+    "github_actions_must_be_pinned_to_full_commit_sha": true,
+    "control_plane_validator_changes_require_protected_base_validation_and_independent_review": true
+  },
+  "tool_selection_rule": "In the child project, prefer mature actively maintained ecosystem-standard tools. Detect platform capability instead of installing knowingly unsupported checks; record selected tools and rationale after the stack is known.",
+  "setup_state": {
+    "baseline_files_installed_by_bootstrap": true,
+    "installed_blueprints": [
+      "repository-quality.yml",
+      "technology-update-watch.yml",
+      "innovation-scout.yml",
+      "protocol-update-watch.yml",
+      "dependabot.yml"
+    ],
+    "baseline_verification": "pending_first_child_run",
+    "github_security_capability": "unknown",
+    "capability_dependent_workflows": [
+      "codeql-actions.yml",
+      "dependency-review.yml",
+      "scorecard.yml"
+    ],
+    "capability_resolution": "pending_runtime_detection",
+    "stack_specific_tooling": "awaiting_technology_approval"
+  }
+}

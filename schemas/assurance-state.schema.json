@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anpos.local/schemas/assurance-state.schema.json",
+  "title": "ANPOS Assurance State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "activation_scope",
+    "requirements",
+    "allowed_applicability",
+    "allowed_states",
+    "rules"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "type": "string"
+    },
+    "activation_scope": {
+      "type": "string"
+    },
+    "last_reconciled_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "last_reconciled_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "minItems": 14,
+      "maxItems": 14,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "requirement_id",
+          "name",
+          "applicability",
+          "state",
+          "reason",
+          "evidence_refs",
+          "last_verified_ref",
+          "last_verified_at",
+          "blocking_findings"
+        ],
+        "properties": {
+          "requirement_id": {
+            "enum": [
+              "REQ-83",
+              "REQ-84",
+              "REQ-85",
+              "REQ-86",
+              "REQ-87",
+              "REQ-88",
+              "REQ-89",
+              "REQ-90",
+              "REQ-91",
+              "REQ-92",
+              "REQ-93",
+              "REQ-94",
+              "REQ-95",
+              "REQ-96"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "applicability": {
+            "enum": [
+              "pending_detection",
+              "applicable",
+              "not_applicable",
+              "optional"
+            ]
+          },
+          "state": {
+            "enum": [
+              "not_started",
+              "in_progress",
+              "blocked",
+              "verification_required",
+              "passed",
+              "failed",
+              "not_applicable"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "last_verified_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_verified_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "blocking_findings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "state": {
+                  "const": "passed"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "evidence_refs": {
+                  "minItems": 1
+                },
+                "last_verified_ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "last_verified_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "applicability": {
+                  "const": "not_applicable"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "state": {
+                  "const": "not_applicable"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "allowed_applicability": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "allowed_states": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

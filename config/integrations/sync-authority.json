@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "status": "active_policy",
+  "activation_scope": "child_project",
+  "default_authority": {
+    "code": "repository",
+    "branch": "repository",
+    "pull_or_merge_request": "repository",
+    "merge_state": "repository",
+    "test_and_check_state": "repository",
+    "release_evidence": "repository",
+    "work_unit_completion": "repository",
+    "business_priority": "project_policy",
+    "target_date": "project_policy",
+    "human_business_notes": "project_management_provider_when_selected"
+  },
+  "sync_controls": {
+    "idempotency_key_required_for_writes_when_supported": true,
+    "provider_revision_or_cursor_required_when_supported": true,
+    "external_id_history_required": true,
+    "self_echo_loop_prevention_required": true,
+    "conflict_must_be_recorded_not_silently_overwritten": true,
+    "repository_reconcile_before_provider_switch": true
+  },
+  "conflict_record_template": {
+    "id": "SYNC-CONFLICT-001",
+    "field": "",
+    "repository_value": null,
+    "provider_value": null,
+    "repository_revision": null,
+    "provider_revision": null,
+    "authority": null,
+    "resolution": null,
+    "resolved_at": null
+  }
+}

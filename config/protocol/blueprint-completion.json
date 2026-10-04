@@ -1,0 +1,2408 @@
+{
+  "schema_version": 1,
+  "status": "baseline_complete",
+  "activation_scope": "canonical_source_blueprint_closure",
+  "protocol_version": "1.4.0",
+  "requirement_range": {
+    "first": 1,
+    "last": 96,
+    "count": 96
+  },
+  "requirements": [
+    {
+      "requirement_id": "REQ-01",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-02",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-03",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-04",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-05",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-06",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-07",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-08",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-09",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-10",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-11",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-12",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-13",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-14",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-15",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-16",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-17",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-18",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-19",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-20",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-21",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-22",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-23",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-24",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-25",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-26",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-27",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-28",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-29",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-30",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-31",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-32",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-33",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-34",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-35",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-36",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-37",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-38",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-39",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-40",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-41",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-42",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-43",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-44",
+      "domain": "core_project_lifecycle",
+      "authoritative_docs": [
+        "START-HERE.md",
+        "PROJECT-INITIALIZATION.md",
+        "PROJECT-MANAGEMENT.md",
+        "DEVELOPMENT-LIFECYCLE.md",
+        "AI-NATIVE-EXECUTION.md",
+        "MULTI-AGENT-ORCHESTRATION.md",
+        "AUTO-AGENT.md",
+        "SUPERVISOR.md",
+        "ORCHESTRATOR.md",
+        "CODE-QUALITY.md"
+      ],
+      "machine_controls": [
+        "config/protocol/version.json",
+        "config/protocol/state-machine.json",
+        "config/traceability/requirements-traceability.json",
+        "config/coordination/agent-work-queue.json",
+        "config/coordination/supervisor-state.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-45",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-46",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-47",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-48",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-49",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-50",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-51",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-52",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-53",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-54",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-55",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-56",
+      "domain": "control_plane_security",
+      "authoritative_docs": [
+        "CONTROL-PLANE-SECURITY.md"
+      ],
+      "machine_controls": [
+        "config/security/control-plane-policy.json",
+        "config/security/trust-policy.json",
+        "config/runtime/budgets.json",
+        "config/consent/consent-requests.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-57",
+      "domain": "production_assurance",
+      "authoritative_docs": [
+        "PRODUCTION-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/release/release-policy.json",
+        "config/operations/operations-policy.json",
+        "config/contracts/migration-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-58",
+      "domain": "production_assurance",
+      "authoritative_docs": [
+        "PRODUCTION-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/release/release-policy.json",
+        "config/operations/operations-policy.json",
+        "config/contracts/migration-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-59",
+      "domain": "production_assurance",
+      "authoritative_docs": [
+        "PRODUCTION-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/release/release-policy.json",
+        "config/operations/operations-policy.json",
+        "config/contracts/migration-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-60",
+      "domain": "production_assurance",
+      "authoritative_docs": [
+        "PRODUCTION-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/release/release-policy.json",
+        "config/operations/operations-policy.json",
+        "config/contracts/migration-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-61",
+      "domain": "production_assurance",
+      "authoritative_docs": [
+        "PRODUCTION-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/release/release-policy.json",
+        "config/operations/operations-policy.json",
+        "config/contracts/migration-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-62",
+      "domain": "production_assurance",
+      "authoritative_docs": [
+        "PRODUCTION-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/release/release-policy.json",
+        "config/operations/operations-policy.json",
+        "config/contracts/migration-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-63",
+      "domain": "production_assurance",
+      "authoritative_docs": [
+        "PRODUCTION-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/release/release-policy.json",
+        "config/operations/operations-policy.json",
+        "config/contracts/migration-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-64",
+      "domain": "production_assurance",
+      "authoritative_docs": [
+        "PRODUCTION-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/release/release-policy.json",
+        "config/operations/operations-policy.json",
+        "config/contracts/migration-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-65",
+      "domain": "production_assurance",
+      "authoritative_docs": [
+        "PRODUCTION-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/release/release-policy.json",
+        "config/operations/operations-policy.json",
+        "config/contracts/migration-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-66",
+      "domain": "production_assurance",
+      "authoritative_docs": [
+        "PRODUCTION-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/release/release-policy.json",
+        "config/operations/operations-policy.json",
+        "config/contracts/migration-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-67",
+      "domain": "design_data_operations",
+      "authoritative_docs": [
+        "DESIGN-DATA-OPERATIONS.md"
+      ],
+      "machine_controls": [
+        "config/design/design-intake.json",
+        "config/design/design-assurance.json",
+        "config/data/data-governance.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-68",
+      "domain": "design_data_operations",
+      "authoritative_docs": [
+        "DESIGN-DATA-OPERATIONS.md"
+      ],
+      "machine_controls": [
+        "config/design/design-intake.json",
+        "config/design/design-assurance.json",
+        "config/data/data-governance.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-69",
+      "domain": "design_data_operations",
+      "authoritative_docs": [
+        "DESIGN-DATA-OPERATIONS.md"
+      ],
+      "machine_controls": [
+        "config/design/design-intake.json",
+        "config/design/design-assurance.json",
+        "config/data/data-governance.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-70",
+      "domain": "design_data_operations",
+      "authoritative_docs": [
+        "DESIGN-DATA-OPERATIONS.md"
+      ],
+      "machine_controls": [
+        "config/design/design-intake.json",
+        "config/design/design-assurance.json",
+        "config/data/data-governance.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-71",
+      "domain": "design_data_operations",
+      "authoritative_docs": [
+        "DESIGN-DATA-OPERATIONS.md"
+      ],
+      "machine_controls": [
+        "config/design/design-intake.json",
+        "config/design/design-assurance.json",
+        "config/data/data-governance.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-72",
+      "domain": "design_data_operations",
+      "authoritative_docs": [
+        "DESIGN-DATA-OPERATIONS.md"
+      ],
+      "machine_controls": [
+        "config/design/design-intake.json",
+        "config/design/design-assurance.json",
+        "config/data/data-governance.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-73",
+      "domain": "design_data_operations",
+      "authoritative_docs": [
+        "DESIGN-DATA-OPERATIONS.md"
+      ],
+      "machine_controls": [
+        "config/design/design-intake.json",
+        "config/design/design-assurance.json",
+        "config/data/data-governance.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-74",
+      "domain": "design_data_operations",
+      "authoritative_docs": [
+        "DESIGN-DATA-OPERATIONS.md"
+      ],
+      "machine_controls": [
+        "config/design/design-intake.json",
+        "config/design/design-assurance.json",
+        "config/data/data-governance.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_control_plane.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-75",
+      "domain": "commercial_distribution",
+      "authoritative_docs": [
+        "COMMERCIAL-LICENSING.md"
+      ],
+      "machine_controls": [
+        "config/licensing/product-catalog.json",
+        "config/licensing/marketplace-adapter.json",
+        "config/licensing/vendor-source-boundary.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_commercial_licensing.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-76",
+      "domain": "commercial_distribution",
+      "authoritative_docs": [
+        "COMMERCIAL-LICENSING.md"
+      ],
+      "machine_controls": [
+        "config/licensing/product-catalog.json",
+        "config/licensing/marketplace-adapter.json",
+        "config/licensing/vendor-source-boundary.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_commercial_licensing.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-77",
+      "domain": "commercial_distribution",
+      "authoritative_docs": [
+        "COMMERCIAL-LICENSING.md"
+      ],
+      "machine_controls": [
+        "config/licensing/product-catalog.json",
+        "config/licensing/marketplace-adapter.json",
+        "config/licensing/vendor-source-boundary.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_commercial_licensing.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-78",
+      "domain": "commercial_distribution",
+      "authoritative_docs": [
+        "COMMERCIAL-LICENSING.md"
+      ],
+      "machine_controls": [
+        "config/licensing/product-catalog.json",
+        "config/licensing/marketplace-adapter.json",
+        "config/licensing/vendor-source-boundary.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_commercial_licensing.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-79",
+      "domain": "commercial_distribution",
+      "authoritative_docs": [
+        "COMMERCIAL-LICENSING.md"
+      ],
+      "machine_controls": [
+        "config/licensing/product-catalog.json",
+        "config/licensing/marketplace-adapter.json",
+        "config/licensing/vendor-source-boundary.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_commercial_licensing.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-80",
+      "domain": "commercial_distribution",
+      "authoritative_docs": [
+        "COMMERCIAL-LICENSING.md"
+      ],
+      "machine_controls": [
+        "config/licensing/product-catalog.json",
+        "config/licensing/marketplace-adapter.json",
+        "config/licensing/vendor-source-boundary.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_commercial_licensing.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-81",
+      "domain": "commercial_distribution",
+      "authoritative_docs": [
+        "COMMERCIAL-LICENSING.md"
+      ],
+      "machine_controls": [
+        "config/licensing/product-catalog.json",
+        "config/licensing/marketplace-adapter.json",
+        "config/licensing/vendor-source-boundary.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_commercial_licensing.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-82",
+      "domain": "commercial_distribution",
+      "authoritative_docs": [
+        "COMMERCIAL-LICENSING.md"
+      ],
+      "machine_controls": [
+        "config/licensing/product-catalog.json",
+        "config/licensing/marketplace-adapter.json",
+        "config/licensing/vendor-source-boundary.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_commercial_licensing.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-83",
+      "domain": "ai_native_product_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-PRODUCT-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/assurance/assurance-state.json",
+        "config/assurance/runtime-executors.json",
+        "config/research/evidence-registry.json",
+        "config/ai/ai-evaluation-policy.json",
+        "config/product/product-validation.json",
+        "config/product/product-analytics.json",
+        "config/product/experimentation-policy.json",
+        "config/release/progressive-delivery.json",
+        "config/quality/engineering-review-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_product_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-84",
+      "domain": "ai_native_product_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-PRODUCT-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/assurance/assurance-state.json",
+        "config/assurance/runtime-executors.json",
+        "config/research/evidence-registry.json",
+        "config/ai/ai-evaluation-policy.json",
+        "config/product/product-validation.json",
+        "config/product/product-analytics.json",
+        "config/product/experimentation-policy.json",
+        "config/release/progressive-delivery.json",
+        "config/quality/engineering-review-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_product_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-85",
+      "domain": "ai_native_product_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-PRODUCT-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/assurance/assurance-state.json",
+        "config/assurance/runtime-executors.json",
+        "config/research/evidence-registry.json",
+        "config/ai/ai-evaluation-policy.json",
+        "config/product/product-validation.json",
+        "config/product/product-analytics.json",
+        "config/product/experimentation-policy.json",
+        "config/release/progressive-delivery.json",
+        "config/quality/engineering-review-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_product_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-86",
+      "domain": "ai_native_product_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-PRODUCT-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/assurance/assurance-state.json",
+        "config/assurance/runtime-executors.json",
+        "config/research/evidence-registry.json",
+        "config/ai/ai-evaluation-policy.json",
+        "config/product/product-validation.json",
+        "config/product/product-analytics.json",
+        "config/product/experimentation-policy.json",
+        "config/release/progressive-delivery.json",
+        "config/quality/engineering-review-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_product_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-87",
+      "domain": "ai_native_product_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-PRODUCT-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/assurance/assurance-state.json",
+        "config/assurance/runtime-executors.json",
+        "config/research/evidence-registry.json",
+        "config/ai/ai-evaluation-policy.json",
+        "config/product/product-validation.json",
+        "config/product/product-analytics.json",
+        "config/product/experimentation-policy.json",
+        "config/release/progressive-delivery.json",
+        "config/quality/engineering-review-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_product_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-88",
+      "domain": "ai_native_product_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-PRODUCT-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/assurance/assurance-state.json",
+        "config/assurance/runtime-executors.json",
+        "config/research/evidence-registry.json",
+        "config/ai/ai-evaluation-policy.json",
+        "config/product/product-validation.json",
+        "config/product/product-analytics.json",
+        "config/product/experimentation-policy.json",
+        "config/release/progressive-delivery.json",
+        "config/quality/engineering-review-policy.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_product_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-89",
+      "domain": "ai_native_governance_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-GOVERNANCE-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/ai/responsible-ai-policy.json",
+        "config/compliance/compliance-profile.json",
+        "config/architecture/decision-records.json",
+        "config/ai/asset-registry.json",
+        "config/contracts/deprecation-policy.json",
+        "config/operations/runbooks-and-drills.json",
+        "config/audit/audit-journal.json",
+        "config/risk/risk-register.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_governance_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-90",
+      "domain": "ai_native_governance_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-GOVERNANCE-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/ai/responsible-ai-policy.json",
+        "config/compliance/compliance-profile.json",
+        "config/architecture/decision-records.json",
+        "config/ai/asset-registry.json",
+        "config/contracts/deprecation-policy.json",
+        "config/operations/runbooks-and-drills.json",
+        "config/audit/audit-journal.json",
+        "config/risk/risk-register.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_governance_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-91",
+      "domain": "ai_native_governance_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-GOVERNANCE-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/ai/responsible-ai-policy.json",
+        "config/compliance/compliance-profile.json",
+        "config/architecture/decision-records.json",
+        "config/ai/asset-registry.json",
+        "config/contracts/deprecation-policy.json",
+        "config/operations/runbooks-and-drills.json",
+        "config/audit/audit-journal.json",
+        "config/risk/risk-register.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_governance_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-92",
+      "domain": "ai_native_governance_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-GOVERNANCE-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/ai/responsible-ai-policy.json",
+        "config/compliance/compliance-profile.json",
+        "config/architecture/decision-records.json",
+        "config/ai/asset-registry.json",
+        "config/contracts/deprecation-policy.json",
+        "config/operations/runbooks-and-drills.json",
+        "config/audit/audit-journal.json",
+        "config/risk/risk-register.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_governance_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-93",
+      "domain": "ai_native_governance_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-GOVERNANCE-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/ai/responsible-ai-policy.json",
+        "config/compliance/compliance-profile.json",
+        "config/architecture/decision-records.json",
+        "config/ai/asset-registry.json",
+        "config/contracts/deprecation-policy.json",
+        "config/operations/runbooks-and-drills.json",
+        "config/audit/audit-journal.json",
+        "config/risk/risk-register.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_governance_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-94",
+      "domain": "ai_native_governance_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-GOVERNANCE-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/ai/responsible-ai-policy.json",
+        "config/compliance/compliance-profile.json",
+        "config/architecture/decision-records.json",
+        "config/ai/asset-registry.json",
+        "config/contracts/deprecation-policy.json",
+        "config/operations/runbooks-and-drills.json",
+        "config/audit/audit-journal.json",
+        "config/risk/risk-register.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_governance_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-95",
+      "domain": "ai_native_governance_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-GOVERNANCE-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/ai/responsible-ai-policy.json",
+        "config/compliance/compliance-profile.json",
+        "config/architecture/decision-records.json",
+        "config/ai/asset-registry.json",
+        "config/contracts/deprecation-policy.json",
+        "config/operations/runbooks-and-drills.json",
+        "config/audit/audit-journal.json",
+        "config/risk/risk-register.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_governance_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    },
+    {
+      "requirement_id": "REQ-96",
+      "domain": "ai_native_governance_assurance",
+      "authoritative_docs": [
+        "AI-NATIVE-GOVERNANCE-ASSURANCE.md"
+      ],
+      "machine_controls": [
+        "config/ai/responsible-ai-policy.json",
+        "config/compliance/compliance-profile.json",
+        "config/architecture/decision-records.json",
+        "config/ai/asset-registry.json",
+        "config/contracts/deprecation-policy.json",
+        "config/operations/runbooks-and-drills.json",
+        "config/audit/audit-journal.json",
+        "config/risk/risk-register.json"
+      ],
+      "verification_refs": [
+        "scripts/validate_ai_native_repo.py",
+        "tests/test_governance_assurance.py",
+        "config/testing/conformance-scenarios.json"
+      ],
+      "coverage_status": "covered_by_blueprint",
+      "runtime_evidence_required_in_child": true
+    }
+  ],
+  "closure_rules": [
+    "Every core requirement ID from REQ-01 through REQ-96 must appear exactly once.",
+    "Blueprint coverage means an authoritative contract and verification path exist; it does not mean a child project has implemented or passed the requirement.",
+    "Child pass claims require project-specific evidence under the active assurance, traceability, release and governance contracts.",
+    "Adding a new normative core requirement beyond REQ-96 requires a planned protocol release and migration entry.",
+    "Commercial launch, external deployment, account configuration and future paid tiers remain separate productization/runtime evidence and do not change blueprint closure."
+  ]
+}

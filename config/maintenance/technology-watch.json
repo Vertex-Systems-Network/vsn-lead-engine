@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "status": "template_blueprint",
+  "enabled": false,
+  "activation_scope": "child_project_only",
+  "interval_hours": 24,
+  "activation_rule": "enable in child after an approved technology stack exists",
+  "scheduler": "github_actions",
+  "workflow_blueprint": "blueprints/github/workflows/technology-update-watch.yml",
+  "active_child_path": ".github/workflows/technology-update-watch.yml",
+  "request_title": "[AI-NATIVE] Technology Update Audit Due",
+  "research_required": true,
+  "consent_required_before_code_changes": true,
+  "owner_email_required_for_material_update": true,
+  "last_completed_at": null,
+  "last_request_reference": null,
+  "last_result": null,
+  "update_classes": [
+    "patch",
+    "minor",
+    "major",
+    "runtime",
+    "platform",
+    "security",
+    "deprecation"
+  ],
+  "required_post_update_verification": [
+    "build",
+    "static_analysis",
+    "unit",
+    "integration",
+    "e2e_when_relevant",
+    "regression",
+    "security",
+    "deployment_or_installation_when_relevant",
+    "rollback_when_relevant"
+  ]
+}

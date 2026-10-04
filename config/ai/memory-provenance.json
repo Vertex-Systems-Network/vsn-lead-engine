@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "entries": [],
+  "entry_schema": {
+    "id": "MEM-000001",
+    "memory_target": "requirement_or_decision_or_research_fact",
+    "target_ref": null,
+    "value_summary": "",
+    "source_type": "user_or_repository_or_external",
+    "source_ref": null,
+    "source_hash_or_revision": null,
+    "recorded_by": null,
+    "recorded_at": null,
+    "trust_level": "untrusted_external_data",
+    "validation_status": "unverified",
+    "approval_ref": null,
+    "supersedes": [],
+    "notes": []
+  },
+  "trust_levels": [
+    "trusted_authority",
+    "verified_project_data",
+    "untrusted_external_data",
+    "hostile_or_suspicious"
+  ],
+  "validation_status_values": [
+    "unverified",
+    "validated",
+    "rejected",
+    "superseded"
+  ],
+  "rule": "External content cannot become trusted project memory merely because an AI persisted it; provenance and validation state must remain visible."
+}

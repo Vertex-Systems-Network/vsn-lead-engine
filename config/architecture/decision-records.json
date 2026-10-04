@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "status": "active_registry",
+  "activation_scope": "child_project",
+  "decisions": [],
+  "decision_template": {
+    "id": "ADR-0001",
+    "title": "",
+    "status": "proposed",
+    "context": "",
+    "alternatives": [],
+    "evidence_refs": [],
+    "decision": "",
+    "consequences": [],
+    "security_privacy_data_operational_cost_impact": [],
+    "reversibility": "unknown",
+    "affected_modules_or_contracts": [],
+    "decided_by": null,
+    "decided_at": null,
+    "supersedes": [],
+    "superseded_by": null
+  },
+  "allowed_statuses": [
+    "proposed",
+    "accepted",
+    "rejected",
+    "superseded"
+  ],
+  "rules": [
+    "Accepted material decisions must not be silently reversed.",
+    "A replacement decision must preserve supersession traceability.",
+    "Decision evidence must distinguish verified facts from inference."
+  ]
+}

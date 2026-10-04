@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "status": "pending_design_decision",
+  "activation_scope": "child_project",
+  "approved_design": {
+    "provider": null,
+    "file_id": null,
+    "node_ids": [],
+    "version_or_revision": null,
+    "snapshot_ref": null,
+    "captured_at": null,
+    "design_system_version": null,
+    "approval_status": "not_approved",
+    "approved_by": null,
+    "approved_at": null
+  },
+  "verification": {
+    "responsive_targets": [],
+    "visual_regression_required_when_material": true,
+    "screenshot_evidence_required_for_visual_acceptance_when_supported": true,
+    "accessibility_target": "WCAG_2_2_AA_for_web_unless_overridden",
+    "design_change_after_approval_requires_impact_analysis": true
+  },
+  "traceability_fields": [
+    "design_surface_refs",
+    "component_refs",
+    "visual_evidence_refs",
+    "accessibility_evidence_refs"
+  ]
+}

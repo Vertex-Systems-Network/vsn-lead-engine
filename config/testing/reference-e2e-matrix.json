@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "status": "reference_blueprint",
+  "activation_scope": "child_and_repository_supervisor_acceptance_reference",
+  "protocol_version": "1.4.0",
+  "scenarios": [
+    {
+      "id": "E2E-FRESH-CHILD",
+      "name": "fresh_child_bootstrap",
+      "source_state": "empty_or_new_repository",
+      "required_operations": [
+        "resolve_target_repository",
+        "bind_exact_target_head",
+        "bootstrap_from_immutable_anpos_release",
+        "initialize_child_state",
+        "validate_repository",
+        "open_change_request",
+        "run_child_ci"
+      ],
+      "expected_invariants": [
+        "application code is not invented before approved project intake and lifecycle decisions",
+        "canonical vendor-only assets are absent from the child",
+        "Requirements 83-96 are initialized without pass claims",
+        "project-specific runtime state is child-owned",
+        "generated CODEOWNERS and quality/governance controls match the child baseline"
+      ],
+      "required_evidence": [
+        "target_head_before",
+        "anpos_release_identity",
+        "change_request_ref",
+        "validation_result",
+        "ci_result",
+        "resulting_head"
+      ],
+      "failure_gates": [
+        "target_head_changed",
+        "bootstrap_collision",
+        "validation_failed",
+        "ci_failed",
+        "vendor_asset_leakage",
+        "assurance_pass_without_project_evidence"
+      ],
+      "certification_status": "reference_only"
+    },
+    {
+      "id": "E2E-EXISTING-ADOPTION",
+      "name": "existing_repository_adoption",
+      "source_state": "non_anpos_repository_with_existing_application",
+      "required_operations": [
+        "profile_existing_repository",
+        "bind_exact_target_head",
+        "inventory_project_owned_paths",
+        "plan_non_destructive_adoption",
+        "preserve_existing_ci_deploy_license_and_architecture",
+        "apply_on_feature_branch",
+        "validate_repository",
+        "open_change_request",
+        "run_ci"
+      ],
+      "expected_invariants": [
+        "existing application code and project-owned configuration are preserved unless an explicit migration authorizes change",
+        "ANPOS control files are added or reconciled without blind overlay",
+        "collisions are reported before mutation",
+        "Requirements 83-96 applicability is classified without fabricated pass evidence",
+        "the adoption plan becomes invalid if the target head changes"
+      ],
+      "required_evidence": [
+        "repository_profile",
+        "collision_report",
+        "target_head_before",
+        "adoption_plan",
+        "change_request_ref",
+        "validation_result",
+        "ci_result",
+        "resulting_head"
+      ],
+      "failure_gates": [
+        "unresolved_collision",
+        "target_head_changed",
+        "project_owned_state_overwritten",
+        "validation_failed",
+        "ci_failed",
+        "fabricated_assurance_evidence"
+      ],
+      "certification_status": "reference_only"
+    },
+    {
+      "id": "E2E-PRE14-UPGRADE",
+      "name": "pre_1_4_child_upgrade",
+      "source_state": "active_anpos_child_before_1_4_0",
+      "required_operations": [
+        "read_current_child_protocol_and_state",
+        "bind_exact_target_head",
+        "load_protocol_migrations",
+        "plan_non_destructive_upgrade",
+        "preserve_verified_project_evidence",
+        "reconcile_requirements_83_96_controls",
+        "validate_repository",
+        "open_change_request",
+        "run_ci"
+      ],
+      "expected_invariants": [
+        "application code approved architecture CI deployment behavior and project legal/commercial terms remain preserved",
+        "verified child evidence is not reset merely because the protocol is upgraded",
+        "new controls are classified by actual applicability",
+        "legal conclusions product success production readiness and AI safety are not inferred from protocol installation",
+        "upgrade outcome records exact from/to protocol identities"
+      ],
+      "required_evidence": [
+        "from_protocol_version",
+        "to_protocol_version",
+        "target_head_before",
+        "migration_plan",
+        "evidence_preservation_report",
+        "change_request_ref",
+        "validation_result",
+        "ci_result",
+        "resulting_head"
+      ],
+      "failure_gates": [
+        "missing_migration_path",
+        "target_head_changed",
+        "verified_evidence_lost",
+        "project_owned_state_overwritten",
+        "validation_failed",
+        "ci_failed",
+        "unsupported_automatic_claim"
+      ],
+      "certification_status": "reference_only"
+    }
+  ],
+  "execution_rule": "Reference scenarios define acceptance contracts. A child or plugin runtime is certified only after the applicable scenario is executed against real repository/runtime evidence and the recorded evidence is bound to the exact source and resulting refs."
+}
