@@ -537,6 +537,88 @@
       "notes": [
         "Official docs accessed 2026-10-05; no independent usability evaluation."
       ]
+    },
+    {
+      "id": "EVID-000020",
+      "claim_or_question": "Apollo's public page describes team-pooled credits with per-user caps and says standard plans are internal-use only; customer-facing products/sharing/resale need a separate custom-priced agreement.",
+      "source_type": "primary",
+      "source_ref": "https://www.apollo.io/pricing",
+      "source_title": "Apollo pricing and plan FAQ",
+      "publisher_or_owner": "Apollo.io",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Useful credit-governance comparator, but standard seat pricing is not a resale/API wholesale quote. Exact figures were not exposed in the page text fetched.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Accessed 2026-10-05."
+      ]
+    },
+    {
+      "id": "EVID-000021",
+      "claim_or_question": "Hunter's public pricing page lists $0/50 monthly credits Free, $34/month Starter (24,000 credits/year), $104/month Growth (120,000/year), $209/month Scale (300,000/year), and custom Enterprise; a separate API-only Data Platform sells search and verification credits.",
+      "source_type": "primary",
+      "source_ref": "https://hunter.io/pricing",
+      "source_title": "Hunter plans and pricing",
+      "publisher_or_owner": "Hunter",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Retail app plans and API-only credit purchase are distinct economics; neither establishes VSN redistribution rights or cost per usable lead.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Observed public page on 2026-10-05; verify at checkout/vendor before procurement."
+      ]
+    },
+    {
+      "id": "EVID-000022",
+      "claim_or_question": "Clay's pricing page showed inconsistent/dynamic Launch and Growth figures in the captured view: card figures differed from summary starting prices, while usage allowances varied with billing selection.",
+      "source_type": "primary",
+      "source_ref": "https://www.clay.com/pricing",
+      "source_title": "Clay plans and pricing",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Do not use one captured Clay price as canonical; re-check selected billing mode/checkout. Competitor prices do not define VSN wholesale data cost or end-user rights.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Accessed 2026-10-05; captured Launch card $167/mo vs summary $185/mo, Growth card $446/mo vs summary $495/mo."
+      ]
     }
   ],
   "entry_contract": {

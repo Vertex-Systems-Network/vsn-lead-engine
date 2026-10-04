@@ -38,7 +38,19 @@ Do not pick a launch segment from this table without observed interviews and sam
 
 Apollo's official guidance documents AND logic across filters and OR logic among values in one filter; its workflows include saved lists/searches, enrichment and optional outreach. Clay documents reorderable/skip-enabled provider waterfalls, run conditions and optional successful-provider output. Hunter documents company discovery filters, saved leads, email finding/verification and CSV export. These observations guide question design; they are not comparative usability tests or customer evidence.
 
-## 4. Interview recruitment and protocol
+## 4. Competitor pricing and commercial shape (official pages, 2026-10-05)
+
+Prices below are vendor-published retail plan observations, not wholesale API rates and not a recommendation for VSN prices.
+
+| Product | Public pricing/usage observed | Product implication and limit |
+|---|---|---|
+| Apollo | Pricing page names Free, Basic, Professional and Custom; describes credits pooled across a team, reset each billing cycle, with admin per-user credit caps. Exact dollar amounts were not exposed in the page text fetched for this review. Apollo explicitly says standard plans are for internal business use and powering customer-facing products/sharing/resale requires a separate custom-priced agreement. | Credit caps/usage ledger are relevant patterns; do not infer API resale economics from seats or standard plans. Request a written VSN-specific quote/contract before any cost model. |
+| Hunter | Public page showed Free at $0/50 monthly credits; Starter $34/month with 24,000 annual credits; Growth $104/month with 120,000 annual credits; Scale $209/month with 300,000 annual credits; Enterprise custom. The page also showed a separate API-only Data Platform with configurable search and verification credit purchases. Displayed yearly-billing comparisons and the plan table summarize credits differently by period (monthly card vs annual totals), so preserve period when comparing. | A focused email product bundles discovery, verification, enrichment and outreach. API-only credits differ from product-seat plans; customer-facing data rights and VSN wholesale rates remain unverified. |
+| Clay | Official page shows a free tier (100 Data Credits/month and 500 Actions/month). Pricing page content returned multiple visible Launch/Growth figures: Launch card $167/month while a page summary says starts at $185/month; Growth card $446/month while summary says starts at $495/month. Annual/action/data-credit figures also vary by selected billing display. | Treat the page as internally/dynamically inconsistent in this captured view; do not select a number as canonical without checking the live checkout state. Clay is a workflow comparator; end-customer redistribution/provider rights are not established. |
+
+Apollo credit details and the prohibition on using ordinary plans for customer-facing products come from its official pricing FAQ. Hunter values come from the official pricing page accessed on the snapshot date. Clay values are recorded with the observed page inconsistency intact. These plan prices do not establish VSN's cost per rights-eligible usable lead.
+
+## 5. Interview recruitment and protocol
 
 ### Recruit
 Aim for 8–12 discovery conversations before locking segment/MVP:
@@ -68,7 +80,7 @@ Avoid leading questions such as “Would you use this AI lead-gen app?” Prefer
 - Exact anonymized quote or observed artifact reference (never infer it).
 - Evidence class, confidence, contradicting evidence, follow-up, and researcher interpretation separately.
 
-## 5. Synthesis rules and proposed success metrics
+## 6. Synthesis rules and proposed success metrics
 
 After interviews, cluster repeated observed jobs/pains and preserve contradictions. Count participants per observation; do not convert frequency from a small qualitative sample into a population estimate. Follow with a task-based prototype test and a larger survey only if a decision still needs quantification.
 
@@ -84,7 +96,7 @@ Candidate outcome metrics to test with users:
 
 No numerical target is approved yet. Baselines must come from observed workflows and a measured permitted-source sample.
 
-## 6. Decision gates
+## 7. Decision gates
 
 Do not complete WU-SAAS-USER-MARKET-RESEARCH until:
 - The launch segment and top user job have interview evidence and at least one counterexample/contradiction review.
@@ -94,3 +106,8 @@ Do not complete WU-SAAS-USER-MARKET-RESEARCH until:
 - Interviews are completed or explicitly recorded as blocked by unavailable participants; do not imply validation if only desk research exists.
 
 After that, take WU-SAAS-MVP-DECISIONS and record owner decisions as ANPOS ADRs. User research does not authorize source use, paid provider activation, stack approval, or implementation.
+
+## Pricing sources
+- Apollo pricing and external-product restrictions: https://www.apollo.io/pricing
+- Hunter plans and API-only Data Platform: https://hunter.io/pricing
+- Clay plans/actions/data credits: https://www.clay.com/pricing

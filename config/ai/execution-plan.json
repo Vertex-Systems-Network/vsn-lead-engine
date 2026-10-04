@@ -428,7 +428,8 @@
       "completion_evidence": [
         "docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md: competitor workflow desk review, segment hypotheses, interview protocol, evidence capture form, candidate metrics and closure gates prepared.",
         "config/research/evidence-registry.json EVID-000017 through EVID-000019: official Apollo, Clay and Hunter workflow documentation captured.",
-        "Customer interviews, task tests and validated launch segment/MVP outcomes are still outstanding; research unit remains in_progress."
+        "Customer interviews, task tests and validated launch segment/MVP outcomes are still outstanding; research unit remains in_progress.",
+        "config/research/evidence-registry.json EVID-000020 through EVID-000022 and the research workbench pricing snapshot: Apollo credit/cap and external-product terms, Hunter plan/API credit distinction, Clay displayed-price inconsistency documented."
       ]
     },
     {
@@ -704,5 +705,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "User/job research is active: desk-workbench and interview protocol prepared; customer validation is not yet evidenced. Source feasibility matrix is documented; vendor activation remains gated. Minimize hosted CI runners by preferring local/static deterministic checks, grouping compatible required checks, and avoiding duplicate runs without weakening required security or protected-branch checks."
+  "progress_note": "User/job research remains active; desk competitor journeys and dated pricing observations are prepared, but customer interviews and validated launch segment/outcomes remain outstanding. Source activation remains gated. Minimize hosted CI runners without weakening required security or protected-branch checks."
 }
