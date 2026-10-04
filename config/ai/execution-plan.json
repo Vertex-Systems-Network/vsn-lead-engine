@@ -415,7 +415,7 @@
       "objective": "Compare user jobs and competitor journeys/pricing; record evidence and uncertainty.",
       "dependencies": [],
       "priority": 20,
-      "status": "ready",
+      "status": "in_progress",
       "blockers": [],
       "acceptance_criteria": [
         "User segment/jobs and MVP outcome metrics have evidence.",
@@ -435,7 +435,7 @@
       "objective": "Research candidate sources by country, fields, rights, storage, attribution, rate, price and coverage.",
       "dependencies": [],
       "priority": 15,
-      "status": "in_progress",
+      "status": "complete",
       "blockers": [],
       "acceptance_criteria": [
         "No adapter is selected without source-specific evidence.",
@@ -445,7 +445,11 @@
         "Provider documentation/terms review",
         "Qualified compliance input where needed"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/ai/LEAD-SAAS-SOURCE-FEASIBILITY.md: source-by-source fields, geography, rights/storage/attribution, pricing/usage, and unresolved checks recorded.",
+        "config/research/evidence-registry.json EVID-000011 through EVID-000016: Overture, OSM/Overpass, Google Places, Apollo, Hunter and Clay primary-source evidence.",
+        "No provider or adapter selected; contract, country/niche yield sample tests, source-specific legal review and actual procurement remain gates under WU-SAAS-MVP-DECISIONS."
+      ]
     },
     {
       "id": "WU-SAAS-MVP-DECISIONS",
@@ -696,5 +700,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "New SaaS scope is in discovery only. Existing daily quota operations remain concurrently in progress; no product runtime or paid integration is claimed."
+  "progress_note": "Source feasibility matrix is recorded; vendor activation/selection remains gated. User/job validation is now the next active SaaS discovery work unit. Existing daily quota operations remain concurrently in progress."
 }
