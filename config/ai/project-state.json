@@ -19,10 +19,10 @@
   },
   "outstanding_updates": [
     "Continue existing WU-OPS-DAILY-QUOTA independently from current real workbook/health evidence; do not reset or claim complete.",
-    "Conduct user/job validation and deeper competitor workflow/pricing research; user-market research is now active.",
-    "Public source feasibility matrix is complete; no provider is selected. Country/niche sample yield, actual contract rights, procurement prices and qualified compliance review remain required before activation.",
-    "Resolve whether SaaS code remains in this production repository or moves to a dedicated application repository.",
-    "Resolve launch market, source funding model, field policy, plans/prices, client platform order and monthly budget.",
+    "Complete WU-SAAS-USER-MARKET-RESEARCH with actual user interviews/task evidence; desk research and interview workbench are prepared but do not validate demand.",
+    "Public source feasibility matrix is complete; no provider is selected. Country/niche sample yield, exact contract rights, procurement prices and qualified review remain activation gates.",
+    "Review docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md and accept/reject the proposed decisions; ADR-0007 remains proposed, not approved.",
+    "Resolve SaaS repository boundary, launch segment/market, source funding and required fields, plans/quotas/payment, platform order and monthly budget before system design.",
     "Keep stack approval pending until system design and costed alternatives are reviewed."
   ],
   "outstanding_removals": [],
@@ -56,5 +56,5 @@
     },
     "no_verified_supervisor": true
   },
-  "notes": "SaaS remains in discovery only. Existing production runtime and WU-OPS-DAILY-QUOTA remain active concurrently. Current-engine audit and public-source feasibility matrix are documented; no provider, adapter, legal approval, implementation or paid service is selected. User/job validation is the next active work unit."
+  "notes": "SaaS remains in discovery only. Current-engine audit, source-feasibility matrix, competitor workflow/pricing review, interview workbench and MVP decision brief are documented. ADR-0007 is proposed only. No provider, legal approval, implementation, paid service, market, plan, platform, repository boundary or stack is accepted. User research remains the next active unit; production daily quota remains independently active."
 }

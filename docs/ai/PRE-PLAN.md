@@ -59,6 +59,7 @@ Market-driven candidates: source/field provenance, cost preview, run history, re
 - Apple in-app subscriptions and Microsoft Store commerce have platform-specific rules. Cross-platform entitlement sync and storefront-specific checkout must be designed after distribution decision.
 Evidence URLs, dates, evidence class and limitations are in `config/research/evidence-registry.json`. Findings are initial desk research, not legal advice, independently verified user findings, or current full-price comparison.
 - User/job research is active: Apollo, Clay and Hunter documented workflows plus an interview guide, segment hypotheses, evidence-capture form and closure gates are prepared in `docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md`. No customer interviews or market validation are claimed; keep the work unit open until actual evidence is recorded.
+- MVP decision brief and proposed ADR-0007 now give reviewable recommendations for repository boundary, web-first sequence, market/source gates, costs, CSV/custom inputs, schedules and bounded AI. All remain proposals pending interviews and explicit owner decisions: `docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md`.
 
 ### Positioning hypothesis
 “Transparent, source-aware lead discovery and scheduled workflows that let smaller teams choose free, provider-funded, or bring-your-own data services with visible limits and control.” Validate this against user interviews and actual permitted provider coverage/cost before adopting as public positioning.

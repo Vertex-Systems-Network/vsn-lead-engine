@@ -220,6 +220,54 @@
       "decided_at": null,
       "supersedes": [],
       "superseded_by": null
+    },
+    {
+      "id": "ADR-0007",
+      "title": "Propose an evidence-gated, web-first SaaS MVP",
+      "status": "proposed",
+      "context": "User requested a multi-platform lead SaaS with subscriptions, scheduled country/niche searches, free/paid/custom source options, admin, AI and rich landing site. The repository's production lead engine is an existing Python CLI/workflow and no customer interviews, approved launch market, provider distribution rights, unit economics, stack or repo boundary have been decided.",
+      "alternatives": [
+        "Build all web/desktop/mobile surfaces and broad integrations together",
+        "Start with responsive web after validating one target segment and one permitted source path",
+        "Implement SaaS in this production repo immediately",
+        "Create a dedicated SaaS application repo before product code"
+      ],
+      "evidence_refs": [
+        "docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md",
+        "docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md",
+        "docs/ai/LEAD-SAAS-SOURCE-FEASIBILITY.md",
+        "docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md",
+        "config/research/evidence-registry.json"
+      ],
+      "decision": "Proposal only: validate actual users and a permitted first market/source; if evidence supports it, begin with responsive web, tenant isolation, a manual run, source/cost/provenance preview, hard spend controls, CSV input, and bounded AI setup help. Defer native desktop/mobile and broad provider integrations until user evidence and stable API contracts. Consider a dedicated SaaS repo before code to protect the current production pipeline. Keep every provider disabled until exact use rights, sample yield and unit economics are reviewed. No part of this proposal is accepted or authorized as implementation scope.",
+      "consequences": [
+        "SaaS discovery can advance with reviewable recommendations while owner choices remain explicit.",
+        "No implementation, vendor, market, plan price or platform order is approved by this proposed ADR.",
+        "MVP acceptance depends on customer evidence and owner decisions; no target lead count is promised."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "Tenant isolation and least privilege are P0 architecture gates.",
+        "Source/field/country rights and retention must be checked before activation.",
+        "Paid and AI operations require estimates, explicit opt-in, per-tenant hard caps and kill switches.",
+        "Current production operations must remain isolated and unchanged.",
+        "Hosted CI runner use follows the repository runner-minimization policy without skipping required checks."
+      ],
+      "reversibility": "Planning proposal is reversible until accepted. If accepted, changes require a superseding ADR with evidence and migration/compatibility impact.",
+      "affected_modules_or_contracts": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-SYSTEM-DESIGN",
+        "MOD-SAAS-IDENTITY",
+        "MOD-SOURCE-CATALOG",
+        "MOD-JOB-ORCHESTRATION",
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-WEB-EXPERIENCE",
+        "MOD-DESKTOP-CLIENT",
+        "MOD-MOBILE-CLIENT"
+      ],
+      "decided_by": "ANPOS evidence-backed recommendation; VSN owner acceptance pending",
+      "decided_at": null,
+      "supersedes": [],
+      "superseded_by": null
     }
   ],
   "decision_template": {

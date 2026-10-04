@@ -469,7 +469,9 @@
       "priority": 30,
       "status": "blocked",
       "blockers": [
-        "Requires product/business decisions and current source/legal/cost research"
+        "Depends on WU-SAAS-USER-MARKET-RESEARCH completion or explicit disposition.",
+        "Owner must accept/reject product-boundary, segment/market, source/field, commercial, platform and budget decisions; recommendations are not approvals.",
+        "Exact source use rights, sample yield and cost evidence remain provider-specific gates."
       ],
       "acceptance_criteria": [
         "Owner decisions recorded as durable ADRs.",
@@ -478,7 +480,11 @@
       "required_checks": [
         "ANPOS decision/consent evidence"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md: concrete proposed decisions, recommendations, alternatives, consequences, gates and owner inputs prepared.",
+        "config/architecture/decision-records.json ADR-0007: evidence-gated, web-first MVP proposal recorded with status proposed and owner acceptance pending.",
+        "No owner choices, price, provider, market, technology stack or implementation repository has been accepted."
+      ]
     },
     {
       "id": "WU-SAAS-SYSTEM-DESIGN",
@@ -705,5 +711,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "User/job research remains active; desk competitor journeys and dated pricing observations are prepared, but customer interviews and validated launch segment/outcomes remain outstanding. Source activation remains gated. Minimize hosted CI runners without weakening required security or protected-branch checks."
+  "progress_note": "WU-SAAS-MVP-DECISIONS has a proposed decision brief and ADR-0007, but remains blocked until user research and owner decisions are recorded. No proposal is treated as consent. Runner minimization remains required for future automated checks."
 }
