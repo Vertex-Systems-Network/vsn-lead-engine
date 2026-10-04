@@ -32,6 +32,7 @@ jobs:
     timeout-minutes: 10
     env:
       GITHUB_ADMIN_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
+      GH_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
       GITHUB_REPOSITORY: ${{ github.repository }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -71,9 +72,43 @@ jobs:
         if: ${{ steps.admin.outputs.ready == 'true' && (github.event_name != 'workflow_dispatch' || inputs.apply) }}
         run: python scripts/apply_main_protection.py --confirm
 
+      - name: Apply repository merge settings
+        if: ${{ steps.admin.outputs.ready == 'true' && (github.event_name != 'workflow_dispatch' || inputs.apply) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}" \
+            -F allow_merge_commit=false \
+            -F allow_rebase_merge=false \
+            -F allow_squash_merge=true \
+            -F allow_auto_merge=true \
+            -F allow_update_branch=true \
+            -F delete_branch_on_merge=true >/tmp/repository-settings.json
+
       - name: Verify live ruleset
         if: ${{ steps.admin.outputs.ready == 'true' }}
         run: python scripts/verify_main_protection.py
+
+      - name: Verify repository merge settings
+        if: ${{ steps.admin.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SETTINGS="$(gh api "repos/${GITHUB_REPOSITORY}")"
+          test "$(jq -r '.allow_merge_commit' <<<"$SETTINGS")" = "false"
+          test "$(jq -r '.allow_rebase_merge' <<<"$SETTINGS")" = "false"
+          test "$(jq -r '.allow_squash_merge' <<<"$SETTINGS")" = "true"
+          test "$(jq -r '.allow_auto_merge' <<<"$SETTINGS")" = "true"
+          test "$(jq -r '.allow_update_branch' <<<"$SETTINGS")" = "true"
+          test "$(jq -r '.delete_branch_on_merge' <<<"$SETTINGS")" = "true"
+          echo "Repository merge settings match ANPOS policy."
+
+      - name: Dispatch governance audit after self-heal
+        if: ${{ steps.admin.outputs.ready == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run governance-audit.yml --repo "${GITHUB_REPOSITORY}" --ref main
 
       - name: Report unavailable live verification
         if: ${{ steps.admin.outputs.ready != 'true' }}
