@@ -167,7 +167,7 @@ def validate_required_files() -> None:
         "schemas/responsible-ai-policy.schema.json", "schemas/compliance-profile.schema.json", "schemas/decision-records.schema.json",
         "schemas/ai-asset-registry.schema.json", "schemas/deprecation-policy.schema.json", "schemas/runbooks-and-drills.schema.json",
         "schemas/audit-journal.schema.json", "schemas/risk-register.schema.json",
-        "schemas/blueprint-completion.schema.json", "schemas/reference-e2e-matrix.schema.json", "schemas/extension-contract.schema.json", "schemas/execution-sandbox.schema.json", "schemas/repository-supervisor-planner.schema.json",
+        "schemas/blueprint-completion.schema.json", "schemas/reference-e2e-matrix.schema.json", "schemas/extension-contract.schema.json", "schemas/execution-sandbox.schema.json",
         "scripts/bootstrap_instance.py", "scripts/anpos_guard.py", "scripts/claim_slot.py", "scripts/supervisor_lease.py",
         "scripts/lease_control.py", "scripts/coordination_mutation.py", "scripts/consent_guard.py",
         "scripts/install_quality_capabilities.py", "scripts/configure_dependabot.py", "scripts/validate_ai_native_repo.py",
