@@ -18,7 +18,9 @@ state mutation. The reconciliation commit/merge itself will naturally advance
 `main`; future sessions must always re-read live GitHub before relying on this
 checkpoint.
 
-## Verified repository baseline
+## Verified
+
+### Repository baseline
 
 The historical P01–P70 engineering program remains the accepted product
 baseline. The repository was not reset when ANPOS was introduced.
@@ -36,7 +38,7 @@ ANPOS child adoption is verified through:
 
 Vendor/operator-only ANPOS assets are not present in the child repository.
 
-## Latest verified production evidence
+### Latest verified production evidence
 
 Latest inspected successful production execution:
 
@@ -52,6 +54,19 @@ Latest inspected successful production execution:
 Therefore the repository is production-ready, but the latest verified daily
 quota snapshot is **not complete**. Do not convert workflow success into a
 false quota-complete claim.
+
+## Not Verified
+
+- The latest verified 2026-10-04 production snapshot is not quota-complete: **6,855 / 12,000**.
+- Strict user-OAuth create → trash autonomy has no recent successful certification evidence.
+- No Development AI/Supervisor runtime identity is verified in ANPOS.
+- Independent CODEOWNER review and coordination-ref namespace enforcement are not yet verified live.
+
+## Known Risk
+
+- A genuinely missing My Drive workbook still depends on future strict user-OAuth certification.
+- Treating successful workflow execution as quota completion would overstate production status.
+- Enabling distributed Worker claims without verified runtime identity would violate ANPOS control-plane rules.
 
 ## ANPOS execution boundary
 
@@ -94,7 +109,7 @@ complete until that probe is actually green.
 This blocker does not invalidate existing/precreated workbook production
 operations.
 
-## Next safe actions
+## Next Action
 
 1. Let normal production scheduling/recovery continue toward the daily 12,000
    target; verify quota from real workbook/runtime evidence.
