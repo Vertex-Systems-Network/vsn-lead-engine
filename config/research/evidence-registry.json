@@ -456,6 +456,87 @@
       "notes": [
         "Price page observed on 2026-10-05 and may change."
       ]
+    },
+    {
+      "id": "EVID-000017",
+      "claim_or_question": "Apollo documents advanced search filters, saved searches/lists, enrichment, exports and optional sequence/workflow engagement.",
+      "source_type": "primary",
+      "source_ref": "https://knowledge.apollo.io/hc/en-us/articles/4412665755661-Use-Search-Filters-to-Find-Prospects",
+      "source_title": "Use Search Filters to Find Prospects",
+      "publisher_or_owner": "Apollo",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Competitor journey suggests explainable filter logic, reusable search/list, and separation of discovery, enrichment and outreach. This is workflow evidence only, not VSN demand evidence.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-AI-ASSIST"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Official docs accessed 2026-10-05; no independent usability evaluation."
+      ]
+    },
+    {
+      "id": "EVID-000018",
+      "claim_or_question": "Clay documents a configurable enrichment waterfall with provider order, skips, required inputs, run conditions and optional successful-provider output.",
+      "source_type": "primary",
+      "source_ref": "https://university.clay.com/docs/building-a-data-waterfall",
+      "source_title": "Waterfalls",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Comparator suggests explicit provider order, run conditions, reusable workflows and result-provider visibility as potential product concepts. Does not establish user demand or license rights.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Official docs accessed 2026-10-05; product workflow observation only."
+      ]
+    },
+    {
+      "id": "EVID-000019",
+      "claim_or_question": "Hunter documents discovery filters for companies/contacts, saving leads, email finding/verification and CSV export.",
+      "source_type": "primary",
+      "source_ref": "https://help.hunter.io/en/articles/12269815-hunter-discover-faqs",
+      "source_title": "Hunter Discover FAQs",
+      "publisher_or_owner": "Hunter",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Competitor workflow separates company discovery from optional email enrichment/verification and export. Does not establish VSN's user demand, coverage or resale rights.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Official docs accessed 2026-10-05; no independent usability evaluation."
+      ]
     }
   ],
   "entry_contract": {
