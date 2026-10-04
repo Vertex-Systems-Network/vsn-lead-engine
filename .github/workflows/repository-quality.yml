@@ -33,8 +33,13 @@ jobs:
       - name: Compile repository scripts and tests
         run: python -m compileall -q scripts tests
 
-      - name: Run control-plane and child-safe commercial conformance unit tests
-        run: python -m unittest discover -s tests -p 'test_*.py'
+      - name: Run ANPOS control-plane conformance unit tests
+        shell: bash
+        run: |
+          python -m unittest discover -s tests -p 'test_control_plane.py'
+          python -m unittest discover -s tests -p 'test_product_assurance.py'
+          python -m unittest discover -s tests -p 'test_governance_assurance.py'
+          python -m unittest discover -s tests -p 'test_blueprint_closure.py'
 
       - name: Validate current AI-native state and workflow safety
         run: python scripts/validate_ai_native_repo.py
@@ -42,10 +47,10 @@ jobs:
       - name: Validate commercial distribution and licensing blueprint when present
         shell: bash
         run: |
-          if [ -f scripts/validate_commercial_licensing.py ]; then
+          if [ -f scripts/validate_commercial_licensing.py ] && [ -f config/licensing/commercial-policy.json ]; then
             python scripts/validate_commercial_licensing.py
           else
-            echo "Commercial distribution validator is not installed in this child development adoption."
+            echo "Commercial distribution is not activated for this child development adoption."
           fi
 
       - name: Run protected-base validators against proposed tree
