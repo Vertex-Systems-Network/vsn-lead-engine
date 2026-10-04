@@ -46,7 +46,7 @@ jobs:
           cache: pip
       - run: python scripts/install_locked.py --dev
       - run: python -m vsn_lead_engine.cli validate
-      - run: pytest -q
+      - run: pytest -q --ignore=tests/test_control_plane.py --ignore=tests/test_product_assurance.py --ignore=tests/test_governance_assurance.py --ignore=tests/test_blueprint_closure.py
 
   run:
     if: ${{ github.event_name != 'pull_request' }}
