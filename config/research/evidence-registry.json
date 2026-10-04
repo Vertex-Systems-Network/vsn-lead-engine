@@ -289,6 +289,173 @@
         "Read-only audit; no production workflow, source, credentials or runtime behavior changed.",
         "Repository boundary remains unresolved."
       ]
+    },
+    {
+      "id": "EVID-000011",
+      "claim_or_question": "Overture Places is a global candidate dataset whose records can have optional fields and source-specific license metadata; operating status is distinct from opening hours/current-time open.",
+      "source_type": "primary",
+      "source_ref": "https://docs.overturemaps.org/guides/places/",
+      "source_title": "Overture Places documentation",
+      "publisher_or_owner": "Overture Maps Foundation",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Potential free discovery input; coverage and optional phone/email/site fields vary. Mixed upstream licenses and per-record provenance require policy-aware ingestion.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-LEAD-PROVENANCE"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Field coverage and commercial SaaS use require country/category sample and qualified rights review."
+      ]
+    },
+    {
+      "id": "EVID-000012",
+      "claim_or_question": "OpenStreetMap data is under ODbL and public Overpass instances have finite capacity/policies; large/repeated workloads should not assume unrestricted shared endpoint capacity.",
+      "source_type": "primary",
+      "source_ref": "https://www.openstreetmap.org/copyright",
+      "source_title": "OpenStreetMap Copyright and License",
+      "publisher_or_owner": "OpenStreetMap",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Attribution/share-alike and service capacity constraints must be evaluated for the exact workflow; self-hosting/extracts have operating cost.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-PRODUCTION-RUNTIME"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "OSM ODbL and Overpass operational guidance recorded separately in source matrix."
+      ]
+    },
+    {
+      "id": "EVID-000013",
+      "claim_or_question": "Google Places has content storage/caching restrictions beyond specified exceptions and SKU-based usage billing.",
+      "source_type": "primary",
+      "source_ref": "https://developers.google.com/maps/documentation/places/web-service/policies",
+      "source_title": "Policies and attributions for Places API",
+      "publisher_or_owner": "Google for Developers",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Poor default for a persistent lead database without exact policy review; usage budget must be SKU-specific.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Rates are time-sensitive and need re-check at provider evaluation."
+      ]
+    },
+    {
+      "id": "EVID-000014",
+      "claim_or_question": "Apollo standard API/data terms do not establish general rights to expose or resell its data to VSN SaaS tenants; custom agreement/reseller route may be required.",
+      "source_type": "primary",
+      "source_ref": "https://www.apollo.io/terms",
+      "source_title": "Apollo Terms and Reseller Program",
+      "publisher_or_owner": "Apollo.io",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Conditional candidate only after written resale/storage rights and commercial quote; public marketing/pricing cannot settle unit economics.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Need vendor contract review before activation."
+      ]
+    },
+    {
+      "id": "EVID-000015",
+      "claim_or_question": "Hunter offers email-oriented search/enrichment/verification APIs with request-rate and credit-plan constraints; public plan claims do not establish VSN resale rights.",
+      "source_type": "primary",
+      "source_ref": "https://hunter.io/api-documentation/v2",
+      "source_title": "Hunter API documentation",
+      "publisher_or_owner": "Hunter",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Potential optional email enrichment adapter after contract, retention, coverage and cost tests; not primary POI discovery.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Plan pricing and API constraints must be refreshed during actual procurement."
+      ]
+    },
+    {
+      "id": "EVID-000016",
+      "claim_or_question": "Clay sells a provider-orchestration workflow with credit/action-based tiers; public comparator pricing does not establish embedded or resale rights for VSN.",
+      "source_type": "primary",
+      "source_ref": "https://www.clay.com/pricing",
+      "source_title": "Clay pricing",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Useful competitor/workflow comparator for waterfall controls and usage presentation; not selected as VSN provider.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Price page observed on 2026-10-05 and may change."
+      ]
     }
   ],
   "entry_contract": {
