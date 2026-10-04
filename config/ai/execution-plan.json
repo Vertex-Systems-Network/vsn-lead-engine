@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
+  "reconciliation_base_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
   "phases": [
     {
       "id": "PHASE-HISTORICAL-BASELINE",
@@ -60,10 +60,11 @@
       "dependencies": [
         "PHASE-ANPOS-ADOPTION"
       ],
-      "status": "ready",
+      "status": "complete",
       "exit_criteria": [
-        "REQ-83-96 applicability is classified with reasons/evidence.",
-        "Deferred identity/reviewer/coordination protections are either verified or remain explicitly deferred."
+        "REQ-83-96 applicability classified with project-specific reasons/evidence.",
+        "Evidence-backed applicable requirements verified; REQ-90 external qualified review remains explicitly non-passed.",
+        "Supported GitHub governance/security capabilities are live and verified; identity/platform-dependent extensions remain explicitly deferred."
       ]
     }
   ],
@@ -179,7 +180,7 @@
         "WU-ANPOS-ADOPTION"
       ],
       "priority": 40,
-      "status": "in_progress",
+      "status": "complete",
       "blockers": [],
       "acceptance_criteria": [
         "Every REQ-83 through REQ-96 has project-specific applicability and reason.",
@@ -191,9 +192,10 @@
         "ANPOS assurance schema/tests"
       ],
       "completion_evidence": [
+        "PR #125",
+        "main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
         "config/assurance/assurance-state.json",
-        "docs/ai/ASSURANCE-EVIDENCE.md",
-        "docs/ai/ENGINEERING-QUALITY-REVIEW-2026-10-04.md"
+        "docs/ai/ASSURANCE-EVIDENCE.md"
       ]
     },
     {
@@ -253,10 +255,8 @@
         "WU-ANPOS-ASSURANCE-CLASSIFICATION"
       ],
       "priority": 45,
-      "status": "blocked",
-      "blockers": [
-        "Requires merged immutable evidence ref and successful child checks."
-      ],
+      "status": "complete",
+      "blockers": [],
       "acceptance_criteria": [
         "Applicable REQ-83-96 states match merged evidence.",
         "All passed rows reference immutable merged ref/time.",
@@ -267,7 +267,13 @@
         "validate",
         "security capability checks when verified"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345400 repository-integrity success",
+        "Actions run 37227345382 CodeQL success",
+        "Actions run 37227345426 governance audit success",
+        "Issue #128 closed"
+      ]
     }
   ],
   "status_values": [
@@ -282,5 +288,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "P1 assurance classification/evidence implementation in progress; final pass-state reconciliation intentionally waits for immutable post-merge verification."
+  "progress_note": "ANPOS 1.4.0 adoption, assurance classification, supported security capabilities and active main governance are verified. Production quota work continues independently; identity/platform/legal external gates remain explicit."
 }

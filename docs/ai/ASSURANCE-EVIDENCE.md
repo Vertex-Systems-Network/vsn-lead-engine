@@ -37,3 +37,26 @@ ANPOS does not self-certify jurisdiction-specific law. Qualified privacy/complia
 ## REQ-91 / 93 / 94 / 95 / 96
 
 Architecture decisions, compatibility/deprecation, runbooks/drills, hash-chained audit evidence and the unified risk register are implemented as project-specific machine state. Their final `passed` status is promoted only after the evidence package is merged and verified on an immutable main commit.
+
+
+## Immutable verification closure
+
+Verification reference: `8922bc8c3e7e331c88e6506625e4d9cca5ea9173` at 2026-10-04T19:12:35Z.
+
+Final classification:
+
+- **Not applicable:** REQ-83, REQ-84, REQ-86, REQ-89, REQ-92.
+- **Passed with project-specific evidence:** REQ-85, REQ-87, REQ-88, REQ-91, REQ-93, REQ-94, REQ-95, REQ-96.
+- **Verification required / external qualified review:** REQ-90.
+
+Supporting verification:
+- repository-integrity: Actions run `37227345400` — success;
+- CodeQL / analyze-actions: Actions run `37227345382` — success;
+- GitHub Governance Audit: Actions run `37227345426` — success;
+- OpenSSF Scorecard: Actions run `37226403498` — success;
+- product validation on PR #131: Actions run `37227281327` — success;
+- live main ruleset `24086362`: `validate`, `repository-integrity`, `analyze-actions` required;
+- repository merge settings self-healed and verified;
+- governance drift Issue #128 closed after clean audit.
+
+REQ-90 remains intentionally non-passed because ANPOS must not invent jurisdiction-specific legal/privacy conclusions. That is an external assurance gate, not an unimplemented repository control.

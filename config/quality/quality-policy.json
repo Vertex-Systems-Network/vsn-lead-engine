@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "status": "baseline_verified_security_capabilities_partially_verified",
+  "status": "supported_quality_and_security_capabilities_verified",
   "activation_scope": "child_project",
   "apply_to_template_source": false,
   "setup_flow": {
@@ -79,32 +79,33 @@
     "baseline_verification": "verified_on_child_repository",
     "github_security_capability": {
       "repository_visibility": "public",
-      "codeql_actions": "verified_supported",
+      "codeql_actions": "verified_live_required",
       "dependency_review": "unavailable_until_dependency_graph_enabled",
-      "ossf_scorecard": "pending_post_merge_execution",
-      "governance_audit": "pending_post_merge_execution"
+      "ossf_scorecard": "verified_live_non_required",
+      "governance_audit": "verified_live"
     },
     "capability_dependent_workflows": [
       "codeql-actions.yml",
-      "dependency-review.yml",
       "scorecard.yml"
     ],
-    "capability_resolution": "CodeQL for GitHub Actions verified successful on PR #125 run 37226172430. Dependency Review is unavailable while Dependency graph is disabled. Scorecard/governance audit await post-merge main execution.",
+    "capability_resolution": "CodeQL and Scorecard are live/verified; governance audit is live/verified; Dependency Review was live-probed and removed from active CI because Dependency graph is disabled.",
     "stack_specific_tooling": "existing_project_stack_already_operational; future material stack changes require approval",
-    "verified_main_ref": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
-    "verified_at": "2026-10-04T18:13:02Z",
+    "verified_main_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+    "verified_at": "2026-10-04T19:12:35Z",
     "verified_required_checks": [
       "validate",
       "repository-integrity",
       "analyze-actions"
     ],
-    "verified_product_test_evidence": "PR #123: 305 passed",
+    "verified_product_test_evidence": "PR #131 Lead Engine validate run 37227281327: success; earlier full product-suite evidence retained at 305 passed.",
     "installed_child_security_workflows": [
       "codeql-actions.yml",
       "scorecard.yml",
       "governance-audit.yml"
     ],
-    "dependency_review_evidence": "Actions run 37226110820: Dependency review is not supported; Dependency graph must be enabled in repository security settings.",
-    "codeql_evidence": "Actions run 37226172430: CodeQL / analyze-actions completed success."
+    "dependency_review_evidence": "PR #125 run 37226110820: Dependency Review unsupported because Dependency graph is disabled; active workflow intentionally absent until capability changes.",
+    "codeql_evidence": "Main Actions run 37227345382: CodeQL / analyze-actions success.",
+    "scorecard_evidence": "Main Actions run 37226403498: OpenSSF Scorecard / analysis success.",
+    "governance_audit_evidence": "Main Actions run 37227345426: GitHub Governance Audit success; Issue #128 closed."
   }
 }

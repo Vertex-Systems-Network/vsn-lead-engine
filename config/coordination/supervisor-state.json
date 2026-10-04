@@ -27,16 +27,16 @@
     "orphan_election_ref_requires_recovery": true,
     "lock_namespace_requires_trusted_runtime_protection_when_supported": true
   },
-  "merge_generation": 3,
-  "last_merge_sha": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
-  "last_merge_at": "2026-10-04T18:12:45Z",
+  "merge_generation": 9,
+  "last_merge_sha": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+  "last_merge_at": "2026-10-04T19:11:51Z",
   "active_worker_count": 0,
   "open_required_action_alert_count": 0,
   "last_pm_sync_at": null,
   "last_readme_dashboard_update_at": null,
-  "last_reconciled_main_sha": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
+  "last_reconciled_main_sha": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
   "status": "idle_synced",
   "runtime_mode": "degraded_no_verified_supervisor",
-  "merge_generation_scope": "ANPOS adoption-era merges #120, #122 and #123 only; pre-adoption merge history remains in repository Git history.",
-  "reconciliation_note": "State synchronized to repository evidence without assigning a fake Supervisor identity."
+  "merge_generation_scope": "ANPOS adoption/hardening merges #120, #122, #123, #124, #125, #127, #129, #130 and #131; final reconciliation records the inspected main immediately before its own merge.",
+  "reconciliation_note": "ANPOS adoption, assurance and active main governance are reconciled to immutable main evidence. No fake Supervisor identity is assigned; distributed claims remain disabled until a real runtime identity exists."
 }

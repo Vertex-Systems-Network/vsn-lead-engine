@@ -10,15 +10,21 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [],
@@ -31,7 +37,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
       "status": "verified",
       "verification_status": "verified"
     },
@@ -44,15 +52,21 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [],
@@ -64,7 +78,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
       "status": "verified",
       "verification_status": "verified"
     },
@@ -77,15 +93,21 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [],
@@ -100,9 +122,11 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
-      "status": "implemented",
-      "verification_status": "partially_verified"
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
+      "status": "verified",
+      "verification_status": "verified"
     },
     {
       "requirement_id": "REQ-86",
@@ -113,15 +137,21 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [],
@@ -132,9 +162,11 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
-      "status": "implemented",
-      "verification_status": "partially_verified"
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
+      "status": "verified",
+      "verification_status": "verified"
     },
     {
       "requirement_id": "REQ-87",
@@ -145,15 +177,23 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success",
+        "Actions run 37227345426: governance audit success",
+        "Issue #128 closed"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [],
@@ -167,9 +207,11 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
-      "status": "implemented",
-      "verification_status": "partially_verified"
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
+      "status": "verified",
+      "verification_status": "verified"
     },
     {
       "requirement_id": "REQ-88",
@@ -180,17 +222,24 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
       "test_evidence": [
         "Lead Engine product suite: 305 passed",
-        "docs/ai/ENGINEERING-QUALITY-REVIEW-2026-10-04.md"
+        "docs/ai/ENGINEERING-QUALITY-REVIEW-2026-10-04.md",
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success",
+        "Actions run 37227345426: governance audit success",
+        "Issue #128 closed"
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -204,9 +253,11 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
-      "status": "implemented",
-      "verification_status": "partially_verified"
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
+      "status": "verified",
+      "verification_status": "verified"
     },
     {
       "requirement_id": "REQ-89",
@@ -217,15 +268,21 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [
@@ -239,7 +296,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
       "status": "verified",
       "verification_status": "verified"
     },
@@ -252,15 +311,20 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Technical privacy/data controls verified; qualified legal/privacy review remains external."
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [
@@ -278,7 +342,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     },
@@ -291,15 +357,23 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success",
+        "Actions run 37227345426: governance audit success",
+        "Issue #128 closed"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [
@@ -316,9 +390,11 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
-      "status": "implemented",
-      "verification_status": "partially_verified"
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
+      "status": "verified",
+      "verification_status": "verified"
     },
     {
       "requirement_id": "REQ-92",
@@ -329,15 +405,21 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [
@@ -353,7 +435,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
       "status": "verified",
       "verification_status": "verified"
     },
@@ -366,15 +450,21 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [
@@ -394,9 +484,11 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
-      "status": "implemented",
-      "verification_status": "partially_verified"
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
+      "status": "verified",
+      "verification_status": "verified"
     },
     {
       "requirement_id": "REQ-94",
@@ -407,15 +499,21 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [
@@ -433,9 +531,11 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
-      "status": "implemented",
-      "verification_status": "partially_verified"
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
+      "status": "verified",
+      "verification_status": "verified"
     },
     {
       "requirement_id": "REQ-95",
@@ -446,15 +546,23 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success",
+        "Actions run 37227345426: governance audit success",
+        "Issue #128 closed"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [
@@ -471,9 +579,11 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
-      "status": "implemented",
-      "verification_status": "partially_verified"
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
+      "status": "verified",
+      "verification_status": "verified"
     },
     {
       "requirement_id": "REQ-96",
@@ -484,15 +594,23 @@
         "MOD-ANPOS-ASSURANCE"
       ],
       "work_unit_ids": [
-        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+        "WU-ANPOS-ASSURANCE-VERIFY"
       ],
       "design_surface_refs": [],
       "design_component_refs": [],
       "branch_refs": [
         "anpos/p1-p3-assurance-hardening"
       ],
-      "pull_request_refs": [],
-      "test_evidence": [],
+      "pull_request_refs": [
+        "PR #125"
+      ],
+      "test_evidence": [
+        "Actions run 37227345400: repository-integrity success",
+        "Actions run 37227345382: CodeQL analyze-actions success",
+        "Actions run 37227345426: governance audit success",
+        "Issue #128 closed"
+      ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
       "security_evidence_refs": [
@@ -509,9 +627,11 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
-      "status": "implemented",
-      "verification_status": "partially_verified"
+      "release_refs": [
+        "main:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
+      ],
+      "status": "verified",
+      "verification_status": "verified"
     }
   ],
   "link_template": {
