@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "status": "template_blueprint",
+  "activation_scope": "commercial_distribution_only",
+  "provider": "github_marketplace",
+  "configured": false,
+  "listing": {
+    "github_app_slug": null,
+    "marketplace_listing_slug": null,
+    "verified_publisher_confirmed": false,
+    "financial_onboarding_confirmed": false
+  },
+  "listing_constraints": {
+    "paid_listing_requires_verified_publisher": true,
+    "paid_listing_requires_financial_onboarding": true,
+    "maximum_pricing_plans": 10,
+    "paid_plan_requires_monthly_and_annual_usd_prices": true,
+    "supported_pricing_models": ["free", "flat_rate", "per_unit"],
+    "optional_free_trial_days_when_enabled": 14,
+    "constraints_must_be_rechecked_against_current_github_docs_before_launch": true
+  },
+  "webhook": {
+    "event": "marketplace_purchase",
+    "supported_actions": ["purchased", "changed", "cancelled"],
+    "signature_header": "X-Hub-Signature-256",
+    "signature_algorithm": "HMAC-SHA256",
+    "delivery_id_header": "X-GitHub-Delivery",
+    "event_header": "X-GitHub-Event",
+    "raw_body_must_be_preserved_until_signature_verification": true,
+    "constant_time_signature_compare_required": true,
+    "delivery_id_deduplication_required": true,
+    "unknown_action_has_no_entitlement_side_effect": true,
+    "out_of_order_or_ambiguous_event_requires_api_reconciliation": true
+  },
+  "event_processing": {
+    "canonical_subject": "github_numeric_account_id",
+    "transactional_per_account": true,
+    "idempotent_side_effects_required": true,
+    "audit_event_required": true,
+    "minimum_customer_data_only": true,
+    "repository_write_is_not_billing_authority": true
+  },
+  "purchase_actions": {
+    "purchased": "create_or_activate_entitlement_after_verified_reconciliation",
+    "changed": "recalculate_plan_seats_and_entitlements_after_verified_reconciliation",
+    "cancelled": "end_or_transition_commercial_entitlements_at_verified_effective_state_without_modifying_generated_project_code"
+  },
+  "recovery": {
+    "marketplace_api_reconciliation_required_after_missed_or_ambiguous_webhook": true,
+    "duplicate_delivery_must_not_duplicate_provisioning": true,
+    "failed_provisioning_must_be_retryable_without_duplicate_customer_state": true
+  },
+  "secrets": {
+    "webhook_secret_in_repository": false,
+    "github_app_private_key_in_repository": false,
+    "entitlement_signing_private_key_in_repository": false,
+    "secrets_manager_required": true
+  },
+  "privacy": {
+    "cancelled_trial_private_customer_data_cleanup_max_days": 30,
+    "payment_card_data_expected_from_github": false
+  }
+}
