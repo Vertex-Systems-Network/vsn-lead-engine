@@ -1,13 +1,241 @@
 {
   "schema_version": 1,
-  "status": "pending_project_threat_model",
+  "status": "active_project_threat_model",
   "activation_scope": "child_project",
   "methodology": "project_specific_threat_model_with_OWASP_ASVS_or_equivalent_verification_when_applicable",
-  "assets": [],
-  "actors": [],
-  "trust_boundaries": [],
-  "entry_points": [],
-  "threats": [],
+  "assets": [
+    {
+      "id": "ASSET-001",
+      "name": "Google Sheets dated lead records",
+      "classification": "internal/personal-business-contact data"
+    },
+    {
+      "id": "ASSET-002",
+      "name": "R2 fingerprint and health/yield state",
+      "classification": "internal"
+    },
+    {
+      "id": "ASSET-003",
+      "name": "GitHub Actions / Google / R2 credentials",
+      "classification": "secret"
+    },
+    {
+      "id": "ASSET-004",
+      "name": "Protected repository control plane/workflows",
+      "classification": "security-sensitive"
+    }
+  ],
+  "actors": [
+    {
+      "id": "ACTOR-001",
+      "name": "Authorized VSN repository operator",
+      "trust": "trusted authenticated"
+    },
+    {
+      "id": "ACTOR-002",
+      "name": "GitHub Actions runner/workflow identity",
+      "trust": "trusted only within declared permissions"
+    },
+    {
+      "id": "ACTOR-003",
+      "name": "External public data source/business website",
+      "trust": "untrusted data"
+    },
+    {
+      "id": "ACTOR-004",
+      "name": "Untrusted pull-request/repository input",
+      "trust": "untrusted until protected checks/merge"
+    }
+  ],
+  "trust_boundaries": [
+    {
+      "id": "BOUNDARY-001",
+      "from": "public internet sources",
+      "to": "Lead Engine runner",
+      "controls": [
+        "bounded source adapters",
+        "taxonomy validation",
+        "SSRF/private-network rejection"
+      ]
+    },
+    {
+      "id": "BOUNDARY-002",
+      "from": "GitHub Actions runner",
+      "to": "Google APIs",
+      "controls": [
+        "GitHub secrets",
+        "credential preflight",
+        "no production write job on PR"
+      ]
+    },
+    {
+      "id": "BOUNDARY-003",
+      "from": "GitHub Actions runner",
+      "to": "Cloudflare R2",
+      "controls": [
+        "server-only secrets",
+        "exact fingerprint ledger",
+        "pending recovery"
+      ]
+    },
+    {
+      "id": "BOUNDARY-004",
+      "from": "pull request",
+      "to": "protected main",
+      "controls": [
+        "required CI",
+        "squash-only ruleset",
+        "no bypass",
+        "immutable action pins"
+      ]
+    }
+  ],
+  "entry_points": [
+    "Overture/public rows",
+    "Official website/redirect chain",
+    "Common Crawl HTML",
+    "GitHub workflow events",
+    "Google/R2 API responses"
+  ],
+  "threats": [
+    {
+      "id": "THREAT-001",
+      "title": "SSRF/private-network access through official-site enrichment",
+      "asset_ids": [
+        "ASSET-003"
+      ],
+      "actor_ids": [
+        "ACTOR-003"
+      ],
+      "entry_point": "Official website URL/redirect",
+      "abuse_case": "Malicious/misconfigured URL redirects to loopback/private/link-local/internal infrastructure.",
+      "likelihood": "medium",
+      "impact": "high",
+      "controls": [
+        "Reject non-public targets.",
+        "Revalidate redirects.",
+        "Bound pages/bytes/timeouts.",
+        "tests/test_enrichment.py"
+      ],
+      "verification_refs": [
+        "DATA_SOURCES.md",
+        "src/vsn_lead_engine/enrichment.py",
+        "tests/test_enrichment.py"
+      ],
+      "residual_risk": "DNS/provider behavior remains external; bounded validation reduces exposure.",
+      "status": "mitigated"
+    },
+    {
+      "id": "THREAT-002",
+      "title": "Production credential exposure to untrusted PR code/logs",
+      "asset_ids": [
+        "ASSET-003"
+      ],
+      "actor_ids": [
+        "ACTOR-004"
+      ],
+      "entry_point": "pull_request workflow",
+      "abuse_case": "Untrusted code attempts to read/exfiltrate Google/R2/admin secrets.",
+      "likelihood": "medium",
+      "impact": "critical",
+      "controls": [
+        "PR job validation only.",
+        "Production run skipped on PR.",
+        "Default contents:read.",
+        "Secrets only in real-run steps."
+      ],
+      "verification_refs": [
+        ".github/workflows/lead-engine.yml",
+        ".github/workflows/repository-quality.yml"
+      ],
+      "residual_risk": "Workflow permission/secret changes still require review.",
+      "status": "mitigated"
+    },
+    {
+      "id": "THREAT-003",
+      "title": "Duplicate admission after partial R2/Sheet transaction failure",
+      "asset_ids": [
+        "ASSET-001",
+        "ASSET-002"
+      ],
+      "actor_ids": [
+        "ACTOR-002"
+      ],
+      "entry_point": "accepted-lead commit path",
+      "abuse_case": "Runner dies between reservation, Sheet write and permanent fingerprint merge.",
+      "likelihood": "medium",
+      "impact": "high",
+      "controls": [
+        "Pending markers.",
+        "Registry lock/exact checks.",
+        "Next-run Sheet reconciliation.",
+        "Packed-v2 + objects-v1 compatibility."
+      ],
+      "verification_refs": [
+        "README.md",
+        "src/vsn_lead_engine/packed_registry.py",
+        "tests/test_registry.py",
+        "tests/test_packed_registry.py"
+      ],
+      "residual_risk": "R2 outage blocks exact reconciliation; production should fail closed.",
+      "status": "mitigated"
+    },
+    {
+      "id": "THREAT-004",
+      "title": "Unsafe duplicate recovery dispatch near midnight",
+      "asset_ids": [
+        "ASSET-001",
+        "ASSET-002"
+      ],
+      "actor_ids": [
+        "ACTOR-002"
+      ],
+      "entry_point": "Recovery supervisor",
+      "abuse_case": "Late recovery crosses date boundary or competes with active run.",
+      "likelihood": "medium",
+      "impact": "medium",
+      "controls": [
+        "Serialized concurrency.",
+        "Active-run check.",
+        "Midnight runway guard.",
+        "Frozen date/health evidence."
+      ],
+      "verification_refs": [
+        ".github/workflows/quota-recovery-supervisor.yml",
+        "Actions run 37225162383",
+        "tests/test_schedule.py"
+      ],
+      "residual_risk": "Quota may remain short; safety takes priority.",
+      "status": "mitigated"
+    },
+    {
+      "id": "THREAT-005",
+      "title": "Control-plane governance tampering",
+      "asset_ids": [
+        "ASSET-004"
+      ],
+      "actor_ids": [
+        "ACTOR-004"
+      ],
+      "entry_point": "PR modifying ANPOS/ruleset/workflow validators",
+      "abuse_case": "Change weakens validation/protection/coordination safeguards.",
+      "likelihood": "medium",
+      "impact": "high",
+      "controls": [
+        "Protected-base validator.",
+        "repository-integrity.",
+        "Main ruleset/no bypass.",
+        "Protected control-plane path policy."
+      ],
+      "verification_refs": [
+        ".github/workflows/repository-quality.yml",
+        "config/security/control-plane-policy.json",
+        "config/github/ruleset-policy.json"
+      ],
+      "residual_risk": "Independent reviewer/team remains pending.",
+      "status": "mitigating"
+    }
+  ],
   "threat_template": {
     "id": "THREAT-001",
     "title": "",
