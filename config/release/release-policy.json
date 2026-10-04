@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "pending_environment_configuration",
+  "status": "active_protected_main_delivery",
   "activation_scope": "child_project",
   "environment_template": {
     "name": "production",
@@ -32,5 +32,43 @@
     "untrusted_prs_must_not_access_production_credentials": true,
     "environment_secret_separation_required": true
   },
-  "completion_rule": "A release is complete only after deployment outcome and post-deploy verification are recorded against the immutable commit/artifact."
+  "completion_rule": "A release is complete only after deployment outcome and post-deploy verification are recorded against the immutable commit/artifact.",
+  "environments": [
+    {
+      "name": "pull_request_validation",
+      "deployment_authority": [],
+      "required_checks": [
+        "validate",
+        "repository-integrity"
+      ],
+      "approval_required": false,
+      "secret_scope": "no production credentials",
+      "data_classification_allowed": [
+        "repository code/test fixtures"
+      ],
+      "migration_preflight_required": true,
+      "smoke_test_required": true,
+      "rollback_or_rollforward_plan_required": true,
+      "observability_required": true
+    },
+    {
+      "name": "production_main_schedule",
+      "deployment_authority": [
+        "protected main GitHub Actions"
+      ],
+      "required_checks": [
+        "protected-main merge requirements"
+      ],
+      "approval_required": true,
+      "secret_scope": "GitHub Actions secrets for Google/R2 only in real-run steps",
+      "data_classification_allowed": [
+        "internal",
+        "secret runtime credentials"
+      ],
+      "migration_preflight_required": true,
+      "smoke_test_required": true,
+      "rollback_or_rollforward_plan_required": true,
+      "observability_required": true
+    }
+  ]
 }
