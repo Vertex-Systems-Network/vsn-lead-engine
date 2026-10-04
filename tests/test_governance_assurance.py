@@ -42,8 +42,14 @@ class GovernanceAssuranceTests(unittest.TestCase):
         rows = {row["requirement_id"]: row for row in state["requirements"]}
         expected = {f"REQ-{n}" for n in range(89, 97)}
         self.assertTrue(expected.issubset(rows))
+        instance = load("config/protocol/instance.json")
         for rid in expected:
-            self.assertNotEqual(rows[rid]["state"], "passed")
+            if instance.get("instance_status") == "template_source":
+                self.assertNotEqual(rows[rid]["state"], "passed")
+            if rows[rid]["state"] == "passed":
+                self.assertTrue(rows[rid]["evidence_refs"])
+                self.assertTrue(rows[rid]["last_verified_ref"])
+                self.assertTrue(rows[rid]["last_verified_at"])
 
     def test_responsible_ai_has_human_override_and_transparency_safeguards(self) -> None:
         policy = load("config/ai/responsible-ai-policy.json")
@@ -74,7 +80,21 @@ class GovernanceAssuranceTests(unittest.TestCase):
         self.assertEqual(audit["integrity"]["mode"], "sha256_hash_chain")
         self.assertTrue(audit["rules"]["secrets_credentials_and_sensitive_full_prompts_forbidden"])
         self.assertTrue(audit["rules"]["integrity_break_requires_investigation_before_trusting_later_entries"])
-        self.assertEqual(audit["entries"], [])
+        instance = load("config/protocol/instance.json")
+        if instance.get("instance_status") == "template_source":
+            self.assertEqual(audit["entries"], [])
+        else:
+            self.assertGreaterEqual(len(audit["entries"]), 1)
+            import importlib.util
+
+            spec = importlib.util.spec_from_file_location(
+                "verify_audit_journal",
+                ROOT / "scripts" / "verify_audit_journal.py",
+            )
+            module = importlib.util.module_from_spec(spec)
+            assert spec.loader is not None
+            spec.loader.exec_module(module)
+            module.verify(audit)
 
     def test_governance_conformance_scenarios_exist(self) -> None:
         scenarios = {row["name"] for row in load("config/testing/conformance-scenarios.json")["scenarios"]}
