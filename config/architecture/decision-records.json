@@ -1,8 +1,190 @@
 {
   "schema_version": 1,
-  "status": "active_registry",
+  "status": "active_project_registry",
   "activation_scope": "child_project",
-  "decisions": [],
+  "decisions": [
+    {
+      "id": "ADR-0001",
+      "title": "Use Overture Maps Places as the primary free discovery source",
+      "status": "accepted",
+      "context": "Production requires scalable free US/Canada business discovery without paid APIs/public-community Overpass dependence.",
+      "alternatives": [
+        "Paid discovery APIs",
+        "Public community Overpass",
+        "Self-hosted Overpass"
+      ],
+      "evidence_refs": [
+        "DATA_SOURCES.md",
+        "README.md",
+        "src/vsn_lead_engine/sources/overture.py"
+      ],
+      "decision": "Use Overture Maps Places resolved through its STAC catalog as primary production discovery.",
+      "consequences": [
+        "No paid discovery dependency.",
+        "Quality depends on source/provider coverage.",
+        "Bounded public-site enrichment remains needed for missing phones."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "Public source data only.",
+        "Free-source model preserved.",
+        "Source timeouts/partitions are bounded."
+      ],
+      "reversibility": "Reversible through source adapter after evidence-backed replacement.",
+      "affected_modules_or_contracts": [
+        "MOD-PRODUCTION-RUNTIME",
+        "DATA_SOURCES.md"
+      ],
+      "decided_by": "legacy project decision reconstructed from repository evidence",
+      "decided_at": null,
+      "supersedes": [],
+      "superseded_by": null
+    },
+    {
+      "id": "ADR-0002",
+      "title": "Use Cloudflare R2 hashed fingerprints as permanent cross-day dedupe authority",
+      "status": "accepted",
+      "context": "Daily lead history grows indefinitely and raw contact fields are unnecessary for duplicate blocking.",
+      "alternatives": [
+        "Google Master Registry",
+        "SQL dedupe database",
+        "Per-lead R2 objects only"
+      ],
+      "evidence_refs": [
+        "README.md",
+        "src/vsn_lead_engine/packed_registry.py",
+        "tests/test_packed_registry.py"
+      ],
+      "decision": "Use type-separated 96-bit BLAKE2 tokens in packed-v2 R2 shards with historical objects-v1 read compatibility and pending recovery.",
+      "consequences": [
+        "Scalable duplicate history without raw lead storage in R2.",
+        "Fingerprint history should not be expired merely for space.",
+        "Pack/pending writes require locking/recovery discipline."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "R2 stores hashed fingerprints.",
+        "Cloudflare credentials are server-only.",
+        "Object storage avoids a bounded SQL tier."
+      ],
+      "reversibility": "Migratable with registry audit/backfill; deleting history without migration weakens dedupe.",
+      "affected_modules_or_contracts": [
+        "MOD-PRODUCTION-RUNTIME",
+        "R2 registry contract"
+      ],
+      "decided_by": "legacy project decision reconstructed from repository evidence",
+      "decided_at": null,
+      "supersedes": [],
+      "superseded_by": null
+    },
+    {
+      "id": "ADR-0003",
+      "title": "Keep full accepted lead records in dated Google Sheets",
+      "status": "accepted",
+      "context": "Operators need daily consumable workbooks while R2 only needs dedupe state.",
+      "alternatives": [
+        "Full leads in R2",
+        "Full leads in SQL",
+        "Single never-ending sheet"
+      ],
+      "evidence_refs": [
+        "README.md",
+        "src/vsn_lead_engine/sheets.py",
+        "tests/test_sheets.py"
+      ],
+      "decision": "Write full records to one dated Google workbook; use R2 only for permanent fingerprints/telemetry.",
+      "consequences": [
+        "Daily workbooks are directly usable.",
+        "Workbook readiness/ownership is a production dependency.",
+        "R2 cannot reconstruct full records."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "Google credentials stay secret.",
+        "Dated files bound operational scope.",
+        "No raw production copy to lower environments without approval."
+      ],
+      "reversibility": "Storage adapter can change through approved migration/parity verification.",
+      "affected_modules_or_contracts": [
+        "MOD-PRODUCTION-RUNTIME",
+        "MOD-MYDRIVE-AUTONOMY"
+      ],
+      "decided_by": "legacy project decision reconstructed from repository evidence",
+      "decided_at": null,
+      "supersedes": [],
+      "superseded_by": null
+    },
+    {
+      "id": "ADR-0004",
+      "title": "Use GitHub Actions plus serialized recovery supervisor as production controller",
+      "status": "accepted",
+      "context": "Project needs a zero-server scheduled controller with bounded retries and no competing recovery runs.",
+      "alternatives": [
+        "Paid persistent server",
+        "External cron",
+        "Single unmonitored daily workflow"
+      ],
+      "evidence_refs": [
+        ".github/workflows/lead-engine.yml",
+        ".github/workflows/quota-recovery-supervisor.yml",
+        "src/vsn_lead_engine/watchdog.py"
+      ],
+      "decision": "Run on GitHub-hosted Actions with serialized concurrency, recovery supervisor, timeouts, midnight guards and health evidence.",
+      "consequences": [
+        "No paid always-on server.",
+        "GitHub Actions is an operational dependency.",
+        "Late catch-up stops when safe runway is insufficient."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "PR validation has no production credentials.",
+        "Secrets injected only into real-run steps.",
+        "Hosted-runner constraints shape budgets."
+      ],
+      "reversibility": "Can move schedulers if equivalent concurrency, identity, secret and evidence controls are retained.",
+      "affected_modules_or_contracts": [
+        "MOD-PRODUCTION-RUNTIME",
+        "production scheduling"
+      ],
+      "decided_by": "legacy project decision reconstructed from repository evidence",
+      "decided_at": null,
+      "supersedes": [],
+      "superseded_by": null
+    },
+    {
+      "id": "ADR-0005",
+      "title": "Adopt ANPOS as governance overlay without resetting existing product",
+      "status": "accepted",
+      "context": "Lead Engine already had production history P01-P70 before ANPOS 1.4.0.",
+      "alternatives": [
+        "Reset as new ANPOS project",
+        "Keep ad-hoc legacy state only"
+      ],
+      "evidence_refs": [
+        "AGENTS.md",
+        "docs/ai/ANPOS-ADOPTION.md",
+        "config/ai/project-state.json",
+        "PR #120",
+        "PR #124"
+      ],
+      "decision": "Preserve existing implementation/history and use ANPOS for governance, traceability and future work.",
+      "consequences": [
+        "Legacy checkpoints remain evidence.",
+        "Project lifecycle is production_operations.",
+        "Future control-plane work follows protected checks."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "Vendor-only ANPOS runtime excluded.",
+        "No AI identity fabricated.",
+        "Governance changes remain protected."
+      ],
+      "reversibility": "ANPOS can evolve through versioned migration; completed repo evidence cannot be silently discarded.",
+      "affected_modules_or_contracts": [
+        "MOD-ANPOS-GOVERNANCE",
+        "MOD-ANPOS-ASSURANCE"
+      ],
+      "decided_by": "VSN repository owner instruction plus verified adoption",
+      "decided_at": "2026-10-04T15:30:52Z",
+      "supersedes": [],
+      "superseded_by": null
+    }
+  ],
   "decision_template": {
     "id": "ADR-0001",
     "title": "",

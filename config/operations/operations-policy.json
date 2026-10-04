@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "pending_operational_configuration",
+  "status": "active_production_monitoring_and_recovery",
   "activation_scope": "child_project",
   "service_objective_template": {
     "service": "",
@@ -32,10 +32,26 @@
     "alert_actionability_required": true
   },
   "recovery": {
-    "rto": null,
-    "rpo": null,
+    "rto": "bounded by next safe GitHub Actions recovery/scheduled window; no guaranteed contractual RTO",
+    "rpo": "accepted-lead commit protocol targets no silent duplicate-history loss; unresolved pending state must reconcile before certification",
     "backup_policy_required_when_stateful": true,
     "restore_test_required_before_production_for_critical_state": true,
-    "disaster_recovery_exercise_frequency": null
-  }
+    "disaster_recovery_exercise_frequency": "risk-triggered and after material registry/controller changes"
+  },
+  "service_objectives": [
+    {
+      "service": "Daily lead production",
+      "sli": "accepted unique leads per category/day",
+      "target": "1000 per each of 12 categories when public-source yield and safe runtime permit",
+      "window": "Asia/Karachi calendar day",
+      "error_budget_policy": "No quality/dedupe weakening to fill quota; incomplete quota is surfaced as operational evidence."
+    },
+    {
+      "service": "R2 exact dedupe authority",
+      "sli": "unresolved pending recovery at certification",
+      "target": 0,
+      "window": "each production certification boundary",
+      "error_budget_policy": "Fail closed when exact dedupe authority cannot be verified."
+    }
+  ]
 }

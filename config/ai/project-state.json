@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "lifecycle_stage": "production_operations",
-  "current_phase": "PHASE-PRODUCTION-OPERATIONS",
-  "current_module": "MOD-PRODUCTION-RUNTIME",
-  "current_work_unit": "WU-OPS-DAILY-QUOTA",
+  "current_phase": "PHASE-ANPOS-HARDENING",
+  "current_module": "MOD-ANPOS-ASSURANCE",
+  "current_work_unit": "WU-ANPOS-ASSURANCE-CLASSIFICATION",
   "last_verified_completion": "ANPOS 1.4.0 adoption/governance alignment through PR #123; main ruleset 24086362 active; PR #123 product CI 305 passed; post-merge repository-integrity run 37223542864 succeeded.",
-  "next_valid_work_unit": "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+  "next_valid_work_unit": "WU-ANPOS-ASSURANCE-VERIFY",
   "progress": {
     "total_work_units": 7,
     "complete": 2,
@@ -17,9 +17,10 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Classify ANPOS Requirements 83-96 using project-specific applicability and evidence.",
-    "Detect actual support/eligibility for capability-dependent GitHub security checks before activation.",
-    "Refresh production quota evidence from live runtime/workbook state; latest verified 2026-10-04 snapshot is 6,855 / 12,000."
+    "Merge and verify classified REQ-83-96 evidence; then promote only immutable evidence-backed requirements to passed.",
+    "Verify CodeQL, Dependency Review and OpenSSF Scorecard child workflows; only successful PR checks may become required.",
+    "Activate and verify GitHub governance drift audit.",
+    "Refresh live production quota evidence independently of ANPOS assurance closure."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -29,9 +30,9 @@
   ],
   "critical_defects": [],
   "qa_readiness": "verified_current",
-  "security_readiness": "partial_governance_hardening",
-  "last_reconciled_repository_ref": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
-  "last_reconciled_at": "2026-10-04T18:13:02Z",
+  "security_readiness": "assurance_hardening_in_progress",
+  "last_reconciled_repository_ref": "ec525a1faac7e4e8b6e736ddc40261bde0275c26",
+  "last_reconciled_at": "2026-10-04T18:45:00Z",
   "reconciliation": {
     "source_of_truth_order": [
       "live GitHub repository and Actions evidence",

@@ -41,6 +41,9 @@ jobs:
           python -m unittest discover -s tests -p 'test_governance_assurance.py'
           python -m unittest discover -s tests -p 'test_blueprint_closure.py'
 
+      - name: Verify tamper-evident audit journal
+        run: python scripts/verify_audit_journal.py
+
       - name: Validate current AI-native state and workflow safety
         run: python scripts/validate_ai_native_repo.py
 

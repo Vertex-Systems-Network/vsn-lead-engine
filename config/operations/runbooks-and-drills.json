@@ -1,9 +1,208 @@
 {
   "schema_version": 1,
-  "status": "pending_operational_applicability",
+  "status": "active_project_runbooks",
   "activation_scope": "child_project",
-  "runbooks": [],
-  "drills": [],
+  "runbooks": [
+    {
+      "id": "RUNBOOK-0001",
+      "scenario": "Daily quota shortfall or failed/missing native production run",
+      "owner": "VSN repository owner/operator",
+      "preconditions": [
+        "Dated workbook exists or readiness recovery can resolve it.",
+        "Google write credential available."
+      ],
+      "detection": [
+        "Health ledger shows incomplete quota.",
+        "Native run failed/missing or shortfall remains."
+      ],
+      "containment_steps": [
+        "Do not dispatch while a real run is active.",
+        "Respect schedule/midnight runway."
+      ],
+      "recovery_steps": [
+        "Re-check live workbook quota.",
+        "Dispatch one serialized recovery run only when safe/no active run.",
+        "Continue bounded cycles while safe."
+      ],
+      "verification_steps": [
+        "Re-read category counts.",
+        "Require R2 pending unresolved=0 at final certification.",
+        "Verify health event."
+      ],
+      "rollback_or_fallback": [
+        "Stop dispatch when midnight guard blocks.",
+        "Resume next safe window without weakening quality."
+      ],
+      "escalation": [
+        "Investigate persistent source/Google/R2 incidents."
+      ],
+      "last_verified_at": "2026-10-04T18:38:11Z",
+      "evidence_refs": [
+        ".github/workflows/quota-recovery-supervisor.yml",
+        "Actions run 37225162383",
+        "src/vsn_lead_engine/health.py"
+      ]
+    },
+    {
+      "id": "RUNBOOK-0002",
+      "scenario": "Missing/invalid Google credential or missing My Drive creation capability",
+      "owner": "VSN repository owner/operator",
+      "preconditions": [
+        "A real write/create is requested."
+      ],
+      "detection": [
+        "Credential preflight missing.",
+        "Strict capability probe fails/unavailable."
+      ],
+      "containment_steps": [
+        "Skip lead writes safely.",
+        "Record health incident."
+      ],
+      "recovery_steps": [
+        "Use existing/precreated user-owned workbook when available.",
+        "Provision GOOGLE_OAUTH_USER_JSON via authorized-user onboarding.",
+        "Run strict create→trash probe."
+      ],
+      "verification_steps": [
+        "Validate user OAuth mode.",
+        "Probe creates/trashes test workbook."
+      ],
+      "rollback_or_fallback": [
+        "Service-account writer access may continue for existing/precreated files but does not certify autonomous creation."
+      ],
+      "escalation": [
+        "Human Google authorization required if OAuth secret absent."
+      ],
+      "last_verified_at": null,
+      "evidence_refs": [
+        ".github/workflows/google-drive-capability.yml",
+        "tests/test_google_oauth_certification.py",
+        ".ai/state/CURRENT-STATE.yaml"
+      ]
+    },
+    {
+      "id": "RUNBOOK-0003",
+      "scenario": "R2 dedupe partial write, pending transaction, or registry migration incident",
+      "owner": "VSN repository owner/operator",
+      "preconditions": [
+        "R2 registry mode active."
+      ],
+      "detection": [
+        "registry-check/audit failure.",
+        "pending marker after interruption."
+      ],
+      "containment_steps": [
+        "Fail closed on registry preflight failure.",
+        "Do not accept collisions with permanent/live pending fingerprints."
+      ],
+      "recovery_steps": [
+        "Reconcile pending markers against Sheet Unique Key.",
+        "Activate written reservations or roll back missing writes.",
+        "Audit before migration/cutover claim."
+      ],
+      "verification_steps": [
+        "pending unresolved=0.",
+        "No missing historical fingerprints.",
+        "Smoke leaves no residue."
+      ],
+      "rollback_or_fallback": [
+        "Historical objects-v1 stays readable if packed-v2 migration incomplete."
+      ],
+      "escalation": [
+        "Stop production if exact dedupe authority cannot be verified."
+      ],
+      "last_verified_at": "2026-09-28T00:00:00Z",
+      "evidence_refs": [
+        "README.md",
+        ".github/workflows/r2-registry.yml",
+        "tests/test_registry.py",
+        "tests/test_packed_registry.py"
+      ]
+    },
+    {
+      "id": "RUNBOOK-0004",
+      "scenario": "Bad repository change or production regression after main merge",
+      "owner": "VSN repository owner/operator",
+      "preconditions": [
+        "A change reaches protected main."
+      ],
+      "detection": [
+        "Required CI fails before merge or runtime health regresses after merge."
+      ],
+      "containment_steps": [
+        "Protected main blocks failed required checks.",
+        "Stop unsafe recovery when guardrails trigger."
+      ],
+      "recovery_steps": [
+        "Create corrective/revert PR from last known-good main.",
+        "Run required checks.",
+        "Resume recovery after corrected main."
+      ],
+      "verification_steps": [
+        "Exact corrective head green.",
+        "Post-merge repository-integrity green.",
+        "Runtime evidence returns expected behavior."
+      ],
+      "rollback_or_fallback": [
+        "Squash-only history supports bounded revert PR; no protected-main force push."
+      ],
+      "escalation": [
+        "Security/data-integrity regressions remain blockers."
+      ],
+      "last_verified_at": "2026-10-04T18:34:00Z",
+      "evidence_refs": [
+        ".github/main-protection-ruleset.json",
+        ".github/workflows/repository-quality.yml",
+        ".ai/state/RECOVERY-PROTOCOL.md"
+      ]
+    }
+  ],
+  "drills": [
+    {
+      "id": "DRILL-0001",
+      "runbook_id": "RUNBOOK-0001",
+      "environment": "production-observed-safe-recovery",
+      "performed_at": "2026-10-04T18:37:44Z",
+      "expected_behavior": [
+        "Do not start recovery when remaining midnight runway is below requirement.",
+        "Record schedule-gate block."
+      ],
+      "actual_behavior": [
+        "Supervisor computed insufficient-midnight-runway.",
+        "No new real run dispatched.",
+        "Health ledger recorded blocked gate."
+      ],
+      "recovery_time": "No unsafe recovery attempted; guard evaluated within workflow.",
+      "data_loss": "none observed",
+      "findings": [
+        "Quota remained incomplete, but date-boundary safety was preserved."
+      ],
+      "follow_up_refs": [
+        "Actions run 37225162383"
+      ],
+      "result": "passed"
+    },
+    {
+      "id": "DRILL-0002",
+      "runbook_id": "RUNBOOK-0003",
+      "environment": "historical production cutover evidence",
+      "performed_at": "2026-09-28T00:00:00Z",
+      "expected_behavior": [
+        "Exact fingerprint parity before R2 authority cutover.",
+        "Reserve/collision/rollback smoke leaves zero residue."
+      ],
+      "actual_behavior": [
+        "README records 47,849/47,849 permanent fingerprints present, zero missing/pending, and clean isolated smoke."
+      ],
+      "recovery_time": "not measured in retained summary",
+      "data_loss": "none reported",
+      "findings": [],
+      "follow_up_refs": [
+        "README.md#final-r2-cutover-certification"
+      ],
+      "result": "passed"
+    }
+  ],
   "runbook_template": {
     "id": "RUNBOOK-0001",
     "scenario": "",

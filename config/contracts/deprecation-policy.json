@@ -1,8 +1,33 @@
 {
   "schema_version": 1,
-  "status": "pending_applicability_detection",
+  "status": "active_project_compatibility_policy",
   "activation_scope": "child_project",
-  "supported_versions": [],
+  "supported_versions": [
+    {
+      "subject": "VSN Lead Engine package",
+      "supported": "0.66.1 current production package",
+      "source_ref": "src/vsn_lead_engine/__init__.py",
+      "consumer_scope": "repository workflows/operators"
+    },
+    {
+      "subject": "Python runtime",
+      "supported": "3.12 in CI/production workflows; project metadata remains >=3.11",
+      "source_ref": "pyproject.toml + .github/workflows/*.yml",
+      "consumer_scope": "GitHub Actions/runtime"
+    },
+    {
+      "subject": "GitHub Actions dependencies",
+      "supported": "reviewed immutable commit SHAs",
+      "source_ref": ".github/workflows/",
+      "consumer_scope": "repository automation"
+    },
+    {
+      "subject": "ANPOS protocol",
+      "supported": "1.4.0",
+      "source_ref": "config/protocol/version.json",
+      "consumer_scope": "repository control plane"
+    }
+  ],
   "deprecations": [],
   "deprecation_template": {
     "id": "DEP-0001",

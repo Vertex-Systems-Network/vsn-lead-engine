@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "pending_applicability_detection",
+  "status": "active_direct_low_risk_release_pending_assurance_merge",
   "activation_scope": "child_project",
   "supported_strategies": [
     "direct_low_risk_release",

@@ -179,7 +179,7 @@
         "WU-ANPOS-ADOPTION"
       ],
       "priority": 40,
-      "status": "ready",
+      "status": "in_progress",
       "blockers": [],
       "acceptance_criteria": [
         "Every REQ-83 through REQ-96 has project-specific applicability and reason.",
@@ -190,7 +190,11 @@
         "repository-integrity",
         "ANPOS assurance schema/tests"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "config/assurance/assurance-state.json",
+        "docs/ai/ASSURANCE-EVIDENCE.md",
+        "docs/ai/ENGINEERING-QUALITY-REVIEW-2026-10-04.md"
+      ]
     },
     {
       "id": "WU-ANPOS-INDEPENDENT-REVIEW",
@@ -238,6 +242,32 @@
         "Live governance verification"
       ],
       "completion_evidence": []
+    },
+    {
+      "id": "WU-ANPOS-ASSURANCE-VERIFY",
+      "phase_id": "PHASE-ANPOS-HARDENING",
+      "module_id": "MOD-ANPOS-ASSURANCE",
+      "title": "Verify assurance evidence on immutable merged ref",
+      "objective": "After classification/evidence merge, re-run child gates and mark only evidence-backed requirements passed.",
+      "dependencies": [
+        "WU-ANPOS-ASSURANCE-CLASSIFICATION"
+      ],
+      "priority": 45,
+      "status": "blocked",
+      "blockers": [
+        "Requires merged immutable evidence ref and successful child checks."
+      ],
+      "acceptance_criteria": [
+        "Applicable REQ-83-96 states match merged evidence.",
+        "All passed rows reference immutable merged ref/time.",
+        "REQ-90 remains verification_required until qualified legal/privacy review."
+      ],
+      "required_checks": [
+        "repository-integrity",
+        "validate",
+        "security capability checks when verified"
+      ],
+      "completion_evidence": []
     }
   ],
   "status_values": [
@@ -251,5 +281,6 @@
     "complete",
     "deferred",
     "deprecated"
-  ]
+  ],
+  "progress_note": "P1 assurance classification/evidence implementation in progress; final pass-state reconciliation intentionally waits for immutable post-merge verification."
 }

@@ -1,15 +1,83 @@
 {
   "schema_version": 1,
-  "status": "pending_applicability_detection",
+  "status": "technical_controls_mapped_qualified_review_pending",
   "activation_scope": "child_project",
-  "jurisdictions": [],
+  "jurisdictions": [
+    "Pakistan (operator location)",
+    "United States (lead market/source geography)",
+    "Canada (lead market/source geography)"
+  ],
   "applicable_frameworks": [],
-  "data_processing_activities": [],
+  "data_processing_activities": [
+    {
+      "id": "PROC-001",
+      "activity": "Collect publicly listed business contact/location fields from approved public sources.",
+      "purpose": "Create B2B lead workbooks for VSN business development.",
+      "data_categories": [
+        "business name",
+        "business phone",
+        "business email when public",
+        "public social profiles",
+        "business address/location"
+      ],
+      "sources": [
+        "Overture Maps Places",
+        "official business website",
+        "bounded Common Crawl fallback"
+      ],
+      "storage": [
+        "Google Sheets dated workbook"
+      ],
+      "minimization": "Phone is mandatory for accepted leads; fields are limited to lead/business-use columns."
+    },
+    {
+      "id": "PROC-002",
+      "activity": "Create exact cross-day duplicate fingerprints.",
+      "purpose": "Prevent repeated acceptance of the same business.",
+      "data_categories": [
+        "normalized provider/source ID",
+        "domain",
+        "phone+business name",
+        "business+location"
+      ],
+      "sources": [
+        "accepted lead records"
+      ],
+      "storage": [
+        "Cloudflare R2 hashed fingerprint ledger"
+      ],
+      "minimization": "Raw values are converted to type-separated 96-bit BLAKE2 tokens before R2 access."
+    },
+    {
+      "id": "PROC-003",
+      "activity": "Collect reliability/quality telemetry.",
+      "purpose": "Quota recovery, incident response and source-yield optimization.",
+      "data_categories": [
+        "counts",
+        "rates",
+        "partition IDs",
+        "run/incident metadata"
+      ],
+      "sources": [
+        "Lead Engine runtime"
+      ],
+      "storage": [
+        "R2 health/yield state",
+        "Google Sheets Overview",
+        "GitHub Actions"
+      ],
+      "minimization": "Operational telemetry does not require full raw lead records."
+    }
+  ],
   "privacy_assessment": {
-    "assessment_required": "pending_detection",
-    "assessment_type": null,
-    "status": "not_started",
-    "evidence_refs": [],
+    "assessment_required": "required",
+    "assessment_type": "qualified privacy/compliance review for B2B public-contact processing and cross-border operations",
+    "status": "in_progress",
+    "evidence_refs": [
+      "DATA_SOURCES.md",
+      "config/data/data-governance.json",
+      "docs/ai/ASSURANCE-EVIDENCE.md"
+    ],
     "reviewed_by": null,
     "reviewed_at": null,
     "review_expires_at": null

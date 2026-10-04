@@ -32,11 +32,11 @@
     "require_linear_history": true,
     "required_status_checks": [
       "validate",
-      "repository-integrity"
+      "repository-integrity",
+      "analyze-actions"
     ],
     "conditional_status_checks": [
       "Dependency Review / dependency-review",
-      "CodeQL / analyze-actions",
       "OpenSSF Scorecard / analysis",
       "stack-specific checks discovered after technology approval"
     ]
@@ -72,11 +72,14 @@
     "Both validate and repository-integrity are required status checks and have successful observed runs.",
     "PR-only changes, squash-only merging, strict up-to-date checks, conversation resolution, linear history, deletion protection and non-fast-forward protection are live.",
     "CODEOWNER/one-review/last-push approval enforcement remains deferred until an independent reviewer or team is configured; current_user_can_bypass is never.",
-    "Coordination-ref namespace restrictions remain a separate capability/application gap and must not be claimed as enforced until verified."
+    "Coordination-ref namespace restrictions remain a separate capability/application gap and must not be claimed as enforced until verified.",
+    "Dependency Review was live-probed on PR #125 and is unavailable while GitHub Dependency graph is disabled; the active PR workflow was removed to avoid knowingly red CI.",
+    "CodeQL for GitHub Actions was verified successful on PR #125 run 37226172430 and is now proposed as a required main check; live enforcement awaits merge/controller verification.",
+    "OpenSSF Scorecard remains a non-PR capability and will be verified after activation on main."
   ],
   "setup_state": {
     "user_decision": "approved",
-    "application_status": "main_checks_verified_review_and_coordination_extensions_pending",
+    "application_status": "codeql_required_check_pending_merge_and_live_verification",
     "enforcement_verified": false,
     "governance_audit_installed": false,
     "verified_main_ruleset_id": 24086362,
@@ -84,6 +87,22 @@
       "validate",
       "repository-integrity"
     ],
-    "verified_at": "2026-10-04T18:11:06Z"
+    "verified_at": "2026-10-04T18:11:06Z",
+    "security_check_capabilities": {
+      "dependency_review": {
+        "status": "unavailable",
+        "reason": "Observed PR run 37226110820 reported Dependency review is not supported because Dependency graph is disabled.",
+        "activation_condition": "Enable Dependency graph in GitHub repository security settings, then obtain a successful child PR run before requiring dependency-review."
+      },
+      "codeql_actions": {
+        "status": "verified_supported",
+        "evidence": "PR #125 Actions run 37226172430 completed CodeQL / analyze-actions successfully.",
+        "activation_condition": "Promote analyze-actions into live required main checks after this PR merges and Main Protection Controller verifies the live ruleset."
+      },
+      "ossf_scorecard": {
+        "status": "pending_post_merge_verification",
+        "activation_condition": "Keep non-required; verify scheduled/push execution after workflow activation."
+      }
+    }
   }
 }

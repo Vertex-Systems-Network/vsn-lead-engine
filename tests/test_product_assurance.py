@@ -53,8 +53,18 @@ class ProductAssuranceTests(unittest.TestCase):
             {row["requirement_id"] for row in rows},
             {f"REQ-{n}" for n in range(83, 97)},
         )
+        instance = load("config/protocol/instance.json")
         for row in rows:
-            self.assertNotEqual(row["state"], "passed", "Template source must not claim assurance pass evidence")
+            if instance.get("instance_status") == "template_source":
+                self.assertNotEqual(
+                    row["state"],
+                    "passed",
+                    "Template source must not claim assurance pass evidence",
+                )
+            if row["state"] == "passed":
+                self.assertTrue(row["evidence_refs"])
+                self.assertTrue(row["last_verified_ref"])
+                self.assertTrue(row["last_verified_at"])
 
     def test_runtime_executor_contract_covers_all_assurance_requirements(self) -> None:
         contract = load("config/assurance/runtime-executors.json")
