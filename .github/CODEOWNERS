@@ -56,4 +56,5 @@
 /config/traceability/ @wpessential
 /schemas/ @wpessential
 /scripts/ @wpessential
+/tests/ @wpessential
 /requirements-anpos.txt @wpessential
