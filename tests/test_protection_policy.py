@@ -72,6 +72,8 @@ def test_protection_controller_never_embeds_admin_token():
     assert "allow_update_branch=true" in workflow
     assert "delete_branch_on_merge=true" in workflow
     assert "gh workflow run governance-audit.yml" in workflow
+    assert "actions: write" in workflow
+    assert "GH_TOKEN: ${{ github.token }}" in workflow
     assert 'echo "::error::GH_ADMIN_TOKEN is required before P12 live enforcement can be certified."' in workflow
     assert "exit 2" in workflow
     assert "permissions:\n  contents: read" in workflow
