@@ -3,13 +3,13 @@
   "lifecycle_stage": "discovery_planning",
   "current_phase": "PHASE-SAAS-DISCOVERY",
   "current_module": "MOD-PRODUCT-DISCOVERY",
-  "current_work_unit": "WU-SAAS-CURRENT-ENGINE-AUDIT",
+  "current_work_unit": "WU-SAAS-SOURCE-FEASIBILITY",
   "last_verified_completion": "ANPOS 1.4.0 hardening verified through main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173: required validate/repository-integrity/analyze-actions, Scorecard, governance audit, repository merge settings and ruleset enforcement are evidenced; REQ-83-96 classification/verification is complete except external qualified privacy/compliance review for REQ-90.",
-  "next_valid_work_unit": "WU-SAAS-CURRENT-ENGINE-AUDIT",
+  "next_valid_work_unit": "WU-SAAS-SOURCE-FEASIBILITY",
   "progress": {
     "total_work_units": 21,
-    "complete": 4,
-    "ready": 2,
+    "complete": 5,
+    "ready": 1,
     "in_progress": 2,
     "blocked": 4,
     "deferred": 2,
@@ -19,11 +19,11 @@
   },
   "outstanding_updates": [
     "Continue existing WU-OPS-DAILY-QUOTA independently from current real workbook/health evidence; do not reset or claim complete.",
-    "Perform repo-relative SaaS code/runtime audit and compare current product boundary.",
-    "Complete user/job validation and deeper source/competitor research before fixing MVP.",
+    "Complete user/job validation and deeper competitor research; source-feasibility matrix is now active.",
     "Resolve whether SaaS code remains in this production repository or moves to a dedicated application repository.",
     "Resolve market, source funding model, provider shortlist, fields, plans/prices, platform order and monthly budget.",
-    "Keep stack approval pending until system design and costed alternatives are reviewed."
+    "Keep stack approval pending until system design and costed alternatives are reviewed.",
+    "Complete active WU-SAAS-SOURCE-FEASIBILITY with source-specific coverage, terms/storage rights, attribution, pricing and cost evidence before MVP/provider decisions."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -56,5 +56,5 @@
     },
     "no_verified_supervisor": true
   },
-  "notes": "SaaS is a new planned product direction from the 2026-10-05 user intake. Existing production runtime and WU-OPS-DAILY-QUOTA remain active concurrently; no code, deployment or provider billing is changed by this plan."
+  "notes": "SaaS is a new planned product direction from the 2026-10-05 user intake. Existing production runtime and WU-OPS-DAILY-QUOTA remain active concurrently; no code, deployment or provider billing is changed by this plan. Current-engine capability audit completed as repository evidence; source feasibility is the next active discovery work unit."
 }
