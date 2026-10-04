@@ -203,9 +203,11 @@
       "quality_gates": [
         "repository-integrity"
       ],
-      "status": "ready",
+      "status": "in_progress",
       "completion_evidence": [],
-      "update_notes": [],
+      "update_notes": [
+        "REQ-83-96 classified against the actual non-AI production Lead Engine; project evidence/runbooks/ADRs/risk/audit/threat state populated before immutable verification."
+      ],
       "removal_or_deprecation_notes": []
     },
     {
