@@ -72,7 +72,10 @@
     "Both validate and repository-integrity are required status checks and have successful observed runs.",
     "PR-only changes, squash-only merging, strict up-to-date checks, conversation resolution, linear history, deletion protection and non-fast-forward protection are live.",
     "CODEOWNER/one-review/last-push approval enforcement remains deferred until an independent reviewer or team is configured; current_user_can_bypass is never.",
-    "Coordination-ref namespace restrictions remain a separate capability/application gap and must not be claimed as enforced until verified."
+    "Coordination-ref namespace restrictions remain a separate capability/application gap and must not be claimed as enforced until verified.",
+    "Dependency Review was live-probed on PR #125 and is unavailable while GitHub Dependency graph is disabled; the active PR workflow was removed to avoid knowingly red CI.",
+    "CodeQL for GitHub Actions is installed on PR #125 but must not become a required main check until its child PR run succeeds.",
+    "OpenSSF Scorecard remains a non-PR capability and will be verified after activation on main."
   ],
   "setup_state": {
     "user_decision": "approved",
@@ -84,6 +87,21 @@
       "validate",
       "repository-integrity"
     ],
-    "verified_at": "2026-10-04T18:11:06Z"
+    "verified_at": "2026-10-04T18:11:06Z",
+    "security_check_capabilities": {
+      "dependency_review": {
+        "status": "unavailable",
+        "reason": "Observed PR run 37226110820 reported Dependency review is not supported because Dependency graph is disabled.",
+        "activation_condition": "Enable Dependency graph in GitHub repository security settings, then obtain a successful child PR run before requiring dependency-review."
+      },
+      "codeql_actions": {
+        "status": "verification_in_progress",
+        "activation_condition": "Require analyze-actions only after a successful child PR run on the current hardening branch."
+      },
+      "ossf_scorecard": {
+        "status": "pending_post_merge_verification",
+        "activation_condition": "Keep non-required; verify scheduled/push execution after workflow activation."
+      }
+    }
   }
 }
