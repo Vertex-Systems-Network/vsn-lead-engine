@@ -1,6 +1,259 @@
 {
   "schema_version": 1,
-  "modules": [],
+  "reconciliation_base_ref": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
+  "modules": [
+    {
+      "id": "MOD-HISTORICAL-ROADMAP",
+      "name": "Historical P01-P70 Product Baseline",
+      "objective": "Preserve completed Lead Engine engineering milestones as verified history.",
+      "scope": [
+        "P01-P70 repository implementation",
+        "Legacy state/checkpoint continuity"
+      ],
+      "boundaries": [
+        "Do not replay completed mutations without evidence of loss/regression."
+      ],
+      "dependencies": [],
+      "option_ids": [],
+      "data_entities": [],
+      "contracts": [],
+      "ui_surfaces": [],
+      "security_responsibilities": [
+        "Preserve immutable-action pinning and established product safety invariants."
+      ],
+      "acceptance_criteria": [
+        "Historical baseline remains complete and repository-backed."
+      ],
+      "quality_gates": [
+        "Repository reality overrides stale checkpoint text."
+      ],
+      "status": "complete",
+      "completion_evidence": [
+        "README.md",
+        ".ai/state/LAST-CHECKPOINT.md"
+      ],
+      "update_notes": [
+        "Reconciled into ANPOS instead of resetting to not_started."
+      ],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-ANPOS-GOVERNANCE",
+      "name": "ANPOS Governance and Quality Gates",
+      "objective": "Operate the ANPOS 1.4.0 child control plane on protected main.",
+      "scope": [
+        "ANPOS manifest/config/schemas",
+        "repository-integrity",
+        "main ruleset evidence"
+      ],
+      "boundaries": [
+        "Vendor/operator-only ANPOS runtime remains excluded."
+      ],
+      "dependencies": [
+        "MOD-HISTORICAL-ROADMAP"
+      ],
+      "option_ids": [],
+      "data_entities": [],
+      "contracts": [],
+      "ui_surfaces": [],
+      "security_responsibilities": [
+        "Protected control-plane paths",
+        "strict required status checks"
+      ],
+      "acceptance_criteria": [
+        "ANPOS validation and main governance are live and evidenced."
+      ],
+      "quality_gates": [
+        "validate",
+        "repository-integrity"
+      ],
+      "status": "complete",
+      "completion_evidence": [
+        "PR #120",
+        "PR #122",
+        "PR #123",
+        "ruleset 24086362"
+      ],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-PRODUCTION-RUNTIME",
+      "name": "Daily Lead Production Runtime",
+      "objective": "Run the US + Canada daily lead engine toward 12,000 accepted unique leads while preserving exact R2 dedupe.",
+      "scope": [
+        "Lead Engine workflows",
+        "Overture discovery",
+        "taxonomy classification",
+        "R2 ledger",
+        "daily workbook",
+        "health ledger"
+      ],
+      "boundaries": [
+        "US + Canada",
+        "phone-required accepted leads",
+        "no paid discovery dependencies"
+      ],
+      "dependencies": [
+        "MOD-HISTORICAL-ROADMAP"
+      ],
+      "option_ids": [],
+      "data_entities": [
+        "Daily workbook",
+        "R2 fingerprint ledger",
+        "health ledger"
+      ],
+      "contracts": [
+        "12,000/day",
+        "1,000/category/day",
+        "exact cross-day duplicate blocking"
+      ],
+      "ui_surfaces": [],
+      "security_responsibilities": [
+        "Server-only credentials remain in GitHub secrets.",
+        "Untrusted PRs do not receive production credentials."
+      ],
+      "acceptance_criteria": [
+        "Daily runtime remains successful and quota evidence is real."
+      ],
+      "quality_gates": [
+        "validate",
+        "production health evidence"
+      ],
+      "status": "in_progress",
+      "completion_evidence": [
+        "Run 37213320765 succeeded; latest inspected total 6,855 / 12,000"
+      ],
+      "update_notes": [
+        "Operational module is ongoing by nature; workflow success does not equal quota completion."
+      ],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-MYDRIVE-AUTONOMY",
+      "name": "My Drive User-OAuth Autonomy",
+      "objective": "Certify creation of genuinely missing user-owned dated workbooks.",
+      "scope": [
+        "Google authorized-user OAuth",
+        "strict create/trash capability probe"
+      ],
+      "boundaries": [
+        "No raw OAuth secret in repository."
+      ],
+      "dependencies": [
+        "MOD-HISTORICAL-ROADMAP"
+      ],
+      "option_ids": [],
+      "data_entities": [
+        "Google authorized-user credential stored only as secret"
+      ],
+      "contracts": [
+        "Strict user-OAuth create→trash probe before autonomy claim"
+      ],
+      "ui_surfaces": [],
+      "security_responsibilities": [
+        "Credential secrecy",
+        "least-privilege Google access"
+      ],
+      "acceptance_criteria": [
+        "Strict probe succeeds with real user OAuth evidence."
+      ],
+      "quality_gates": [
+        "Google Drive Capability"
+      ],
+      "status": "blocked",
+      "completion_evidence": [],
+      "update_notes": [
+        "Existing/precreated workbooks can remain operational while this is blocked."
+      ],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-ANPOS-ASSURANCE",
+      "name": "ANPOS Product/Governance Assurance",
+      "objective": "Classify and evidence Requirements 83-96 for the actual Lead Engine.",
+      "scope": [
+        "REQ-83 through REQ-96",
+        "assurance evidence registry",
+        "risk/ADR/runbook applicability"
+      ],
+      "boundaries": [
+        "No blueprint-only pass evidence."
+      ],
+      "dependencies": [
+        "MOD-ANPOS-GOVERNANCE"
+      ],
+      "option_ids": [],
+      "data_entities": [
+        "Assurance state",
+        "risk register",
+        "decision records",
+        "evidence registry"
+      ],
+      "contracts": [
+        "Project-specific evidence for passed states"
+      ],
+      "ui_surfaces": [],
+      "security_responsibilities": [
+        "Do not invent legal/compliance conclusions."
+      ],
+      "acceptance_criteria": [
+        "All requirements classified with explicit rationale."
+      ],
+      "quality_gates": [
+        "repository-integrity"
+      ],
+      "status": "ready",
+      "completion_evidence": [],
+      "update_notes": [],
+      "removal_or_deprecation_notes": []
+    },
+    {
+      "id": "MOD-ANPOS-COORDINATION",
+      "name": "ANPOS Identity and Coordination Hardening",
+      "objective": "Enable independent review and distributed coordination only when real identities/capabilities exist.",
+      "scope": [
+        "CODEOWNER reviewer policy",
+        "Supervisor/Worker identity",
+        "claims/**",
+        "supervisor/**"
+      ],
+      "boundaries": [
+        "No fake agent identity or lock authority."
+      ],
+      "dependencies": [
+        "MOD-ANPOS-GOVERNANCE"
+      ],
+      "option_ids": [],
+      "data_entities": [
+        "Supervisor state",
+        "agent work queue",
+        "agent catalog"
+      ],
+      "contracts": [
+        "Verified runtime identity before privileged claims"
+      ],
+      "ui_surfaces": [],
+      "security_responsibilities": [
+        "Fencing/leases",
+        "independent review",
+        "trusted coordination refs"
+      ],
+      "acceptance_criteria": [
+        "Capabilities are verified before enforcement/dispatch."
+      ],
+      "quality_gates": [
+        "control-plane conformance",
+        "live rules verification"
+      ],
+      "status": "deferred",
+      "completion_evidence": [],
+      "update_notes": [
+        "Deferred safely; no persistent verified Supervisor exists."
+      ],
+      "removal_or_deprecation_notes": []
+    }
+  ],
   "status_values": [
     "not_started",
     "ready",
@@ -12,24 +265,5 @@
     "complete",
     "deferred",
     "deprecated"
-  ],
-  "module_template": {
-    "id": "MOD-EXAMPLE",
-    "name": "Example module",
-    "objective": "Coherent product or engineering responsibility.",
-    "scope": [],
-    "boundaries": [],
-    "dependencies": [],
-    "option_ids": [],
-    "data_entities": [],
-    "contracts": [],
-    "ui_surfaces": [],
-    "security_responsibilities": [],
-    "acceptance_criteria": [],
-    "quality_gates": [],
-    "status": "not_started",
-    "completion_evidence": [],
-    "update_notes": [],
-    "removal_or_deprecation_notes": []
-  }
+  ]
 }

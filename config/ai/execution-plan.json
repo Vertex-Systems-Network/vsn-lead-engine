@@ -1,7 +1,245 @@
 {
   "schema_version": 1,
-  "phases": [],
-  "work_units": [],
+  "reconciliation_base_ref": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
+  "phases": [
+    {
+      "id": "PHASE-HISTORICAL-BASELINE",
+      "name": "P01-P70 Verified Product Baseline",
+      "objective": "Preserve the existing production-ready Lead Engine implementation and its completed engineering milestones.",
+      "module_ids": [
+        "MOD-HISTORICAL-ROADMAP"
+      ],
+      "dependencies": [],
+      "status": "complete",
+      "exit_criteria": [
+        "P01-P70 remain represented by repository/checkpoint evidence and are not replayed."
+      ]
+    },
+    {
+      "id": "PHASE-ANPOS-ADOPTION",
+      "name": "ANPOS 1.4.0 Adoption and Main Governance",
+      "objective": "Install and verify the ANPOS child control plane without replacing the product implementation.",
+      "module_ids": [
+        "MOD-ANPOS-GOVERNANCE"
+      ],
+      "dependencies": [
+        "PHASE-HISTORICAL-BASELINE"
+      ],
+      "status": "complete",
+      "exit_criteria": [
+        "ANPOS child validation passes.",
+        "Main rules require validate and repository-integrity.",
+        "Vendor-only ANPOS assets are absent."
+      ]
+    },
+    {
+      "id": "PHASE-PRODUCTION-OPERATIONS",
+      "name": "Production Operations",
+      "objective": "Operate the daily US + Canada lead pipeline while preserving quota, taxonomy and exact R2 dedupe invariants.",
+      "module_ids": [
+        "MOD-PRODUCTION-RUNTIME",
+        "MOD-MYDRIVE-AUTONOMY"
+      ],
+      "dependencies": [
+        "PHASE-HISTORICAL-BASELINE"
+      ],
+      "status": "in_progress",
+      "exit_criteria": [
+        "Daily quota evidence is reconciled from real runtime/workbook state.",
+        "External workbook-creation autonomy is certified or remains explicitly blocked."
+      ]
+    },
+    {
+      "id": "PHASE-ANPOS-HARDENING",
+      "name": "ANPOS Assurance and Coordination Hardening",
+      "objective": "Classify Requirements 83-96 and complete only governance capabilities supported by real identities/platform evidence.",
+      "module_ids": [
+        "MOD-ANPOS-ASSURANCE",
+        "MOD-ANPOS-COORDINATION"
+      ],
+      "dependencies": [
+        "PHASE-ANPOS-ADOPTION"
+      ],
+      "status": "ready",
+      "exit_criteria": [
+        "REQ-83-96 applicability is classified with reasons/evidence.",
+        "Deferred identity/reviewer/coordination protections are either verified or remain explicitly deferred."
+      ]
+    }
+  ],
+  "work_units": [
+    {
+      "id": "WU-BASELINE-P01-P70",
+      "phase_id": "PHASE-HISTORICAL-BASELINE",
+      "module_id": "MOD-HISTORICAL-ROADMAP",
+      "title": "Preserve verified P01-P70 baseline",
+      "objective": "Treat completed legacy milestones as historical verified work rather than replaying them under ANPOS.",
+      "dependencies": [],
+      "priority": 10,
+      "status": "complete",
+      "blockers": [],
+      "acceptance_criteria": [
+        "Legacy checkpoint and README retain the P01-P70 production baseline.",
+        "No completed product milestone is reset to not_started."
+      ],
+      "required_checks": [
+        "Repository truth and checkpoint reconciliation."
+      ],
+      "completion_evidence": [
+        "README.md current status/history",
+        ".ai/state/LAST-CHECKPOINT.md",
+        "PR #117 P70 evidence retained in history"
+      ]
+    },
+    {
+      "id": "WU-ANPOS-ADOPTION",
+      "phase_id": "PHASE-ANPOS-ADOPTION",
+      "module_id": "MOD-ANPOS-GOVERNANCE",
+      "title": "Adopt and verify ANPOS child governance",
+      "objective": "Install ANPOS 1.4.0 and align protected main with verified child quality checks.",
+      "dependencies": [
+        "WU-BASELINE-P01-P70"
+      ],
+      "priority": 20,
+      "status": "complete",
+      "blockers": [],
+      "acceptance_criteria": [
+        "ANPOS repository validation passes.",
+        "Main ruleset is active with validate and repository-integrity.",
+        "Vendor-only boundary is clean."
+      ],
+      "required_checks": [
+        "validate",
+        "repository-integrity"
+      ],
+      "completion_evidence": [
+        "PR #120",
+        "PR #122",
+        "PR #123",
+        "ruleset 24086362",
+        "Actions run 37223542864"
+      ]
+    },
+    {
+      "id": "WU-OPS-DAILY-QUOTA",
+      "phase_id": "PHASE-PRODUCTION-OPERATIONS",
+      "module_id": "MOD-PRODUCTION-RUNTIME",
+      "title": "Operate and verify daily 12,000-lead quota",
+      "objective": "Continue bounded production runs until the dated workbook reaches the daily target without weakening quality/dedupe rules.",
+      "dependencies": [
+        "WU-BASELINE-P01-P70"
+      ],
+      "priority": 30,
+      "status": "in_progress",
+      "blockers": [],
+      "acceptance_criteria": [
+        "Real dated workbook reaches 12,000 / 12,000 for the active date.",
+        "R2 pending recovery unresolved count is zero at certification.",
+        "No taxonomy or dedupe invariant is weakened."
+      ],
+      "required_checks": [
+        "Successful real Lead Engine workflow evidence",
+        "Workbook/health-ledger evidence",
+        "R2 recovery evidence"
+      ],
+      "completion_evidence": [
+        "Latest verified run 37213320765: 6,855 / 12,000; not complete"
+      ]
+    },
+    {
+      "id": "WU-OAUTH-MYDRIVE",
+      "phase_id": "PHASE-PRODUCTION-OPERATIONS",
+      "module_id": "MOD-MYDRIVE-AUTONOMY",
+      "title": "Certify strict user-OAuth My Drive creation autonomy",
+      "objective": "Prove a genuinely missing My Drive workbook can be created and trashed with the intended user OAuth path.",
+      "dependencies": [
+        "WU-BASELINE-P01-P70"
+      ],
+      "priority": 80,
+      "status": "blocked",
+      "blockers": [
+        "Human/external Google user authorization and strict create→trash certification evidence are not available in repository evidence."
+      ],
+      "acceptance_criteria": [
+        "Strict Google Drive Capability create→trash probe succeeds with user OAuth.",
+        "No secret material is committed."
+      ],
+      "required_checks": [
+        "Google Drive Capability strict user-OAuth certification"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+      "phase_id": "PHASE-ANPOS-HARDENING",
+      "module_id": "MOD-ANPOS-ASSURANCE",
+      "title": "Classify ANPOS Requirements 83-96",
+      "objective": "Set actual applicability/state/reasons for AI/product/governance assurance using VSN Lead Engine evidence.",
+      "dependencies": [
+        "WU-ANPOS-ADOPTION"
+      ],
+      "priority": 40,
+      "status": "ready",
+      "blockers": [],
+      "acceptance_criteria": [
+        "Every REQ-83 through REQ-96 has project-specific applicability and reason.",
+        "Applicable requirements reference real evidence or remain non-passed.",
+        "No policy-presence-only pass claims."
+      ],
+      "required_checks": [
+        "repository-integrity",
+        "ANPOS assurance schema/tests"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-ANPOS-INDEPENDENT-REVIEW",
+      "phase_id": "PHASE-ANPOS-HARDENING",
+      "module_id": "MOD-ANPOS-COORDINATION",
+      "title": "Enable independent protected-control-plane review",
+      "objective": "Enforce CODEOWNER/one-review/last-push approval only after an independent reviewer/team exists.",
+      "dependencies": [
+        "WU-ANPOS-ADOPTION"
+      ],
+      "priority": 90,
+      "status": "deferred",
+      "blockers": [
+        "No independent reviewer/team has been verified for safe enforcement."
+      ],
+      "acceptance_criteria": [
+        "Independent reviewer/team exists and can approve protected paths.",
+        "Ruleset is applied and re-read without self-review deadlock."
+      ],
+      "required_checks": [
+        "Live ruleset verification"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "WU-ANPOS-COORDINATION-REFS",
+      "phase_id": "PHASE-ANPOS-HARDENING",
+      "module_id": "MOD-ANPOS-COORDINATION",
+      "title": "Protect ANPOS coordination ref namespaces",
+      "objective": "Apply trusted-runtime restrictions to claims/** and supervisor/** only when supported and verifiable.",
+      "dependencies": [
+        "WU-ANPOS-ADOPTION"
+      ],
+      "priority": 95,
+      "status": "deferred",
+      "blockers": [
+        "No verified persistent Supervisor/runtime identity and no verified coordination-ref rules capability/application evidence."
+      ],
+      "acceptance_criteria": [
+        "Coordination refs are protected by verified trusted-runtime policy or an authenticated gateway fallback.",
+        "Live re-read proves enforcement."
+      ],
+      "required_checks": [
+        "Control-plane conformance",
+        "Live governance verification"
+      ],
+      "completion_evidence": []
+    }
+  ],
   "status_values": [
     "not_started",
     "ready",
@@ -13,28 +251,5 @@
     "complete",
     "deferred",
     "deprecated"
-  ],
-  "phase_template": {
-    "id": "PHASE-EXAMPLE",
-    "name": "Example phase",
-    "objective": "Outcome boundary for a group of modules/work units.",
-    "module_ids": [],
-    "dependencies": [],
-    "status": "not_started",
-    "exit_criteria": []
-  },
-  "work_unit_template": {
-    "id": "WU-EXAMPLE",
-    "phase_id": "PHASE-EXAMPLE",
-    "module_id": "MOD-EXAMPLE",
-    "title": "Small independently executable and verifiable slice",
-    "objective": "Clear outcome",
-    "dependencies": [],
-    "priority": null,
-    "status": "not_started",
-    "blockers": [],
-    "acceptance_criteria": [],
-    "required_checks": [],
-    "completion_evidence": []
-  }
+  ]
 }

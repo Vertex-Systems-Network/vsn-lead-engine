@@ -1,47 +1,68 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "project": {
     "name": "VSN Lead Engine",
     "repository": "Vertex-Systems-Network/vsn-lead-engine",
-    "product_version": "0.66.0"
+    "product_version": "0.66.1",
+    "anpos_protocol_version": "1.4.0"
   },
   "execution": {
     "status": "stable",
-    "current_phase": "PRODUCTION-READY",
-    "active_task": "PRODUCTION-MONITORING",
-    "last_completed_task": "P70-DEPLOYMENT-READINESS-DAY-BOUNDARY",
-    "next_task": null
+    "lifecycle_stage": "production_operations",
+    "current_phase": "PHASE-PRODUCTION-OPERATIONS",
+    "active_task": "WU-OPS-DAILY-QUOTA",
+    "last_completed_task": "WU-ANPOS-ADOPTION",
+    "next_control_plane_task": "WU-ANPOS-ASSURANCE-CLASSIFICATION"
   },
-  "observed_main_sha": "ee79c6d1a4ab502fc366e22a4aa368f305a6c74f",
+  "observed_main_sha": "ca87ea081c4d461e275aeb720cf7f8cf82ad32cf",
+  "observed_main_semantics": "Last fully reconciled repository head before this snapshot mutation.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": null,
-  "current_milestone": "P70-DEPLOYMENT-READINESS-DAY-BOUNDARY",
-  "milestone_status": "COMPLETED",
-  "last_completed_milestone": "P70 made readiness-related main-push targeting day-boundary aware: local today before 20:50 PKT and next-day at/after 20:50 PKT. PR #117 exact-head CI #231 passed 305 tests and merged. Production readiness run #9 resolved 2026-09-29 at 00:34 PKT as today and passed in one attempt.",
+  "current_milestone": "PRODUCTION-MONITORING",
+  "milestone_status": "IN_PROGRESS",
+  "last_completed_milestone": "P01-P70 production baseline preserved; ANPOS 1.4.0 adoption/governance alignment verified through PRs #120, #122 and #123.",
   "production": {
-    "last_certified_date": "2026-09-28",
+    "latest_observed_date": "2026-10-04",
+    "last_full_quota_certified_date": "2026-09-28",
     "daily_target": 12000,
-    "accepted": 12000,
-    "shortfall": 0,
-    "quota_status": "complete",
-    "motorbikes": 1000,
-    "production_run": 162
+    "latest_observed_accepted": 6855,
+    "latest_observed_shortfall": 5145,
+    "quota_status": "in_progress",
+    "latest_observed_run_id": 37213320765,
+    "latest_observed_run_origin": "recovery-supervisor",
+    "latest_observed_run_result": "success",
+    "r2_pending_recovery_unresolved": 0
   },
   "quality": {
-    "latest_required_ci_run": 231,
-    "latest_required_ci_result": "success",
+    "product_version": "0.66.1",
+    "latest_product_pr_validation": "PR #123",
     "pytest": "305 passed",
-    "node20_deprecation_warning": false
+    "anpos_repository_integrity": "success",
+    "anpos_main_run_id": 37223542864,
+    "main_protection_controller": "success",
+    "main_protection_run_id": 37223412749,
+    "required_status_checks": [
+      "validate",
+      "repository-integrity"
+    ]
+  },
+  "governance": {
+    "main_ruleset_id": 24086362,
+    "main_ruleset_enforcement": "active",
+    "independent_codeowner_review": "pending_independent_reviewer_or_team",
+    "coordination_ref_namespace_protection": "pending_capability_and_runtime_verification"
   },
   "blockers": [
-    "GOOGLE_OAUTH_USER_JSON is not yet configured in GitHub. Existing/precreated workbooks remain operational, but fully autonomous creation of a genuinely missing My Drive workbook is not certified until the strict user-OAuth create/trash probe passes.",
-    "The 2026-09-29 real lead-production quota run is pending its scheduled 08:00 PKT start; the last fully certified production quota remains 2026-09-28 = 12,000 / 12,000."
+    "Strict user-OAuth My Drive create/trash autonomy has no recent successful certification evidence; existing/precreated workbooks remain operational through the current production path.",
+    "2026-10-04 daily quota is not yet complete in the latest verified production evidence: 6,855 / 12,000.",
+    "No Development AI/Supervisor runtime identity is verified in ANPOS; multi-agent dispatch must remain disabled."
   ],
   "timeout_control": {
     "tight_polling_forbidden": true,
     "duplicate_replay_forbidden": true,
     "one_logical_milestone_per_continue_default": true
   },
-  "exact_next_safe_action": "Monitor the scheduled 2026-09-29 08:00 PKT production run and verify the daily 12,000-lead quota. Do not start another development milestone unless real production evidence identifies a concrete defect. Separately complete GOOGLE_OAUTH_USER_JSON provisioning when human Google authorization is available."
+  "exact_next_safe_action": "Continue normal production scheduling/recovery toward the 2026-10-04 12,000-lead quota without weakening dedupe/taxonomy controls. For ANPOS development, classify Requirements 83-96 next; keep PM selection, verified AI identity, independent review, and coordination-ref hardening explicit until real evidence exists.",
+  "last_reconciled_at": "2026-10-04T18:13:02Z"
 }

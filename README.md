@@ -2079,6 +2079,9 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 
 ## Current status
 
+- Runtime package version: **0.66.1**
+- ANPOS child control plane: **1.4.0 ACTIVE — STATE RECONCILED TO PRODUCTION OPERATIONS**
+
 - User consent: **APPROVED**
 - Google integration: **VERIFIED**
 - Daily dated workbook routing: **ENABLED**
@@ -2097,7 +2100,7 @@ stored as GitHub secret `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - P9 daily adaptive state: **ONE COMPACT R2 OBJECT/DAY ACTIVE**
 - P10 schedule/catch-up: **08:00–23:00 PKT NATIVE + OFFSET SUPERVISOR ACTIVE**
 - P11 daily health ledger: **READINESS + RUN + INCIDENT AUDIT ACTIVE**
-- P12 protected-main governance: **LIVE RULESET ACTIVE — PR + STRICT VALIDATE + SQUASH-ONLY**
+- P12 protected-main governance: **LIVE RULESET ACTIVE — PR + STRICT VALIDATE + REPOSITORY-INTEGRITY + SQUASH-ONLY**
 - P13 rolling historical yield prior: **CROSS-DAY COLD-START ROUTING ACTIVE**
 - P14 zero-yield cooldown: **SAME-DAY EXHAUSTION DEFERRAL ACTIVE**
 - P15 fair category weighting: **LAYERED 3×/2×/1× COVERAGE ACTIVE**

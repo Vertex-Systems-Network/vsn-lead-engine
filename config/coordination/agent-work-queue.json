@@ -1,7 +1,7 @@
 {
   "schema_version": 4,
   "coordination_mode": "multi_agent",
-  "updated_at": "2026-10-04T15:04:00Z",
+  "updated_at": "2026-10-04T18:13:02Z",
   "slots": [],
   "slot_schema": {
     "id": "SLOT-001",
@@ -98,5 +98,24 @@
     "merged",
     "completed",
     "canceled"
-  ]
+  ],
+  "dispatch_state": "disabled_until_verified_supervisor_and_agent",
+  "planning_mirror": [
+    {
+      "work_unit_id": "WU-ANPOS-ASSURANCE-CLASSIFICATION",
+      "state": "ready_not_dispatchable",
+      "reason": "No verified Supervisor/Worker identity."
+    },
+    {
+      "work_unit_id": "WU-ANPOS-INDEPENDENT-REVIEW",
+      "state": "deferred",
+      "reason": "Independent reviewer/team not verified."
+    },
+    {
+      "work_unit_id": "WU-ANPOS-COORDINATION-REFS",
+      "state": "deferred",
+      "reason": "Persistent trusted runtime/capability not verified."
+    }
+  ],
+  "reconciliation_note": "Planned work is mirrored here, but no claimable slot is emitted because ANPOS requires a live verified Supervisor before Worker claims."
 }
