@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "status": "classified_evidence_verification_required",
+  "status": "verified_with_external_compliance_review_pending",
   "activation_scope": "child_project",
-  "last_reconciled_at": "2026-10-04T18:45:00Z",
-  "last_reconciled_ref": "ec525a1faac7e4e8b6e736ddc40261bde0275c26",
+  "last_reconciled_at": "2026-10-04T19:12:35Z",
+  "last_reconciled_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
   "requirements": [
     {
       "requirement_id": "REQ-83",
@@ -14,10 +14,11 @@
       "evidence_refs": [
         "src/vsn_lead_engine/",
         "config/runtime.json",
-        "config/ai/agent-catalog.json"
+        "config/ai/agent-catalog.json",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
@@ -28,71 +29,86 @@
       "reason": "Current release is a non-interactive backend pipeline whose product output is a dated operational workbook; no end-user UX surface requires usability validation.",
       "evidence_refs": [
         "config/product/product-validation.json",
-        "src/vsn_lead_engine/sheets.py"
+        "src/vsn_lead_engine/sheets.py",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
       "requirement_id": "REQ-85",
       "name": "Product Analytics and Outcome Evidence",
       "applicability": "applicable",
-      "state": "verification_required",
-      "reason": "Daily quota, funnel, country/category, health, incident and recovery metrics are instrumented with real production evidence; immutable pass verification follows merge.",
+      "state": "passed",
+      "reason": "Project-specific implementation/evidence was merged and verified against immutable main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173; applicable assurance checks completed without unresolved blocking findings.",
       "evidence_refs": [
         "src/vsn_lead_engine/health.py",
         "src/vsn_lead_engine/sheets.py",
         "docs/ai/ASSURANCE-EVIDENCE.md",
         "Actions run 37213320765",
-        "Actions run 37225162383"
+        "Actions run 37225162383",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345400 (repository-integrity success)",
+        "Actions run 37227345382 (CodeQL analyze-actions success)"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
       "requirement_id": "REQ-86",
       "name": "Experimentation and Hypothesis Lifecycle",
-      "applicability": "optional",
-      "state": "not_started",
-      "reason": "No bounded experiment is currently required; adaptive routing is deterministic production control logic with tests/telemetry, not an active A/B or user experiment.",
+      "applicability": "not_applicable",
+      "state": "not_applicable",
+      "reason": "No experiment is active or required for the current production release; adaptive routing is deterministic control logic rather than an A/B, model, or user experiment.",
       "evidence_refs": [
-        "config/product/experimentation-policy.json"
+        "config/product/experimentation-policy.json",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
       "requirement_id": "REQ-87",
       "name": "Progressive Delivery and Feature Safety",
       "applicability": "applicable",
-      "state": "verification_required",
-      "reason": "Protected-main promotion, main-only production scheduling, serialized recovery, health guardrails and midnight stop behavior provide release safety; final pass follows merged evidence.",
+      "state": "passed",
+      "reason": "Project-specific implementation/evidence was merged and verified against immutable main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173; applicable assurance checks completed without unresolved blocking findings.",
       "evidence_refs": [
         ".github/workflows/lead-engine.yml",
         ".github/workflows/quota-recovery-supervisor.yml",
         ".github/main-protection-ruleset.json",
-        "docs/ai/ASSURANCE-EVIDENCE.md"
+        "docs/ai/ASSURANCE-EVIDENCE.md",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345400 (repository-integrity success)",
+        "Actions run 37227345382 (CodeQL analyze-actions success)",
+        "Actions run 37227345426 (governance audit success)",
+        "Issue #128 closed after verified governance alignment"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
       "requirement_id": "REQ-88",
       "name": "AI-Generated Engineering Quality and Maintainability Review",
       "applicability": "applicable",
-      "state": "verification_required",
-      "reason": "A project-specific engineering review plus product/ANPOS CI evidence exists; final pass follows merged evidence.",
+      "state": "passed",
+      "reason": "Project-specific implementation/evidence was merged and verified against immutable main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173; applicable assurance checks completed without unresolved blocking findings.",
       "evidence_refs": [
         "docs/ai/ENGINEERING-QUALITY-REVIEW-2026-10-04.md",
         "tests/",
-        "Actions run 37224678510"
+        "Actions run 37224678510",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345400 (repository-integrity success)",
+        "Actions run 37227345382 (CodeQL analyze-actions success)",
+        "Actions run 37227345426 (governance audit success)",
+        "Issue #128 closed after verified governance alignment"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
@@ -103,10 +119,11 @@
       "reason": "Lead Engine production does not use AI for user-facing/high-impact decisions; development-time ANPOS/assistant tooling is not runtime lead acceptance behavior.",
       "evidence_refs": [
         "src/vsn_lead_engine/",
-        "config/ai/responsible-ai-policy.json"
+        "config/ai/responsible-ai-policy.json",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
@@ -114,15 +131,16 @@
       "name": "Privacy, Regulatory and Compliance Evidence",
       "applicability": "applicable",
       "state": "verification_required",
-      "reason": "Publicly listed business contact data is processed across US/Canada sources by a Pakistan operator. Technical controls are documented, but qualified legal/privacy applicability review is intentionally not self-certified.",
+      "reason": "Technical privacy/data controls and processing evidence are implemented and verified, but jurisdiction-specific legal/privacy conclusions still require qualified external review and are intentionally not self-certified.",
       "evidence_refs": [
         "DATA_SOURCES.md",
         "config/data/data-governance.json",
         "config/compliance/compliance-profile.json",
-        "docs/ai/ASSURANCE-EVIDENCE.md"
+        "docs/ai/ASSURANCE-EVIDENCE.md",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": [
         "Qualified privacy/compliance review remains required before jurisdiction-specific legal claims."
       ]
@@ -131,15 +149,20 @@
       "requirement_id": "REQ-91",
       "name": "Architecture Decision Records",
       "applicability": "applicable",
-      "state": "verification_required",
-      "reason": "Material legacy architecture choices are reconstructed into durable ADRs with repository evidence; final pass follows merged evidence.",
+      "state": "passed",
+      "reason": "Project-specific implementation/evidence was merged and verified against immutable main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173; applicable assurance checks completed without unresolved blocking findings.",
       "evidence_refs": [
         "config/architecture/decision-records.json",
         "README.md",
-        "docs/ai/ASSURANCE-EVIDENCE.md"
+        "docs/ai/ASSURANCE-EVIDENCE.md",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345400 (repository-integrity success)",
+        "Actions run 37227345382 (CodeQL analyze-actions success)",
+        "Actions run 37227345426 (governance audit success)",
+        "Issue #128 closed after verified governance alignment"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
@@ -150,72 +173,89 @@
       "reason": "No AI model/prompt/retrieval/embedding configuration produces Lead Engine runtime behavior; development AI catalog remains unselected.",
       "evidence_refs": [
         "config/ai/asset-registry.json",
-        "config/ai/agent-catalog.json"
+        "config/ai/agent-catalog.json",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
       "requirement_id": "REQ-93",
       "name": "Compatibility, Deprecation and End-of-Life Management",
       "applicability": "applicable",
-      "state": "verification_required",
-      "reason": "Runtime/package support and deprecation rules are recorded for Python, package, Actions and ANPOS protocol; final pass follows merged evidence.",
+      "state": "passed",
+      "reason": "Project-specific implementation/evidence was merged and verified against immutable main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173; applicable assurance checks completed without unresolved blocking findings.",
       "evidence_refs": [
         "config/contracts/deprecation-policy.json",
         "pyproject.toml",
         "requirements.lock",
-        ".github/dependabot.yml"
+        ".github/dependabot.yml",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345400 (repository-integrity success)",
+        "Actions run 37227345382 (CodeQL analyze-actions success)"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
       "requirement_id": "REQ-94",
       "name": "Operational Runbooks and Resilience Drills",
       "applicability": "applicable",
-      "state": "verification_required",
-      "reason": "Production recovery/runbooks are populated and tied to real quota-recovery, midnight-guard, Google capability and R2 recovery evidence.",
+      "state": "passed",
+      "reason": "Project-specific implementation/evidence was merged and verified against immutable main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173; applicable assurance checks completed without unresolved blocking findings.",
       "evidence_refs": [
         "config/operations/runbooks-and-drills.json",
         ".ai/state/RECOVERY-PROTOCOL.md",
         "Actions run 37225162383",
-        "README.md"
+        "README.md",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345400 (repository-integrity success)",
+        "Actions run 37227345382 (CodeQL analyze-actions success)"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
       "requirement_id": "REQ-95",
       "name": "Tamper-Evident Audit Journal",
       "applicability": "applicable",
-      "state": "verification_required",
-      "reason": "SHA-256 chained privileged-action journal and verifier are implemented; pass follows merged CI verification.",
+      "state": "passed",
+      "reason": "Project-specific implementation/evidence was merged and verified against immutable main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173; applicable assurance checks completed without unresolved blocking findings.",
       "evidence_refs": [
         "config/audit/audit-journal.json",
         "scripts/verify_audit_journal.py",
-        "tests/test_governance_assurance.py"
+        "tests/test_governance_assurance.py",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345400 (repository-integrity success)",
+        "Actions run 37227345382 (CodeQL analyze-actions success)",
+        "Actions run 37227345426 (governance audit success)",
+        "Issue #128 closed after verified governance alignment"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     },
     {
       "requirement_id": "REQ-96",
       "name": "Unified Risk and Exception Register",
       "applicability": "applicable",
-      "state": "verification_required",
-      "reason": "Material operational, privacy/compliance, governance and coordination risks are registered with owners and mitigations; pass follows merged evidence.",
+      "state": "passed",
+      "reason": "Project-specific implementation/evidence was merged and verified against immutable main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173; applicable assurance checks completed without unresolved blocking findings.",
       "evidence_refs": [
         "config/risk/risk-register.json",
         "config/security/threat-model.json",
-        "docs/ai/ASSURANCE-EVIDENCE.md"
+        "docs/ai/ASSURANCE-EVIDENCE.md",
+        "commit:8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+        "Actions run 37227345400 (repository-integrity success)",
+        "Actions run 37227345382 (CodeQL analyze-actions success)",
+        "Actions run 37227345426 (governance audit success)",
+        "Issue #128 closed after verified governance alignment"
       ],
-      "last_verified_ref": null,
-      "last_verified_at": null,
+      "last_verified_ref": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
+      "last_verified_at": "2026-10-04T19:12:35Z",
       "blocking_findings": []
     }
   ],
