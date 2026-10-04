@@ -47,6 +47,7 @@ def test_main_protection_requires_pr_and_strict_validate_and_anpos_checks():
     assert checks["required_status_checks"]==[
         {"context":"validate"},
         {"context":"repository-integrity"},
+        {"context":"analyze-actions"},
     ]
 
 
