@@ -3,13 +3,13 @@
   "lifecycle_stage": "discovery_planning",
   "current_phase": "PHASE-SAAS-DISCOVERY",
   "current_module": "MOD-PRODUCT-DISCOVERY",
-  "current_work_unit": "WU-SAAS-SOURCE-FEASIBILITY",
-  "last_verified_completion": "ANPOS 1.4.0 hardening verified through main 8922bc8c3e7e331c88e6506625e4d9cca5ea9173: required validate/repository-integrity/analyze-actions, Scorecard, governance audit, repository merge settings and ruleset enforcement are evidenced; REQ-83-96 classification/verification is complete except external qualified privacy/compliance review for REQ-90.",
-  "next_valid_work_unit": "WU-SAAS-SOURCE-FEASIBILITY",
+  "current_work_unit": "WU-SAAS-USER-MARKET-RESEARCH",
+  "last_verified_completion": "Source-feasibility work unit completed as a documented evidence matrix; no provider selected and provider activation remains gated pending user/MVP decisions, sample validation, contract terms and qualified review.",
+  "next_valid_work_unit": "WU-SAAS-USER-MARKET-RESEARCH",
   "progress": {
     "total_work_units": 21,
-    "complete": 5,
-    "ready": 1,
+    "complete": 6,
+    "ready": 0,
     "in_progress": 2,
     "blocked": 4,
     "deferred": 2,
@@ -19,11 +19,11 @@
   },
   "outstanding_updates": [
     "Continue existing WU-OPS-DAILY-QUOTA independently from current real workbook/health evidence; do not reset or claim complete.",
-    "Complete user/job validation and deeper competitor research; source-feasibility matrix is now active.",
+    "Conduct user/job validation and deeper competitor workflow/pricing research; user-market research is now active.",
+    "Public source feasibility matrix is complete; no provider is selected. Country/niche sample yield, actual contract rights, procurement prices and qualified compliance review remain required before activation.",
     "Resolve whether SaaS code remains in this production repository or moves to a dedicated application repository.",
-    "Resolve market, source funding model, provider shortlist, fields, plans/prices, platform order and monthly budget.",
-    "Keep stack approval pending until system design and costed alternatives are reviewed.",
-    "Complete active WU-SAAS-SOURCE-FEASIBILITY with source-specific coverage, terms/storage rights, attribution, pricing and cost evidence before MVP/provider decisions."
+    "Resolve launch market, source funding model, field policy, plans/prices, client platform order and monthly budget.",
+    "Keep stack approval pending until system design and costed alternatives are reviewed."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -56,5 +56,5 @@
     },
     "no_verified_supervisor": true
   },
-  "notes": "SaaS is a new planned product direction from the 2026-10-05 user intake. Existing production runtime and WU-OPS-DAILY-QUOTA remain active concurrently; no code, deployment or provider billing is changed by this plan. Current-engine capability audit completed as repository evidence; source feasibility is the next active discovery work unit."
+  "notes": "SaaS remains in discovery only. Existing production runtime and WU-OPS-DAILY-QUOTA remain active concurrently. Current-engine audit and public-source feasibility matrix are documented; no provider, adapter, legal approval, implementation or paid service is selected. User/job validation is the next active work unit."
 }
