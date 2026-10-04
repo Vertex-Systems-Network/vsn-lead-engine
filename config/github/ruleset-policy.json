@@ -31,7 +31,8 @@
     "block_branch_deletion": true,
     "require_linear_history": true,
     "required_status_checks": [
-      "AI Native Quality Gates / repository-integrity"
+      "validate",
+      "repository-integrity"
     ],
     "conditional_status_checks": [
       "Dependency Review / dependency-review",
@@ -67,14 +68,14 @@
     "shared_coordination_state_requires_supervisor_review": true
   },
   "notes": [
-    "This file is a reusable desired-policy blueprint, not evidence that the template source repository has these rules applied.",
-    "Apply only to a child/new project after the user approves the rules setup.",
-    "Only require status checks that have actually run successfully in the child repository and are supported by its plan/features.",
-    "Control-plane and lock-namespace protection is a security boundary, not a documentation preference."
+    "VSN Main Protection is live and verified active.",
+    "The validate and repository-integrity contexts have both completed successfully on the ANPOS adoption pull request.",
+    "CODEOWNER/one-review enforcement remains deferred until an independent reviewer or team is configured; enabling it with only the PR author as CODEOWNER can deadlock self-authored changes.",
+    "Coordination-ref namespace restrictions remain a separate capability/application gap and must not be claimed as enforced until verified."
   ],
   "setup_state": {
     "user_decision": "approved",
-    "application_status": "existing_main_ruleset_active_anpos_extensions_pending",
+    "application_status": "main_checks_alignment_pending_merge_and_controller_verification",
     "enforcement_verified": false,
     "governance_audit_installed": false
   }
