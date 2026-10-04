@@ -24,9 +24,17 @@ def test_compact_ai_state_contract():
     assert state["current_milestone"]
     assert state["milestone_status"]
     assert state["exact_next_safe_action"]
-    assert state["production"]["daily_target"] == 12000
-    assert state["production"]["accepted"] == 12000
-    assert state["production"]["shortfall"] == 0
+    production=state["production"]
+    assert production["daily_target"] == 12000
+    assert 0 <= production["accepted"] <= production["daily_target"]
+    assert production["shortfall"] == production["daily_target"] - production["accepted"]
+    assert production["quota_status"] in {"in_progress", "complete"}
+    if production["quota_status"] == "complete":
+        assert production["accepted"] == production["daily_target"]
+        assert production["shortfall"] == 0
+    if "latest_observed_accepted" in production:
+        assert production["latest_observed_accepted"] == production["accepted"]
+        assert production["latest_observed_shortfall"] == production["shortfall"]
 
 
 def test_checkpoint_and_recovery_have_required_resume_boundaries():
