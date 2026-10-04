@@ -55,6 +55,7 @@ Market-driven candidates: source/field provenance, cost preview, run history, re
 - Hunter publicly provides email discovery/verification, API and credit-based plans. Lesson: focused, measurable adapters can be integrated without promising uniform fields from all providers.
 - Google Places policy restricts storage/caching of content except defined exceptions such as Place IDs; this demonstrates why each provider needs its own policy and storage contract.
 - Google Maps Platform bills by service/SKU and usage; a single generic “paid” setting is insufficient.
+- Source feasibility matrix records Overture's mixed source licenses and optional fields, OSM ODbL and shared Overpass limits, Google Places storage and SKU cost constraints, Apollo resale-contract uncertainty, Hunter's email-focused credits/API limits, and Clay's credit/action comparator. No provider is approved or selected; see `docs/ai/LEAD-SAAS-SOURCE-FEASIBILITY.md` and EVID-000011–000016.
 - Apple in-app subscriptions and Microsoft Store commerce have platform-specific rules. Cross-platform entitlement sync and storefront-specific checkout must be designed after distribution decision.
 Evidence URLs, dates, evidence class and limitations are in `config/research/evidence-registry.json`. Findings are initial desk research, not legal advice, independently verified user findings, or current full-price comparison.
 
