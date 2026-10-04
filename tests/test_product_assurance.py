@@ -92,8 +92,13 @@ class ProductAssuranceTests(unittest.TestCase):
 
     def test_140_is_active_and_next_release_is_unplanned(self) -> None:
         current = load("config/protocol/version.json")
-        planned = load("config/protocol/next-release.json")
         self.assertEqual(current["version"], "1.4.0")
+        next_release = ROOT / "config/protocol/next-release.json"
+        if not next_release.exists():
+            # next-release.json is vendor/source-management state and is intentionally
+            # removed from initialized child repositories.
+            return
+        planned = load("config/protocol/next-release.json")
         self.assertEqual(planned["current_version"], current["version"])
         self.assertIsNone(planned["planned_version"])
         self.assertEqual(planned["status"], "unplanned")
