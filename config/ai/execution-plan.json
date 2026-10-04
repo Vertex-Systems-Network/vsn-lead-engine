@@ -700,5 +700,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "Source feasibility matrix is recorded; vendor activation/selection remains gated. User/job validation is now the next active SaaS discovery work unit. Existing daily quota operations remain concurrently in progress."
+  "progress_note": "Source feasibility matrix is recorded; vendor activation/selection remains gated. User/job validation is the next active SaaS discovery unit. Runner policy: minimize hosted CI runner usage by preferring local/static deterministic validation, grouping compatible required checks, and avoiding duplicate workflow runs; never skip required independent security or protected-branch checks."
 }
