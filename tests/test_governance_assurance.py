@@ -142,6 +142,20 @@ class GovernanceAssuranceTests(unittest.TestCase):
         ]:
             self.assertIn(marker, proc.stdout)
 
+    def test_governance_audit_is_repository_explicit(self) -> None:
+        workflow = (ROOT / ".github/workflows/governance-audit.yml").read_text(
+            encoding="utf-8"
+        )
+        blueprint = (ROOT / "blueprints/github/workflows/governance-audit.yml").read_text(
+            encoding="utf-8"
+        )
+        for content in [workflow, blueprint]:
+            self.assertIn('gh issue list --repo "$REPO"', content)
+            self.assertIn('gh issue edit "$OPEN" --repo "$REPO"', content)
+            self.assertIn('gh issue create --repo "$REPO"', content)
+            self.assertIn('gh issue close "$OPEN" --repo "$REPO"', content)
+            self.assertIn('GOVERNANCE_READ_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}', content)
+
     def test_governance_paths_are_protected(self) -> None:
         protected = set(load("config/security/control-plane-policy.json")["protected_paths"])
         owned = {row["pattern"] for row in load("config/github/path-ownership.json")["rules"]}
