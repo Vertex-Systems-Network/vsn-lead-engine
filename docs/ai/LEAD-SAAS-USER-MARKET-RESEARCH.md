@@ -1,8 +1,8 @@
 # SaaS User and Market Research Workbench
 
-Research snapshot: 2026-10-05 PKT  
+Research snapshot: 2026-10-06 PKT  
 ANPOS work unit: WU-SAAS-USER-MARKET-RESEARCH  
-Status: active — desk-research package complete; external validation pending  
+Status: active — desk-research package refreshed; external validation pending  
 Evidence boundary: No customer interviews, surveys, pricing tests, or product trials have been conducted for this plan. Competitor documentation describes vendor workflows; it does not validate VSN customer demand or vendor performance.
 
 ## 1. Research questions
@@ -345,14 +345,56 @@ Record observable behavior separately from opinion. No pass score is assigned in
 
 This storyboard is ready for prototyping/review but has not been rendered, tested or shown to participants. The moderated session protocol, observation rubric and synthesis memo template are in [LEAD-SAAS-PROTOTYPE-TEST-RUNBOOK.md](LEAD-SAAS-PROTOTYPE-TEST-RUNBOOK.md). No participants have been recruited or tested; WU-SAAS-USER-MARKET-RESEARCH remains in_progress.
 
-## 8. Status reconciliation and acceptance gates (2026-10-05)
+## 3E. Decision synthesis: separate jobs, competitive baseline, and evidence gates (2026-10-06)
+
+**Status:** synthesis of public documentation and repository evidence only. This section does not select a launch segment, prove demand, set a price, select a provider, or authorize implementation.
+
+### Keep the product jobs separate during discovery
+
+| Candidate job | Candidate buyer to interview | Workflow references in this review | VSN evidence today | Decision-critical unknown | Discriminating interview/prototype test |
+|---|---|---|---|---|---|
+| Build a local-business/place list | Agency/BPO staff producing client lists; possibly local-market sales teams | Outscraper task-based Maps search; Google/Yelp/Foursquare/Overture/OSM place sources | VSN has an internal place/business workflow baseline (EVID-000033), not external demand evidence | Whether buyers need a saved local list repeatedly; mandatory fields and country coverage; rights to retain/export; phone-qualified yield and cost | Have participant show a recent real brief and rejection rules; use task T1 with synthetic records; only later run an authorized, pre-registered source sample |
+| Find named people and direct contact details | In-house B2B sales/marketing; agencies that promise named decision-makers | Apollo and Seamless search/lists/CRM flows; Sales Navigator search/alerts; Hunter email finding/verification | No external evidence that VSN users prefer named people over business records | Required role/contact fields, accuracy/freshness standard, CRM destination, applicable data rights, credit economics, jurisdiction/privacy obligations | Task T2 asks participant to continue from a business to a decision-maker; record if they use a separate provider, manual lookup, or do not need this job |
+| Clean, verify, or enrich an existing list | Agency/BPO, in-house sales, or consultant with an existing CSV/CRM list | Hunter email verification; Clay multi-step/provider workflow | No participant evidence that list cleanup is a frequent or paid pain | File schema, volume/frequency, required enrichment, acceptable error rate, and source use/retention terms | Ask to walk through the last imported list, show a redacted schema only if voluntarily offered, and identify the exact manual cleanup steps |
+| Repeat/schedule collection and govern spend | Buyer/operator already repeating any of the above jobs | Apollo saved-search alerts; Clay action/data-credit meters; Outscraper async task lifecycle | Fixed scheduling and dedupe exist only in VSN's internal workflow | Recurrence frequency, acceptable freshness, desired timezone/failure behavior, cost predictability and cancellation expectations | Task T3 uses a simulated schedule; ask what they do today after partial/late jobs and whether a schedule actually saves work |
+
+A source/API vendor, a workflow-enrichment tool, and a full prospecting suite are not interchangeable direct competitors. Keep three categories in the notes: **(1) data/source options** such as Google Places or Yelp, **(2) orchestration/enrichment** such as Clay, and **(3) end-user prospecting suites** such as Apollo or Seamless. Compare each only on the job it performs; a source's records do not equal a complete SaaS workflow, and a vendor workflow does not grant VSN downstream data rights.
+
+### What competitor evidence supports—and what it does not
+
+The refreshed first-party pages confirm a competitive workflow baseline: filters plus reusable saved searches/lists; some form of alerts or repeat use; review/export or CRM handoff; asynchronous job tracking for place-search APIs; and usage meters or credit governance. Examples: [Apollo saved searches and alerts](https://knowledge.apollo.io/hc/en-us/articles/4409803718669-Save-Share-and-Set-Alerts-for-Searches) and its [standard-plan external-product restriction](https://www.apollo.io/pricing) (EVID-000036–000037); [Clay's separate Actions and Data Credits](https://www.clay.com/pricing) (EVID-000038); [Hunter's team credit controls and plan separation](https://help.hunter.io/en/articles/11131690-pricing-plans-and-feature-faqs) (EVID-000039); [Sales Navigator saved-search alerts](https://www.linkedin.com/help/sales-navigator/answer/a102024/) (EVID-000040); [Outscraper's async-capable Maps Search task](https://docs.outscraper.com/endpoints/maps-search/) (EVID-000041); and [Google Places storage policy](https://developers.google.com/maps/documentation/places/web-service/policies) (EVID-000042).
+
+These pages establish what vendors document about their products. They do **not** establish that VSN's candidate users have an unmet need, that advertised data is accurate, that usage-based pricing is preferred, that an API's upstream source permits SaaS resale, or that VSN can profitably supply a given country/niche. Broad claims such as “more leads,” “verified,” “real-time,” or “cheaper” are not accepted as facts without independent measurement and appropriate source permission.
+
+The desk review also reduces the strength of a generic positioning claim: **filters, saved searches, lists, exports, CRM handoff, and basic usage controls are not demonstrated differentiators by themselves.** A narrower candidate to test is repeatable local-business list production with configurable required fields, visible provenance/freshness, deduplication, clear partial-job status, and an explicit cost/permission gate. This is a product hypothesis, not a validated wedge; provider rights and phone/field yield could make it infeasible.
+
+### Segment test plan that fits the current evidence
+
+For the planned 8–12 exploratory interviews, use **two primary comparison cohorts**, not all three segments at once: (A) agency/BPO staff who personally source or quality-check client lists, and (B) in-house B2B sales/marketing staff who personally build or use lists. Aim for 3–4 qualified participants in each cohort, then use remaining places for disconfirming/adequate-workaround cases. If recruitment access makes one cohort impossible, record that limitation and test the accessible cohort plus counterexamples; do not silently treat internal VSN users or list recipients as substitutes. Independent consultants remain a follow-up cohort unless evidence shows they are a materially different buyer/job worth testing now.
+
+Use the same recent-work interview prompts and synthetic-data tasks across both cohorts. Record actual last-job date, trigger, frequency, fields rejected, current tools, manual minutes, spend and spend authority, destination, and what happened after a poor result. Distinguish direct observation, participant report, opinion, and researcher inference. “Would use/pay” alone is not validation. Do not collect confidential client records.
+
+### Evidence and decision gates
+
+| Gate | Evidence required | Current status |
+|---|---|---|
+| Segment/problem | Repeated recent job, concrete failure/cost, required-field rules, identifiable buyer, and counterexamples by segment | **Unknown** — no interviews/surveys |
+| Workflow fit | Observed task completion/time and comprehension on the same neutral mock across cohorts | **Not tested** — storyboard only |
+| Source feasibility | Written use/storage/export rights, authorized sample, measured rights-eligible usable yield, freshness, duplicates, and unit cost | **Open** — desk matrix only; no provider selected/sample run |
+| Price/commercial | Current alternatives/spend authority, tested plan/limit comprehension, real provider and infrastructure cost model | **Unknown** — vendor pricing pages are not VSN willingness-to-pay evidence |
+| Market sizing | Named segment, launch geography, repeat-job frequency, buyer count and obtainable channel | **Not estimable without false precision** — segment/geography/MVP are unselected |
+| MVP decision | Owner-approved segment/job, fields, source/funding model, exclusions, success metric, platform order and budget | **Blocked** — ADR-0007 remains proposed |
+
+**Research disposition:** desk-research deliverable is complete and refreshed; user/market validation is still **in progress**. Continue WU-SAAS-USER-MARKET-RESEARCH until external sessions are synthesized with counterexamples, or record an actual recruitment blocker. Do not mark it complete from competitor research alone. The next responsible action is participant recruitment and interviews; no external outreach or sessions have been conducted by this research pass.
+
+## 8. Status reconciliation and acceptance gates (2026-10-06)
 
 This section distinguishes the completed desk-research deliverables from the evidence that still requires participants. It does not mark the research work unit complete.
 
 | Research acceptance item | Status | Evidence / honest boundary |
 |---|---|---|
-| Segment and problem hypotheses | Prepared for testing | H1–H7 are researcher hypotheses informed by public-source desk research and the internal VSN operating case; none is participant-validated. |
-| Competitor workflows compared beyond marketing summaries | Complete as public-document review | Apollo, Clay, Hunter, LinkedIn Sales Navigator, Seamless.AI, Outscraper, Google Places, Yelp Places and Foursquare documented workflows/policy limits are summarized in sections 3B–3D and crosswalked to registry IDs. No hands-on competitive trials or independent usability tests were performed. |
+| Segment and problem hypotheses | Prepared for testing | H1–H7 are researcher hypotheses informed by public-source desk research and the internal VSN operating case; none is participant-validated. Section 3E keeps place discovery, named-contact prospecting, list enrichment, and recurring workflow as separate jobs. |
+| Competitor workflows compared beyond marketing summaries | Complete as public-document review | Apollo, Clay, Hunter, LinkedIn Sales Navigator, Seamless.AI, Outscraper, Google Places, Yelp Places and Foursquare workflows/policy limits are summarized in sections 3B–3E and crosswalked to registry IDs EVID-000017–000042. No hands-on competitive trials or independent usability tests were performed. |
 | Interview preparation | Complete as preparation | Screener, invitation, consent script, interviewer guide, capture/synthesis forms and [prototype test runbook](LEAD-SAAS-PROTOTYPE-TEST-RUNBOOK.md) are prepared. No outreach or session has been performed. |
 | Prototype screens/tasks | Specified only | Three tasks and screen storyboard are specified; no clickable prototype has been built or shown to participants. |
 | User/problem evidence from recent workflows | Pending | No external participant interview, survey, or workflow artifact has been collected. |
