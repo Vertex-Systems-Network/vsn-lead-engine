@@ -109,7 +109,7 @@ Apollo credit details and the prohibition on using ordinary plans for customer-f
 Aim for 8–12 discovery conversations before locking segment/MVP:
 - At least 4 people who personally build or purchase B2B/business lead lists.
 - At least 3 people from a second plausible segment.
-- At most 2 close collaborators from VSN to reduce internal confirmation bias.
+- Recruit 8–12 external participants; internal VSN operators/collaborators are supplementary only (at most 2) and never count toward the external segment sample.
 - Include non-users/currently manual workflows; do not recruit only enthusiastic friends.
 - Record role, company size band, target markets, list frequency and whether participant controls tool spending. Avoid collecting unnecessary personal data.
 
