@@ -56,5 +56,11 @@
     },
     "no_verified_supervisor": true
   },
-  "notes": "SaaS remains in discovery only. Current-engine audit, source-feasibility desk matrix, competitor workflow/pricing review (EVID-000011–000032), interview workbench, and repository-grounded first-party operating case (EVID-000033) are documented. The incumbent case is not customer validation. ADR-0007 is proposed only. No provider, legal approval, implementation, paid service, market, plan, platform, repository boundary or stack is accepted. User research remains the next active unit; production daily quota remains independently active."
+  "notes": "SaaS remains in discovery only. Current-engine audit, source-feasibility desk matrix, competitor workflow/pricing review (EVID-000011–000032), interview workbench, and repository-grounded first-party operating case (EVID-000033) are documented. The incumbent case is not customer validation. ADR-0007 is proposed only. No provider, legal approval, implementation, paid service, market, plan, platform, repository boundary or stack is accepted. User research remains the next active unit; production daily quota remains independently active. Latest read-only check of the 2026-10-05 private daily workbook confirms production quota remains In Progress; exact total and file ID are not mirrored into public GitHub.",
+  "latest_production_workbook_observation": {
+    "tracking_date": "2026-10-05",
+    "status": "In Progress",
+    "checked_read_only": true,
+    "source": "Private connected Google Drive daily workbook; exact totals and file identifier not copied to this public repository."
+  }
 }

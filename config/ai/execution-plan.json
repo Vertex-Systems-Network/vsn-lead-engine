@@ -250,7 +250,8 @@
         "R2 recovery evidence"
       ],
       "completion_evidence": [
-        "Latest verified run 37213320765: 6,855 / 12,000; not complete"
+        "Latest verified run 37213320765: 6,855 / 12,000; not complete",
+        "2026-10-05 read-only check of the current private daily workbook: status remains In Progress; quota acceptance is not met. Exact count, workbook ID and URL are intentionally not duplicated in this public repository. The previously recorded 2026-10-04 run snapshot is historical, not the current count."
       ]
     },
     {
@@ -718,5 +719,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "WU-SAAS-USER-MARKET-RESEARCH remains in_progress: competitor/source desk review, interview kit, and a repository-grounded first-party operating case are prepared; no external user interviews, task tests, validated segment, or user-backed MVP outcome exist. Foursquare and Yelp evidence has unresolved terms, quotas and pricing; neither is source approval or demand validation. WU-SAAS-MVP-DECISIONS remains blocked pending user research, owner choices, and source-specific rights/yield/economics. Runner minimization remains required."
+  "progress_note": "WU-SAAS-USER-MARKET-RESEARCH remains in_progress: competitor/source desk review, interview kit, and a repository-grounded first-party operating case are prepared; no external user interviews, task tests, validated segment, or user-backed MVP outcome exist. Foursquare and Yelp evidence has unresolved terms, quotas and pricing; neither is source approval or demand validation. WU-SAAS-MVP-DECISIONS remains blocked pending user research, owner choices, and source-specific rights/yield/economics. Runner minimization remains required. Production operations remain in_progress: read-only check of the 2026-10-05 private workbook still shows In Progress; the prior 2026-10-04 run snapshot is historical and does not certify today's quota."
 }
