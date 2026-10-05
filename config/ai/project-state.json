@@ -19,9 +19,9 @@
   },
   "outstanding_updates": [
     "Continue existing WU-OPS-DAILY-QUOTA independently from current real workbook/health evidence; do not reset or claim complete.",
-    "Complete WU-SAAS-USER-MARKET-RESEARCH with actual user interviews/task evidence; desk research and interview workbench, including alternatives (Seamless.AI, Outscraper, Google Places billing), are prepared but do not validate demand.",
-    "Public source feasibility matrix is complete; no provider is selected. Country/niche sample yield, exact contract rights, procurement prices and qualified review remain activation gates.",
-    "Review docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md and accept/reject the proposed decisions; ADR-0007 remains proposed, not approved.",
+    "Complete WU-SAAS-USER-MARKET-RESEARCH with actual external user interviews/task evidence; desk research, interview execution kit, and the VSN repository-based operating case are prepared, but none substitutes for external demand validation.",
+    "Public source feasibility matrix is complete as desk research; no provider selected. Foursquare and Yelp documentation add unresolved pricing/quota conflicts; all country/niche sample yield, exact contract rights, procurement prices and qualified review remain activation gates.",
+    "Review docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md and accept/reject proposed decisions; ADR-0007 remains proposed, not approved.",
     "Resolve SaaS repository boundary, launch segment/market, source funding and required fields, plans/quotas/payment, platform order and monthly budget before system design.",
     "Keep stack approval pending until system design and costed alternatives are reviewed."
   ],
@@ -56,5 +56,5 @@
     },
     "no_verified_supervisor": true
   },
-  "notes": "SaaS remains in discovery only. Current-engine audit, source-feasibility matrix, competitor workflow/pricing review (now including EVID-000023–000026), interview workbench and MVP decision brief are documented. ADR-0007 is proposed only. No provider, legal approval, implementation, paid service, market, plan, platform, repository boundary or stack is accepted. User research remains the next active unit; production daily quota remains independently active."
+  "notes": "SaaS remains in discovery only. Current-engine audit, source-feasibility desk matrix, competitor workflow/pricing review (EVID-000011–000032), interview workbench, and repository-grounded first-party operating case (EVID-000033) are documented. The incumbent case is not customer validation. ADR-0007 is proposed only. No provider, legal approval, implementation, paid service, market, plan, platform, repository boundary or stack is accepted. User research remains the next active unit; production daily quota remains independently active."
 }

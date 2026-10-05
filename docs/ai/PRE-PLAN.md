@@ -57,10 +57,10 @@ Market-driven candidates: source/field provenance, cost preview, run history, re
 - Google Maps Platform bills by service/SKU and usage; exact field masks can raise the charged SKU, so cost preview needs the requested-field set. A generic “paid” setting is insufficient.
 - Seamless.AI positions Prospector around named-contact discovery with an advertised 50-credit free start; this is a separate job hypothesis, not evidence of VSN user demand.
 - Outscraper markets Google Maps crawling and metered records; its public terms require a payment method before first use and point to a separate Global Services Agreement. Pricing does not establish upstream source rights; keep it unselected pending qualified review and written rights confirmation. See EVID-000023–000026.
-- Source feasibility matrix records Overture's mixed source licenses and optional fields, OSM ODbL and shared Overpass limits, Google Places storage and SKU cost constraints, Apollo resale-contract uncertainty, Hunter's email-focused credits/API limits, and Clay's credit/action comparator. No provider is approved or selected; see `docs/ai/LEAD-SAAS-SOURCE-FEASIBILITY.md` and EVID-000011–000016.
+- Source feasibility matrix records Overture's mixed source licenses and optional fields, OSM ODbL and shared Overpass limits, Google Places storage and SKU cost constraints, Apollo resale-contract uncertainty, Hunter's email-focused credits/API limits, and Clay's credit/action comparator. Later Foursquare and Yelp desk reviews record unresolved pricing/quota conflicts and retention/use restrictions. No provider is approved or selected; see `docs/ai/LEAD-SAAS-SOURCE-FEASIBILITY.md` and EVID-000011–000032.
 - Apple in-app subscriptions and Microsoft Store commerce have platform-specific rules. Cross-platform entitlement sync and storefront-specific checkout must be designed after distribution decision.
 Evidence URLs, dates, evidence class and limitations are in `config/research/evidence-registry.json`. Findings are initial desk research, not legal advice, independently verified user findings, or current full-price comparison.
-- User/job research is active: Apollo, Clay, Hunter and relevant alternatives (Seamless.AI, Outscraper, Google Places billing) documented workflows plus an interview guide, segment hypotheses, evidence-capture form and closure gates are prepared in `docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md`. No customer interviews or market validation are claimed; keep the work unit open until actual evidence is recorded.
+- User/job research remains active: Apollo, Clay, Hunter, Seamless.AI, Outscraper, Google Places, Foursquare and Yelp Places desk comparisons, interview execution kit, segment hypotheses, evidence-capture form and closure gates are prepared in `docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md`. EVID-000033 documents VSN's incumbent workflow as a first-party repository case only. No external customer interviews or market validation are claimed; keep the work unit open until actual evidence is recorded.
 - MVP decision brief and proposed ADR-0007 now give reviewable recommendations for repository boundary, web-first sequence, market/source gates, costs, CSV/custom inputs, schedules and bounded AI. All remain proposals pending interviews and explicit owner decisions: `docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md`.
 
 ### Positioning hypothesis
@@ -145,7 +145,10 @@ These decisions do not block documentation/research. Technology approval and ext
 - [x] Existing repo/production boundary reconciled from current repository state.
 - [x] Initial official-source/competitor desk research recorded with provenance.
 - [x] Phased candidate plan, proposed options/modules, work units and risks prepared.
-- [ ] User/job validation and deeper competitor/source-policy research.
+- [x] Public competitor and source workflow desk comparisons recorded with provenance; EVID-000011–000032.
+- [x] VSN incumbent workflow captured as a repository-grounded first-party case; EVID-000033 (not customer validation).
+- [ ] External user/job validation through interviews or task evidence.
+- [ ] Source contract, qualified rights review, target-market yield and quote gates.
 - [ ] Product boundary, launch market, source model, billing, platform and budget decisions.
 - [ ] System/data/threat/UX design and architecture records.
 - [ ] Technology alternatives evaluated and owner approval recorded.
