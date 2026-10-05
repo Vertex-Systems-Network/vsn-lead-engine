@@ -117,6 +117,45 @@ Do not complete WU-SAAS-USER-MARKET-RESEARCH until:
 
 After that, take WU-SAAS-MVP-DECISIONS and record owner decisions as ANPOS ADRs. User research does not authorize source use, paid provider activation, stack approval, or implementation.
 
+## 5A. Interview execution kit (ready to use; no sessions claimed)
+
+### 60-second recruitment screener
+Ask only these routing questions; record category/band, not unnecessary personal details:
+1. In the last 90 days, have you personally built, purchased, or requested a list of businesses or business contacts? (yes/no)
+2. Which best describes your role in that work? (builds lists / requests or approves lists / uses lists / other)
+3. How often does this happen? (weekly or more / monthly / less often / never)
+4. Which is closest to the job? (find local businesses / find named decision-makers / enrich or verify contacts / combine and deliver data / other)
+5. Do you choose or influence tools and spending? (yes / shared / no)
+6. Would you be comfortable discussing the workflow without sharing confidential customer or personal data? (yes/no)
+
+Recruit recent, first-hand experience first. Include people who do not buy tools and those whose current process works well. Do not treat screener responses as interview findings. Track only screener ID, routing bands, recruitment source and interview status; delete contact details when scheduling is complete unless the participant asks for follow-up.
+
+### Copy-ready invitation
+> Hi — I’m researching how teams create and use business lead lists. Would you be open to a 30-minute conversation about a recent real workflow? This is research, not a sales call. Please don’t share confidential client records or sensitive personal data. Participation is optional, and you can skip any question or stop at any time. I’ll take anonymized notes; I will not record audio/video unless we separately agree first. Would [two time windows] work for you?
+
+### Opening consent script
+> Thanks for your time. I’m trying to understand what you actually did the last time you needed a business or contact list. There are no right answers, and criticism is useful. Please avoid naming clients or sharing confidential records. May I take anonymized notes? I will not record this call. You may skip a question or stop whenever you want. Is that okay?
+
+Record the response as yes/no and proceed only after a clear yes to notes. If audio/video recording is desired, seek separate explicit permission before recording and follow the participant's applicable privacy expectations. Do not infer consent from attendance.
+
+### Interviewer run sheet
+- Before: assign an interview ID; check the screener fit; prepare a blank capture form; do not show the concept until the recent workflow is understood.
+- During: ask for one recent example; separate what happened from opinions or future guesses; ask “what happened next?” and “how did you decide?”; capture exact wording only with identifying details removed.
+- If shown a concept: label it as an unvalidated VSN concept, present the same neutral flow to every participant, and ask what is confusing or missing before asking preference.
+- After: within 24 hours, separate observation, participant quote, interpretation and open question; note contradictions and confidence; remove direct identifiers from research notes.
+
+### Synthesis worksheet (one row per observation)
+| Interview IDs | Observed job/trigger | Current workaround | Cost or failure described | Required lead fields/quality | Schedule/device need | Evidence type | Counterexample | Confidence | Decision affected |
+|---|---|---|---|---|---|---|---|---|---|
+| pending | pending | pending | pending | pending | pending | pending | pending | unassessed | pending |
+
+Use counts as “n of interviewed participants,” not market prevalence. Keep a separate row for disconfirming evidence. Do not rank a segment solely by enthusiasm for a mockup; prioritize recent behavior, repeat frequency, measurable failure/cost, purchasing influence, and a legally feasible path to deliver the needed data.
+
+### Session completion checklist
+A session is usable evidence only when its record contains screener fit, consent-to-notes status, a concrete recent workflow, observed steps/tools, quality acceptance/rejection rules, spend/source constraints, a direct anonymized quote or artifact reference (if available), researcher interpretation separated from fact, and at least one uncertainty or contradiction check. Missing items remain unknown; do not fill gaps from assumptions.
+
+This execution kit is preparation only. At snapshot time, no participant has been recruited or interviewed through this plan; WU-SAAS-USER-MARKET-RESEARCH remains in progress.
+
 ## Pricing sources
 - Apollo pricing and external-product restrictions: https://www.apollo.io/pricing
 - Hunter plans and API-only Data Platform: https://hunter.io/pricing
