@@ -1423,6 +1423,31 @@
         "Treat advertised lead freshness/coverage as claims until independently tested.",
         "Public product page does not establish VSN's rights to reuse Lead411 data."
       ]
+    },
+    {
+      "id": "EVID-000051",
+      "claim_or_question": "What scale and price does Lead411's SMB Sales Boost product page advertise, and is that offer directly reconcilable with Lead411's general pricing page?",
+      "source_type": "primary",
+      "source_ref": "https://www.lead411.com/sales-tools/smb-sales-boost/",
+      "source_title": "SMB Sales Boost product claims and public pricing cross-check",
+      "publisher_or_owner": "Lead411",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Lead411's SMB Sales Boost page advertises over 1.1 million leads across 1,400+ SMB categories, business access within days of formation, daily delivery through dashboard/email/CSV/API/MCP, and plans starting at $49/month. A separate general Lead411 pricing page displays Basic at $99/month per user with 200 US contacts/month and a 3-month minimum. The reviewed pages do not explain whether these are the same product, plan, billing conditions or included quantities, so they cannot be treated as a reconciled apples-to-apples price. Scale, freshness and conversion statements remain vendor claims.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Product pricing/plan scope must be confirmed from current checkout or written quote before use in a competitor price comparison.",
+        "No VSN provider rights, coverage benchmark or data-quality validation follows from these pages."
+      ]
     }
   ],
   "entry_contract": {
