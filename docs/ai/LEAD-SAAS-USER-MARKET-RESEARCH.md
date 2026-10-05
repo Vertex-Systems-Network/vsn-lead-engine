@@ -346,6 +346,8 @@ This section distinguishes the completed desk-research deliverables from the evi
 | MVP outcome metric and baseline | Candidate measures only | Candidate metrics are listed in section 6; no user-backed baseline or target has been agreed. |
 | User research work-unit exit | Not met | Keep WU-SAAS-USER-MARKET-RESEARCH in_progress until sessions are completed and synthesized, or a genuine recruitment blocker is recorded without claiming validation. |
 
+Source validation is a separate evidence stream from participant research. A rights-aware, pre-registered sample benchmark protocol is in [LEAD-SAAS-SOURCE-SAMPLE-BENCHMARK.md](LEAD-SAAS-SOURCE-SAMPLE-BENCHMARK.md); it remains unrun until an owner-approved market/niche brief and source-specific rights gates exist. It cannot substitute for interviews or validate demand.
+
 ### Next execution sequence
 
 1. Recruit participants who pass the screener, with external participants across at least two candidate segments and a mix of tool buyers/non-buyers.
