@@ -828,6 +828,96 @@
         "Personalization API usage guidelines (scope must be checked): https://docs.foursquare.com/developer/reference/usage-guidelines-personalization-apis.",
         "No vendor contact, account, API key, or agreement was used/obtained."
       ]
+    },
+    {
+      "source_type": "primary",
+      "source_title": "Yelp Places API FAQ and Rate Limiting",
+      "publisher_or_owner": "Yelp",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Primary FAQ: https://docs.developer.yelp.com/docs/places-faq",
+        "The listed terms are public documentation, not a negotiated VSN license or legal review."
+      ],
+      "id": "EVID-000030",
+      "claim_or_question": "What do Yelp Places public docs say about trial/paid quotas, caching, commercial analysis, supported geographies, data coverage bias and search caps?",
+      "source_ref": "https://docs.developer.yelp.com/docs/places-faq",
+      "summary": "Yelp Places FAQ states trial up to 5,000 calls during 30 days for evaluation only (not commercial deployment); paid plans default to 30,000 calls/month with daily limit up to 5,000 and overage increments of 1,000, while exact price is linked through signup/sales rather than exposed. Yelp says API content may be cached up to 24 hours and Yelp Business IDs indefinitely; commercial analysis is not permitted for Places integrations. Results are available where Yelp operates; listings need Yelp user-generated content or other user-contributed enhancement. Search supports up to 50 results per request and 240 per originating query."
+    },
+    {
+      "source_type": "primary",
+      "source_title": "Yelp Places API Getting Started",
+      "publisher_or_owner": "Yelp",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Primary guide: https://docs.developer.yelp.com/docs/places-intro",
+        "No vendor account, API key, or agreement was used/obtained."
+      ],
+      "id": "EVID-000031",
+      "claim_or_question": "Does Yelp signal a separate commercial product route for consumer products and what fields does Places expose?",
+      "source_ref": "https://docs.developer.yelp.com/docs/places-intro",
+      "summary": "Yelp's Getting Started guide describes Search, Phone Search, Business Match, and Details endpoints, with fields including business name, address, phone, ratings, categories, coordinates and review counts. Its page directs commercial use in a consumer product to Yelp Places Enterprise. This does not establish VSN's proposed persistent lead storage/export rights; exact terms must be confirmed."
+    },
+    {
+      "source_type": "primary",
+      "source_title": "Yelp Places Rate Limiting",
+      "publisher_or_owner": "Yelp",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Primary rate-limiting page: https://docs.developer.yelp.com/docs/places-rate-limiting",
+        "Do not normalize these figures into one trial allowance; confirm actual plan and headers."
+      ],
+      "id": "EVID-000032",
+      "claim_or_question": "What quota does Yelp document for rate limiting, and does it align with its FAQ trial totals?",
+      "source_ref": "https://docs.developer.yelp.com/docs/places-rate-limiting",
+      "summary": "Yelp's Rate Limiting page describes signup-selected Starter trials as limited to 300 API calls per 24 hours, with remaining/max/reset quota headers; the FAQ separately says trial users receive up to 5,000 calls during 30 days and describes the paid default. This is a public-docs discrepancy or plan-level distinction and cannot be resolved without the selected plan/account quota."
     }
   ],
   "entry_contract": {
