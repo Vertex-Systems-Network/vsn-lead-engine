@@ -329,4 +329,4 @@ Status: specification only. This defines a neutral, repeatable set of screens fo
 
 Record observable behavior separately from opinion. No pass score is assigned in advance; propose thresholds only after the planned sessions and review of counterexamples. Screen completion does not prove demand, data rights, source quality, cost viability, willingness to pay, or product-market fit.
 
-This storyboard is ready for prototyping/review but has not been rendered, tested or shown to participants. WU-SAAS-USER-MARKET-RESEARCH remains in_progress.
+This storyboard is ready for prototyping/review but has not been rendered, tested or shown to participants. The moderated session protocol, observation rubric and synthesis memo template are in [LEAD-SAAS-PROTOTYPE-TEST-RUNBOOK.md](LEAD-SAAS-PROTOTYPE-TEST-RUNBOOK.md). No participants have been recruited or tested; WU-SAAS-USER-MARKET-RESEARCH remains in_progress.
