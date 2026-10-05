@@ -45,6 +45,7 @@ Apollo's official guidance documents AND logic across filters and OR logic among
 | Seamless.AI Prospector | Contact-first B2B prospecting with AI-enhanced filters; official FAQ advertises 50 free search credits without a card, then directs users to sales for customized plans. | Compare named-contact search as a distinct optional job, and test whether users want it alongside place/business discovery. | Official pricing page did not expose usable price text in this capture. Free credits and product claims do not validate VSN demand, contact quality, or VSN redistribution rights. |
 | Outscraper | Markets a Google Maps crawler flow: choose location/category, set parameters, run a task, download results. Pricing page shows a displayed B2B database initial tier at $2/1,000 businesses for first 5k records; its short terms require a payment method before first use and reference a separate Global Services Agreement. | Cost per record, payment-method requirement, recurring use, and rights must be separate filters in any free/paid comparison. A nominal free threshold may still require a card. | This is scraping of Google Maps according to Outscraper's own product description. Published price is not permission from the upstream data source or a distribution/license clearance. Keep unselected pending qualified review and written exact rights. |
 | Google Places API (New) | Search/details returns depend on requested fields; field masks control response fields and mixing Essentials + Pro fields bills at the highest applicable SKU. | Cost preview must be generated from the exact field mask and refresh when users add/remove fields; broad “paid source” toggles are insufficient. | Field-mask billing documentation does not resolve Places storage/display restrictions; see source-feasibility matrix and re-check current policies before use. |
+| Foursquare Places | Foursquare advertises 100M+ commercial POIs, 200+ countries/territories and 1,100+ venue categories across its Places products; the API uses Pro/Premium endpoint pricing, and a separate flat-file offer is available. | A relevant location-source comparator; evaluate business/place discovery separately from named-contact prospecting and exact requested fields. | Vendor coverage claims are not independent yield evidence. Pricing page conflict: its Pro table lists 500 free calls, while the page footer says up to 10,000 free Pro calls; field tier changes endpoint pricing. Current new Places API terms for persistent lead storage, export/resale and attribution, flat-file quote/rights, contact-field availability, and market/niche yield remain unresolved. Legacy V3 endpoints had a May 15, 2026 deprecation date; validate against the current API. No selection. |
 
 This is competitor/source workflow desk research only. It does not constitute customer validation, comparative testing, a legal determination, or source selection. Evidence IDs EVID-000023–000026 are in the registry.
 
@@ -90,33 +91,6 @@ Avoid leading questions such as “Would you use this AI lead-gen app?” Prefer
 - Exact anonymized quote or observed artifact reference (never infer it).
 - Evidence class, confidence, contradicting evidence, follow-up, and researcher interpretation separately.
 
-## 6. Synthesis rules and proposed success metrics
-
-After interviews, cluster repeated observed jobs/pains and preserve contradictions. Count participants per observation; do not convert frequency from a small qualitative sample into a population estimate. Follow with a task-based prototype test and a larger survey only if a decision still needs quantification.
-
-Candidate outcome metrics to test with users:
-- Time from brief to first rights-eligible, usable lead.
-- Accepted-lead rate under user-defined required fields.
-- Duplicate and stale-record rates on a labeled sample.
-- Setup completion and first successful run.
-- Schedule success/partial/failure visibility and recovery time.
-- User understanding of source, field provenance and paid cap before run.
-- Cost per usable lead by source/market/niche.
-- Repeat use and export/CRM handoff completion.
-
-No numerical target is approved yet. Baselines must come from observed workflows and a measured permitted-source sample.
-
-## 7. Decision gates
-
-Do not complete WU-SAAS-USER-MARKET-RESEARCH until:
-- The launch segment and top user job have interview evidence and at least one counterexample/contradiction review.
-- Competitor comparison uses observed documented workflows/features, not only marketing summaries.
-- MVP outcome metric and baseline collection method are chosen with user evidence.
-- Business discovery vs named-contact enrichment distinction is resolved.
-- Interviews are completed or explicitly recorded as blocked by unavailable participants; do not imply validation if only desk research exists.
-
-After that, take WU-SAAS-MVP-DECISIONS and record owner decisions as ANPOS ADRs. User research does not authorize source use, paid provider activation, stack approval, or implementation.
-
 ## 5A. Interview execution kit (ready to use; no sessions claimed)
 
 ### 60-second recruitment screener
@@ -156,6 +130,33 @@ A session is usable evidence only when its record contains screener fit, consent
 
 This execution kit is preparation only. At snapshot time, no participant has been recruited or interviewed through this plan; WU-SAAS-USER-MARKET-RESEARCH remains in progress.
 
+## 6. Synthesis rules and proposed success metrics
+
+After interviews, cluster repeated observed jobs/pains and preserve contradictions. Count participants per observation; do not convert frequency from a small qualitative sample into a population estimate. Follow with a task-based prototype test and a larger survey only if a decision still needs quantification.
+
+Candidate outcome metrics to test with users:
+- Time from brief to first rights-eligible, usable lead.
+- Accepted-lead rate under user-defined required fields.
+- Duplicate and stale-record rates on a labeled sample.
+- Setup completion and first successful run.
+- Schedule success/partial/failure visibility and recovery time.
+- User understanding of source, field provenance and paid cap before run.
+- Cost per usable lead by source/market/niche.
+- Repeat use and export/CRM handoff completion.
+
+No numerical target is approved yet. Baselines must come from observed workflows and a measured permitted-source sample.
+
+## 7. Decision gates
+
+Do not complete WU-SAAS-USER-MARKET-RESEARCH until:
+- The launch segment and top user job have interview evidence and at least one counterexample/contradiction review.
+- Competitor comparison uses observed documented workflows/features, not only marketing summaries.
+- MVP outcome metric and baseline collection method are chosen with user evidence.
+- Business discovery vs named-contact enrichment distinction is resolved.
+- Interviews are completed or explicitly recorded as blocked by unavailable participants; do not imply validation if only desk research exists.
+
+After that, take WU-SAAS-MVP-DECISIONS and record owner decisions as ANPOS ADRs. User research does not authorize source use, paid provider activation, stack approval, or implementation.
+
 ## Pricing sources
 - Apollo pricing and external-product restrictions: https://www.apollo.io/pricing
 - Hunter plans and API-only Data Platform: https://hunter.io/pricing
@@ -163,3 +164,8 @@ This execution kit is preparation only. At snapshot time, no participant has bee
 - Seamless.AI Prospector and pricing: https://seamless.ai/products/prospector and https://seamless.ai/pricing
 - Outscraper Google Maps crawler, pricing and Terms of Service: https://outscraper.com/google-maps-crawler/, https://outscraper.com/pricing/, https://outscraper.com/terms-of-service/
 - Google Places API usage and billing: https://developers.google.com/maps/documentation/places/web-service/usage-and-billing
+- Foursquare Places API pricing: https://foursquare.com/pricing/
+- Foursquare Places delivery overview: https://docs.foursquare.com/data-products/docs/places-delivery-overview
+- Foursquare Places API migration/pricing notice: https://docs.foursquare.com/developer/reference/upcoming-changes
+- Foursquare Developer Console terms onboarding: https://docs.foursquare.com/developer/docs/developer-console-get-started
+- Foursquare FSQ OS Places release notes: https://docs.foursquare.com/data-products/docs/fsq-os-places-release-notes

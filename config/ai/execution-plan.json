@@ -431,7 +431,8 @@
         "Customer interviews, task tests and validated launch segment/MVP outcomes are still outstanding; research unit remains in_progress.",
         "config/research/evidence-registry.json EVID-000020 through EVID-000022 and the research workbench pricing snapshot: Apollo credit/cap and external-product terms, Hunter plan/API credit distinction, Clay displayed-price inconsistency documented.",
         "Evidence registry EVID-000023–000026 and research workbench section 3A: official Seamless.AI, Outscraper workflow/pricing/terms, and Google Places field-mask/SKU billing desk review added; source demand/right/price approval and user validation remain outstanding.",
-        "Commit c9bf27d12193083356f501450dc7a27fb1906f96 adds section 5A to docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md: recruitment screener, copy-ready invitation and consent script, interviewer run sheet, synthesis worksheet, and session evidence checklist. Preparation only; no participant recruitment/interviews claimed; WU remains in_progress."
+        "Commit c9bf27d12193083356f501450dc7a27fb1906f96 adds section 5A to docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md: recruitment screener, copy-ready invitation and consent script, interviewer run sheet, synthesis worksheet, and session evidence checklist. Preparation only; no participant recruitment/interviews claimed; WU remains in_progress.",
+        "Foursquare source/pricing evidence EVID-000027–000029 is recorded as product/source desk research only; it is not customer-demand evidence and does not close user interviews or validate a segment."
       ]
     },
     {
@@ -455,7 +456,8 @@
       "completion_evidence": [
         "docs/ai/LEAD-SAAS-SOURCE-FEASIBILITY.md: source-by-source fields, geography, rights/storage/attribution, pricing/usage, and unresolved checks recorded.",
         "config/research/evidence-registry.json EVID-000011 through EVID-000016: Overture, OSM/Overpass, Google Places, Apollo, Hunter and Clay primary-source evidence.",
-        "No provider or adapter selected; contract, country/niche yield sample tests, source-specific legal review and actual procurement remain gates under WU-SAAS-MVP-DECISIONS."
+        "No provider or adapter selected; contract, country/niche yield sample tests, source-specific legal review and actual procurement remain gates under WU-SAAS-MVP-DECISIONS.",
+        "docs/ai/LEAD-SAAS-SOURCE-FEASIBILITY.md and evidence registry EVID-000027–000029 add an official Foursquare Places API/flat-file desk review. Pricing and vendor-stated coverage are recorded with the 500-vs-10,000 free-call inconsistency; exact new-API/flat-file storage, export and redistribution rights plus country/niche yield remain unresolved. No provider selected."
       ]
     },
     {
@@ -713,5 +715,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "WU-SAAS-USER-MARKET-RESEARCH remains in_progress: desk research and interview execution kit are prepared, but no interviews, task tests, validated segment, or user-backed MVP outcome exist. WU-SAAS-MVP-DECISIONS remains blocked pending research, owner choices, and source-specific rights/yield/economics. Runner minimization remains required."
+  "progress_note": "WU-SAAS-USER-MARKET-RESEARCH remains in_progress: desk research and interview execution kit are prepared, but no interviews, task tests, validated segment, or user-backed MVP outcome exist. Foursquare pricing/coverage desk evidence was added with unresolved terms and pricing discrepancy; it is not demand validation. WU-SAAS-MVP-DECISIONS remains blocked pending research, owner choices, and source-specific rights/yield/economics. Runner minimization remains required."
 }

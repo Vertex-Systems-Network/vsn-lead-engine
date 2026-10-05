@@ -739,6 +739,95 @@
       "notes": [
         "Official usage/billing doc explicitly describes field masks and highest applicable SKU."
       ]
+    },
+    {
+      "id": "EVID-000027",
+      "claim_or_question": "Foursquare's public Places API pricing page accessed 2026-10-05 lists Pro calls at 0–500 free, then $15 CPM for 501–100,000, $12 CPM for 100,001–500,000, and $9 CPM for 500,001+; Premium endpoint/field pricing starts at $18.75 CPM up to 100,000. The same page footer advertises up to 10,000 free Pro calls.",
+      "source_type": "primary",
+      "source_ref": "https://foursquare.com/pricing/",
+      "source_title": "Foursquare pricing",
+      "publisher_or_owner": "Foursquare",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "The page's own Pro free-call statements conflict (500 in the tier table versus up to 10,000 in the footer). It also makes pricing endpoint/field-tier-dependent. Treat displayed pricing as an observed snapshot, not a confirmed quote; resolve plan eligibility, counting semantics and current SKU before modeling cost.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Pricing page accessed 2026-10-05 shows both figures.",
+        "Upcoming Changes doc also lists 500 free Pro calls and rates effective June 1, 2026: https://docs.foursquare.com/developer/reference/upcoming-changes.",
+        "CPM is the unit as displayed; confirm exact billing semantics with Foursquare before procurement."
+      ]
+    },
+    {
+      "id": "EVID-000028",
+      "claim_or_question": "Foursquare's official Places delivery page markets 100M+ commercial points of interest, 200+ countries and territories, and 1,100+ venue categories, and describes API and flat-file delivery.",
+      "source_type": "primary",
+      "source_ref": "https://docs.foursquare.com/data-products/docs/places-delivery-overview",
+      "source_title": "Places Delivery Overview",
+      "publisher_or_owner": "Foursquare",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "This establishes the vendor's published product/coverage claims and delivery options only. It does not independently validate country/niche yield, field completeness, phone availability, price, or VSN's redistribution/storage rights.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Vendor claims need market/niche benchmark before any coverage promise.",
+        "Related pages: https://docs.foursquare.com/data-products/docs/places-overview and https://foursquare.com/pricing/."
+      ]
+    },
+    {
+      "id": "EVID-000029",
+      "claim_or_question": "For VSN's proposed multi-tenant lead SaaS, the reviewed public Foursquare Places product/pricing pages do not establish current new-API and flat-file rights for persistent storage, customer export/redistribution, attribution, or exact contact-field availability; these remain provider/legal review questions.",
+      "source_type": "primary",
+      "source_ref": "https://docs.foursquare.com/developer/docs/developer-console-get-started",
+      "source_title": "Foursquare Developer Console Get Started",
+      "publisher_or_owner": "Foursquare",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "unknown",
+      "confidence": "medium",
+      "summary": "Foursquare's developer onboarding says users must accept its Developer Master Terms, but this review did not establish that contract's application to VSN's proposed lead-database and resale use. A separate Usage Guidelines page explicitly addresses the Personalization API; do not assume it governs the newer Places API without confirming scope. Obtain and review the exact applicable agreement before integration or export.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Current API migration notice: https://docs.foursquare.com/developer/reference/upcoming-changes.",
+        "Personalization API usage guidelines (scope must be checked): https://docs.foursquare.com/developer/reference/usage-guidelines-personalization-apis.",
+        "No vendor contact, account, API key, or agreement was used/obtained."
+      ]
     }
   ],
   "entry_contract": {
