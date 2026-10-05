@@ -1004,6 +1004,202 @@
         "Review exact executed subscription and contract with qualified counsel before any integration or customer-facing use.",
         "Do not generalize this self-service EULA to a separate negotiated license."
       ]
+    },
+    {
+      "id": "EVID-000036",
+      "claim_or_question": "How do current Apollo product docs describe saved-search reuse, sharing and alerts?",
+      "source_type": "primary",
+      "source_ref": "https://knowledge.apollo.io/hc/en-us/articles/4409803718669-Save-Share-and-Set-Alerts-for-Searches",
+      "source_title": "Save, Share, and Set Alerts for Searches",
+      "publisher_or_owner": "Apollo",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Apollo help documents creating reusable people/company/deal/task searches, sharing searches with selected teammates or company members at defined access levels, and daily/weekly/monthly alerts for new matches. This verifies a vendor-described workflow only; no usability test or customer-demand claim is made.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Official help center page reviewed 2026-10-06.",
+        "Vendor-described capability is not proof of VSN user demand."
+      ]
+    },
+    {
+      "id": "EVID-000037",
+      "claim_or_question": "Do Apollo's currently displayed standard plans permit VSN to use records in a customer-facing SaaS or resell them?",
+      "source_type": "primary",
+      "source_ref": "https://www.apollo.io/pricing",
+      "source_title": "Apollo pricing and external-product restriction",
+      "publisher_or_owner": "Apollo",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Apollo's pricing page states the listed plans are for internal business use and use to power external products, share with customers, or resell is not permitted under standard terms; those use cases require a separate agreement with custom pricing. This is a vendor-page summary, not legal advice or a review of any negotiated contract.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Recheck the exact contract and current checkout terms before a provider decision."
+      ]
+    },
+    {
+      "id": "EVID-000038",
+      "claim_or_question": "Does Clay currently separate platform usage from third-party data/AI consumption in its pricing model?",
+      "source_type": "primary",
+      "source_ref": "https://www.clay.com/pricing",
+      "source_title": "Clay current plan and usage pricing page",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Clay's current pricing page distinguishes platform Actions for enrichment/GTM execution from Data Credits used to buy data and AI from vendors; it also lists credit reporting and plan-dependent top-ups/budgets. This confirms separate metering concepts, not that VSN users prefer usage-based pricing. Displayed prices vary across page/version views and are not frozen here.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "No current price point is adopted; quote/checkout and regional terms must be rechecked before purchase."
+      ]
+    },
+    {
+      "id": "EVID-000039",
+      "claim_or_question": "How does Hunter describe team credit governance and the separation between data plans and outreach sequences?",
+      "source_type": "primary",
+      "source_ref": "https://help.hunter.io/en/articles/11131690-pricing-plans-and-feature-faqs",
+      "source_title": "Pricing, Plans and Feature FAQs",
+      "publisher_or_owner": "Hunter",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Hunter's current FAQ says credits are shared across a team, per-member limits can be set, paid plans can purchase additional credit packs, and Data Platform plans do not include Sequences. This supports a documented distinction between data usage and outreach features; it does not establish local-business coverage, VSN buyer demand, or resale rights.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Official FAQ reviewed 2026-10-06."
+      ]
+    },
+    {
+      "id": "EVID-000040",
+      "claim_or_question": "What do current Sales Navigator docs say about reusable lead/account searches and alerts?",
+      "source_type": "primary",
+      "source_ref": "https://www.linkedin.com/help/sales-navigator/answer/a102024/",
+      "source_title": "Save lead and account searches in Sales Navigator",
+      "publisher_or_owner": "LinkedIn",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "LinkedIn's help page states saved lead/account searches retain filter criteria, can generate weekly email and in-product alerts for new matches, and can be shared with colleagues. This is a workflow benchmark only and does not grant permission to extract, store, or resell LinkedIn content.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [
+        "EVID-000034"
+      ],
+      "notes": [
+        "Official help content rechecked 2026-10-06; prior EVID-000034 covered a different Sales Navigator guide."
+      ]
+    },
+    {
+      "id": "EVID-000041",
+      "claim_or_question": "How does Outscraper document local map search submission and task retrieval?",
+      "source_type": "primary",
+      "source_ref": "https://docs.outscraper.com/endpoints/maps-search/",
+      "source_title": "Maps Search API Reference",
+      "publisher_or_owner": "Outscraper",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "The Maps Search API documentation describes multi-query place search and a synchronous/asynchronous submission option; its Tasks API documents later task lookup. This is evidence of an async job interaction pattern only; it does not establish data accuracy, upstream permission, VSN customer-facing rights, or provider selection.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Task retrieval documentation: https://docs.outscraper.com/endpoints/tasks/.",
+        "No paid account or sample was run."
+      ]
+    },
+    {
+      "id": "EVID-000042",
+      "claim_or_question": "What storage/cache limit does the current Google Places API policy state?",
+      "source_type": "primary",
+      "source_ref": "https://developers.google.com/maps/documentation/places/web-service/policies",
+      "source_title": "Policies and attributions for Places API (New)",
+      "publisher_or_owner": "Google Maps Platform",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Google's current Places policy says Places content generally must not be prefetched, cached, or stored except for specified exceptions; place IDs are exempt from caching restrictions. This highlights a material constraint for persistent lead export workflows. It is not a complete legal analysis of any proposed implementation or separately licensed arrangement.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [
+        "EVID-000013"
+      ],
+      "notes": [
+        "Re-check field-specific terms and implementation guidance before integration."
+      ]
     }
   ],
   "entry_contract": {
