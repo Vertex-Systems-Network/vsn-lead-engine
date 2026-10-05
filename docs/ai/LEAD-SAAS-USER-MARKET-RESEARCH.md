@@ -59,7 +59,7 @@ Apollo's official guidance documents AND logic across filters and OR logic among
 This is competitor/source workflow desk research only. It does not constitute customer validation, comparative testing, a legal determination, or source selection. Evidence IDs EVID-000023–000032 are in the registry. The separate first-party incumbent workflow case is EVID-000033.
 
 
-### Source evidence crosswalk for sections 3B–3C
+### Source evidence crosswalk for sections 3B–3D
 
 The competitor statements above map to the existing ANPOS evidence registry as follows. These registry items establish documented workflows and source terms only; they are not user-demand findings or legal approvals.
 
@@ -298,3 +298,35 @@ Use a clickable prototype or paper screens, not a working source integration. Po
 Do not predeclare a numeric pass threshold. After the planned sessions, compare actual behaviors and counterexamples across the recruited segments, decide whether task wording/prototype defects biased results, and then propose a threshold with its rationale before any larger usability test. A task that works in a prototype does not prove provider rights, deliverable lead quality, willingness to pay, or market size.
 
 No prototype has been built or tested through this plan as of this snapshot. This section is test preparation only.
+
+
+## 3D. Low-fidelity screen storyboard for the prototype tasks
+
+Status: specification only. This defines a neutral, repeatable set of screens for a paper or clickable mock. It is not a product specification or a provider integration. Keep a visible banner on every screen: **“Research prototype — fictional data only — no search or collection runs.”**
+
+| Screen | Contents and controls | Participant sees / does | Research purpose |
+|---|---|---|---|
+| S0 — Task entry | Three task cards: “Build a local business list,” “Find the right contact,” “Set up a repeat run.” Intro text says this is a research prototype and that records/costs are simulated. | Moderator reads the applicable T1/T2/T3 task card; participant chooses the next action without coaching. | Check whether the user understands the job options and whether place discovery and contact discovery should be separate. |
+| S1 — Define search | Fields: target (businesses or people), country, state/region, city, niche/category, optional radius; “business status” is selectable only as a requested filter and annotated “availability depends on source.” A “required fields” checklist is participant-controlled. | Participant configures a task in their own words; capture missing options and order of choices. | Learn the user’s vocabulary, required filters, and whether fields like phone/email are mandatory or optional. |
+| S2 — Review source and run estimate | Source cards all labeled “Not selected / permission and coverage not verified”; data fields list; estimate card reads “No verified estimate in this prototype”; hard-cap input reads “Choose a limit for the test”; buttons “Edit search” and “Continue to simulated results.” | Participant decides what evidence/cost/limit they need before proceeding; mock continue does not call a source. | Test trust and spend-control expectations without making false cost, coverage, source or permission claims. |
+| S3 — Simulated results | Three synthetic rows named “Example Business A/B/C,” city “Sample City,” fields display “Example only,” status “Mock source,” freshness “Not checked”; filters and export control are visible, but export downloads nothing. | Participant assesses what is missing, marks a hypothetical row usable/unusable, and explains what source/freshness evidence they would need. | Reveal acceptance/rejection criteria, provenance expectations, duplicate checks, and export needs. |
+| S4 — Contact discovery branch | After S3, an optional “Find decision-maker contacts” action opens a separate explainer: “This prototype has no contact-data source. What would you do next in your real process?” | Participant narrates whether they expect person records, a separate tool, CRM handoff or manual research; no fake contact records appear. | Distinguish place/business discovery from named-person prospecting and identify provider dependency. |
+| S5 — Recurring job | Frequency (off/weekly), day/time, timezone shown explicitly, notification choice, “Pause/cancel anytime” control, and limit field. Confirmation states “Simulation only — no job has been scheduled.” | Participant configures a hypothetical repeat run and explains what failure, partial completion, cost or approval notice they need. | Determine whether recurring schedules belong in the first workflow and what operational controls users need. |
+
+### Navigation and content rules
+
+- T1 uses S0 → S1 → S2 → S3. T2 starts from S3 → S4, then ask what they would do next. T3 uses S0 → S1 → S2 → S5.
+- Use the exact same fictional rows, field values, labels and task wording for each participant. Do not use actual business/contact records, competitor data, provider logos, or unverified prices.
+- Keep source, coverage, freshness and price as unknown placeholders. Do not let the visual design imply a provider is approved or a result is truly verified.
+- Keep all controls keyboard reachable with visible focus; use plain labels, readable contrast and responsive layout. Record accessibility friction as a finding.
+- If participant asks to run, export, save, email or schedule real data, explain that the research mock does not perform those actions. Do not enter personal or client data into the prototype.
+
+### Moderator observation sheet
+
+| Participant ID | Task | Starting screen | Click/choice path | Needed help | Confusing/misread control | Required fields named | Trust/cost/freshness evidence requested | Participant workaround | Outcome/quote | Researcher interpretation |
+|---|---|---|---|---|---|---|---|---|---|---|
+| pending | T1/T2/T3 | untested | untested | untested | untested | unknown | unknown | unknown | none | unassessed |
+
+Record observable behavior separately from opinion. No pass score is assigned in advance; propose thresholds only after the planned sessions and review of counterexamples. Screen completion does not prove demand, data rights, source quality, cost viability, willingness to pay, or product-market fit.
+
+This storyboard is ready for prototyping/review but has not been rendered, tested or shown to participants. WU-SAAS-USER-MARKET-RESEARCH remains in_progress.
