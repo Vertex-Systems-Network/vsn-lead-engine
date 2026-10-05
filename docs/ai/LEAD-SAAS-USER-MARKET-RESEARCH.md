@@ -1,6 +1,6 @@
 # SaaS User and Market Research Workbench
 
-Research snapshot: 2026-10-06 PKT — refreshed with Lusha and Lead411 primary-source workflow docs  
+Research snapshot: 2026-10-06 PKT — refreshed with Lusha and Lead411 workflow/pricing cross-check  
 ANPOS work unit: WU-SAAS-USER-MARKET-RESEARCH  
 Status: active — desk-research package refreshed; external validation pending  
 Evidence boundary: No customer interviews, surveys, pricing tests, or product trials have been conducted for this plan. Competitor documentation describes vendor workflows; it does not validate VSN customer demand or vendor performance.
@@ -69,7 +69,7 @@ Apollo's official guidance documents AND logic across filters and OR logic among
 | Yelp Places API | Business Search, Phone Search, Business Match and Details cover local listing lookup; API result listings require user-generated content or contributions, Search is capped at 50/page and 240/query. Yelp FAQ allows 24-hour content cache, says commercial analysis is not permitted, and reserves additional fields/use cases for Yelp Places Enterprise. Trial is evaluation-only; paid call allowance is metered and exact price isn't stated in the public FAQ. | Strong product/rights mismatch risk for a persistent lead export: retain only IDs indefinitely per FAQ, not full content; written Enterprise/paid terms must explicitly clear VSN's intended multi-tenant storage/export/analysis before even a pilot. Desk research only; no demand signal. FAQ gives 5,000 calls/30-day trial, while rate-limit docs state 300/day for a Starter trial plan, so actual plan/quota must be confirmed. | Yelp's reviewed source constraints signal a potential mismatch but aren't a legal conclusion about any negotiated Enterprise agreement. No vendor contacted and no source selected. |
 | Foursquare Places | Foursquare advertises 100M+ commercial POIs, 200+ countries/territories and 1,100+ venue categories across its Places products; the API uses Pro/Premium endpoint pricing, and a separate flat-file offer is available. | A relevant location-source comparator; evaluate business/place discovery separately from named-contact prospecting and exact requested fields. | Vendor coverage claims are not independent yield evidence. Pricing page conflict: its Pro table lists 500 free calls, while the page footer says up to 10,000 free Pro calls; field tier changes endpoint pricing. Current new Places API terms for persistent lead storage, export/resale and attribution, flat-file quote/rights, contact-field availability, and market/niche yield remain unresolved. Legacy V3 endpoints had a May 15, 2026 deprecation date; validate against the current API. No selection. |
 
-This is competitor/source workflow desk research only. It does not constitute customer validation, comparative testing, a legal determination, or source selection. Evidence IDs EVID-000023–000032 and EVID-000043–000050 are in the registry (50 entries total). The separate first-party incumbent workflow case is EVID-000033.
+This is competitor/source workflow desk research only. It does not constitute customer validation, comparative testing, a legal determination, or source selection. Evidence IDs EVID-000023–000032 and EVID-000043–000051 are in the registry (51 entries total). The separate first-party incumbent workflow case is EVID-000033.
 
 
 ### Source evidence crosswalk for sections 3B–3D
@@ -92,7 +92,7 @@ The competitor statements above map to the existing ANPOS evidence registry as f
 | OpenStreetMap data license and service boundary | EVID-000046 | Official copyright/license page; ODbL and service policies are separate checks. |
 | Apollo current data licensing and API restrictions | EVID-000047–000048 | Current official Developer FAQ and API Terms; no VSN custom contract exists. |
 | Lusha contact prospecting | EVID-000049 | Official help workflow for filters, contact reveal/credits, tables, saved searches and exports; no independent quality or demand evidence. |
-| Lead411 SMB local-business leads | EVID-000050 | Vendor-advertised daily small-business lead dashboard/API/CSV workflow; coverage and performance unverified. |
+| Lead411 SMB local-business leads and commercial claims | EVID-000050–000051 | Vendor-advertised daily small-business lead dashboard/API/CSV/MCP workflow, size/freshness claims, and unreconciled product-vs-general pricing displays; performance unverified. |
 
 The hypothesis set H1–H7 is a researcher-generated set of propositions informed by the desk evidence and incumbent case. It has no direct participant evidence; keep all seven marked unvalidated until interviews/task tests produce observations.
 
