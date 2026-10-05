@@ -918,6 +918,36 @@
       "claim_or_question": "What quota does Yelp document for rate limiting, and does it align with its FAQ trial totals?",
       "source_ref": "https://docs.developer.yelp.com/docs/places-rate-limiting",
       "summary": "Yelp's Rate Limiting page describes signup-selected Starter trials as limited to 300 API calls per 24 hours, with remaining/max/reset quota headers; the FAQ separately says trial users receive up to 5,000 calls during 30 days and describes the paid default. This is a public-docs discrepancy or plan-level distinction and cannot be resolved without the selected plan/account quota."
+    },
+    {
+      "id": "EVID-000033",
+      "claim_or_question": "What concrete lead-collection job and constraints are already present in VSN's incumbent engine, and which can serve as a first-party comparison baseline without being treated as market validation?",
+      "source_type": "repository",
+      "source_ref": "https://github.com/Vertex-Systems-Network/vsn-lead-engine/blob/0be495f0035df485089c33b1a74bdb93e96b959d/docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md",
+      "source_title": "VSN Lead Engine SaaS Direction — Existing Lead Engine Capability Audit",
+      "publisher_or_owner": "VSN",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": "Audit states production repository main at ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "The repository audit records one internal lead workflow: 56 configured US/Canada geographies, 12 fixed categories, free-only source mode, a 1,000-record/category operating target, normalized phone required for accepted leads, Google Sheets output, R2-backed cross-day deduplication, and fixed GitHub Actions scheduling with Asia/Karachi safeguards. This is an incumbent operating case only; it does not establish customer demand, delivered yield, or the suitability of these constraints for a multi-tenant product.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-USER-SCHEDULES",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Read-only source/config/runtime audit; no live production run, customer workbook, provider account, or yield sample was accessed.",
+        "Keep VSN-specific operating choices separate from external user evidence and SaaS acceptance criteria."
+      ]
     }
   ],
   "entry_contract": {

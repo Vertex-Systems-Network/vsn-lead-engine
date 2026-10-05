@@ -27,6 +27,14 @@ Evidence boundary: No customer interviews, surveys, pricing tests, or product tr
 
 Do not pick a launch segment from this table without observed interviews and sample workflows.
 
+### First-party operating case: VSN's existing lead workflow (repository evidence, not customer validation)
+
+The audited production engine provides one concrete internal workflow to compare against the segment hypotheses: 56 configured US/Canada geographies and 12 fixed categories; free-only source mode; an operating target of 1,000 records per category; normalized phone required for acceptance; Google Sheets delivery; cross-day deduplication using an R2 fingerprint ledger; and fixed GitHub Actions scheduling with Asia/Karachi safeguards. These are repository configuration/runtime facts and operating choices, not measured SaaS demand, a yield guarantee, or a validated customer requirement.
+
+Use this case to ask in future interviews which parts generalize: phone-required acceptance, repeated scheduled collection, category/location controls, spend/source visibility, cross-run deduplication, and spreadsheet/CRM handoff. Treat the 1,000-per-category target, fixed geography/taxonomy, free-only mode, and operator-driven recovery as VSN-specific constraints until another user demonstrates the same need. The audit found no SaaS tenancy, subscription, API or customer job scheduler in the current repo.
+
+Source: `docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md` (read-only audit against main commit `ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2`). No live production run, customer workbook, provider account or yield sample was examined.
+
 ## 3. Competitor workflow desk review
 
 | Product | Documented journey | Useful product lesson | Important boundary |

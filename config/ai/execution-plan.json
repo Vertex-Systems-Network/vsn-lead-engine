@@ -433,7 +433,8 @@
         "Evidence registry EVID-000023–000026 and research workbench section 3A: official Seamless.AI, Outscraper workflow/pricing/terms, and Google Places field-mask/SKU billing desk review added; source demand/right/price approval and user validation remain outstanding.",
         "Commit c9bf27d12193083356f501450dc7a27fb1906f96 adds section 5A to docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md: recruitment screener, copy-ready invitation and consent script, interviewer run sheet, synthesis worksheet, and session evidence checklist. Preparation only; no participant recruitment/interviews claimed; WU remains in_progress.",
         "Foursquare source/pricing evidence EVID-000027–000029 is recorded as product/source desk research only; it is not customer-demand evidence and does not close user interviews or validate a segment.",
-        "Yelp Places evidence EVID-000030–000032 and market-research section 3A add a conditional source/workflow comparator only; no customer interviews, task tests or demand validation are claimed."
+        "Yelp Places evidence EVID-000030–000032 and market-research section 3A add a conditional source/workflow comparator only; no customer interviews, task tests or demand validation are claimed.",
+        "EVID-000033 and the first-party operating-case subsection of docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md capture the current repository workflow as an internal comparison baseline only; it is not customer validation and does not close user interviews or validate SaaS demand."
       ]
     },
     {
@@ -717,5 +718,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "WU-SAAS-USER-MARKET-RESEARCH remains in_progress: desk research and interview execution kit are prepared, but no interviews, task tests, validated segment, or user-backed MVP outcome exist. Foursquare and Yelp source/pricing desk evidence was added with unresolved terms, quotas and pricing discrepancies; neither is demand validation or source approval. WU-SAAS-MVP-DECISIONS remains blocked pending research, owner choices, and source-specific rights/yield/economics. Runner minimization remains required."
+  "progress_note": "WU-SAAS-USER-MARKET-RESEARCH remains in_progress: competitor/source desk review, interview kit, and a repository-grounded first-party operating case are prepared; no external user interviews, task tests, validated segment, or user-backed MVP outcome exist. Foursquare and Yelp evidence has unresolved terms, quotas and pricing; neither is source approval or demand validation. WU-SAAS-MVP-DECISIONS remains blocked pending user research, owner choices, and source-specific rights/yield/economics. Runner minimization remains required."
 }
