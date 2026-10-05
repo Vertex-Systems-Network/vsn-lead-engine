@@ -58,6 +58,26 @@ Apollo's official guidance documents AND logic across filters and OR logic among
 
 This is competitor/source workflow desk research only. It does not constitute customer validation, comparative testing, a legal determination, or source selection. Evidence IDs EVID-000023–000032 are in the registry. The separate first-party incumbent workflow case is EVID-000033.
 
+
+### Source evidence crosswalk for sections 3B–3C
+
+The competitor statements above map to the existing ANPOS evidence registry as follows. These registry items establish documented workflows and source terms only; they are not user-demand findings or legal approvals.
+
+| Competitor / claim group | Evidence IDs | Scope |
+|---|---|---|
+| Apollo filter/search and usage/resale terms | EVID-000014, EVID-000017, EVID-000020 | Official product/pricing/terms documentation; no VSN license inferred. |
+| Clay provider waterfalls and two-meter model | EVID-000005, EVID-000018, EVID-000016, EVID-000022 | Official workflow and pricing comparator. |
+| Hunter discovery/email verification/plans | EVID-000006, EVID-000015, EVID-000019, EVID-000021 | Official product/API/pricing comparator. |
+| Seamless.AI contact workflow | EVID-000023 | Vendor-described workflow; marketing claims not independently tested. |
+| Outscraper task flow, price and terms | EVID-000024, EVID-000025 | Product/pricing/terms capture; no upstream permission or redistribution rights inferred. |
+| Google Places policy and field-mask billing | EVID-000002, EVID-000013, EVID-000026 | Official storage/display policy and SKU/field pricing evidence. |
+| Yelp Places workflow, cache/analysis and rate limits | EVID-000030–EVID-000032 | Official API docs; plan-specific limits and intended SaaS use still need confirmation. |
+| Foursquare product, pricing and self-service restrictions | EVID-000027–EVID-000029, EVID-000035 | Official public pages and self-service EULA; obtain qualified review of the exact VSN subscription and use. |
+| LinkedIn Sales Navigator saved lead/search workflow | EVID-000034 | Official help workflow only; no data extraction/storage rights inferred. |
+| VSN internal comparison case | EVID-000033 | Repository facts only; not customer or market validation. |
+
+The hypothesis set H1–H7 is a researcher-generated set of propositions informed by the desk evidence and incumbent case. It has no direct participant evidence; keep all seven marked unvalidated until interviews/task tests produce observations.
+
 ## 4. Competitor pricing and commercial shape (official pages, 2026-10-05)
 
 Prices below are vendor-published retail plan observations, not wholesale API rates and not a recommendation for VSN prices.
