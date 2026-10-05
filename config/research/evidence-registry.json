@@ -1200,6 +1200,179 @@
       "notes": [
         "Re-check field-specific terms and implementation guidance before integration."
       ]
+    },
+    {
+      "id": "EVID-000043",
+      "claim_or_question": "What does the current Overture Places guide say about the Places theme's upstream sources, licensing model, data properties and release characteristics?",
+      "source_type": "primary",
+      "source_ref": "https://docs.overturemaps.org/guides/places/",
+      "source_title": "Places Guide: sources, licensing, schema and quality",
+      "publisher_or_owner": "Overture Maps Foundation",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "The official guide describes the Places theme as having no OpenStreetMap data and says licensing depends on source, with CDLA Permissive 2.0 and Apache 2.0 among the stated licenses. It documents place properties such as names, taxonomy, confidence, addresses, websites, phones/emails when present, and GERS identity. The guide's September 2026 source table reports roughly 81 million feature records across named contributors; this is vendor-published aggregate data, not independent coverage or yield evidence for VSN's target market.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Vendor documentation does not guarantee phone/email completeness or currentness for any chosen niche/geography.",
+        "No sample benchmark, vendor contact, or independent data-quality test was performed."
+      ]
+    },
+    {
+      "id": "EVID-000044",
+      "claim_or_question": "What source-specific licenses and attribution does Overture currently document for the Places theme?",
+      "source_type": "primary",
+      "source_ref": "https://docs.overturemaps.org/attribution/",
+      "source_title": "Attribution and Licensing",
+      "publisher_or_owner": "Overture Maps Foundation",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Overture's licensing page lists Places sources and applicable licenses: several named sources under CDLA Permissive 2.0, Foursquare-derived data under Apache 2.0, and AllThePlaces under CC0 1.0. This supports maintaining a release/source-to-license mapping; it does not establish that any particular VSN storage, transformation, joining, or customer-export model is approved.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Do not generalize the Places theme's no-OSM statement to all Overture themes or to a VSN dataset later joined with OSM.",
+        "Obtain qualified review for the intended product use and applicable release/source terms."
+      ]
+    },
+    {
+      "id": "EVID-000045",
+      "claim_or_question": "How does Overture publish and version its source data releases?",
+      "source_type": "primary",
+      "source_ref": "https://docs.overturemaps.org/getting-data/cloud-sources/",
+      "source_title": "Accessing the Overture Catalog",
+      "publisher_or_owner": "Overture Maps Foundation",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Official documentation says Overture publishes monthly releases, retains dated releases, and provides a STAC catalog; release assets include GERS registry/bridge files and a changelog. This makes release identifiers and lineage relevant for reproducible freshness/deduplication tests. It does not establish update timeliness for any individual business record.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "No release was downloaded or benchmarked for VSN."
+      ]
+    },
+    {
+      "id": "EVID-000046",
+      "claim_or_question": "What data license and public-service boundary does OpenStreetMap document?",
+      "source_type": "primary",
+      "source_ref": "https://www.openstreetmap.org/copyright",
+      "source_title": "Copyright and License",
+      "publisher_or_owner": "OpenStreetMap Foundation",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "OpenStreetMap states its data is licensed under ODbL, requiring attribution and share-alike when distributing an altered or built-upon database. The page separately states OSMF does not provide a free third-party map API or tile service and links to usage policies. Data-license permission and operational permission/capacity of a particular public service are separate questions.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "This is a primary-source summary, not a legal conclusion about a specific VSN database or derived-work design.",
+        "Review service-specific policies and capacity before any production use."
+      ]
+    },
+    {
+      "id": "EVID-000047",
+      "claim_or_question": "What contract does Apollo say is required to share, expose, or resell data to non-Apollo users?",
+      "source_type": "primary",
+      "source_ref": "https://docs.apollo.io/docs/developer-faqs",
+      "source_title": "Developer FAQs: Data Licensing",
+      "publisher_or_owner": "Apollo",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Apollo's current Developer FAQ says integrations that share, expose, or resell data to non-Apollo users require a custom contract with Apollo. This is a vendor-stated boundary for evaluation; no VSN contract has been negotiated or approved.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [
+        "EVID-000037"
+      ],
+      "notes": [
+        "Prior EVID-000037 summarizes the pricing-page restriction; this entry adds the current developer FAQ wording.",
+        "Do not infer a custom contract will be offered or commercially viable."
+      ]
+    },
+    {
+      "id": "EVID-000048",
+      "claim_or_question": "What restrictions do Apollo's current API Terms place on third-party API access or sublicensing?",
+      "source_type": "primary",
+      "source_ref": "https://www.apollo.io/terms/api",
+      "source_title": "Apollo API Terms of Service",
+      "publisher_or_owner": "Apollo",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Apollo API Terms say users must not sell, access, or sublicense the API for third-party use and prohibit use to replicate or compete with Apollo absent an applicable Apollo Agreement. This is a direct summary of published API restrictions, not legal advice or review of a negotiated agreement.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Re-read applicable agreement and obtain qualified review before any provider decision."
+      ]
     }
   ],
   "entry_contract": {
