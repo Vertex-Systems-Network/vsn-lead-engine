@@ -243,3 +243,38 @@ Official references reviewed:
 - Yelp Places FAQ: https://docs.developer.yelp.com/docs/places-faq
 - Foursquare self-service Places API EULA: https://foursquare.com/legal/terms/apilicenseagreement/
 - Foursquare SLA applicability: https://foursquare.com/legal/terms/places-api/sla/
+
+
+## 3C. Prototype task-test plan (prepared; no tests run)
+
+Purpose: distinguish observed workflow fit from stated interest and clarify whether local-business discovery and named-contact prospecting are one job or two. Use the same neutral low-fidelity prototype and identical fictional data for every participant. This is a research instrument, not a feature commitment.
+
+### Prototype task cards
+
+| Task | Participant prompt (read verbatim) | Observe without coaching | Decision informed |
+|---|---|---|---|
+| T1 — Local business discovery | “You have been asked to prepare a list of independent auto repair businesses in one city for a client. Use this prototype to create the list you would normally deliver. Stop when you believe it is ready.” | What geography/category they select; which filters they need; their own required fields; how they judge an estimate; whether they inspect source/freshness; when they consider results exportable; confusion or workaround. | Whether local business/place discovery is a coherent first job; required fields/filters; acceptable preview and export. |
+| T2 — Named contact vs place record | “For the same client, you now need to contact the person responsible for purchasing. Show what you would do next, using only options you would trust.” | Whether they expect a contact attached to each place, a separate people search, verification, CRM handoff, or manual research; what permissions/cost they expect; whether combining the two jobs creates confusion. | Whether named-person data is a separate phase/product and which source rights/data fields become hard gates. |
+| T3 — Recurring run and spend control | “Your client wants an updated list every Monday. Configure the repeat run so you are comfortable leaving it unattended. Show what must be visible before you save.” | Timezone/schedule interpretation; pause/cancel expectations; what estimate/cap they need; no-result/partial/failure handling; notification needs; who can approve paid use. | Whether scheduling belongs in MVP; minimum guardrails and whether manual-first is acceptable. |
+
+Use a clickable prototype or paper screens, not a working source integration. Populate it with clearly fictional/mock records labeled “sample data — not real leads.” Do not include competitor-owned records or imply an actual source license. Present source/cost values as labeled placeholders until benchmarked.
+
+### Moderator protocol and measures
+
+1. First ask the participant to narrate what they would do; do not explain controls unless they are blocked.
+2. Record task start/end, completed/abandoned, wrong turns, help needed, misunderstood labels, and any workaround.
+3. After each task ask: “What would you do next in your real work?”, “What would make this output unusable?”, and “What information was missing before you would trust/save this?”
+4. Ask for a confidence rating only after observing task behavior; retain the participant’s reason in their words. Do not treat a favorable rating as demand proof.
+5. Keep a separate note for prototype defects versus product/market mismatch. Any claim about provider coverage, legality, freshness, price or “verified” status must be visibly marked unknown until backed by actual evidence.
+
+### Per-participant result record
+
+| Participant ID / segment | Task | Completed? | Time / help / wrong turns | Fields and source requirements named | Trust/cost concerns | Workaround | Evidence quote/observation | Interpretation / confidence |
+|---|---|---|---|---|---|---|---|---|
+| pending | T1/T2/T3 | untested | untested | unknown | unknown | unknown | none | none |
+
+### Review rule
+
+Do not predeclare a numeric pass threshold. After the planned sessions, compare actual behaviors and counterexamples across the recruited segments, decide whether task wording/prototype defects biased results, and then propose a threshold with its rationale before any larger usability test. A task that works in a prototype does not prove provider rights, deliverable lead quality, willingness to pay, or market size.
+
+No prototype has been built or tested through this plan as of this snapshot. This section is test preparation only.
