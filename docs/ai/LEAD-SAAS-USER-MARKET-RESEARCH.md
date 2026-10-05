@@ -179,3 +179,67 @@ After that, take WU-SAAS-MVP-DECISIONS and record owner decisions as ANPOS ADRs.
 - Foursquare Developer Console terms onboarding: https://docs.foursquare.com/developer/docs/developer-console-get-started
 - Foursquare FSQ OS Places release notes: https://docs.foursquare.com/data-products/docs/fsq-os-places-release-notes
 - Yelp Places FAQ and rates: https://docs.developer.yelp.com/docs/places-faq and https://docs.developer.yelp.com/docs/places-rate-limiting
+
+
+## 3B. User/market hypothesis and competitor workflow synthesis refresh (2026-10-05)
+
+Status: desk research synthesized; external validation remains pending. Sources were public official product/help/pricing/policy documentation reviewed on 2026-10-05. Competitor descriptions are vendor-documented workflows and are not independent usability, quality, demand, or legal assessments.
+
+### Testable hypotheses (not findings)
+
+| ID | Hypothesis | Disconfirming evidence to seek | Minimum next validation |
+|---|---|---|---|
+| H1 | Small lead-generation/BPO agencies may need repeatable local-business discovery when they currently assemble lists from directories, spreadsheets, and scripts. | Recent workflows show no meaningful time/cost loss, or users primarily need named contacts instead of business records. | Recent-workflow interviews plus one niche/city task prototype. |
+| H2 | Search-to-export repeatability (saved criteria, job status/history, filters, freshness and provenance) may matter more than maximizing raw lead count. | Users only need one-off spreadsheets and do not value saved searches or repeat runs. | Walk through last real job; compare task completion with a neutral prototype. |
+| H3 | Phone-qualified records may differentiate VSN for calling workflows, but a phone-required rule may suppress usable coverage. | Phone is optional or its requirement sharply reduces acceptable coverage. | Let users choose required fields and measure acceptance/rejection on a permitted sample. |
+| H4 | Users may value visible per-job estimates and hard usage caps over vague/unlimited claims. | Users prefer fixed pricing and find metered estimates confusing or irrelevant. | Compare comprehension of mocked fixed-cap and usage-based flows; no real charges. |
+| H5 | Free-source-first with optional paid enrichment may be attractive only if source rights and field yield are viable. | Free data is insufficient, paid providers prohibit customer-facing use, or costs exceed viable economics. | Authorized small benchmark and written provider clearance for the exact SaaS use. |
+| H6 | Responsive web may satisfy initial demand before separate desktop/mobile apps. | Buyers need native/offline workflows or platform integrations that web cannot support. | Same task prototype tested at desktop and mobile breakpoints. |
+| H7 | Local business/place discovery and named-contact prospecting may be distinct products and should be tested separately. | Same buyer demonstrates a unified recent workflow and a common success metric. | Separate task tests; compare buyer, required data, source rights and unit economics. |
+
+These hypotheses are not ranked or validated. Existing VSN engine use is an internal operating case only, not external demand or willingness-to-pay evidence.
+
+### Competitor workflow comparison
+
+| Product | Documented flow | Product/commercial implication | Rights/validation boundary |
+|---|---|---|---|
+| Apollo | Apply people/company filters; review records; save lists or searches; enrich; export or sync CRM; optionally enroll in multi-touch sequences. | Benchmark understandable filter logic, reusable lists and a visible handoff from discovery to outreach. | Standard plan terms do not permit powering an external product, sharing customer-facing data or resale absent separate agreement. No SaaS rights assumed. |
+| Clay | Build a table/workflow; run enrichment/AI steps; order/skip providers with conditions; monitor Actions and Data Credits; sync results. BYOK changes data-credit treatment. | Benchmark per-step cost/provenance, workflow preview, provider order and explicit stop conditions. | It is an orchestration comparator, not a VSN data license. |
+| Hunter | Discover companies/domains; find and verify emails; save leads; use sequences; export or API. | Treat email finding/verification as a separate optional workflow and expose verification state and credit use. | Not evidence for phone-first place-discovery coverage or customer-facing data rights. |
+| LinkedIn Sales Navigator | Search/filter leads and accounts; save them into lists; save searches for alerts; share/collaborate; selected CRM actions depend on plan. | Saved criteria, list reuse and alerts are useful UX patterns to test. | Product UI access does not grant permission to extract, retain or resell LinkedIn data. |
+| Seamless.AI | Search/filter company/contact records; build lists; export or sync CRM; vendor describes extension, data verification and outreach actions. | Benchmark guided contact reveal, list handoff and CRM workflow. | Vendor performance claims are not independently tested; no redistribution rights assumed. |
+| Outscraper | Submit category/location queries; choose locations and filters; create synchronous/asynchronous tasks; poll status; enrich domains/emails; export files. | Strong local-search task/status/export comparator; test estimate, progress and partial/failure states. | Published service/pricing does not itself establish upstream data permission or rights to redistribute within a SaaS. |
+| Google Places API | Text/nearby search and place details with requested fields; content must be displayed according to attribution and API policies. | Exact field mask should drive cost preview; show source-aware display and limitations. | Places content is subject to caching/storage restrictions; place IDs are an exception. Not a default persistent bulk lead feed. |
+| Yelp Places API | Business search/details and related local lookup endpoints; access is key/plan/quota controlled. | Benchmark lookup/filter functionality, but do not infer bulk prospecting use from API availability. | FAQ states content cache up to 24 hours, business IDs may be stored indefinitely, and commercial analysis is not permitted for Places integrations. Plan-specific written clearance needed for any SaaS storage/export use. |
+| Foursquare Places API | Search/discover POIs and request details; entitlement/SLA depends on commercial terms. | Keep location discovery separate from contact prospecting and evaluate exact fields/yield. | Self-service terms restrict third-party/bulk availability, systematic locality extraction, service bureau/application provider use and lead generation unless expressly authorized via subscription. Treat as blocked absent explicit written rights. |
+
+### VSN prototype requirements suggested by desk research
+
+1. Search by market and niche, with optional location/area and only source-supported filters; visibly identify unsupported filters.
+2. Preview query scope, eligible source, fields, expected cost/cap and known limitations before the user starts a paid job.
+3. Show durable job ID and queued/running/partial/failed/completed states, timestamps, progress, cancel/retry and reason for failure.
+4. Support saved criteria and workspace deduplication; schedule recurring jobs only after recurrence need and source rights are validated.
+5. Show field-level source and last-checked time; distinguish missing from not found; use “verified” only for a defined validation method.
+6. Start with CSV export; gate CRM integrations on provider terms, user authorization, mapping and retention/deletion rules.
+7. Enforce provider/job/workspace caps and show estimated vs actual usage with a hard stop at the configured limit.
+8. Gate each connector by documented purpose, territory, fields, display, retention, onward-sharing, attribution and deletion entitlement, not by API-key presence alone.
+
+### Evidence and completion boundary
+
+Desk-research synthesis for the hypotheses and workflows above is complete for this snapshot. User/market validation is not complete: no participants have been interviewed, no prototype task test has been run, and no segment, price, source or MVP has been approved. Competitor hands-on testing and vendor legal/commercial clearance have not been performed. Keep WU-SAAS-USER-MARKET-RESEARCH active until interviews are completed or explicitly recorded as blocked; do not mark market demand validated from this desk research.
+
+Official references reviewed:
+- Apollo prospect filters: https://knowledge.apollo.io/hc/en-us/articles/4412665755661-Use-Search-Filters-to-Find-Prospects
+- Apollo pricing/data sharing restrictions: https://www.apollo.io/pricing
+- Clay pricing: https://www.clay.com/pricing
+- Clay Actions and Data Credits: https://university.clay.com/docs/actions-data-credits
+- Hunter plans: https://hunter.io/pricing/
+- Hunter plan FAQ: https://help.hunter.io/en/articles/11131690-pricing-plans-and-feature-faqs
+- LinkedIn Sales Navigator workflow: https://www.linkedin.com/help/sales-navigator/answer/a10728097
+- Seamless.AI contact search: https://seamless.ai/products/solutions/features/contact-search
+- Outscraper Maps API: https://docs.outscraper.com/endpoints/maps-search/
+- Outscraper pricing: https://outscraper.com/pricing/
+- Google Places API policy: https://developers.google.com/maps/documentation/places/web-service/policies
+- Yelp Places FAQ: https://docs.developer.yelp.com/docs/places-faq
+- Foursquare self-service Places API EULA: https://foursquare.com/legal/terms/apilicenseagreement/
+- Foursquare SLA applicability: https://foursquare.com/legal/terms/places-api/sla/
