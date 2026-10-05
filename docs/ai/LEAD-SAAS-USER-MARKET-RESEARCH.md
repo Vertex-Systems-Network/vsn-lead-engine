@@ -27,6 +27,19 @@ Evidence boundary: No customer interviews, surveys, pricing tests, or product tr
 
 Do not pick a launch segment from this table without observed interviews and sample workflows.
 
+### External participant routing and coverage plan
+
+Use the participant's most recent real task to classify them; do not classify only by job title or employer. Record a primary segment and, when applicable, a secondary role. Keep internal VSN operators as a separate first-party comparison and do not count them as external validation.
+
+| Code | Candidate segment | Count as a fit when the recent task shows… | Keep distinct from |
+|---|---|---|---|
+| AGENCY | Agency/BPO or lead-generation service | They personally built, bought, or quality-checked a business/contact list for an external client | In-house staff creating lists for their own employer |
+| INHOUSE | In-house B2B sales/marketing team | They personally built, bought, or used a list for their own organization's sales/marketing process | A consultant or vendor delivering a client list |
+| INDEPENDENT | Independent consultant/researcher | They personally assembled a business dataset for their own research or a client project, with no regular in-house team workflow | A list recipient who did not take part in sourcing or acceptance |
+| OTHER | Other/unclear job | They have relevant list use but do not fit the three groups above, or their role is only recipient/approver | Do not silently reassign OTHER to the closest-sounding segment |
+
+For an 8–12 person exploratory sample, recruit external participants across at least two of AGENCY, INHOUSE and INDEPENDENT; aim for 3–4 in each selected segment where recruitment allows. Include at least two people whose current workflow works adequately or who do not buy prospecting tools. These are coverage targets, not statistical quotas or a representative sample. Report every segment's actual n, including zero; if a cell is not recruited, mark it “not observed” rather than generalizing. Capture target countries/niches as participant experience, with no launch geography presumed.
+
 ### First-party operating case: VSN's existing lead workflow (repository evidence, not customer validation)
 
 The audited production engine provides one concrete internal workflow to compare against the segment hypotheses: 56 configured US/Canada geographies and 12 fixed categories; free-only source mode; an operating target of 1,000 records per category; normalized phone required for acceptance; Google Sheets delivery; cross-day deduplication using an R2 fingerprint ledger; and fixed GitHub Actions scheduling with Asia/Karachi safeguards. These are repository configuration/runtime facts and operating choices, not measured SaaS demand, a yield guarantee, or a validated customer requirement.
@@ -127,11 +140,12 @@ Ask only these routing questions; record category/band, not unnecessary personal
 1. In the last 90 days, have you personally built, purchased, or requested a list of businesses or business contacts? (yes/no)
 2. Which best describes your role in that work? (builds lists / requests or approves lists / uses lists / other)
 3. How often does this happen? (weekly or more / monthly / less often / never)
-4. Which is closest to the job? (find local businesses / find named decision-makers / enrich or verify contacts / combine and deliver data / other)
+4. Which best describes the most recent list job, and for whom was it done? (built a client list at an agency/BPO / built a list for own employer / assembled data as an independent consultant/researcher / only requested or received a list / other)
 5. Do you choose or influence tools and spending? (yes / shared / no)
 6. Would you be comfortable discussing the workflow without sharing confidential customer or personal data? (yes/no)
+7. Which countries/markets and business types did that recent job cover? (record broad categories only; no client or personal details)
 
-Recruit recent, first-hand experience first. Include people who do not buy tools and those whose current process works well. Do not treat screener responses as interview findings. Track only screener ID, routing bands, recruitment source and interview status; delete contact details when scheduling is complete unless the participant asks for follow-up.
+Recruit recent, first-hand experience first. Route each qualified screener to AGENCY, INHOUSE, INDEPENDENT or OTHER using the routing table in section 2; record both the recent task and whether it served a client, the participant's own employer, or an independent project. Include people who do not buy tools and those whose current process works well. Do not treat screener responses as interview findings. Track only screener ID, routing bands, recruitment source and interview status; delete contact details when scheduling is complete unless the participant asks for follow-up.
 
 ### Copy-ready invitation
 > Hi — I’m researching how teams create and use business lead lists. Would you be open to a 30-minute conversation about a recent real workflow? This is research, not a sales call. Please don’t share confidential client records or sensitive personal data. Participation is optional, and you can skip any question or stop at any time. I’ll take anonymized notes; I will not record audio/video unless we separately agree first. Would [two time windows] work for you?
