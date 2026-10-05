@@ -948,6 +948,62 @@
         "Read-only source/config/runtime audit; no live production run, customer workbook, provider account, or yield sample was accessed.",
         "Keep VSN-specific operating choices separate from external user evidence and SaaS acceptance criteria."
       ]
+    },
+    {
+      "id": "EVID-000034",
+      "claim_or_question": "What workflow does LinkedIn Sales Navigator document for finding, saving and reusing lead/account searches?",
+      "source_type": "primary",
+      "source_ref": "https://www.linkedin.com/help/sales-navigator/answer/a10728097",
+      "source_title": "Get started prospecting in Sales Navigator by finding and saving leads",
+      "publisher_or_owner": "LinkedIn",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "LinkedIn's help page describes filtering lead searches, reviewing and saving leads/accounts to lists, saving searches for alerts, and plan-dependent CRM workflows. This supports a competitor interaction-flow description only; it does not establish user demand or permission to extract, retain, or resell LinkedIn data.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Official workflow help page.",
+        "Do not infer data acquisition, storage, export, or resale rights from use of Sales Navigator UI."
+      ]
+    },
+    {
+      "id": "EVID-000035",
+      "claim_or_question": "What does the Foursquare Places API self-service EULA say about third-party sharing, bulk/systematic place-data access and lead generation?",
+      "source_type": "primary",
+      "source_ref": "https://foursquare.com/legal/terms/apilicenseagreement/",
+      "source_title": "Places API - PAYG (Self-Service EULA)",
+      "publisher_or_owner": "Foursquare",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "The self-service EULA states restrictions on making Places Data available to third parties in bulk or enabling systematic querying of all or substantially all data for a locality/region/country, and restricts lead generation unless expressly authorized via the subscription. This makes the self-service offer unselected for VSN's intended SaaS lead workflow absent explicit subscription authorization. It is a public-term reading, not qualified legal advice or a conclusion about a separately negotiated agreement.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Review exact executed subscription and contract with qualified counsel before any integration or customer-facing use.",
+        "Do not generalize this self-service EULA to a separate negotiated license."
+      ]
     }
   ],
   "entry_contract": {
