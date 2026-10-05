@@ -2,7 +2,7 @@
 
 Research snapshot: 2026-10-05 PKT  
 ANPOS work unit: WU-SAAS-USER-MARKET-RESEARCH  
-Status: active — desk research and interview preparation only  
+Status: active — desk-research package complete; external validation pending  
 Evidence boundary: No customer interviews, surveys, pricing tests, or product trials have been conducted for this plan. Competitor documentation describes vendor workflows; it does not validate VSN customer demand or vendor performance.
 
 ## 1. Research questions
@@ -330,3 +330,28 @@ Status: specification only. This defines a neutral, repeatable set of screens fo
 Record observable behavior separately from opinion. No pass score is assigned in advance; propose thresholds only after the planned sessions and review of counterexamples. Screen completion does not prove demand, data rights, source quality, cost viability, willingness to pay, or product-market fit.
 
 This storyboard is ready for prototyping/review but has not been rendered, tested or shown to participants. The moderated session protocol, observation rubric and synthesis memo template are in [LEAD-SAAS-PROTOTYPE-TEST-RUNBOOK.md](LEAD-SAAS-PROTOTYPE-TEST-RUNBOOK.md). No participants have been recruited or tested; WU-SAAS-USER-MARKET-RESEARCH remains in_progress.
+
+## 8. Status reconciliation and acceptance gates (2026-10-05)
+
+This section distinguishes the completed desk-research deliverables from the evidence that still requires participants. It does not mark the research work unit complete.
+
+| Research acceptance item | Status | Evidence / honest boundary |
+|---|---|---|
+| Segment and problem hypotheses | Prepared for testing | H1–H7 are researcher hypotheses informed by public-source desk research and the internal VSN operating case; none is participant-validated. |
+| Competitor workflows compared beyond marketing summaries | Complete as public-document review | Apollo, Clay, Hunter, LinkedIn Sales Navigator, Seamless.AI, Outscraper, Google Places, Yelp Places and Foursquare documented workflows/policy limits are summarized in sections 3B–3D and crosswalked to registry IDs. No hands-on competitive trials or independent usability tests were performed. |
+| Interview preparation | Complete as preparation | Screener, invitation, consent script, interviewer guide, capture/synthesis forms and [prototype test runbook](LEAD-SAAS-PROTOTYPE-TEST-RUNBOOK.md) are prepared. No outreach or session has been performed. |
+| Prototype screens/tasks | Specified only | Three tasks and screen storyboard are specified; no clickable prototype has been built or shown to participants. |
+| User/problem evidence from recent workflows | Pending | No external participant interview, survey, or workflow artifact has been collected. |
+| Counterexamples and segment comparison | Pending | No participant evidence or counterexample has been gathered. |
+| MVP outcome metric and baseline | Candidate measures only | Candidate metrics are listed in section 6; no user-backed baseline or target has been agreed. |
+| User research work-unit exit | Not met | Keep WU-SAAS-USER-MARKET-RESEARCH in_progress until sessions are completed and synthesized, or a genuine recruitment blocker is recorded without claiming validation. |
+
+### Next execution sequence
+
+1. Recruit participants who pass the screener, with external participants across at least two candidate segments and a mix of tool buyers/non-buyers.
+2. Run the same neutral 30-minute protocol and fictional-data tasks; retain anonymized observations, quotes and counterexamples.
+3. Synthesize behavior by segment, distinguish participant facts from opinions and interpretation, and record the sample size.
+4. If the prototype reveals new requirements, revise the mock and run focused follow-up tasks; do not call the segment validated based on stated interest alone.
+5. Submit explicit owner decisions on segment, launch market, source/funding mode, fields, outcome metrics, price/payment, platforms, repository boundary and budget. Until then, downstream MVP and architecture work remain gated.
+
+Recruitment contacts must not be copied into this repository. Do not claim interviews are scheduled or completed until there is session evidence.
