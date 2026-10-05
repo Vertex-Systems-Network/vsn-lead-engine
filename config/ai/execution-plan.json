@@ -430,7 +430,8 @@
         "config/research/evidence-registry.json EVID-000017 through EVID-000019: official Apollo, Clay and Hunter workflow documentation captured.",
         "Customer interviews, task tests and validated launch segment/MVP outcomes are still outstanding; research unit remains in_progress.",
         "config/research/evidence-registry.json EVID-000020 through EVID-000022 and the research workbench pricing snapshot: Apollo credit/cap and external-product terms, Hunter plan/API credit distinction, Clay displayed-price inconsistency documented.",
-        "Evidence registry EVID-000023–000026 and research workbench section 3A: official Seamless.AI, Outscraper workflow/pricing/terms, and Google Places field-mask/SKU billing desk review added; source demand/right/price approval and user validation remain outstanding."
+        "Evidence registry EVID-000023–000026 and research workbench section 3A: official Seamless.AI, Outscraper workflow/pricing/terms, and Google Places field-mask/SKU billing desk review added; source demand/right/price approval and user validation remain outstanding.",
+        "Commit c9bf27d12193083356f501450dc7a27fb1906f96 adds section 5A to docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md: recruitment screener, copy-ready invitation and consent script, interviewer run sheet, synthesis worksheet, and session evidence checklist. Preparation only; no participant recruitment/interviews claimed; WU remains in_progress."
       ]
     },
     {
@@ -712,5 +713,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "WU-SAAS-MVP-DECISIONS has a proposed decision brief and ADR-0007, but remains blocked until user research and owner decisions are recorded. Competitor/source workflow desk research was expanded (EVID-000023–000026); no proposal/provider is treated as consent. Runner minimization remains required for future automated checks."
+  "progress_note": "WU-SAAS-USER-MARKET-RESEARCH remains in_progress: desk research and interview execution kit are prepared, but no interviews, task tests, validated segment, or user-backed MVP outcome exist. WU-SAAS-MVP-DECISIONS remains blocked pending research, owner choices, and source-specific rights/yield/economics. Runner minimization remains required."
 }
