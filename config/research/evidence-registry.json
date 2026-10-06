@@ -1448,6 +1448,32 @@
         "Product pricing/plan scope must be confirmed from current checkout or written quote before use in a competitor price comparison.",
         "No VSN provider rights, coverage benchmark or data-quality validation follows from these pages."
       ]
+    },
+    {
+      "id": "EVID-000052",
+      "claim_or_question": "What self-service plan and per-field credit details does Lusha's current public pricing page display?",
+      "source_type": "primary",
+      "source_ref": "https://www.lusha.com/pricing/",
+      "source_title": "Lusha plans, credit allowances and public pricing snapshot",
+      "publisher_or_owner": "Lusha",
+      "published_at": null,
+      "accessed_at": "2026-10-07",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Lusha's pricing page displayed Free at $0/month with 40 credits/month; Starter at $37.45 USD/month billed yearly with 4,800 credits/year and 1 seat; Pro at $52.45 USD/month billed yearly with 7,200 credits/year and 2 seats; Premium at $299.95 USD/month billed yearly with 40,800 credits/year and 5 seats; Scale custom. Its page states email reveals consume 1 credit and phone reveals 5 credits, and monthly unused credits can roll over up to twice the plan allowance while annual credits are issued upfront and reset at year-end. The selected configuration is a rendered pricing-page snapshot, not a guaranteed quote; public prices and plan configuration can change. These are retail workspace prices, not wholesale/API resale economics or evidence of VSN willingness to pay.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Pricing page uses a dynamic credit/billing selector; preserve billing period and selected allowance when comparing.",
+        "No Lusha customer-facing redistribution rights for VSN are inferred."
+      ]
     }
   ],
   "entry_contract": {
