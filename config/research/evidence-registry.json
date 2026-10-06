@@ -1474,6 +1474,63 @@
         "Pricing page uses a dynamic credit/billing selector; preserve billing period and selected allowance when comparing.",
         "No Lusha customer-facing redistribution rights for VSN are inferred."
       ]
+    },
+    {
+      "id": "EVID-000053",
+      "claim_or_question": "Seamless.AI documents targeted contact search, saved searches/lists, credit-based Find/Find All enrichment, CRM/CSV export, Chrome-extension capture and plan-dependent API access.",
+      "source_type": "primary",
+      "source_ref": "https://seamless.ai/customers/education/articles/seamless-ai-your-quick-start-guide",
+      "source_title": "Seamless.AI Quick Start Guide",
+      "publisher_or_owner": "Seamless.AI",
+      "published_at": null,
+      "accessed_at": "2026-10-07",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Official documentation confirms a mature named-contact prospecting workflow baseline. It does not establish VSN demand, data accuracy, downstream rights, or economic feasibility.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Workflow capability only; no hands-on trial or independent quality benchmark was performed."
+      ]
+    },
+    {
+      "id": "EVID-000054",
+      "claim_or_question": "Clay documents reusable enrichment Functions, multi-provider waterfall ordering, conditional fallback runs and per-action credit consumption.",
+      "source_type": "primary",
+      "source_ref": "https://university.clay.com/fr/docs/functions",
+      "source_title": "Clay Functions documentation",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-07",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Official documentation supports provider orchestration requirements such as reusable logic, fallback visibility, credit accounting and auditability. It does not establish VSN demand, provider rights or unit economics.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Workflow capability only; no provider benchmark or customer validation was performed."
+      ]
     }
   ],
   "entry_contract": {
