@@ -1532,9 +1532,11 @@
       "branch_refs": [
         "codex/next-job-state-filter"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #182"
+      ],
       "test_evidence": [
-        "Native saved-job state filter/cursor continuity and private bounded validated query implemented; local 129 pass/16 PostgreSQL skips (145 cases), eight transport tests, Next build/type/lint/format and HTTP filtered/empty/Next/First page flow pass; final-head CI pending. No mutation/provider or full browser/customer acceptance."
+        "PR #182 merged at 9bc1065b403299b74b60dca52ce6d1cc46f4d810; head 593799c04edc7b03d888663362d655106da92eea passed required checks/Actions CodeQL, PostgreSQL 37704612846 (145 tests/migration/settings), and Next/HTTP 37704612908 (eight transport tests, native forms/source configuration and filtered/empty/Next/First-page flows)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1551,7 +1553,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:9bc1065b403299b74b60dca52ce6d1cc46f4d810"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }
