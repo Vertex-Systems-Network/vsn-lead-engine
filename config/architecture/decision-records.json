@@ -187,7 +187,7 @@
     {
       "id": "ADR-0006",
       "title": "Treat multi-platform lead SaaS as a new product direction while preserving the existing production engine",
-      "status": "proposed",
+      "status": "accepted",
       "context": "User requested subscription web/desktop/mobile experiences, configurable sources and scheduled user jobs in the existing ANPOS-enabled VSN Lead Engine repository. The repository already runs a production daily lead workflow.",
       "alternatives": [
         "Replace/rewrite the existing engine immediately",
@@ -200,11 +200,11 @@
         "config/ai/project-state.json",
         "config/ai/execution-plan.json"
       ],
-      "decision": "For this planning milestone, record the SaaS direction in the current repository's ANPOS memory bank, keep production runtime/quotas independent, and defer implementation-repository choice until system design.",
+      "decision": "Keep SaaS planning and implementation additive in the current repository while isolating the existing production lead runtime. The AI may later split a dedicated application repository only if architecture/operational evidence shows a clear benefit; that technical move does not require per-step owner confirmation when reversible and zero-new-spend.",
       "consequences": [
-        "No current production runtime change.",
-        "Planning can proceed without falsely claiming SaaS features exist.",
-        "A boundary decision is mandatory before application code/hosting work."
+        "System design and safe implementation can proceed without a repository-boundary confirmation pause.",
+        "Existing production lead flow remains isolated and protected by its current invariants.",
+        "A later repository split must preserve history, CI, security and traceability."
       ],
       "security_privacy_data_operational_cost_impact": [
         "Avoids accidental disruption to production lead flow.",
@@ -216,15 +216,15 @@
         "MOD-PRODUCT-DISCOVERY",
         "PHASE-SAAS-DISCOVERY"
       ],
-      "decided_by": "Proposed from explicit user intake; owner decision pending",
-      "decided_at": null,
+      "decided_by": "VSN repository owner standing technical delegation plus ANPOS evidence-backed selection",
+      "decided_at": "2026-10-07",
       "supersedes": [],
       "superseded_by": null
     },
     {
       "id": "ADR-0007",
       "title": "Propose an evidence-gated, web-first SaaS MVP",
-      "status": "proposed",
+      "status": "accepted",
       "context": "User requested a multi-platform lead SaaS with subscriptions, scheduled country/niche searches, free/paid/custom source options, admin, AI and rich landing site. The repository's production lead engine is an existing Python CLI/workflow and no customer interviews, approved launch market, provider distribution rights, unit economics, stack or repo boundary have been decided.",
       "alternatives": [
         "Build all web/desktop/mobile surfaces and broad integrations together",
@@ -239,11 +239,12 @@
         "docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md",
         "config/research/evidence-registry.json"
       ],
-      "decision": "Proposal only: validate actual users and a permitted first market/source; if evidence supports it, begin with responsive web, tenant isolation, a manual run, source/cost/provenance preview, hard spend controls, CSV input, and bounded AI setup help. Defer native desktop/mobile and broad provider integrations until user evidence and stable API contracts. Consider a dedicated SaaS repo before code to protect the current production pipeline. Keep every provider disabled until exact use rights, sample yield and unit economics are reviewed. No part of this proposal is accepted or authorized as implementation scope.",
+      "decision": "Adopt a reversible development baseline: responsive web first on shared versioned APIs; preserve US+Canada compatibility as the initial engineering scope; keep source integration policy-aware and provider-disabled until rights are established; default to free/zero-new-paid-spend development paths and allow BYOK-capable interfaces without activating paid providers; defer native desktop/mobile until the API/web contracts stabilize. This authorizes development sequencing, not a claim of customer demand, legal clearance, provider rights, pricing approval or public launch readiness.",
       "consequences": [
-        "SaaS discovery can advance with reviewable recommendations while owner choices remain explicit.",
-        "No implementation, vendor, market, plan price or platform order is approved by this proposed ADR.",
-        "MVP acceptance depends on customer evidence and owner decisions; no target lead count is promised."
+        "System/data/threat/UX design can proceed immediately without owner technical confirmation.",
+        "Customer research remains evidence for product validation but is no longer a blocker to reversible architecture and implementation work.",
+        "Paid providers, commercial billing activation and public launch remain separately gated.",
+        "Desktop/mobile remain later clients against stable shared APIs."
       ],
       "security_privacy_data_operational_cost_impact": [
         "Tenant isolation and least privilege are P0 architecture gates.",
@@ -264,8 +265,8 @@
         "MOD-DESKTOP-CLIENT",
         "MOD-MOBILE-CLIENT"
       ],
-      "decided_by": "ANPOS evidence-backed recommendation; VSN owner acceptance pending",
-      "decided_at": null,
+      "decided_by": "VSN repository owner standing technical delegation plus ANPOS evidence-backed recommendation",
+      "decided_at": "2026-10-07",
       "supersedes": [],
       "superseded_by": null
     }

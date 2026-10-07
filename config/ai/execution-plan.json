@@ -92,17 +92,17 @@
       "dependencies": [
         "PHASE-SAAS-DISCOVERY"
       ],
-      "status": "not_started",
+      "status": "in_progress",
       "exit_criteria": [
         "Threat/data flows and module/API contracts reviewed.",
         "Repository boundary and rollout model decided.",
-        "Technology alternatives submitted for owner approval."
+        "Technology decision recorded under standing technical delegation after alternatives/cost review; any new paid external commitment remains separately gated."
       ]
     },
     {
       "id": "PHASE-SAAS-WEB-MVP",
       "name": "Web SaaS MVP",
-      "objective": "Build safe core subscription, workspace, source/job and lead workflows after stack approval.",
+      "objective": "Build safe core subscription, workspace, source/job and lead workflows after an evidence-backed stack decision; no new paid external commitment is implied.",
       "module_ids": [
         "MOD-SAAS-IDENTITY",
         "MOD-SAAS-BILLING",
@@ -468,30 +468,26 @@
       "id": "WU-SAAS-MVP-DECISIONS",
       "phase_id": "PHASE-SAAS-DISCOVERY",
       "module_id": "MOD-PRODUCT-DISCOVERY",
-      "title": "Resolve MVP and commercial decisions",
-      "objective": "Decide product boundary, initial market/niches/fields, source funding model, plans, platforms and budget.",
+      "title": "Resolve MVP development defaults and isolate external gates",
+      "objective": "Record reversible development defaults so system design can proceed without owner technical confirmation while keeping paid/legal/provider activation gates explicit.",
       "dependencies": [
         "WU-SAAS-USER-MARKET-RESEARCH",
         "WU-SAAS-SOURCE-FEASIBILITY"
       ],
       "priority": 30,
-      "status": "blocked",
-      "blockers": [
-        "Depends on WU-SAAS-USER-MARKET-RESEARCH completion or explicit disposition.",
-        "Owner must accept/reject product-boundary, segment/market, source/field, commercial, platform and budget decisions; recommendations are not approvals.",
-        "Exact source use rights, sample yield and cost evidence remain provider-specific gates."
-      ],
+      "status": "complete",
+      "blockers": [],
       "acceptance_criteria": [
-        "Owner decisions recorded as durable ADRs.",
-        "MVP exclusions and success metrics approved."
+        "Development defaults are recorded as durable ADRs under standing technical delegation.",
+        "External paid/legal/provider activation gates remain explicit and do not block independent design/implementation."
       ],
       "required_checks": [
-        "ANPOS decision/consent evidence"
+        "ADR and repository-state reconciliation"
       ],
       "completion_evidence": [
-        "docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md: concrete proposed decisions, recommendations, alternatives, consequences, gates and owner inputs prepared.",
-        "config/architecture/decision-records.json ADR-0007: evidence-gated, web-first MVP proposal recorded with status proposed and owner acceptance pending.",
-        "No owner choices, price, provider, market, technology stack or implementation repository has been accepted."
+        "AGENTS.md standing technical autonomy delegates ordinary software-development decisions to AI and forbids per-step technical confirmation.",
+        "ADR-0006 accepts additive implementation in the current repository while preserving production isolation.",
+        "ADR-0007 accepts a reversible web-first US+Canada development baseline with zero-new-paid-spend/provider-disabled defaults; customer validation, provider rights and commercial activation remain evidence gates."
       ]
     },
     {
@@ -499,18 +495,17 @@
       "phase_id": "PHASE-SAAS-SYSTEM-DESIGN",
       "module_id": "MOD-SAAS-IDENTITY",
       "title": "Design tenancy, billing, data, scheduler and client contracts",
-      "objective": "Create system context, trust boundaries, tenant data flow, job state model and client API contracts.",
+      "objective": "Create system context, trust boundaries, tenant data flow, job state model and client API contracts using the accepted reversible development defaults.",
       "dependencies": [
         "WU-SAAS-MVP-DECISIONS"
       ],
       "priority": 40,
-      "status": "blocked",
-      "blockers": [
-        "MVP and repository-boundary decisions pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "acceptance_criteria": [
         "Threat/data-flow diagrams and contracts reviewed.",
-        "Scheduler DST/idempotency/failure semantics specified."
+        "Scheduler DST/idempotency/failure semantics specified.",
+        "No unresolved technical-choice question is routed to the user when repository evidence can select a reversible default."
       ],
       "required_checks": [
         "Architecture review",
@@ -523,22 +518,25 @@
       "id": "WU-SAAS-STACK-CONSENT",
       "phase_id": "PHASE-SAAS-SYSTEM-DESIGN",
       "module_id": "MOD-PRODUCT-DISCOVERY",
-      "title": "Evaluate and request technology stack approval",
-      "objective": "Compare viable stack/hosting/queue/database/payment/AI choices by skills, cost, capability and risk.",
+      "title": "Evaluate and select technology stack",
+      "objective": "Compare viable stack/hosting/queue/database/payment/AI choices by skills, cost, capability and risk, then select the safest reversible zero-new-spend development stack under standing technical delegation.",
       "dependencies": [
         "WU-SAAS-SYSTEM-DESIGN"
       ],
       "priority": 50,
       "status": "blocked",
       "blockers": [
-        "Owner technology and ongoing cost approval required"
+        "Depends on WU-SAAS-SYSTEM-DESIGN completion; no owner technical approval is required."
       ],
       "acceptance_criteria": [
-        "Alternatives and budget impact documented.",
-        "Explicit Approve Technology Stack recorded before stack-specific implementation."
+        "Alternatives, compatibility and budget impact documented.",
+        "Technology stack decision recorded in an ADR under standing technical delegation before stack-specific implementation.",
+        "Any new recurring paid service remains disabled until separate external spend authorization exists."
       ],
       "required_checks": [
-        "ANPOS consent guard"
+        "ADR review",
+        "Cost/compatibility review",
+        "Quality/security tooling compatibility"
       ],
       "completion_evidence": []
     },
@@ -724,5 +722,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "WU-SAAS-USER-MARKET-RESEARCH remains in_progress: competitor/source desk review, interview kit, and a repository-grounded first-party operating case are prepared; no external user interviews, task tests, validated segment, or user-backed MVP outcome exist. Foursquare and Yelp evidence has unresolved terms, quotas and pricing; neither is source approval or demand validation. WU-SAAS-MVP-DECISIONS remains blocked pending user research, owner choices, and source-specific rights/yield/economics. Runner minimization remains required. Production operations remain in_progress: read-only check of the 2026-10-05 private workbook still shows In Progress; the prior 2026-10-04 run snapshot is historical and does not certify today's quota."
+  "progress_note": "Standing technical autonomy is active: ordinary development choices, technical errors, CI repair, stack selection and reversible implementation decisions must not be routed back to the user. WU-SAAS-MVP-DECISIONS is complete on reversible development defaults; WU-SAAS-SYSTEM-DESIGN is ready. External user validation, provider rights, paid spend, credentials and legally binding/commercial activation remain evidence/authorization gates but must not stop independent safe work. Production quota operations remain independent and evidence-driven."
 }
