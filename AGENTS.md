@@ -226,9 +226,11 @@ For every fresh development session, `continue`, resume, or timeout recovery:
 8. Stop the development loop only when no authorized ready work remains, the host/runtime token or tool budget is exhausted, a configured circuit breaker opens, or every remaining path requires genuine human approval/credentials/external legal-provider authority. Never invent a numeric token budget when the host does not expose one; use the host-provided remaining budget as the ceiling.
 9. Do not replay completed mutations after a timeout without proving they did not happen.
 10. Avoid tight CI polling; use useful waiting time for independent safe work and refresh CI at meaningful merge/checkpoint boundaries.
-11. Keep README and machine state synchronized whenever durable milestone/module status changes.
-12. Before ending an invocation, checkpoint exact main/branch/PR/check evidence plus the next ready frontier so the next workspace turn resumes without rediscovery.
-13. End with repo name, completed milestones/work units, blocked work with evidence, next ready frontier, module progress, and overall operational status.
+11. Keep README and machine state synchronized continuously as development progresses. Any PR that materially changes a milestone/work-unit status, completion evidence, architecture/stack decision, delivered capability, blocker state, or roadmap percentage must update the README progress/status section in the same PR whenever the new state is already known. Do not postpone README progress reconciliation until the end of the project.
+12. After every successful main merge that changes durable project progress, re-read README on protected `main`. If the merged PR omitted or under-reported that progress, immediately create a README/state reconciliation change and merge it through normal CI before treating the checkpoint as fully synchronized. README on `main` must reflect verified repository reality and must never claim unmerged, untested, externally unverified, or merely planned work as complete.
+13. README progress updates must cite durable evidence in prose where useful (merged PR/commit, tests, ADR/design contract) and distinguish implementation progress from customer validation, provider rights, paid activation, legal/compliance review, deployment, and launch readiness.
+14. Before ending an invocation, checkpoint exact main/branch/PR/check evidence plus the next ready frontier so the next workspace turn resumes without rediscovery.
+15. End with repo name, completed milestones/work units, blocked work with evidence, next ready frontier, module progress, and overall operational status.
 
 Security and correctness rules:
 
