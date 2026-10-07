@@ -75,3 +75,70 @@ class SourcePreviewTests(TestCase):
         self.assertEqual(self.client.get(self.page).status_code, 404)
         self.client.logout()
         self.assertEqual(self.client.get(self.page).status_code, 302)
+
+
+class SourceApiTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="catalog-api")
+        self.workspace = create_workspace(self.user, {"name": "API", "timezone": "UTC"})
+        self.page = f"/api/v1/workspaces/{self.workspace.id}/sources/"
+        self.client.force_login(self.user)
+
+    def test_empty_private_catalog_has_no_activation_or_evidence(self):
+        response = self.client.get(self.page)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["sources"], [])
+        self.assertFalse(response.json()["truncated"])
+        self.assertIn("private", response["Cache-Control"])
+        self.assertIn("no-store", response["Cache-Control"])
+        self.assertFalse(SourcePolicy.objects.exists())
+        SourcePolicy.objects.create(
+            code="synthetic",
+            countries=["US"],
+            evidence={"collection": "private-evidence"},
+            controls={"rate_limit": "private-control"},
+        )
+        entry = self.client.get(self.page).json()["sources"][0]
+        self.assertEqual(entry["countries"], ["US"])
+        self.assertFalse(entry["metadata_limited"])
+        self.assertNotIn("evidence", entry)
+        self.assertNotIn("controls", entry)
+
+    def test_huge_valid_metadata_is_explicitly_unavailable_with_bounded_wire_response(self):
+        import json
+
+        SourcePolicy.objects.bulk_create(
+            [
+                SourcePolicy(
+                    code=f"source-{i:03}",
+                    countries=["US"],
+                    categories=["界" * 120] * 100,
+                    fields=["phone"],
+                )
+                for i in range(101)
+            ]
+        )
+        data = self.client.get(self.page).json()
+        self.assertEqual(len(data["sources"]), 100)
+        self.assertTrue(data["truncated"])
+        self.assertLess(len(json.dumps(data, ensure_ascii=True).encode()), 131072)
+        for entry in data["sources"]:
+            self.assertTrue(entry["metadata_limited"])
+            for key in ["countries", "categories", "statuses", "fields"]:
+                self.assertIsNone(entry[key])
+
+    def test_viewer_can_read_but_foreign_revoked_anonymous_and_write_are_denied(self):
+        Membership.objects.filter(workspace=self.workspace, user=self.user).update(role="viewer")
+        self.assertEqual(self.client.get(self.page).status_code, 200)
+        other = User.objects.create_user(username="foreign-source-api")
+        foreign = create_workspace(other, {"name": "Other", "timezone": "UTC"})
+        self.assertEqual(
+            self.client.get(f"/api/v1/workspaces/{foreign.id}/sources/").status_code, 404
+        )
+        self.assertEqual(
+            self.client.post(self.page, "{}", content_type="application/json").status_code, 405
+        )
+        Membership.objects.filter(workspace=self.workspace, user=self.user).delete()
+        self.assertEqual(self.client.get(self.page).status_code, 404)
+        self.client.logout()
+        self.assertEqual(self.client.get(self.page).status_code, 403)

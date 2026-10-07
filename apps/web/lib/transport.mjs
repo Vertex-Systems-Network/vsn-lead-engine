@@ -26,7 +26,7 @@ export async function readBackend(
   const form = formPath.test(path);
   if (
     !form &&
-    !/^\/api\/v1\/workspaces\/(?:[0-9a-f-]{36}\/(?:usage\/|jobs\/(?:[0-9a-f-]{36}\/)?))?(?:\?(?:page=[1-9][0-9]{0,5}|after=[0-9a-f-]{36}))?$/.test(
+    !/^\/api\/v1\/workspaces\/(?:[0-9a-f-]{36}\/(?:usage\/|sources\/|jobs\/(?:[0-9a-f-]{36}\/)?))?(?:\?(?:page=[1-9][0-9]{0,5}|after=[0-9a-f-]{36}))?$/.test(
       path,
     )
   ) {

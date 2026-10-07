@@ -229,6 +229,9 @@ def main():
                     parser.feed(body)
                     return body, parser
 
+                source_path = f"/dashboard/workspaces/{workspace.id}/sources"
+                empty_catalog, _ = native_form(source_path)
+                assert "No source policies are configured" in empty_catalog
                 draft_path = f"/dashboard/workspaces/{workspace.id}/search/new"
                 body, native = native_form(draft_path)
                 assert "Create draft search" in body and "Phone (always required)" in body
@@ -280,6 +283,30 @@ def main():
                     controls={k: "synthetic-only" for k in CONTROLS},
                     max_provider_calls=1,
                 )
+
+                configured, _ = native_form(source_path)
+                assert (
+                    "http-fixture" in configured
+                    and "Recorded as free; cost verification is separate" in configured
+                )
+                assert "synthetic-only" not in configured
+                SourcePolicy.objects.create(
+                    code="<script>source</script>",
+                    categories=["<img src=x>"],
+                    evidence={"collection": "private-secret-reference"},
+                )
+                escaped, _ = native_form(source_path)
+                assert "&lt;script&gt;source&lt;/script&gt;" in escaped
+                assert "&lt;img src=x&gt;" in escaped and "private-secret-reference" not in escaped
+                Membership.objects.filter(user=user, workspace=workspace).update(role="viewer")
+                viewer_catalog, _ = native_form(source_path)
+                assert "http-fixture" in viewer_catalog
+                Membership.objects.filter(user=user, workspace=workspace).update(role="owner")
+                denied_catalog, _ = native_form(f"/dashboard/workspaces/{other.id}/sources")
+                assert (
+                    "http-fixture" not in denied_catalog
+                    and "Foreign private marker" not in denied_catalog
+                )
                 enqueue_job(user, workspace.id, created.id, 0)
                 assert account(cancel_action, stale.hidden, origin)[0] == 409
                 assert UsageReservation.objects.get().status == "reserved"
@@ -318,7 +345,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native draft/replay/role/tenant/cancel flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native draft/replay/role/tenant/cancel and bounded source configuration flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)
