@@ -48,7 +48,7 @@ class PreDispatchTests(TestCase):
         start = timezone.now()
         with patch("core.attempts.timezone.now", return_value=start):
             lease = claim_pre_dispatch(self.outbox.id)
-        with patch("core.attempts.timezone.now", side_effect=[start, start + LEASE]):
+        with patch("core.attempts.timezone.now", side_effect=[start, start, start + LEASE]):
             with self.assertRaises(RevisionConflict):
                 check_pre_dispatch(self.outbox.id, lease.token)
 

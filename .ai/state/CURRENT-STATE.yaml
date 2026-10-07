@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "02240c19fe348d6003519b221ba867ed5c7c19e3",
+  "observed_main_sha": "920c5dc5ab5c64d25ff73616676af50ef8aa6dd9",
   "observed_main_semantics": "Exact protected main inspected immediately before this dependency/checkpoint reconciliation branch.",
   "active_issue": null,
-  "active_pr": 161,
-  "active_branch": "codex/saas-predispatch-leases",
+  "active_pr": 162,
+  "active_branch": "codex/saas-predispatch-recovery",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -61,7 +61,8 @@
     "saas_usage": "PR #157: validate, repository-integrity, analyze-actions, CodeQL and PostgreSQL concurrent usage-cap tests successful",
     "saas_quality_baseline": "PR #158: lint/format/compile, required checks, CodeQL, PostgreSQL tests and migrations successful",
     "dependency_refresh": "PR #159 all required checks, CodeQL, verify and saas-postgres successful on e60e8d214b87d0b747f7b7a9a6b9f88af8d68798",
-    "saas_atomic_outbox": "PR #160: all required checks, CodeQL and PostgreSQL enqueue/cancel races/migration gates successful on c8d736c59455e786f0eb8a8da7b2f784456cf808"
+    "saas_atomic_outbox": "PR #160: all required checks, CodeQL and PostgreSQL enqueue/cancel races/migration gates successful on c8d736c59455e786f0eb8a8da7b2f784456cf808",
+    "saas_predispatch_leases": "PR #161: all required checks, CodeQL and PostgreSQL lease exclusion/earlier concurrency/migration gates successful on 31c72ee16dbdc3b462b6a6e6260408a4cb19d306"
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -108,7 +109,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify/merge bounded pre-dispatch leases and live gate rechecks on PostgreSQL, then continue dispatch-start/idempotency/uncertain-outcome and operational reservation recovery contracts plus web workflows. Providers, billing and launch remain disabled/gated.",
+  "exact_next_safe_action": "Verify/merge bounded pre-dispatch expiry/recovery on PostgreSQL, then continue explicit dispatch-start/idempotency/uncertain-outcome reconciliation, operational scheduling and web/billing workflows. Source/provider, billing and launch activation remains gated.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

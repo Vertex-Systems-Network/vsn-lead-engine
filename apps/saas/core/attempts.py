@@ -22,7 +22,12 @@ def preflight(outbox):
     """Caller holds the workspace lock; repeat before every future external action."""
     job = outbox.job
     lock_workspace(outbox.submitted_by, job.workspace_id)
-    if job.status != "queued" or outbox.status != "pending":
+    if (
+        job.status != "queued"
+        or outbox.status != "pending"
+        or outbox.expires_at is not None
+        and outbox.expires_at <= timezone.now()
+    ):
         raise RevisionConflict()
     reservation = UsageReservation.objects.select_for_update().get(pk=outbox.reservation_id)
     if reservation.workspace_id != job.workspace_id or reservation.status != "reserved":
@@ -71,6 +76,8 @@ def claim_pre_dispatch(outbox_id):
     )
     preflight(intent)
     now = timezone.now()
+    if intent.expires_at is not None and intent.expires_at <= now:
+        raise RevisionConflict()
     active = JobAttempt.objects.select_for_update().filter(outbox=intent, status="leased").first()
     if active:
         if active.expires_at > now:
@@ -83,7 +90,10 @@ def claim_pre_dispatch(outbox_id):
             "Pre-dispatch attempt budget exhausted; cancel and review this intent."
         )
     return JobAttempt.objects.create(
-        outbox=intent, number=count + 1, job_revision=intent.job.revision, expires_at=now + LEASE
+        outbox=intent,
+        number=count + 1,
+        job_revision=intent.job.revision,
+        expires_at=min(now + LEASE, intent.expires_at) if intent.expires_at else now + LEASE,
     )
 
 
@@ -109,6 +119,7 @@ def check_pre_dispatch(outbox_id, token):
     ):
         raise RevisionConflict()
     preflight(intent)
-    if attempt.expires_at <= timezone.now():
+    now = timezone.now()
+    if attempt.expires_at <= now or intent.expires_at is not None and intent.expires_at <= now:
         raise RevisionConflict()
     return attempt

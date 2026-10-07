@@ -166,6 +166,7 @@ class JobOutbox(models.Model):
     reservation = models.OneToOneField(UsageReservation, on_delete=models.PROTECT)
     submitted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     submitted_revision = models.PositiveIntegerField()
+    expires_at = models.DateTimeField(null=True, db_index=True)
     source_snapshot = models.JSONField()
     status = models.CharField(max_length=9, default="pending")
     created_at = models.DateTimeField(auto_now_add=True)
