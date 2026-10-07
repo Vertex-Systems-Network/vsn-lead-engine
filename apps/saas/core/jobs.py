@@ -7,7 +7,7 @@ from django.db import transaction
 from django.http import Http404
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
-from .models import Job, JobOutbox, SourcePolicy
+from .models import Job, JobAttempt, JobOutbox, SourcePolicy
 from .serializers import SearchSerializer
 from .usage import lock_workspace, release_usage, reserve_usage
 
@@ -153,6 +153,7 @@ def cancel_pending_job(user, workspace_id, job_id, expected_revision):
         if outbox is None or outbox.status != "pending":
             raise RevisionConflict()
         release_usage(user, workspace_id, outbox.reservation_id)
+        JobAttempt.objects.filter(outbox=outbox, status="leased").update(status="cancelled")
         outbox.status = "cancelled"
         outbox.save(update_fields=["status", "updated_at"])
     job.status = "cancelled"

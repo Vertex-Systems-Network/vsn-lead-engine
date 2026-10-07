@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PRs #154\u2013#159 merged with required checks, CodeQL, verified dependency locks and real PostgreSQL SaaS gates passing. Internal atomic job/reservation/outbox and source-policy catalog prepared for CI.",
+  "last_verified_completion": "PRs #154\u2013#160 merged with required checks, CodeQL, verified locks and real PostgreSQL SaaS tenant/usage/outbox/concurrency/migration gates passing. Bounded pre-dispatch leases and live gate rechecks prepared for CI.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -18,9 +18,9 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify internal job/outbox PostgreSQL concurrency and reversible migration gates before merge.",
-    "Continue worker leases, dispatch-time policy/membership/entitlement/cancellation rechecks and bounded reservation recovery with providers disabled.",
-    "Complete web workflows, billing event/period policy and external release evidence separately."
+    "Verify/merge bounded pre-dispatch leases and current-gate rechecks on real PostgreSQL.",
+    "Continue explicit dispatch-start/idempotency/uncertain-outcome contracts, operational reservation recovery and web workflows with provider activation gated.",
+    "Complete billing events/period policy and external rights/customer/privacy/deployment/launch evidence separately."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_foundation_verified_internal_outbox_ci_pending",
+  "qa_readiness": "saas_outbox_verified_predispatch_lease_ci_pending",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "91caa5884564fcd49f3984524bb916a6f15ee83e",
+  "last_reconciled_repository_ref": "02240c19fe348d6003519b221ba867ed5c7c19e3",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

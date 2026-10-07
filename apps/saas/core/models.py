@@ -178,3 +178,30 @@ class JobOutbox(models.Model):
                 name="saas_outbox_status",
             )
         ]
+
+
+class JobAttempt(models.Model):
+    """Pre-dispatch lease only; external execution is deliberately unavailable."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    outbox = models.ForeignKey(JobOutbox, on_delete=models.CASCADE, related_name="attempts")
+    number = models.PositiveIntegerField()
+    job_revision = models.PositiveIntegerField()
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    expires_at = models.DateTimeField()
+    status = models.CharField(max_length=9, default="leased")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["outbox", "number"], name="saas_attempt_number"),
+            models.UniqueConstraint(
+                fields=["outbox"],
+                condition=models.Q(status="leased"),
+                name="saas_one_active_attempt",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(status__in=["leased", "expired", "cancelled"]),
+                name="saas_attempt_status",
+            ),
+        ]
