@@ -519,7 +519,7 @@
       "phase_id": "PHASE-SAAS-SYSTEM-DESIGN",
       "module_id": "MOD-PRODUCT-DISCOVERY",
       "title": "Evaluate and select technology stack",
-      "objective": "Compare viable stack/hosting/queue/database/payment/AI choices by skills, cost, capability and risk, then select the safest reversible zero-new-spend development stack under standing technical delegation.",
+      "objective": "Compare viable stack/hosting/queue/database/payment/AI choices by skills, cost, capability and risk, then select the safest reversible zero-new-spend development stack under standing technical delegation. The legacy work-unit ID is retained for traceability and does not require an owner confirmation prompt.",
       "dependencies": [
         "WU-SAAS-SYSTEM-DESIGN"
       ],
@@ -545,7 +545,7 @@
       "phase_id": "PHASE-SAAS-WEB-MVP",
       "module_id": "MOD-SAAS-IDENTITY",
       "title": "Implement tenant-safe SaaS foundation",
-      "objective": "Build identity/workspaces/roles, billing entitlements and usage primitives after approval.",
+      "objective": "Build identity/workspaces/roles, billing entitlements and usage primitives after the evidence-backed stack decision; no owner technical approval prompt is required.",
       "dependencies": [
         "WU-SAAS-STACK-CONSENT"
       ],

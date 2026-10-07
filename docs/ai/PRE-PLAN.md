@@ -34,7 +34,7 @@ Evolve VSN's lead-generation capability into a multi-tenant subscription product
 - Latest persisted snapshot before this planning request recorded 6,855/12,000 for 2026-10-04 and shortfall 5,145; this is historical evidence only, not today's status. Re-read live runtime/workbook before operational claims.
 - P01–P70 and production controls are historical/current baseline and are not reset.
 - SaaS foundation implementation has started with stack-neutral workspace, membership, entitlement, search, job-lifecycle and source-policy contracts under `src/vsn_lead_engine/saas/`; no production API, auth provider, billing, scheduler or client application is enabled.
-- Implementation remains deliberately bounded: system design, repository boundary, technology approval, provider rights, billing and launch-market decisions are still required before production SaaS runtime work.
+- Implementation uses accepted reversible development defaults under standing technical autonomy. Provider rights, paid billing/infrastructure activation, unavailable credentials, qualified legal/compliance evidence and final commercial launch remain external gates before production SaaS activation; they do not block independent safe development.
 
 ## 4. Primary Actors and Workflows
 1. Visitor reviews product/source/cost explanations, creates an account, and selects a plan.
@@ -61,7 +61,7 @@ Market-driven candidates: source/field provenance, cost preview, run history, re
 - Apple in-app subscriptions and Microsoft Store commerce have platform-specific rules. Cross-platform entitlement sync and storefront-specific checkout must be designed after distribution decision.
 Evidence URLs, dates, evidence class and limitations are in `config/research/evidence-registry.json`. Findings are initial desk research, not legal advice, independently verified user findings, or current full-price comparison.
 - User/job research remains active: Apollo, Clay, Hunter, Seamless.AI, Outscraper, Google Places, Foursquare and Yelp Places desk comparisons, interview execution kit, segment hypotheses, evidence-capture form and closure gates are prepared in `docs/ai/LEAD-SAAS-USER-MARKET-RESEARCH.md`. EVID-000033 documents VSN's incumbent workflow as a first-party repository case only. No external customer interviews or market validation are claimed; keep the work unit open until actual evidence is recorded.
-- MVP decision brief and proposed ADR-0007 now give reviewable recommendations for repository boundary, web-first sequence, market/source gates, costs, CSV/custom inputs, schedules and bounded AI. All remain proposals pending interviews and explicit owner decisions: `docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md`.
+- The MVP decision brief remains supporting evidence; ADR-0007 is now accepted for reversible development sequencing under standing technical autonomy. External interviews, provider rights and commercial activation evidence remain pending without blocking safe architecture/implementation: `docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md`.
 
 ### Positioning hypothesis
 “Transparent, source-aware lead discovery and scheduled workflows that let smaller teams choose free, provider-funded, or bring-your-own data services with visible limits and control.” Validate this against user interviews and actual permitted provider coverage/cost before adopting as public positioning.
@@ -95,7 +95,7 @@ Legacy production runtime, ANPOS governance, My Drive autonomy and assurance mod
 ## 11. Phase / Milestone Strategy
 - P0 Discovery and validation: current implementation boundary, user/job research, competitors, source/legal/cost evidence, launch market and MVP.
 - P1 System design: actors, API/module boundaries, tenant threat model, data flows, lifecycle/retention, scheduling semantics, UX flows and success measures.
-- P2 Technology selection and explicit owner consent; decide same vs dedicated implementation repository.
+- P2 Technology selection under standing technical autonomy; record the evidence-backed ADR and let the AI decide same-vs-dedicated repository based on architecture/operational evidence without an owner technical-confirmation prompt.
 - P3 SaaS foundation: auth/workspaces/RBAC, tenant isolation, entitlements and usage meter.
 - P4 Collection platform: provider policy registry, first permitted adapters, durable schedule/queue, normalization/provenance/dedupe.
 - P5 User workflows: search setup, job controls/history, lead management/filter/export, notifications.

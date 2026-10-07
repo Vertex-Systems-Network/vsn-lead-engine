@@ -77,9 +77,9 @@ Use `config/ai/agent-catalog.json`. Discover actually invokable/attachable agent
 
 For an uninitialized child offer **Start Development**, complete initialization, then collect one free-form **Idea / Thoughts / Plan / Research / Search / Assumptions** input. Follow `START-HERE.md` for discovery, research, market comparison, comparable-system audit and planning.
 
-Use `DEVELOPMENT-LIFECYCLE.md` for system design, technology recommendation + explicit `Approve Technology Stack`, implementation architecture, data flows, UI/UX, development/DevOps, SQA and authorized defensive security engineering.
+Use `DEVELOPMENT-LIFECYCLE.md` for system design, technology recommendation/selection, implementation architecture, data flows, UI/UX, development/DevOps, SQA and authorized defensive security engineering. In this initialized VSN Lead Engine child, the standing technical-autonomy delegation below satisfies ordinary technology-selection authority, so do not request a separate `Approve Technology Stack` response.
 
-Material technology/scope/risk changes require applicable consent. Security, privacy, accessibility, observability, operability, migration safety, testing and rollback are cross-cutting.
+Material external commitments still require applicable consent, but ordinary reversible technology/implementation changes inside the standing technical delegation do not require per-step owner confirmation. Security, privacy, accessibility, observability, operability, migration safety, testing and rollback remain cross-cutting.
 
 ## Production assurance — requirements 57–74
 
