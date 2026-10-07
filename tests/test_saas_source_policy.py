@@ -2,10 +2,11 @@ from uuid import uuid4
 
 import pytest
 
-from vsn_lead_engine.saas.contracts import Entitlement, SearchSpec
+from vsn_lead_engine.saas.contracts import Entitlement, ExportSpec, SearchSpec
 from vsn_lead_engine.saas.source_policy import (
     SearchAuthorizationError,
     SourcePolicy,
+    authorize_export,
     authorize_search,
 )
 
@@ -110,4 +111,136 @@ def test_authorize_search_rejects_misidentified_policy_entry():
             _search(workspace_id),
             entitlement,
             {"overture-free": mislabeled_policy},
+        )
+
+
+
+def test_search_is_allowed_when_source_policy_forbids_export():
+    workspace_id = uuid4()
+    entitlement = Entitlement(
+        workspace_id=workspace_id,
+        plan_code="free",
+        source_codes=frozenset({"overture-free"}),
+    )
+    policy = SourcePolicy(
+        code="overture-free",
+        countries=frozenset({"US"}),
+        categories=frozenset({"spa"}),
+        allowed_required_fields=frozenset({"phone"}),
+        export_allowed=False,
+    )
+
+    authorize_search(_search(workspace_id), entitlement, {policy.code: policy})
+
+
+def test_authorize_export_accepts_only_plan_and_policy_allowed_fields():
+    workspace_id = uuid4()
+    entitlement = Entitlement(
+        workspace_id=workspace_id,
+        plan_code="free",
+        source_codes=frozenset({"overture-free"}),
+        export_enabled=True,
+    )
+    policy = SourcePolicy(
+        code="overture-free",
+        countries=frozenset({"US"}),
+        allowed_required_fields=frozenset({"phone"}),
+        allowed_export_fields=frozenset({"phone", "website"}),
+        export_allowed=True,
+    )
+
+    authorize_export(
+        ExportSpec(workspace_id, ("overture-free",), ("phone",)),
+        entitlement,
+        {policy.code: policy},
+    )
+
+
+def test_authorize_export_rejects_source_policy_export_denial():
+    workspace_id = uuid4()
+    entitlement = Entitlement(
+        workspace_id=workspace_id,
+        plan_code="free",
+        source_codes=frozenset({"overture-free"}),
+    )
+    policy = SourcePolicy(
+        code="overture-free",
+        countries=frozenset({"US"}),
+        allowed_required_fields=frozenset({"phone"}),
+        export_allowed=False,
+    )
+
+    with pytest.raises(SearchAuthorizationError, match="does not permit export"):
+        authorize_export(
+            ExportSpec(workspace_id, ("overture-free",), ("phone",)),
+            entitlement,
+            {policy.code: policy},
+        )
+
+
+def test_authorize_export_rejects_fields_not_allowed_by_source():
+    workspace_id = uuid4()
+    entitlement = Entitlement(
+        workspace_id=workspace_id,
+        plan_code="free",
+        source_codes=frozenset({"overture-free"}),
+    )
+    policy = SourcePolicy(
+        code="overture-free",
+        countries=frozenset({"US"}),
+        allowed_required_fields=frozenset({"phone"}),
+        allowed_export_fields=frozenset({"phone"}),
+        export_allowed=True,
+    )
+
+    with pytest.raises(SearchAuthorizationError, match="exported fields"):
+        authorize_export(
+            ExportSpec(workspace_id, ("overture-free",), ("email",)),
+            entitlement,
+            {policy.code: policy},
+        )
+
+
+def test_authorize_export_rejects_inactive_or_cross_tenant_entitlement():
+    workspace_id = uuid4()
+    policy = SourcePolicy(
+        code="overture-free",
+        countries=frozenset({"US"}),
+        allowed_required_fields=frozenset({"phone"}),
+    )
+    export = ExportSpec(workspace_id, ("overture-free",), ("phone",))
+
+    with pytest.raises(SearchAuthorizationError, match="workspace"):
+        authorize_export(
+            export,
+            Entitlement(workspace_id=uuid4(), plan_code="free"),
+            {policy.code: policy},
+        )
+    with pytest.raises(SearchAuthorizationError, match="inactive"):
+        authorize_export(
+            export,
+            Entitlement(workspace_id=workspace_id, plan_code="free", active=False),
+            {policy.code: policy},
+        )
+
+
+def test_authorize_export_rejects_plan_export_disabled():
+    workspace_id = uuid4()
+    entitlement = Entitlement(
+        workspace_id=workspace_id,
+        plan_code="free",
+        source_codes=frozenset({"overture-free"}),
+        export_enabled=False,
+    )
+    policy = SourcePolicy(
+        code="overture-free",
+        countries=frozenset({"US"}),
+        allowed_required_fields=frozenset({"phone"}),
+    )
+
+    with pytest.raises(SearchAuthorizationError, match="export is disabled"):
+        authorize_export(
+            ExportSpec(workspace_id, ("overture-free",), ("phone",)),
+            entitlement,
+            {policy.code: policy},
         )
