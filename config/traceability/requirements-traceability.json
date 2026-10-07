@@ -1031,9 +1031,11 @@
       "branch_refs": [
         "codex/saas-draft-form"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #165"
+      ],
       "test_evidence": [
-        "apps/saas/core/test_draft_web.py: DraftWebTests; local SaaS 65 pass, 8 PostgreSQL-only skips; CI pending."
+        "apps/saas/core/test_draft_web.py: DraftWebTests; merged PR #165 head 7bb1124545a230a3349e383d4fe30d5dcff6ecc2 passed required checks, CodeQL and PostgreSQL 37695370079."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1045,6 +1047,48 @@
       "artifact_refs": [
         "apps/saas/core/forms.py",
         "apps/saas/templates/core/draft_search.html"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:5ecd65cf2c0a130bae7f62a34921e6cd7bd9245f"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-PENDING-CANCEL-WEB",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-pending-cancellation"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "apps/saas/core/test_cancellation_web.py: CancellationWebTests; local SaaS 72 pass, 8 PostgreSQL-only skips; CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-JOB-WEB-ENGINEERING-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/cancellation_forms.py",
+        "apps/saas/templates/core/cancel_pending.html",
+        "apps/saas/core/jobs.py"
       ],
       "sbom_refs": [],
       "attestation_refs": [],
