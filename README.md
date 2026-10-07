@@ -27,16 +27,16 @@ and dedupe.
 
 ## SaaS milestone roadmap
 
-Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `f088b56` / PR #150. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is an engineering work-unit indicator, not customer validation, legal clearance, provider-rights approval, deployment, or launch certification.
+Snapshot: **2026-10-08 PKT**, reconciled from protected `main` commit `ab0d308` / PR #151, with the isolated Django foundation added in this change. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is an engineering work-unit indicator, not customer validation, legal clearance, provider-rights approval, deployment, or launch certification.
 
 | Milestone | Start date | Status | Progress |
 |---|---:|---|---|
 | M0 — Current engine audit and SaaS boundary | 2026-10-04 | Complete | `██████████` 100% |
 | M1 — User/market and competitor desk research | 2026-10-04 | Desk research complete; external validation pending | `███████░░░` 70% |
 | M2 — MVP options, scope and success criteria | 2026-10-05 | Reversible development boundary/defaults accepted; external market/commercial validation still open | `███████░░░` 70% |
-| M3 — System, tenant and threat-model design | 2026-10-07 | Core system/threat, API/data and UX interaction contracts merged; final design-state reconciliation remains | `████████░░` 80% |
+| M3 — System, tenant and threat-model design | 2026-10-07 | System/threat, API/data and UX design contracts reconciled; runtime assurance tracked separately | `██████████` 100% |
 | M4 — Technology stack and repository decision | 2026-10-07 | Development stack selected: Django 5.2 LTS + DRF + PostgreSQL, additive current-repo boundary; production vendors/hosting remain gated | `███████░░░` 70% |
-| M5 — SaaS foundation: workspace, roles, entitlements and tenant-safety contracts | 2026-10-07 | Contract foundation plus user/workspace authorization hardening merged; runtime persistence/auth application still incomplete | `██████░░░░` 60% |
+| M5 — SaaS foundation: workspace, roles, entitlements and tenant-safety contracts | 2026-10-07 | Isolated Django session/workspace/draft API and initial migrations implemented; membership management and entitlement runtime remain open | `███████░░░` 70% |
 | M6 — Source policy, adapters and job orchestration | 2026-10-07 | Source-policy identity and source-aware export authorization hardened; first live provider adapter/durable scheduler not yet implemented | `███░░░░░░░` 30% |
 | M7 — Lead web workflow, filters and export | 2026-10-07 | UX interaction contract and export-policy backend contracts exist; deployable web workflow/UI not yet implemented | `██░░░░░░░░` 20% |
 | M8 — Admin controls and bounded AI | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
@@ -49,8 +49,8 @@ Progress notes:
 - M2 development sequencing/defaults are no longer blocked on technical owner confirmation; external market, pricing, provider-rights and launch decisions remain separate evidence/authorization gates.
 - M3 evidence: PR #141 added the stack-neutral system/threat-model baseline, PR #145 added versioned API/data contracts, and PR #150 added the responsive MVP UX interaction contract.
 - M4 evidence: PR #146 accepted the reversible development stack of Django 5.2 LTS + Django REST Framework + PostgreSQL with server-rendered progressive-enhancement UI and no new paid service activation.
-- M5 evidence: PRs #147 and #149 hardened tenant-bound job/source authorization and actor+workspace authorization on top of the existing workspace/role/entitlement contracts.
-- M6/M7 evidence: PR #148 separated search eligibility from source-aware export authorization and added export-field policy tests. No provider adapter, customer scheduler, production SaaS database, billing gateway, or deployed web UI is claimed.
+- M5 evidence: PRs #147 and #149 hardened tenant-bound authorization. `apps/saas/` adds opt-in Django session identity, PostgreSQL models/migrations, transactional workspace ownership and an idempotent draft-job API. The isolated test suite covers cross-tenant reads/writes, stale membership, viewer denial, CSRF, validation, pagination and PostgreSQL duplicate-create concurrency; CI verifies forward/back/forward migration. This is development foundation, not deployed persistence or SaaS production certification.
+- M6/M7 evidence: PR #148 separated search eligibility from source-aware export authorization and added export-field policy tests. No provider adapter, customer scheduler, production SaaS database, billing gateway, or deployed web UI is claimed. Draft creation cannot dispatch providers or consume paid usage.
 - Existing production collector, Google Sheets delivery and R2 dedupe authority remain isolated from the SaaS work.
 - Overall progress is an engineering planning/implementation indicator, not a claim of customer demand, source rights, coverage, legal compliance, paid-service activation, deployment or launch readiness.
 

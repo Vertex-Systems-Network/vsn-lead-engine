@@ -8,3 +8,5 @@ dist/
 build/
 *.egg-info/
 \n.google-oauth-user.json\nclient_secret*.json\n
+apps/saas/*.sqlite3
+apps/saas/.env

@@ -9,13 +9,13 @@
   "execution": {
     "status": "stable",
     "lifecycle_stage": "production_operations",
-    "current_phase": "PHASE-SAAS-SYSTEM-DESIGN",
-    "active_task": "WU-SAAS-SYSTEM-DESIGN",
+    "current_phase": "PHASE-SAAS-WEB-MVP",
+    "active_task": "WU-SAAS-FOUNDATION",
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "28971ea096e9e69c745f741af5dc0303b7e1623a",
-  "observed_main_semantics": "Last fully reconciled protected main before the technical-autonomy reconciliation mutation.",
+  "observed_main_sha": "ab0d30898c255d3b3927dd09e75ac0a9873fba13",
+  "observed_main_semantics": "Exact protected main inspected before this Django foundation branch.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": null,
@@ -101,8 +101,8 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Start WU-SAAS-SYSTEM-DESIGN immediately and continue across newly-unblocked safe work. Do not ask the user for technical choices, error-fix confirmation, retry approval, stack approval or continue confirmation. Resolve technical uncertainty from repository evidence using the safest reversible zero-new-spend option; isolate only genuine external gates and continue independent work.",
-  "last_reconciled_at": "2026-10-07",
+  "exact_next_safe_action": "Verify and merge isolated Django foundation, then continue atomic entitlement/usage/outbox, membership lifecycle and web workflows with provider dispatch disabled.",
+  "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
     "ask_for_technical_confirmation": false,
