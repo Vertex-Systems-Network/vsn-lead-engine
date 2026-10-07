@@ -84,6 +84,21 @@ class SearchSpec:
             raise ValueError("search values cannot be blank")
 
 
+@dataclass(frozen=True, slots=True)
+class ExportSpec:
+    workspace_id: UUID
+    source_codes: tuple[str, ...]
+    fields: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if not self.source_codes:
+            raise ValueError("at least one source is required for export")
+        if not self.fields:
+            raise ValueError("at least one field is required for export")
+        if any(not value.strip() for value in (*self.source_codes, *self.fields)):
+            raise ValueError("export values cannot be blank")
+
+
 @dataclass(slots=True)
 class Job:
     workspace_id: UUID
