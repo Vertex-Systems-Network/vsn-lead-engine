@@ -12,7 +12,7 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.0",
     "prettier": "3.9.9",
-    "typescript": "6.0.3"
+    "typescript": "7.0.2"
   },
   "name": "@vsn/lead-web",
   "version": "0.1.0",
