@@ -220,3 +220,25 @@ def test_authorize_export_rejects_inactive_or_cross_tenant_entitlement():
             Entitlement(workspace_id=workspace_id, plan_code="free", active=False),
             {policy.code: policy},
         )
+
+
+def test_authorize_export_rejects_plan_export_disabled():
+    workspace_id = uuid4()
+    entitlement = Entitlement(
+        workspace_id=workspace_id,
+        plan_code="free",
+        source_codes=frozenset({"overture-free"}),
+        export_enabled=False,
+    )
+    policy = SourcePolicy(
+        code="overture-free",
+        countries=frozenset({"US"}),
+        allowed_required_fields=frozenset({"phone"}),
+    )
+
+    with pytest.raises(SearchAuthorizationError, match="export is disabled"):
+        authorize_export(
+            ExportSpec(workspace_id, ("overture-free",), ("phone",)),
+            entitlement,
+            {policy.code: policy},
+        )
