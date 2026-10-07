@@ -47,6 +47,8 @@ def authorize_search(
         policy = policies.get(code)
         if policy is None or not policy.enabled:
             raise SearchAuthorizationError(f"source is unavailable: {code}")
+        if policy.code != code:
+            raise SearchAuthorizationError(f"source policy identity mismatch: {code}")
         if not set(search.countries).issubset(policy.countries):
             raise SearchAuthorizationError(f"source does not support requested countries: {code}")
         if policy.categories and not set(search.categories).issubset(policy.categories):
