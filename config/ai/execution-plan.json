@@ -608,7 +608,9 @@
       ],
       "completion_evidence": [
         "Independent provider-disabled orchestration primitives implemented on codex/saas-transactional-outbox: transactional job intent/reservation/outbox, source catalog defaults disabled, revision replay/conflict, draft/queued cancellation. PostgreSQL race/migration CI required before merge.",
-        "Foundation primitives support independent orchestration development; full foundation acceptance and externally approved adapter activation remain separate gates."
+        "Foundation primitives support independent orchestration development; full foundation acceptance and externally approved adapter activation remain separate gates.",
+        "PR #160 merged at 02240c19fe348d6003519b221ba867ed5c7c19e3 after all required checks, CodeQL and real PostgreSQL atomic enqueue/cancel concurrency and reversible migrations passed.",
+        "Bounded pre-dispatch lease/reclaim and live gate rechecks implemented on codex/saas-predispatch-leases; no external dispatch or consumer activated; PostgreSQL lease exclusion CI pending."
       ]
     },
     {
