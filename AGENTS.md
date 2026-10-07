@@ -77,9 +77,9 @@ Use `config/ai/agent-catalog.json`. Discover actually invokable/attachable agent
 
 For an uninitialized child offer **Start Development**, complete initialization, then collect one free-form **Idea / Thoughts / Plan / Research / Search / Assumptions** input. Follow `START-HERE.md` for discovery, research, market comparison, comparable-system audit and planning.
 
-Use `DEVELOPMENT-LIFECYCLE.md` for system design, technology recommendation + explicit `Approve Technology Stack`, implementation architecture, data flows, UI/UX, development/DevOps, SQA and authorized defensive security engineering.
+Use `DEVELOPMENT-LIFECYCLE.md` for system design, technology recommendation/selection, implementation architecture, data flows, UI/UX, development/DevOps, SQA and authorized defensive security engineering. In this initialized VSN Lead Engine child, the standing technical-autonomy delegation below satisfies ordinary technology-selection authority, so do not request a separate `Approve Technology Stack` response.
 
-Material technology/scope/risk changes require applicable consent. Security, privacy, accessibility, observability, operability, migration safety, testing and rollback are cross-cutting.
+Material external commitments still require applicable consent, but ordinary reversible technology/implementation changes inside the standing technical delegation do not require per-step owner confirmation. Security, privacy, accessibility, observability, operability, migration safety, testing and rollback remain cross-cutting.
 
 ## Production assurance — requirements 57–74
 
@@ -189,7 +189,28 @@ Use `CONTINUOUS-IMPROVEMENT.md`. Child scheduled blueprints activate only after 
 
 ## Clarification rule
 
-Do not ask the user to choose work repository evidence can determine. Ask only genuine unresolved product/business/legal/ethical/consent/risk/provider/privacy/cost decisions that materially block correct progress.
+Do not ask the user to choose work repository evidence can determine. For an initialized project, technical uncertainty is not a clarification gate: inspect evidence, choose the safest reversible implementation, record the rationale, implement, test, repair failures, and continue. Ask only when every safe path is materially blocked by a genuinely external product/business/legal/ethical/consent/risk/provider/privacy/cost decision that cannot be resolved by repository evidence or a reversible zero-new-spend default.
+
+## VSN Lead Engine standing technical autonomy
+
+The authenticated repository owner has delegated ordinary software-development decisions for this project to the AI. This standing delegation is authoritative for development workflow and removes per-step confirmation as a development dependency.
+
+Without asking for confirmation, the AI must decide and execute:
+- implementation architecture, frameworks, libraries, repository/branch/PR strategy, refactors and code organization;
+- tests, lint/type/static-analysis fixes, CI repair, merge-conflict repair and compatible dependency maintenance;
+- reversible schema/data migrations with migration tests and rollback/roll-forward protection;
+- dev/staging deployment, redeployment, log inspection and technical troubleshooting when the required access already exists;
+- error diagnosis, bounded retry, rollback/revert of a faulty attempted change, and selection of the next safe work unit;
+- technical stack selection after evidence/cost comparison, using a zero-new-paid-spend default unless a paid commitment is separately authorized;
+- documentation, ADR, state, roadmap and traceability updates needed to keep repository truth aligned.
+
+Do not ask questions such as `Should I continue?`, `Should I fix this error?`, `Should I retry?`, `Which technical option do you want?`, or `Do you approve this stack?` when the choice is within the standing technical delegation. If several valid technical options remain, choose the safest reversible option with the lowest operational cost and best fit to existing architecture, document the trade-off, and proceed.
+
+A recoverable technical blocker is work, not a user-consent gate. Diagnose it, repair it within retry/circuit-breaker limits, and continue. If one unit remains technically blocked after bounded repair, capture evidence, isolate/defer that unit, and continue every independent authorized unit. Never stop the whole workspace merely to report a technical blocker.
+
+For this already-initialized child project, do not re-present `Choose Project Management System`, `Choose Development AI`, or `Apply Recommended GitHub Rules` prompts unless the user explicitly asks to change those integrations. Reconcile the existing configured/degraded state and continue.
+
+Human/external authorization remains required only for actions that create a new external commitment or cannot be safely inferred: new paid/recurring spend, credentials/OAuth/account actions that the available authenticated tools cannot perform, legally binding/compliance attestations, acceptance of provider terms or data rights not already established, irreversible destructive production actions, or a public/commercial launch commitment. Even then, continue all independent development first and ask only when that external gate is the sole remaining blocker.
 
 ## VSN Lead Engine project overlay
 

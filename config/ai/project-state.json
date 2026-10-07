@@ -1,46 +1,44 @@
 {
   "schema_version": 1,
   "lifecycle_stage": "implementation_started",
-  "current_phase": "PHASE-SAAS-DISCOVERY",
-  "current_module": "MOD-SAAS-FOUNDATION",
-  "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "Stack-neutral SaaS contracts and source authorization boundary merged to main in PR #134; provider, stack, billing and launch decisions remain gated.",
+  "current_phase": "PHASE-SAAS-SYSTEM-DESIGN",
+  "current_module": "MOD-SAAS-SYSTEM-DESIGN",
+  "current_work_unit": "WU-SAAS-SYSTEM-DESIGN",
+  "last_verified_completion": "Standing technical-autonomy policy and reversible SaaS development defaults are reconciled; stack-neutral foundation remains merged and system design is the next ready frontier.",
   "next_valid_work_unit": "WU-SAAS-SYSTEM-DESIGN",
   "progress": {
     "total_work_units": 21,
-    "complete": 6,
-    "ready": 0,
+    "complete": 7,
+    "ready": 1,
     "in_progress": 3,
-    "blocked": 4,
+    "blocked": 2,
     "deferred": 2,
     "not_started": 6,
     "needs_update": 0,
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Synchronize system-design work after merged stack-neutral foundation; no provider adapter or production SaaS runtime is enabled.",
+    "Execute WU-SAAS-SYSTEM-DESIGN continuously using repository evidence and reversible zero-new-spend defaults; do not request owner confirmation for technical choices.",
+    "After system design, evaluate and select the technology stack autonomously, document alternatives/costs in ADR evidence, and keep new paid services disabled unless separately authorized.",
     "Continue existing WU-OPS-DAILY-QUOTA independently from current real workbook/health evidence; do not reset or claim complete.",
-    "Complete WU-SAAS-USER-MARKET-RESEARCH with actual external user interviews/task evidence; desk research, interview execution kit, and the VSN repository-based operating case are prepared, but none substitutes for external demand validation.",
-    "Public source feasibility matrix is complete as desk research; no provider selected. Foursquare and Yelp documentation add unresolved pricing/quota conflicts; all country/niche sample yield, exact contract rights, procurement prices and qualified review remain activation gates.",
-    "Review docs/ai/LEAD-SAAS-MVP-DECISION-BRIEF.md and accept/reject proposed decisions; ADR-0007 remains proposed, not approved.",
-    "Resolve SaaS repository boundary, launch segment/market, source funding and required fields, plans/quotas/payment, platform order and monthly budget before system design.",
-    "Keep stack approval pending until system design and costed alternatives are reviewed."
+    "Continue external user/job validation and provider-rights/yield/economics research when evidence is available, but do not let those gates block independent architecture, contracts, tests, UI planning or other safe implementation.",
+    "Keep production/commercial activation gated on real provider rights, credentials, paid-spend authorization and qualified legal/compliance evidence where applicable."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
-    "SaaS implementation repository boundary (current repository vs dedicated SaaS app repository).",
-    "Initial user segment, countries/niches and validated MVP success criteria.",
-    "Allowed source providers, free/paid/BYOK model and provider-specific rights/costs.",
-    "Lead field requirements and status taxonomy.",
-    "Plans, quotas, trial, overages, billing currency/provider and store billing.",
-    "Desktop OS and mobile platforms/distribution order.",
-    "Hosting/AI/API monthly budget and payment availability."
+    "External customer/user validation evidence and final market success targets.",
+    "Provider-specific commercial use/storage/export rights and any procurement contract.",
+    "Any new recurring paid infrastructure/API/AI budget above the zero-new-spend development default.",
+    "Final subscription pricing, payment-provider commercial account activation and storefront commercial terms.",
+    "Qualified jurisdiction-specific privacy/compliance conclusions and legally binding attestations.",
+    "Credentials/OAuth/account actions unavailable through currently authenticated tooling.",
+    "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
   "qa_readiness": "ci_verified_for_merged_foundation",
   "security_readiness": "planning_only_tenant_and_provider_controls_required",
-  "last_reconciled_repository_ref": "07397ce991c84a9e58595ce8944158e290b44fbc",
-  "last_reconciled_at": "2026-10-07T18:19:03Z",
+  "last_reconciled_repository_ref": "28971ea096e9e69c745f741af5dc0303b7e1623a",
+  "last_reconciled_at": "2026-10-07",
   "reconciliation": {
     "source_of_truth_order": [
       "live GitHub repository and Actions evidence",
@@ -57,7 +55,7 @@
     },
     "no_verified_supervisor": true
   },
-  "notes": "SaaS foundation implementation has started with merged, stack-neutral contracts and source-policy authorization. No provider, legal approval, stack, billing, deployment or launch decision is accepted. User/market validation and system design remain active gates; existing production quota work remains independent.",
+  "notes": "Standing technical autonomy is active for this initialized project. AI owns ordinary development decisions, technical error repair, CI fixes, reversible migrations, architecture and technology selection without per-step confirmation. Reversible development defaults are current-repo additive implementation, US+Canada compatibility baseline, web-first shared API direction, and zero-new-paid-spend/provider-disabled behavior. External paid, legal, credential, provider-rights and launch commitments remain gated; they do not block independent safe work.",
   "latest_production_workbook_observation": {
     "tracking_date": "2026-10-05",
     "status": "In Progress",
