@@ -1392,9 +1392,11 @@
       "branch_refs": [
         "codex/next-session-navigation"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #178"
+      ],
       "test_evidence": [
-        "apps/saas/core/test_session_navigation.py and apps/web/test/integration_smoke.py: Optional trusted fixed dashboard login/logout return and Next sign-out confirmation link implemented; local SaaS 114 pass/16 PostgreSQL skips (130 cases), Next lint/format/6 transport tests/build/type and real password/CSRF HTTP login-return/logout/old-session denial passed. Final-head CI pending; native Next forms and production proxy/browser acceptance remain open."
+        "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1410,7 +1412,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:90f90a6952932d7ef8a43d5d6bcaa6decb964139"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }

@@ -4,8 +4,8 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-WEB-EXPERIENCE",
   "current_work_unit": "WU-SAAS-LEAD-WEB",
-  "last_verified_completion": "PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870.",
-  "next_valid_work_unit": "WU-SAAS-COLLECTION",
+  "last_verified_completion": "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).",
+  "next_valid_work_unit": "WU-SAAS-LEAD-WEB",
   "progress": {
     "total_work_units": 21,
     "complete": 9,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify Next session navigation; continue Next-native draft/cancel with Django CSRF and signed billing contracts. Native auth UI, production proxy/browser and provider/payment activation remain open.",
+    "Continue native Next draft/cancel screens with narrow Django form context and session/CSRF authority; signed billing events/results remain independent. Production proxy/browser and provider/payment activation remain open.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "next_and_dispatch_ci_verified_full_browser_customer_release_acceptance_open",
+  "qa_readiness": "saas_130_postgres_cases_and_next_http_auth_verified_full_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "b73d0de7ec1e5659c1573d4fc814973be765adbd",
+  "last_reconciled_repository_ref": "90f90a6952932d7ef8a43d5d6bcaa6decb964139",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [
