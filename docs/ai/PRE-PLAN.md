@@ -1,9 +1,9 @@
 # AI-Native Pre-Plan — Lead Engine SaaS Direction
 
-Planning snapshot: 2026-10-05 PKT  
-Repository baseline: `ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2`  
+Planning snapshot: 2026-10-07 PKT  
+Repository baseline: `07397ce991c84a9e58595ce8944158e290b44fbc`  
 Blueprint: ANPOS 1.4.0 child project  
-State: discovery/pre-plan; no new SaaS implementation or stack approval.
+State: discovery with first stack-neutral SaaS contracts merged; no stack, provider, billing or launch approval.
 
 ## 1. Product Objective
 Evolve VSN's lead-generation capability into a multi-tenant subscription product that helps a user define a target market, discover and manage business leads through permitted sources, schedule repeatable jobs, filter/export results, and understand source/usage costs. Provide coherent web, desktop, and mobile experiences over shared account, job, and data contracts. Product success is improved time-to-first-useful-lead and reliable, transparent, compliant job execution—not a guaranteed lead count.
@@ -33,8 +33,8 @@ Evolve VSN's lead-generation capability into a multi-tenant subscription product
 - Current implementation is a Python lead engine oriented to US + Canada, Overture free discovery, phone-required accepted records, R2 packed fingerprint dedupe and dated Google Sheets.
 - Latest persisted snapshot before this planning request recorded 6,855/12,000 for 2026-10-04 and shortfall 5,145; this is historical evidence only, not today's status. Re-read live runtime/workbook before operational claims.
 - P01–P70 and production controls are historical/current baseline and are not reset.
-- SaaS foundation (auth/tenancy/billing/user schedules/client apps) is not implemented in the audited repository tree. The detailed read-only component/reuse/gap map is in `docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md`.
-- Repository write plan is documentation/planning only. New product implementation must wait for research, system design, technology consent, and repo-boundary decision.
+- SaaS foundation implementation has started with stack-neutral workspace, membership, entitlement, search, job-lifecycle and source-policy contracts under `src/vsn_lead_engine/saas/`; no production API, auth provider, billing, scheduler or client application is enabled.
+- Implementation remains deliberately bounded: system design, repository boundary, technology approval, provider rights, billing and launch-market decisions are still required before production SaaS runtime work.
 
 ## 4. Primary Actors and Workflows
 1. Visitor reviews product/source/cost explanations, creates an account, and selects a plan.
@@ -153,4 +153,4 @@ These decisions do not block documentation/research. Technology approval and ext
 - [ ] System/data/threat/UX design and architecture records.
 - [ ] Technology alternatives evaluated and owner approval recorded.
 - [ ] Implementation acceptance criteria refined with approved MVP.
-- [ ] SaaS implementation started.
+- [x] Stack-neutral SaaS contract implementation started and merged via PR #134; production SaaS runtime remains gated.
