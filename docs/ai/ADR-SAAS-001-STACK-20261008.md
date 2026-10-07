@@ -81,7 +81,7 @@ Re-evaluate the framework or queue only if measured requirements show the Django
 
 ## Evidence reviewed
 
-- Django 5.2 supports Python 3.10–3.14 and the project states security/data-loss support through April 2028: [Django 5.2 release notes](https://docs.djangoproject.com/en/5.2/releases/5.2/) and [Django 5.2 LTS release announcement](https://www.djangoproject.com/weblog/2025/dec/03/django-52-released/).
+- Django 5.2 supports Python 3.10–3.14 and the project states security/data-loss support through April 2028: [Django 5.2 release notes](https://docs.djangoproject.com/en/5.2/releases/5.2/) and [Django 5.2 LTS release announcement](https://www.djangoproject.com/weblog/2025/apr/02/django-52-released/).
 - Django provides built-in authentication and session handling: [authentication](https://docs.djangoproject.com/en/5.2/topics/auth/default/) and [sessions](https://docs.djangoproject.com/en/5.2/topics/http/sessions/).
 - DRF provides configurable authentication and serializers for versioned API contracts: [authentication](https://www.django-rest-framework.org/api-guide/authentication/) and [serializers](https://www.django-rest-framework.org/api-guide/serializers/).
 - Django documents transactions and PostgreSQL row-locking support: [database transactions](https://docs.djangoproject.com/en/5.2/topics/db/transactions/) and [QuerySet select_for_update](https://docs.djangoproject.com/en/5.2/ref/models/querysets/#select-for-update).
