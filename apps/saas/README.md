@@ -132,3 +132,7 @@ Reservations bind the current window; new reservations/pre-dispatch checks fail 
 ### Internal daily occurrence foundation
 
 `core.schedules.create_daily_schedule` stores an immutable disabled daily configuration; `materialize_daily` is an internal single-date draft operation, not a worker or API. It snapshots IANA/local time and M3 DST decisions, permits seven local dates of bounded catch-up and retains one occurrence per schedule/date under a workspace lock. Creator and invoking writer authority are rechecked; duplicate calls replay one draft, and skipped whole civil dates record no job. Drafts still require normal entitlement/source/budget enqueue authorization. See [review and remaining activation gates](../../docs/ai/SAAS-DAILY-OCCURRENCES-REVIEW-20261008.md).
+
+### Next session navigation
+
+For localhost Next development, set `SAAS_WEB_ORIGIN=http://localhost:3000` in the Django process; default login/logout then returns to `/dashboard`. The optional value must be an origin only, without credentials/path/query/fragment; production accepts HTTPS only. Omit it for standalone Django defaults. Next's sign-out link opens `/accounts/sign-out/`; confirmation posts the existing CSRF-protected logout route. No GET logout or request-derived external redirect hosts are added. The [session integration review](../../docs/ai/SAAS-NEXT-SESSION-NAVIGATION-REVIEW-20261008.md) records HTTP evidence and remaining native forms/proxy acceptance.

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import (
     HttpResponseBadRequest,
@@ -7,6 +8,7 @@ from django.http import (
 )
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -31,6 +33,13 @@ def health(request):
 def overview(request):
     workspaces = Workspace.objects.filter(membership__user=request.user).order_by("name", "id")
     return render(request, "core/overview.html", {"workspaces": workspaces})
+
+
+@login_required
+@require_GET
+@never_cache
+def sign_out_page(request):
+    return render(request, "core/sign_out.html", {"dashboard_url": settings.LOGIN_REDIRECT_URL})
 
 
 class WorkspaceList(generics.ListCreateAPIView):

@@ -10,15 +10,15 @@
     "status": "stable",
     "lifecycle_stage": "production_operations",
     "current_phase": "PHASE-SAAS-WEB-MVP",
-    "active_task": "WU-SAAS-COLLECTION",
+    "active_task": "WU-SAAS-LEAD-WEB",
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "52653cfbd7d3ccffee0cf1685afcc99be9877183",
-  "observed_main_semantics": "Exact protected main re-read after PR #169 merge and before the documentation-only verification checkpoint.",
+  "observed_main_sha": "b73d0de7ec1e5659c1573d4fc814973be765adbd",
+  "observed_main_semantics": "Exact protected main re-read after PR #177 merge; current PR contains session navigation and evidence reconciliation.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "codex/saas-daily-occurrences",
+  "active_branch": "codex/next-session-navigation",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -39,7 +39,7 @@
   "quality": {
     "product_version": "0.66.1",
     "latest_product_pr_validation": "PR #131 / run 37227281327",
-    "pytest": "success; earlier retained full-suite evidence 305 passed",
+    "pytest": "Latest local root regression: 376 passed, 1 skipped, 28 subtests passed.",
     "anpos_repository_integrity": "success",
     "anpos_main_run_id": 37227345400,
     "codeql": "success",
@@ -73,7 +73,8 @@
     "saas_dispatch_next": "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
     "saas_terminal_receipts": "PR #175 merged at d29cffd520c5eca4152f76633035aab540f5f18b; head 1a1e321ecdf7e93d6597653c20e1d7070eb5ffca passed required checks/actions CodeQL, PostgreSQL 37700238737 (104 tests and receipt races/migration/security gates), and Next/HTTP 37700238777.",
     "saas_periods": "PR #176 merged at 52653cfbd7d3ccffee0cf1685afcc99be9877183; head d3707b30d5284fb94cd39e80c9b4474a6aa749be passed required checks/Actions CodeQL, PostgreSQL 37701109983 (114 tests including period races/migration/security gates), and Next/HTTP 37701109984.",
-    "saas_daily_occurrences_candidate": "Internal disabled daily schedule/occurrence foundation implemented: M3 IANA/DST resolution, atomic bounded draft materialization and creator/replay guards; local 108 pass/16 PostgreSQL skips; final-head PostgreSQL duplicate/revocation CI pending. No timer/activation endpoint/consumer/source work."
+    "saas_daily_occurrences": "PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870.",
+    "saas_session_navigation_candidate": "Optional trusted fixed dashboard login/logout return and Next sign-out confirmation link implemented; local SaaS 114 pass/16 PostgreSQL skips (130 cases), Next lint/format/6 transport tests/build/type and real password/CSRF HTTP login-return/logout/old-session denial passed. Final-head CI pending; native Next forms and production proxy/browser acceptance remain open."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -120,7 +121,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify/merge daily occurrence foundation, then M7 Next-native login-return/logout and draft/cancel with Django CSRF; signed billing-event and accepted-lead/results contracts remain independent ready work, without activating providers/payments.",
+  "exact_next_safe_action": "Verify/merge session navigation, then implement Next-native draft/cancel under Django session/CSRF authority; signed billing-event and accepted-lead/results contracts remain ready independent work. No automatic scheduling, provider or payment activation.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

@@ -9,8 +9,12 @@ import tempfile
 import threading
 import time
 from datetime import timedelta
+from html.parser import HTMLParser
+from http.cookiejar import CookieJar
 from pathlib import Path
-from urllib.request import Request, urlopen
+from urllib.error import HTTPError
+from urllib.parse import urlencode
+from urllib.request import HTTPCookieProcessor, HTTPRedirectHandler, Request, build_opener, urlopen
 from wsgiref.simple_server import WSGIRequestHandler, make_server
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,7 +45,9 @@ def main():
         from django.utils import timezone
 
         call_command("migrate", verbosity=0)
-        user = User.objects.create_user(username="synthetic-next-owner")
+        user = User.objects.create_user(
+            username="synthetic-next-owner", password="disposable-http-password"
+        )
         foreign = User.objects.create_user(username="synthetic-next-other")
         workspace = create_workspace(user, {"name": "Synthetic <workspace>", "timezone": "UTC"})
         other = create_workspace(foreign, {"name": "Foreign private marker", "timezone": "UTC"})
@@ -85,6 +91,9 @@ def main():
             )
             try:
                 origin = f"http://localhost:{port}"
+                # Fixed trusted configuration, not a browser-provided next host.
+                settings.LOGIN_REDIRECT_URL = origin + "/dashboard"
+                settings.LOGOUT_REDIRECT_URL = origin + "/dashboard"
 
                 def read(path, authenticated=True):
                     headers = {"Cookie": f"sessionid={session}"} if authenticated else {}
@@ -137,8 +146,76 @@ def main():
                 )
                 again, _ = read("/dashboard", False)
                 assert "Synthetic &lt;workspace&gt;" not in again
+
+                class NoRedirect(HTTPRedirectHandler):
+                    def redirect_request(self, request, fp, code, msg, headers, newurl):
+                        return None
+
+                class Csrf(HTMLParser):
+                    token = None
+
+                    def handle_starttag(self, tag, attrs):
+                        fields = dict(attrs)
+                        if tag == "input" and fields.get("name") == "csrfmiddlewaretoken":
+                            self.token = fields.get("value")
+
+                jar = CookieJar()
+                opener = build_opener(HTTPCookieProcessor(jar), NoRedirect())
+
+                def account(path, data=None):
+                    payload = None if data is None else urlencode(data).encode()
+                    try:
+                        response = opener.open(Request(backend + path, data=payload), timeout=10)
+                    except HTTPError as error:
+                        if error.code not in {302, 303, 403, 405}:
+                            raise
+                        response = error
+                    with response:
+                        return response.code, response.read().decode(), response.headers
+
+                _, form, _ = account("/accounts/login/")
+                csrf = Csrf()
+                csrf.feed(form)
+                assert csrf.token
+                code, _, returned = account(
+                    "/accounts/login/",
+                    {
+                        "username": user.username,
+                        "password": "disposable-http-password",
+                        "csrfmiddlewaretoken": csrf.token,
+                        "next": "https://evil.example.test/",
+                    },
+                )
+                assert code == 302 and returned["Location"] == origin + "/dashboard"
+                # The real login session, shared by localhost ports, must render Next.
+                with opener.open(origin + "/dashboard", timeout=10) as response:
+                    assert "Synthetic &lt;workspace&gt;" in response.read().decode()
+                active_session = next(cookie.value for cookie in jar if cookie.name == "sessionid")
+                code, form, _ = account("/accounts/sign-out/")
+                assert code == 200 and "End your session" in form
+                csrf = Csrf()
+                csrf.feed(form)
+                assert csrf.token
+                assert account("/accounts/logout/")[0] == 405
+                assert account("/accounts/logout/", {})[0] == 403
+                code, _, returned = account(
+                    "/accounts/logout/", {"csrfmiddlewaretoken": csrf.token}
+                )
+                assert code == 302 and returned["Location"] == origin + "/dashboard"
+                with opener.open(origin + "/dashboard", timeout=10) as response:
+                    logged_out = response.read().decode()
+                    assert "Sign in to see your workspaces" in logged_out
+                    assert "Synthetic &lt;workspace&gt;" not in logged_out
+                # Even replaying the old HTTP-only session cannot restore access.
+                with urlopen(
+                    Request(
+                        origin + "/dashboard", headers={"Cookie": f"sessionid={active_session}"}
+                    ),
+                    timeout=10,
+                ) as response:
+                    assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { backend } from "../../lib/backend";
+import { backend, backendLink } from "../../lib/backend";
 import { workspaces } from "../../lib/contracts";
 import { State } from "../components/state";
 export default async function Dashboard({
@@ -20,6 +20,7 @@ export default async function Dashboard({
   return (
     <>
       <p className="eyebrow">Your operations</p>
+      <a href={backendLink("/accounts/sign-out/")}>Sign out</a>
       <h1>Workspaces</h1>
       <p className="muted">
         Open a workspace to review saved searches and usage.

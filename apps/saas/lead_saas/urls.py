@@ -7,6 +7,7 @@ urlpatterns = [
     path("health/", views.health),
     path("", views.overview),
     path("accounts/login/", ProtectedLoginView.as_view()),
+    path("accounts/sign-out/", views.sign_out_page, name="sign-out-page"),
     path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("api/v1/workspaces/<uuid:workspace_id>/members/", views.MemberList.as_view()),
     path(

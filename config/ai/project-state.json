@@ -2,9 +2,9 @@
   "schema_version": 1,
   "lifecycle_stage": "implementation_started",
   "current_phase": "PHASE-SAAS-WEB-MVP",
-  "current_module": "MOD-JOB-ORCHESTRATION",
-  "current_work_unit": "WU-SAAS-COLLECTION",
-  "last_verified_completion": "PR #176 merged at 52653cfbd7d3ccffee0cf1685afcc99be9877183; head d3707b30d5284fb94cd39e80c9b4474a6aa749be passed required checks/Actions CodeQL, PostgreSQL 37701109983 (114 tests including period races/migration/security gates), and Next/HTTP 37701109984.",
+  "current_module": "MOD-WEB-EXPERIENCE",
+  "current_work_unit": "WU-SAAS-LEAD-WEB",
+  "last_verified_completion": "PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870.",
   "next_valid_work_unit": "WU-SAAS-COLLECTION",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify internal daily occurrence foundation; continue Next auth/mutation integration and signed billing contracts. No scheduler/provider/payment activation claimed.",
+    "Verify Next session navigation; continue Next-native draft/cancel with Django CSRF and signed billing contracts. Native auth UI, production proxy/browser and provider/payment activation remain open.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "next_and_dispatch_ci_verified_full_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "52653cfbd7d3ccffee0cf1685afcc99be9877183",
+  "last_reconciled_repository_ref": "b73d0de7ec1e5659c1573d4fc814973be765adbd",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [
