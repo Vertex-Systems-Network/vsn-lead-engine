@@ -574,7 +574,9 @@
         "src/vsn_lead_engine/saas/source_policy.py defines the stack-neutral source authorization boundary; tests/test_saas_contracts.py and tests/test_saas_source_policy.py cover contracts and rejection paths.",
         "Scope remains reversible and does not alter the production collector, scheduler, Google Sheets delivery or R2 dedupe authority.",
         "apps/saas implements custom user/session identity, transactional workspace ownership and tenant-scoped draft API; local smoke has 15 passing tests and one explicit PostgreSQL-only skip. PostgreSQL CI and production acceptance are separate gates.",
-        "In-memory repository from PR #153 hardened to enforce write role and defensive copies; tests/test_saas_repository.py."
+        "In-memory repository from PR #153 hardened to enforce write role and defensive copies; tests/test_saas_repository.py.",
+        "PR #154 merged at cf58cf808b16ec142b882625aca4e99cdb27958a after all required checks and saas-postgres CI passed, including duplicate-create concurrency and reversible migration tests.",
+        "apps/saas/core/services.py implements role changes/removal with last-owner protection and transactional audit; PostgreSQL concurrent owner regression added (next branch CI pending)."
       ]
     },
     {

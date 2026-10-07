@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "System/API/UX contracts and stack ADR reconciled from merged PRs #141/#145/#146/#150. Isolated Django draft/API foundation implemented on review branch; PostgreSQL CI pending.",
+  "last_verified_completion": "PR #154 merged with validate, repository-integrity, analyze-actions, CodeQL and real PostgreSQL SaaS CI all successful. Membership role/removal lifecycle implemented on next review branch.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -18,10 +18,10 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify isolated Django foundation on PostgreSQL CI and merge after required gates pass.",
-    "Continue atomic entitlement/usage reservations and job/outbox work, preserving disabled provider dispatch.",
-    "Add workspace membership lifecycle and login abuse protection before any exposed SaaS environment.",
-    "Continue external validation/provider/privacy gates independently; no paid, customer-data or launch activation."
+    "Verify and merge membership lifecycle with PostgreSQL concurrent last-owner tests.",
+    "Continue atomic entitlement/usage reservation and durable job/outbox foundation while provider dispatch remains disabled.",
+    "Implement login abuse protection before exposing SaaS environments.",
+    "External provider/customer/privacy/billing/launch evidence remains gated separately."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -34,9 +34,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "local_foundation_verified_postgresql_ci_pending",
+  "qa_readiness": "merged_foundation_postgresql_verified_membership_ci_pending",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "ab0d30898c255d3b3927dd09e75ac0a9873fba13",
+  "last_reconciled_repository_ref": "cf58cf808b16ec142b882625aca4e99cdb27958a",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

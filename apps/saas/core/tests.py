@@ -5,7 +5,7 @@ from uuid import uuid4
 from django.db import close_old_connections, connection, IntegrityError, transaction
 from django.test import TestCase, TransactionTestCase
 from rest_framework.test import APIClient
-from .models import Job, Membership, User, Workspace
+from .models import Job, Membership, MembershipAudit, User, Workspace
 from .services import create_draft, create_workspace
 
 
@@ -152,3 +152,88 @@ class ConcurrentDraftTests(TransactionTestCase):
         self.assertEqual(results[0][0], results[1][0])
         self.assertEqual(sum(created for _, created in results), 1)
         self.assertEqual(Job.objects.count(), 1)
+
+
+class MemberLifecycleTests(TestCase):
+    setUp = TenantAPITests.setUp
+    create = TenantAPITests.create
+    def member_url(self, user=None):
+        return f"/api/v1/workspaces/{self.workspace.id}/members/{(user or self.user).id}/"
+
+    def test_last_owner_cannot_be_demoted_or_removed(self):
+        url = self.member_url()
+        self.assertEqual(self.client.patch(url, {"role": "member"}, format="json").status_code, 400)
+        self.assertEqual(self.client.delete(url).status_code, 400)
+        self.assertEqual(Membership.objects.get(workspace=self.workspace, user=self.user).role, "owner")
+        self.assertEqual(MembershipAudit.objects.count(), 0)
+
+    def test_owner_can_transfer_then_revoke_own_membership(self):
+        Membership.objects.create(workspace=self.workspace, user=self.other, role="member")
+        response = self.client.patch(self.member_url(self.other), {"role": "owner"}, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.client.delete(self.member_url()).status_code, 204)
+        self.assertEqual(self.client.get(self.url).status_code, 404)
+        self.assertEqual(MembershipAudit.objects.count(), 2)
+        self.assertEqual(MembershipAudit.objects.latest("id").action, "removed")
+        self.assertEqual(Membership.objects.filter(workspace=self.workspace, role="owner").count(), 1)
+
+    def test_admin_cannot_change_owner_or_promote_self(self):
+        Membership.objects.create(workspace=self.workspace, user=self.other, role="admin")
+        self.client.force_authenticate(self.other)
+        self.assertEqual(self.client.patch(self.member_url(), {"role": "viewer"}, format="json").status_code, 403)
+        self.assertEqual(self.client.delete(self.member_url()).status_code, 403)
+        self.assertEqual(self.client.patch(self.member_url(self.other), {"role": "owner"}, format="json").status_code, 403)
+        self.assertEqual(MembershipAudit.objects.count(), 0)
+
+    def test_member_cannot_manage_members(self):
+        Membership.objects.create(workspace=self.workspace, user=self.other, role="member")
+        self.client.force_authenticate(self.other)
+        self.assertEqual(self.client.get(f"/api/v1/workspaces/{self.workspace.id}/members/").status_code, 403)
+        self.assertEqual(self.client.patch(self.member_url(), {"role": "viewer"}, format="json").status_code, 403)
+
+    def test_foreign_member_is_hidden(self):
+        response = self.client.patch(self.member_url(self.other), {"role": "viewer"}, format="json")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(MembershipAudit.objects.count(), 0)
+        self.assertEqual(self.client.delete(self.member_url(self.other)).status_code, 404)
+
+    def test_role_change_is_audited_once_and_replay_is_noop(self):
+        Membership.objects.create(workspace=self.workspace, user=self.other, role="member")
+        for _ in range(2):
+            response = self.client.patch(self.member_url(self.other), {"role": "viewer"}, format="json")
+            self.assertEqual(response.status_code, 200)
+        audit = MembershipAudit.objects.get()
+        self.assertEqual(audit.actor_id, self.user.id)
+        self.assertEqual(audit.previous_role, "member")
+        self.assertEqual(audit.new_role, "viewer")
+        self.assertEqual(self.client.patch(self.member_url(self.other), {"role": "owner", "user_id": str(uuid4())}, format="json").status_code, 400)
+        self.assertEqual(self.client.patch(self.member_url(self.other), {"role": "root"}, format="json").status_code, 400)
+
+
+@skipUnless(connection.vendor == "postgresql", "Requires real PostgreSQL row locking")
+class ConcurrentOwnerTests(TransactionTestCase):
+    def test_two_owners_cannot_concurrently_remove_last_owner(self):
+        from .services import change_membership
+        from rest_framework.exceptions import ValidationError
+        user_a = User.objects.create_user(username="owner-a")
+        user_b = User.objects.create_user(username="owner-b")
+        workspace = create_workspace(user_a, {"name": "Race", "timezone": "UTC"})
+        Membership.objects.create(workspace=workspace, user=user_b, role="owner")
+        barrier = Barrier(2)
+        def demote(user_id):
+            close_old_connections()
+            try:
+                actor = User.objects.get(pk=user_id)
+                barrier.wait(timeout=10)
+                try:
+                    change_membership(actor, workspace.id, user_id, role="member")
+                    return "changed"
+                except ValidationError:
+                    return "retained"
+            finally:
+                close_old_connections()
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(demote, [user_a.id, user_b.id]))
+        self.assertCountEqual(results, ["changed", "retained"])
+        self.assertEqual(Membership.objects.filter(workspace=workspace, role="owner").count(), 1)
+        self.assertEqual(MembershipAudit.objects.count(), 1)
