@@ -578,7 +578,9 @@
         "PR #154 merged at cf58cf808b16ec142b882625aca4e99cdb27958a after all required checks and saas-postgres CI passed, including duplicate-create concurrency and reversible migration tests.",
         "apps/saas/core/services.py implements role changes/removal with last-owner protection and transactional audit; PostgreSQL concurrent owner regression added (next branch CI pending).",
         "PR #155 merged at d221dc7742f2cc03ca9bc02d7fe6eb783b8fdedf after PostgreSQL concurrent last-owner and all required CI checks passed.",
-        "Login abuse slice adds transactional 15-minute account/IP caps, keyed fingerprints and concurrent budget regression (next CI pending)."
+        "Login abuse slice adds transactional 15-minute account/IP caps, keyed fingerprints and concurrent budget regression (next CI pending).",
+        "PR #156 merged at e00a0459abf1010bb7141391d28b3fe084dd52a6 after required checks and real PostgreSQL login budget concurrency passed (SaaS Quality run 37688331442).",
+        "core.usage implements persisted fail-closed entitlements and workspace-serialized reserve/settle/release services with idempotency, hard caps and tenant checks; PostgreSQL concurrent reservation regression added (next CI pending)."
       ]
     },
     {
