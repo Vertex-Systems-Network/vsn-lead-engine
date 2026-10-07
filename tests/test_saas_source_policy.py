@@ -144,7 +144,8 @@ def test_authorize_export_accepts_only_plan_and_policy_allowed_fields():
     policy = SourcePolicy(
         code="overture-free",
         countries=frozenset({"US"}),
-        allowed_required_fields=frozenset({"phone", "website"}),
+        allowed_required_fields=frozenset({"phone"}),
+        allowed_export_fields=frozenset({"phone", "website"}),
         export_allowed=True,
     )
 
@@ -188,6 +189,7 @@ def test_authorize_export_rejects_fields_not_allowed_by_source():
         code="overture-free",
         countries=frozenset({"US"}),
         allowed_required_fields=frozenset({"phone"}),
+        allowed_export_fields=frozenset({"phone"}),
         export_allowed=True,
     )
 
