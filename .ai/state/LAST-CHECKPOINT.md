@@ -114,3 +114,16 @@ Do not turn workflow success or ANPOS completion into a false quota-complete cla
 - Branch `codex/saas-usage-reservations` adds inactive/zero internal entitlements, persisted counters and atomic idempotent reservation settlement/release. No client billing or usage mutation API.
 - Local SaaS suite: 29 passing tests, 4 explicit PostgreSQL-only skips. Next CI verifies concurrent reservation caps plus earlier concurrency gates.
 - Next ready frontier: transactional job/reservation/outbox and lease/cancellation/expiry/recovery with provider dispatch disabled. Foundation and production activation remain incomplete.
+
+
+## Quality baseline checkpoint — 2026-10-08 PKT
+
+- Exact main: `453d835cdd29eadae5805b04e4420a33cb3c00a2` / merged PR #157. All required checks, CodeQL and `saas-postgres` successful on `77f507b2b77acadff75390946308d207a7139370`.
+- Delivered this invocation: #154 Django/session/workspace/draft API; #155 owner-safe membership/audit; #156 login attempt caps; #157 persisted internal entitlements and atomic usage reservations.
+- Main README re-read after each merge and reflects delivered slices and open release gates.
+- Branch `codex/saas-quality-baseline`: adds pinned isolated Ruff lint/format/compile checks; reconciles design module and Stage 9 delegation while preserving current implementation state.
+- Local product suite evidence: 332 passed. Latest SaaS smoke evidence: 29 passed and 4 explicit PostgreSQL-only skips; prior PR remote CI executes all concurrency tests without skips. New quality CI pending publication.
+- Existing production collector/Google/R2 path and dependency locks unchanged. No background execution or refreshed production quota is asserted.
+- Next ready work: transactional job/reservation/outbox, source-policy recheck, bounded leases/cancellation/expiry/recovery, web workflows. External provider/customer/privacy/billing/deployment/launch activation remains gated.
+
+- Quality baseline also adopts reviewed Dependabot #135 CodeQL v4.38.2 immutable SHA after upstream tag verification; #144 Stage 9 delegation correction is preserved while stale state is superseded. #152 frontier state is superseded by current merged implementation.

@@ -1,16 +1,23 @@
 """Internal transactional budget services. No queue/provider/payment side effects."""
+
 import hashlib
 import json
 import re
+
 from django.db import transaction
 from django.db.models import Sum
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied, ValidationError
+
 from .models import Entitlement, UsageCounter, UsageReservation, Workspace
 from .services import IdempotencyConflict, membership_for
 
-COUNTERS = {"leads": "lead_limit", "jobs": "job_limit",
-            "provider_calls": "provider_call_limit", "exports": "export_limit"}
+COUNTERS = {
+    "leads": "lead_limit",
+    "jobs": "job_limit",
+    "provider_calls": "provider_call_limit",
+    "exports": "export_limit",
+}
 
 
 def amounts(values):
@@ -49,20 +56,28 @@ def reserve_usage(user, workspace_id, key, requested):
             raise IdempotencyConflict()
         return previous
     counter, _ = UsageCounter.objects.get_or_create(workspace_id=workspace_id)
-    pending = UsageReservation.objects.filter(workspace_id=workspace_id, status="reserved").aggregate(
-        **{name: Sum(name) for name in COUNTERS})
+    pending = UsageReservation.objects.filter(
+        workspace_id=workspace_id, status="reserved"
+    ).aggregate(**{name: Sum(name) for name in COUNTERS})
     for name, limit in COUNTERS.items():
-        if getattr(counter, name) + (pending[name] or 0) + requested[name] > getattr(entitlement, limit):
+        if getattr(counter, name) + (pending[name] or 0) + requested[name] > getattr(
+            entitlement, limit
+        ):
             raise ValidationError(f"{name} budget exceeded.")
-    return UsageReservation.objects.create(workspace_id=workspace_id, key=key,
-                                           request_hash=request_hash, **requested)
+    return UsageReservation.objects.create(
+        workspace_id=workspace_id, key=key, request_hash=request_hash, **requested
+    )
 
 
 @transaction.atomic
 def settle_usage(user, workspace_id, reservation_id, actual):
     actual = amounts(actual)
     lock_workspace(user, workspace_id)
-    reservation = UsageReservation.objects.select_for_update().filter(workspace_id=workspace_id, id=reservation_id).first()
+    reservation = (
+        UsageReservation.objects.select_for_update()
+        .filter(workspace_id=workspace_id, id=reservation_id)
+        .first()
+    )
     if reservation is None:
         raise Http404("Workspace resource not found.")
     if reservation.status == "settled":
@@ -86,7 +101,11 @@ def settle_usage(user, workspace_id, reservation_id, actual):
 @transaction.atomic
 def release_usage(user, workspace_id, reservation_id):
     lock_workspace(user, workspace_id)
-    reservation = UsageReservation.objects.select_for_update().filter(workspace_id=workspace_id, id=reservation_id).first()
+    reservation = (
+        UsageReservation.objects.select_for_update()
+        .filter(workspace_id=workspace_id, id=reservation_id)
+        .first()
+    )
     if reservation is None:
         raise Http404("Workspace resource not found.")
     if reservation.status == "settled":

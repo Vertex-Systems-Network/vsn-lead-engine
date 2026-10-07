@@ -4,7 +4,7 @@ An opt-in Django 5.2 LTS / DRF app, isolated from the existing production collec
 
 ## Local setup
 
-Use Python 3.12 on Linux, a disposable PostgreSQL database and a separate virtual environment. Install with `python -m pip install --require-hashes -r apps/saas/requirements.txt`. This lock contains CPython 3.12 Linux wheels; regenerate/review hashes before choosing another platform.
+Use Python 3.12 on Linux, a disposable PostgreSQL database and a separate virtual environment. Install runtime with `python -m pip install --require-hashes -r apps/saas/requirements.txt`; use `requirements-dev.txt` for the pinned Ruff development tools. This lock contains CPython 3.12 Linux wheels; regenerate/review hashes before choosing another platform.
 
 Set `SAAS_SECRET_KEY` outside Git, and configure `SAAS_DB_NAME`, `SAAS_DB_USER`, `SAAS_DB_PASSWORD`, `SAAS_DB_HOST` and `SAAS_DB_PORT`. The database user requires create-database permission only for the disposable test suite. Use separate limited credentials for any eventual deployment. Set `SAAS_DEBUG=1` only for local development. Run:
 
@@ -51,3 +51,7 @@ A global account bucket can temporarily block a legitimate user during a targete
 `core.usage` provides atomic reserve/settle/release services for accepted leads, jobs, provider calls and exports. Entitlements default inactive with zero limits and are provisioned only by trusted internal code; there is no customer balance, payment or entitlement mutation API. Active reservations and settled counters share the workspace lock so concurrent requests cannot exceed caps. Repeated requests replay by workspace/key and exact normalized amounts; changed amounts conflict. Settlement cannot exceed the reservation and repeats do not double-count. Release frees reserved capacity and cannot refund settled usage.
 
 These are internal primitives, not an activated paid plan. Counters are cumulative within this development model: billing periods, reset/renewal, signed billing events, reservation expiry/recovery, source policy recheck and atomic queue/outbox wiring remain separate work. Never expose settlement or entitlement provisioning directly as client-authoritative mutations. No draft route calls these services or dispatches a provider. Real PostgreSQL CI verifies concurrent reservation limits.
+
+## Quality gates
+
+CI checks the isolated CPython 3.12 Linux hash locks, Ruff static lint/import rules and formatting, compilation, Django checks, migration drift, all PostgreSQL regression/concurrency tests, reversible migration and secure non-debug settings. Run `ruff check --config apps/saas/ruff.toml apps/saas` and `ruff format --check --config apps/saas/ruff.toml apps/saas` before changes. The app-local configuration avoids changing the existing collector's tooling or lock.

@@ -1,7 +1,7 @@
-from django.contrib.auth import views as auth_views
-from django.urls import path
 from core import views
 from core.login_security import ProtectedLoginView
+from django.contrib.auth import views as auth_views
+from django.urls import path
 
 urlpatterns = [
     path("health/", views.health),
@@ -9,7 +9,10 @@ urlpatterns = [
     path("accounts/login/", ProtectedLoginView.as_view()),
     path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("api/v1/workspaces/<uuid:workspace_id>/members/", views.MemberList.as_view()),
-    path("api/v1/workspaces/<uuid:workspace_id>/members/<uuid:user_id>/", views.MemberDetail.as_view()),
+    path(
+        "api/v1/workspaces/<uuid:workspace_id>/members/<uuid:user_id>/",
+        views.MemberDetail.as_view(),
+    ),
     path("api/v1/workspaces/", views.WorkspaceList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/", views.JobList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/", views.JobDetail.as_view()),

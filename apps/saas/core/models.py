@@ -1,6 +1,7 @@
 import uuid
-from django.contrib.auth.models import AbstractUser
+
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
@@ -18,17 +19,23 @@ class Workspace(models.Model):
 class Membership(models.Model):
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    role = models.CharField(max_length=8, choices=[(r, r) for r in ("owner", "admin", "member", "viewer")])
+    role = models.CharField(
+        max_length=8, choices=[(r, r) for r in ("owner", "admin", "member", "viewer")]
+    )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["workspace", "user"], name="saas_unique_membership"),
-            models.CheckConstraint(condition=models.Q(role__in=["owner", "admin", "member", "viewer"]), name="saas_valid_role"),
+            models.CheckConstraint(
+                condition=models.Q(role__in=["owner", "admin", "member", "viewer"]),
+                name="saas_valid_role",
+            ),
         ]
 
 
 class Job(models.Model):
     """Saved draft intent only. This slice cannot enqueue or dispatch a provider."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
@@ -44,16 +51,38 @@ class Job(models.Model):
     class Meta:
         ordering = ["-created_at", "-id"]
         constraints = [
-            models.UniqueConstraint(fields=["workspace", "idempotency_key"], name="saas_job_idempotency"),
-            models.CheckConstraint(condition=models.Q(status__in=["draft", "queued", "running", "partial", "completed", "failed", "paused", "cancelled"]), name="saas_valid_job_status"),
-            models.CheckConstraint(condition=models.Q(revision__gte=0), name="saas_job_revision_nonnegative"),
+            models.UniqueConstraint(
+                fields=["workspace", "idempotency_key"], name="saas_job_idempotency"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(
+                    status__in=[
+                        "draft",
+                        "queued",
+                        "running",
+                        "partial",
+                        "completed",
+                        "failed",
+                        "paused",
+                        "cancelled",
+                    ]
+                ),
+                name="saas_valid_job_status",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(revision__gte=0), name="saas_job_revision_nonnegative"
+            ),
         ]
-        indexes = [models.Index(fields=["workspace", "-created_at"], name="saas_job_workspace_created")]
+        indexes = [
+            models.Index(fields=["workspace", "-created_at"], name="saas_job_workspace_created")
+        ]
 
 
 class MembershipAudit(models.Model):
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
-    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="membership_actions")
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="membership_actions"
+    )
     target_user_id = models.UUIDField()
     action = models.CharField(max_length=16)
     previous_role = models.CharField(max_length=8)
@@ -63,6 +92,7 @@ class MembershipAudit(models.Model):
 
 class LoginBucket(models.Model):
     """Short-lived keyed fingerprints only; no raw username or IP."""
+
     fingerprint = models.CharField(max_length=64, primary_key=True)
     started_at = models.DateTimeField(db_index=True)
     attempts = models.PositiveIntegerField(default=0)
@@ -70,6 +100,7 @@ class LoginBucket(models.Model):
 
 class Entitlement(models.Model):
     """Internal, fail-closed capabilities; no billing provider is activated."""
+
     workspace = models.OneToOneField(Workspace, primary_key=True, on_delete=models.CASCADE)
     active = models.BooleanField(default=False)
     lead_limit = models.PositiveIntegerField(default=0)
@@ -103,6 +134,9 @@ class UsageReservation(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["workspace", "key"], name="saas_reservation_key"),
-            models.CheckConstraint(condition=models.Q(status__in=["reserved", "settled", "released"]), name="saas_reservation_status"),
+            models.CheckConstraint(
+                condition=models.Q(status__in=["reserved", "settled", "released"]),
+                name="saas_reservation_status",
+            ),
         ]
         indexes = [models.Index(fields=["workspace", "status"], name="saas_reservation_workspace")]

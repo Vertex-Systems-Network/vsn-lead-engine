@@ -1,6 +1,8 @@
 """Opt-in SaaS settings. No production collector stores or credentials are used."""
+
 import os
 from pathlib import Path
+
 from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,8 +12,13 @@ if not SECRET_KEY:
     raise ImproperlyConfigured("SAAS_SECRET_KEY is required")
 ALLOWED_HOSTS = os.environ.get("SAAS_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 INSTALLED_APPS = [
-    "django.contrib.auth", "django.contrib.contenttypes", "django.contrib.sessions",
-    "django.contrib.messages", "django.contrib.staticfiles", "rest_framework", "core",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "core",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -25,29 +32,38 @@ MIDDLEWARE = [
 ROOT_URLCONF = "lead_saas.urls"
 WSGI_APPLICATION = "lead_saas.wsgi.application"
 AUTH_USER_MODEL = "core.User"
-TEMPLATES = [{
-    "BACKEND": "django.template.backends.django.DjangoTemplates",
-    "DIRS": [BASE_DIR / "templates"], "APP_DIRS": True,
-    "OPTIONS": {"context_processors": [
-        "django.template.context_processors.request",
-        "django.contrib.auth.context_processors.auth",
-        "django.contrib.messages.context_processors.messages",
-    ]},
-}]
-DATABASES = {"default": {
-    "ENGINE": "django.db.backends.postgresql",
-    "NAME": os.environ.get("SAAS_DB_NAME", "lead_saas"),
-    "USER": os.environ.get("SAAS_DB_USER", "lead_saas"),
-    "PASSWORD": os.environ.get("SAAS_DB_PASSWORD", ""),
-    "HOST": os.environ.get("SAAS_DB_HOST", "127.0.0.1"),
-    "PORT": os.environ.get("SAAS_DB_PORT", "5432"),
-    "CONN_MAX_AGE": 0,
-}}
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ]
+        },
+    }
+]
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("SAAS_DB_NAME", "lead_saas"),
+        "USER": os.environ.get("SAAS_DB_USER", "lead_saas"),
+        "PASSWORD": os.environ.get("SAAS_DB_PASSWORD", ""),
+        "HOST": os.environ.get("SAAS_DB_HOST", "127.0.0.1"),
+        "PORT": os.environ.get("SAAS_DB_PORT", "5432"),
+        "CONN_MAX_AGE": 0,
+    }
+}
 # Explicit disposable local smoke mode; never row-lock/concurrency certification.
 if os.environ.get("SAAS_SQLITE_SMOKE", "0") == "1":
     if not DEBUG:
         raise ImproperlyConfigured("SQLite smoke mode requires SAAS_DEBUG=1")
-    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "smoke.sqlite3"}}
+    DATABASES = {
+        "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "smoke.sqlite3"}
+    }
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
