@@ -108,3 +108,9 @@ Draft/queued job details show a cancellation-review link only to owner/admin/mem
 ## Source configuration preview
 
 The session source page requires current workspace membership, allows viewer reads and rejects mutation methods. It shows the first 100 global application policy records sorted by code and labels truncation when more exist. Only code/version/configured-switch/free-declaration/capability fields are exposed; rights evidence and operational control references stay private. Missing/corrupt/oversized capability metadata displays as unknown. Enabled/free flags are configuration declarations, not proof of rights, current cost, eligibility or live service. No policy is seeded/activated by viewing it, and no dispatch or billing path is exposed.
+
+## Internal dispatch write-ahead ledger
+
+`core.dispatch.begin_dispatch` commits one operation per saved source, stable provider key (separate from the lease fencing token), request/policy binding and started job/outbox/attempt state atomically. Current preflight gates and deadlines are rechecked. Failed persistence rolls back all evidence/state. Duplicate begins conflict and cannot mint a replacement key. Pending cancellation/expiry cannot release a started reservation. `mark_outcome_unknown` is an authorized internal, idempotent uncertainty marker; it keeps the reservation and never retries, settles or refunds. Empty migration rollback is reversible; once started evidence exists, reversal refuses to erase it without an explicit reconciliation/migration plan.
+
+There is no adapter, network-send permission, consumer or public dispatch endpoint. Confirmed provider receipts, success/no-effect reconciliation, terminal settlement and scheduling are still open. A stable UUID alone does not certify provider idempotency or exactly-once execution. The new Next frontend under `../web/` reads the existing API and retains these Django forms for mutations.

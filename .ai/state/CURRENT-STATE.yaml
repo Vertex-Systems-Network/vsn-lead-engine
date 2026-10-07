@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "5dd939146477451e34c64c7281f1d9e1eca607dc",
-  "observed_main_semantics": "Exact protected main inspected immediately before this dependency/checkpoint reconciliation branch.",
+  "observed_main_sha": "8ce3f55541bbacd0746f58da1536819570cfa022",
+  "observed_main_semantics": "Exact protected main inspected before the Next decision and dispatch ledger branch; final-head CI not yet asserted.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": null,
+  "active_branch": "codex/saas-next-decision-dispatch",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -68,7 +68,9 @@
     "saas_job_history": "PR #164 repaired head 387a4ff23964f2d839a80f30201d30dd03ec0214 passed required checks, CodeQL and SaaS PostgreSQL 37695051762",
     "saas_draft_form": "PR #165 head 7bb1124545a230a3349e383d4fe30d5dcff6ecc2 passed required checks, CodeQL and SaaS PostgreSQL 37695370079",
     "saas_pending_cancellation": "PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks, CodeQL and PostgreSQL 37695788773",
-    "saas_source_preview": "PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks, CodeQL and PostgreSQL 37696123260"
+    "saas_source_preview": "PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks, CodeQL and PostgreSQL 37696123260",
+    "checkpoint_168": "PR #168 head 7d4bfc9e69138f7424405a9c88691ecea2fb8a03 passed required checks, CodeQL/actions and SaaS PostgreSQL 37696425439 (84 tests).",
+    "dispatch_next_candidate": "Local verification only; PostgreSQL race/migration and Next CI remain merge gates for codex/saas-next-decision-dispatch"
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -115,7 +117,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Reconcile live main/issues/PRs; implement internal write-ahead dispatch ledger/provider-idempotency/uncertain-outcome tests from docs/ai/SAAS-DISPATCH-RECONCILIATION-NEXT-SLICE.md. No provider consumer enabled. Browser/billing/rights/customer/release gates remain open.",
+  "exact_next_safe_action": "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

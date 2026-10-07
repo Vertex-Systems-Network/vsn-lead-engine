@@ -1143,6 +1143,86 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-DISPATCH-WRITE-AHEAD",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-COLLECTION"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-DISPATCH-RECONCILIATION-NEXT-SLICE.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-next-decision-dispatch"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "apps/saas/core/test_dispatch.py: local regression and explicit PostgreSQL-only concurrency tests; final-head PostgreSQL CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "apps/saas/README.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [
+        "apps/saas/core/migrations/0008_dispatch_write_ahead.py"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/dispatch.py",
+        "apps/saas/core/models.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-NEXT-FRONTEND",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [
+        "docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-next-decision-dispatch"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "apps/web/test/transport.test.mjs: 6 pass; apps/web/test/integration_smoke.py: disposable Next/Django HTTP checks pass; lint/type/build pass locally; final-head CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "apps/web/README.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/web",
+        "docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

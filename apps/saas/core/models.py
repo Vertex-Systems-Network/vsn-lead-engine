@@ -175,7 +175,7 @@ class JobOutbox(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(status__in=["pending", "cancelled"]),
+                condition=models.Q(status__in=["pending", "cancelled", "started"]),
                 name="saas_outbox_status",
             )
         ]
@@ -202,7 +202,43 @@ class JobAttempt(models.Model):
                 name="saas_one_active_attempt",
             ),
             models.CheckConstraint(
-                condition=models.Q(status__in=["leased", "expired", "cancelled"]),
+                condition=models.Q(status__in=["leased", "expired", "cancelled", "started"]),
                 name="saas_attempt_status",
+            ),
+        ]
+
+
+class DispatchOperation(models.Model):
+    """Write-ahead uncertainty ledger; no external caller or terminal receipt yet."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
+    job = models.ForeignKey(Job, on_delete=models.PROTECT)
+    outbox = models.ForeignKey(JobOutbox, on_delete=models.PROTECT, related_name="operations")
+    attempt = models.ForeignKey(JobAttempt, on_delete=models.PROTECT)
+    source_code = models.CharField(max_length=64)
+    provider_key = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    request_hash = models.CharField(max_length=64)
+    policy_version = models.PositiveIntegerField()
+    policy_fingerprint = models.CharField(max_length=64)
+    status = models.CharField(max_length=7, default="started")
+    created_at = models.DateTimeField(auto_now_add=True)
+    unknown_at = models.DateTimeField(null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["outbox", "source_code"], name="saas_dispatch_source"),
+            models.CheckConstraint(
+                condition=models.Q(status__in=["started", "unknown"]), name="saas_dispatch_status"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(policy_version__gte=1), name="saas_dispatch_policy_version"
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(status="started", unknown_at__isnull=True)
+                    | models.Q(status="unknown", unknown_at__isnull=False)
+                ),
+                name="saas_dispatch_unknown_time",
             ),
         ]

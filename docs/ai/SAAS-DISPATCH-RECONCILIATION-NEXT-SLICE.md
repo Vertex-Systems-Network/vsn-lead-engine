@@ -43,3 +43,7 @@ No credentials, provider response bodies, contact records or signed download URL
 - App liveness and all user routes still report provider dispatch unavailable; no outbound code or background consumer is introduced by the internal ledger unit.
 
 Next unit should implement and verify the ledger before enabling an adapter. Browser/accessibility/customer task validation, billing period/events, durable scheduling, actual result storage/export and external rights/privacy/deployment/launch gates remain separate work.
+
+## Current implementation boundary
+
+The codex/saas-next-decision-dispatch candidate implements write-ahead start/unknown identities and reservation retention, not the full plan. Terminal confirmed receipts, evidence-bound success/no-effect transitions, bounded settlement and retry/reconciliation remain next work. No external sender is activated; final-head PostgreSQL races/migrations remain a merge gate.

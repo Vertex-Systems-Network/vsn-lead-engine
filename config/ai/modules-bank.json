@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+  "reconciliation_base_ref": "8ce3f55541bbacd0746f58da1536819570cfa022",
   "modules": [
     {
       "id": "MOD-HISTORICAL-ROADMAP",
@@ -526,7 +526,8 @@
         "SavedSearch",
         "Schedule",
         "Job",
-        "JobAttempt"
+        "JobAttempt",
+        "DispatchOperation"
       ],
       "contracts": [
         "Job lifecycle and idempotency"
@@ -552,10 +553,11 @@
         "Internal source-gated atomic job/reservation/outbox and pre-dispatch cancellation on codex/saas-transactional-outbox; no real policies seeded and no consumer/provider enabled. PostgreSQL CI merge gate pending.",
         "PR #160 atomic outbox/source catalog verified and merged after PostgreSQL race/migration gates. Bounded pre-dispatch lease/live recheck slice prepared for CI; external execution remains unavailable.",
         "PR #161 pre-dispatch lease/current-gate tests verified and merged. Bounded operator-driven expiry/recovery prepared for CI; no consumer/schedule/external execution activated.",
-        "PR #162 operator-driven pre-dispatch expiry/recovery verified on PostgreSQL and merged; no cleanup schedule or provider execution activated."
+        "PR #162 operator-driven pre-dispatch expiry/recovery verified on PostgreSQL and merged; no cleanup schedule or provider execution activated.",
+        "Internal write-ahead DispatchOperation ledger, stable provider key/request-policy binding, atomic start and idempotent unknown outcome retain reserved capacity. Local SaaS suite 83 pass / 10 PostgreSQL-only skips; new start/start and start/cancel races require real PostgreSQL CI before merge. No adapter/consumer/terminal settlement enabled."
       ],
       "update_notes": [
-        "Next internal zero-new-spend implementation: write-ahead dispatch-operation ledger, stable provider key and uncertain-outcome reconciliation. docs/ai/SAAS-DISPATCH-RECONCILIATION-NEXT-SLICE.md is a plan only; external dispatch remains disabled."
+        "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled."
       ],
       "removal_or_deprecation_notes": []
     },
@@ -754,9 +756,12 @@
       "status": "in_progress",
       "completion_evidence": [
         "PRs #163\u2013#165 usage/job visibility and signed CSRF/idempotent draft form verified with required checks, CodeQL and real PostgreSQL regression/migrations (draft 37695370079).",
-        "PRs #164\u2013#167 history/detail, signed session draft form, confirmed pending cancellation and bounded source configuration preview merged with required checks/CodeQL/real PostgreSQL regression and migration gates. Final source head 868e4df27281ed80b4503f129af840c463cdfcca / PostgreSQL 37696123260. No full browser/WCAG/customer/result/export/source-rights or release acceptance claimed."
+        "PRs #164\u2013#167 history/detail, signed session draft form, confirmed pending cancellation and bounded source configuration preview merged with required checks/CodeQL/real PostgreSQL regression and migration gates. Final source head 868e4df27281ed80b4503f129af840c463cdfcca / PostgreSQL 37696123260. No full browser/WCAG/customer/result/export/source-rights or release acceptance claimed.",
+        "Owner-selected Next.js 16.4/TypeScript frontend under apps/web: workspace/jobs/detail/usage GET workflows, server-only bounded session transport and preserved Django mutation forms. Local lint/type/build, 6 transport tests and disposable SQLite Next/Django HTTP rendering/isolation pass; final-head CI required. Browser/WCAG/customer/deployment acceptance remains open."
       ],
-      "update_notes": [],
+      "update_notes": [
+        "Frontend selection partially supersedes templates UI decision only: docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md."
+      ],
       "removal_or_deprecation_notes": []
     },
     {
