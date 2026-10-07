@@ -1,0 +1,15 @@
+{% extends "core/job_base.html" %}
+{% block title %}Source configuration{% endblock %}
+{% block content %}<h1>{{ workspace.name }} source configuration</h1>
+<p>This catalog is shared application configuration. It does not establish live availability, approved collection/storage/export rights, entitlement eligibility, freshness or guaranteed coverage. Provider dispatch is unavailable.</p>
+<p>Saving a source code in a draft does not activate it. Enqueue and dispatch require separate current-policy and entitlement checks. Export rights are assessed separately.</p>
+{% for source in sources %}<section aria-labelledby="source-{{ forloop.counter }}"><h2 id="source-{{ forloop.counter }}">{{ source.code }}</h2>
+<dl><dt>Policy version</dt><dd>{{ source.version }}</dd><dt>Configured switch</dt><dd>{% if source.configured_enabled %}Enabled in configuration{% else %}Disabled in configuration{% endif %}</dd>
+<dt>Free collection declaration</dt><dd>{% if source.configured_free_collection %}Recorded as free; cost verification is separate{% else %}Not recorded as free{% endif %}</dd>
+<dt>Configured countries</dt><dd>{{ source.countries|join:", "|default:"No values recorded / metadata unavailable" }}</dd>
+<dt>Configured categories</dt><dd>{{ source.categories|join:", "|default:"No values recorded / metadata unavailable" }}</dd>
+<dt>Configured business statuses</dt><dd>{{ source.statuses|join:", "|default:"No values recorded / metadata unavailable" }}</dd>
+<dt>Configured fields</dt><dd>{{ source.fields|join:", "|default:"No values recorded / metadata unavailable" }}</dd></dl></section>
+{% empty %}<p>No source policies are configured. You can save search drafts; collection remains unavailable.</p>{% endfor %}
+{% if truncated %}<p>Showing the first 100 source policies by code. Additional entries are omitted from this development preview.</p>{% endif %}
+{% endblock %}

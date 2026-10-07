@@ -269,3 +269,16 @@ def cancel_pending_page(request, workspace_id, job_id):
         {"workspace": workspace, "job": job, "form": form},
         status=response_status,
     )
+
+
+@login_required
+@require_GET
+def source_preview_page(request, workspace_id):
+    from .source_preview import source_preview
+
+    workspace, entries, truncated = source_preview(request.user, workspace_id)
+    return render(
+        request,
+        "core/source_preview.html",
+        {"workspace": workspace, "sources": entries, "truncated": truncated},
+    )

@@ -22,6 +22,7 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 - `/health/`: liveness and explicit disabled provider dispatch; no credentials/database details.
 - `/accounts/login/`, `/accounts/logout/`: Django same-origin sessions; CSRF-protected forms and POST logout.
 - `/`: authenticated workspace overview, with links to read-only workspace usage.
+- `/workspaces/{workspace_id}/sources/`: bounded read-only application policy configuration, without rights/availability claims.
 - `/workspaces/{workspace_id}/search/new/`: CSRF-protected draft form for owners/admins/members, never execution.
 - `/workspaces/{workspace_id}/jobs/`: newest-first read-only history, 25-row signed workspace-bound continuation.
 - `/workspaces/{workspace_id}/jobs/{job_id}/cancel/`: review then signed, revision-bound pending cancellation for writers.
@@ -102,3 +103,8 @@ The session form accepts supported country/status/field choices, bounded categor
 ## Confirmed pending cancellation
 
 Draft/queued job details show a cancellation-review link only to owner/admin/member roles. GET review does not mutate the job. POST requires CSRF and a signed ten-minute actor/workspace/job/revision confirmation; the existing transactional service rechecks membership/write role/state/revision. Only draft or queued jobs can be cancelled; an identical completed cancellation replays safely. Queued cancellation releases unused reserved capacity and invalidates the active attempt. Saved job/scope stays accessible, settled usage is never refunded, and cancelled jobs have no resume action. Unsupported or stale job state returns 409 with a safe review path; tampered/expired/context-mismatched confirmation returns 400. Running work, automatic retries and external providers remain unavailable. Tests use synthetic source fixtures only.
+
+
+## Source configuration preview
+
+The session source page requires current workspace membership, allows viewer reads and rejects mutation methods. It shows the first 100 global application policy records sorted by code and labels truncation when more exist. Only code/version/configured-switch/free-declaration/capability fields are exposed; rights evidence and operational control references stay private. Missing/corrupt/oversized capability metadata displays as unknown. Enabled/free flags are configuration declarations, not proof of rights, current cost, eligibility or live service. No policy is seeded/activated by viewing it, and no dispatch or billing path is exposed.
