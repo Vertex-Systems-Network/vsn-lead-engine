@@ -306,3 +306,103 @@ class ConcurrentLoginTests(TransactionTestCase):
             results = list(pool.map(attempt, range(2)))
         self.assertCountEqual(results, [True, False])
         self.assertTrue(all(row.attempts <= 20 for row in LoginBucket.objects.all()))
+
+
+class UsageReservationTests(TestCase):
+    def setUp(self):
+        from .models import Entitlement
+        self.user = User.objects.create_user(username="usage")
+        self.workspace = create_workspace(self.user, {"name": "Usage", "timezone": "UTC"})
+        self.entitlement = Entitlement.objects.create(workspace=self.workspace, active=True, lead_limit=10, job_limit=2)
+
+    def test_reserve_replay_conflict_and_limits(self):
+        from .usage import reserve_usage
+        from .services import IdempotencyConflict
+        from rest_framework.exceptions import ValidationError
+        first = reserve_usage(self.user, self.workspace.id, "key", {"leads": 8, "jobs": 1})
+        replay = reserve_usage(self.user, self.workspace.id, "key", {"jobs": 1, "leads": 8})
+        self.assertEqual(first.id, replay.id)
+        with self.assertRaises(IdempotencyConflict):
+            reserve_usage(self.user, self.workspace.id, "key", {"leads": 9})
+        with self.assertRaises(ValidationError):
+            reserve_usage(self.user, self.workspace.id, "other", {"leads": 3})
+
+    def test_settlement_is_idempotent_and_unused_capacity_freed(self):
+        from .usage import reserve_usage, settle_usage
+        from .models import UsageCounter
+        from .services import IdempotencyConflict
+        from rest_framework.exceptions import ValidationError
+        first = reserve_usage(self.user, self.workspace.id, "key", {"leads": 8})
+        with self.assertRaises(ValidationError):
+            settle_usage(self.user, self.workspace.id, first.id, {"leads": 9})
+        for _ in range(2):
+            settle_usage(self.user, self.workspace.id, first.id, {"leads": 3})
+        self.assertEqual(UsageCounter.objects.get(workspace=self.workspace).leads, 3)
+        self.assertIsNotNone(reserve_usage(self.user, self.workspace.id, "next", {"leads": 7}))
+        with self.assertRaises(IdempotencyConflict):
+            settle_usage(self.user, self.workspace.id, first.id, {"leads": 4})
+
+    def test_release_frees_capacity_without_refunding_settled_use(self):
+        from .usage import release_usage, reserve_usage, settle_usage
+        from rest_framework.exceptions import ValidationError
+        first = reserve_usage(self.user, self.workspace.id, "key", {"leads": 10})
+        for _ in range(2):
+            release_usage(self.user, self.workspace.id, first.id)
+        with self.assertRaises(ValidationError):
+            settle_usage(self.user, self.workspace.id, first.id, {"leads": 1})
+        second = reserve_usage(self.user, self.workspace.id, "second", {"leads": 10})
+        settle_usage(self.user, self.workspace.id, second.id, {"leads": 10})
+        with self.assertRaises(ValidationError):
+            release_usage(self.user, self.workspace.id, second.id)
+
+    def test_tenant_role_entitlement_and_invalid_amounts_fail_closed(self):
+        from .usage import reserve_usage, settle_usage
+        from django.http import Http404
+        from rest_framework.exceptions import PermissionDenied, ValidationError
+        for value in (-1, True, 1.5, 2147483648):
+            with self.assertRaises(ValidationError):
+                reserve_usage(self.user, self.workspace.id, "bad", {"leads": value})
+        with self.assertRaises(ValidationError):
+            reserve_usage(self.user, self.workspace.id, "bad", {"client_balance": 100})
+        with self.assertRaises(ValidationError):
+            reserve_usage(self.user, self.workspace.id, "paid", {"provider_calls": 1})
+        first = reserve_usage(self.user, self.workspace.id, "key", {"leads": 1})
+        other = User.objects.create_user(username="other")
+        foreign = create_workspace(other, {"name": "Other", "timezone": "UTC"})
+        with self.assertRaises(Http404):
+            settle_usage(other, foreign.id, first.id, {"leads": 1})
+        self.entitlement.active = False
+        self.entitlement.save()
+        with self.assertRaises(PermissionDenied):
+            reserve_usage(self.user, self.workspace.id, "key", {"leads": 1})
+        Membership.objects.filter(workspace=self.workspace, user=self.user).update(role="viewer")
+        with self.assertRaises(PermissionDenied):
+            settle_usage(self.user, self.workspace.id, first.id, {"leads": 1})
+
+
+@skipUnless(connection.vendor == "postgresql", "Requires real PostgreSQL row locking")
+class ConcurrentUsageTests(TransactionTestCase):
+    def test_concurrent_reservations_cannot_overspend(self):
+        from .models import Entitlement, UsageReservation
+        from .usage import reserve_usage
+        from rest_framework.exceptions import ValidationError
+        user = User.objects.create_user(username="budget")
+        workspace = create_workspace(user, {"name": "Budget", "timezone": "UTC"})
+        Entitlement.objects.create(workspace=workspace, active=True, lead_limit=10)
+        barrier = Barrier(2)
+        def reserve(index):
+            close_old_connections()
+            try:
+                actor = User.objects.get(pk=user.id)
+                barrier.wait(timeout=10)
+                try:
+                    reserve_usage(actor, workspace.id, f"key-{index}", {"leads": 7})
+                    return "reserved"
+                except ValidationError:
+                    return "limited"
+            finally:
+                close_old_connections()
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(reserve, range(2)))
+        self.assertCountEqual(results, ["reserved", "limited"])
+        self.assertEqual(UsageReservation.objects.count(), 1)

@@ -14,7 +14,7 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "d221dc7742f2cc03ca9bc02d7fe6eb783b8fdedf",
+  "observed_main_sha": "e00a0459abf1010bb7141391d28b3fe084dd52a6",
   "observed_main_semantics": "Exact protected main inspected before this Django foundation branch.",
   "active_issue": null,
   "active_pr": null,
@@ -56,7 +56,8 @@
       "analyze-actions"
     ],
     "saas_foundation": "PR #154: validate, repository-integrity, analyze-actions, CodeQL and saas-postgres successful",
-    "saas_membership": "PR #155: all required checks and PostgreSQL concurrent last-owner verification successful"
+    "saas_membership": "PR #155: all required checks and PostgreSQL concurrent last-owner verification successful",
+    "saas_login_security": "PR #156: required checks and SaaS Quality 37688331442 successful"
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -103,7 +104,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify/merge login controls, then persist atomic entitlements/usage and job/outbox with providers disabled.",
+  "exact_next_safe_action": "Verify/merge internal usage reservations, then wire transactionally safe job/outbox and lease/recovery controls with providers disabled.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

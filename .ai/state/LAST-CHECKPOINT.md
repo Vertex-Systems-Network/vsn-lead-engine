@@ -105,3 +105,12 @@ Do not turn workflow success or ANPOS completion into a false quota-complete cla
 - Branch `codex/saas-login-abuse-controls` adds bounded transactional account/IP login controls and anonymized HMAC bucket storage; no forwarded-header trust.
 - Local SaaS suite: 25 passing tests, 3 explicit PostgreSQL-only skips. Remote login concurrency gate pending.
 - Next ready frontier remains atomic persisted entitlement/usage and durable job/outbox; deployment cleanup/abuse/recovery evidence remains open.
+
+
+## Internal usage checkpoint — 2026-10-08 PKT
+
+- Exact main: `e00a0459abf1010bb7141391d28b3fe084dd52a6` / merged PR #156; required checks, CodeQL and SaaS Quality run `37688331442` succeeded on `95dac636a94fe0bc0c3ebfde112fdc21b6255667`.
+- Main README re-read and synchronized with login security delivery.
+- Branch `codex/saas-usage-reservations` adds inactive/zero internal entitlements, persisted counters and atomic idempotent reservation settlement/release. No client billing or usage mutation API.
+- Local SaaS suite: 29 passing tests, 4 explicit PostgreSQL-only skips. Next CI verifies concurrent reservation caps plus earlier concurrency gates.
+- Next ready frontier: transactional job/reservation/outbox and lease/cancellation/expiry/recovery with provider dispatch disabled. Foundation and production activation remain incomplete.

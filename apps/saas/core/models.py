@@ -66,3 +66,43 @@ class LoginBucket(models.Model):
     fingerprint = models.CharField(max_length=64, primary_key=True)
     started_at = models.DateTimeField(db_index=True)
     attempts = models.PositiveIntegerField(default=0)
+
+
+class Entitlement(models.Model):
+    """Internal, fail-closed capabilities; no billing provider is activated."""
+    workspace = models.OneToOneField(Workspace, primary_key=True, on_delete=models.CASCADE)
+    active = models.BooleanField(default=False)
+    lead_limit = models.PositiveIntegerField(default=0)
+    job_limit = models.PositiveIntegerField(default=0)
+    provider_call_limit = models.PositiveIntegerField(default=0)
+    export_limit = models.PositiveIntegerField(default=0)
+
+
+class UsageCounter(models.Model):
+    workspace = models.OneToOneField(Workspace, primary_key=True, on_delete=models.CASCADE)
+    leads = models.PositiveIntegerField(default=0)
+    jobs = models.PositiveIntegerField(default=0)
+    provider_calls = models.PositiveIntegerField(default=0)
+    exports = models.PositiveIntegerField(default=0)
+
+
+class UsageReservation(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
+    key = models.CharField(max_length=128)
+    request_hash = models.CharField(max_length=64)
+    leads = models.PositiveIntegerField(default=0)
+    jobs = models.PositiveIntegerField(default=0)
+    provider_calls = models.PositiveIntegerField(default=0)
+    exports = models.PositiveIntegerField(default=0)
+    status = models.CharField(max_length=8, default="reserved")
+    settlement = models.JSONField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["workspace", "key"], name="saas_reservation_key"),
+            models.CheckConstraint(condition=models.Q(status__in=["reserved", "settled", "released"]), name="saas_reservation_status"),
+        ]
+        indexes = [models.Index(fields=["workspace", "status"], name="saas_reservation_workspace")]
