@@ -172,9 +172,12 @@ def main():
                         self.token = None
                         self.hidden = {}
                         self.action = None
+                        self.links = []
 
                     def handle_starttag(self, tag, attrs):
                         fields = dict(attrs)
+                        if tag == "a" and fields.get("href"):
+                            self.links.append(fields["href"])
                         if tag == "form":
                             self.action = fields.get("action")
                         if tag == "input" and fields.get("type") == "hidden" and fields.get("name"):
@@ -318,6 +321,22 @@ def main():
                 assert (created.status, created.revision) == ("cancelled", 2)
                 assert UsageReservation.objects.get().status == "released"
                 assert JobOutbox.objects.get().status == "cancelled"
+
+                filtered, _ = native_form(f"/dashboard/workspaces/{workspace.id}?status=cancelled")
+                assert "Native bakery" in filtered and "Synthetic bakery" not in filtered
+                empty_filtered, _ = native_form(
+                    f"/dashboard/workspaces/{workspace.id}?status=completed"
+                )
+                assert "No saved searches match this status" in empty_filtered
+                paged, links = native_form(f"/dashboard/workspaces/{workspace.id}?status=draft")
+                assert "Next page" in paged and "status=draft&amp;after=" in paged
+
+                next_href = next(
+                    href for href in links.links if href.startswith("?status=draft&after=")
+                )
+                following, links = native_form(f"/dashboard/workspaces/{workspace.id}" + next_href)
+                assert "Synthetic bakery" in following and "Native bakery" not in following
+                assert f"/dashboard/workspaces/{workspace.id}?status=draft" in links.links
                 _, closed_form = native_form(detail_path + "/cancel")
                 assert "confirmation" not in closed_form.hidden
                 active_session = next(cookie.value for cookie in jar if cookie.name == "sessionid")
@@ -345,7 +364,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native draft/replay/role/tenant/cancel and bounded source configuration flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native draft/replay/role/tenant/cancel and bounded source configuration/status-filter pagination flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

@@ -190,3 +190,12 @@ footer {
   font: inherit;
   cursor: pointer;
 }
+
+.actions select {
+  font: inherit;
+  padding: 10px;
+  color: #142334;
+  border: 1px solid #768cab;
+  border-radius: 6px;
+  max-width: 100%;
+}

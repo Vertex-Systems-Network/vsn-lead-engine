@@ -144,3 +144,7 @@ Authenticated `draft-form/` and job `cancel-form/` API contexts expose only boun
 ### Native source preview API
 
 The read-only workspace `sources/` API reuses the bounded shared catalog preview, omits internal evidence/controls and marks capability data exceeding its per-entry wire budget as unavailable. Responses remain private/no-store and tenant membership is checked. The native Next page displays configured switches and recorded capabilities without granting source/rights/cost/availability authority. See [review](../../docs/ai/SAAS-NEXT-SOURCE-CONFIGURATION-REVIEW-20261008.md).
+
+### Saved job state filtering
+
+The job-list API accepts one supported `status` and optional UUID `after`, returning up to 25 tenant-scoped rows. Unknown/repeated query parameters fail; absent status remains the unfiltered cursor contract. Native Next filter changes reset continuation and pagination retains the selected state. This filters saved job state, not requested business statuses or accepted-lead classification. See [review](../../docs/ai/SAAS-JOB-STATE-FILTER-REVIEW-20261008.md).

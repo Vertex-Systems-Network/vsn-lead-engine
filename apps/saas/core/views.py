@@ -70,28 +70,14 @@ class WorkspaceList(generics.ListCreateAPIView):
         serializer.instance = create_workspace(self.request.user, serializer.validated_data)
 
 
+@method_decorator(never_cache, name="dispatch")
 class JobList(APIView):
     def get(self, request, workspace_id):
         membership_for(request.user, workspace_id)
-        # Bounded cursor continuation; filter tenant before applying the cursor.
-        query = Job.objects.filter(workspace_id=workspace_id).order_by("id")
-        after = request.query_params.get("after")
-        if after:
-            from uuid import UUID
+        from .job_query import job_page
 
-            from rest_framework.exceptions import ValidationError
-
-            try:
-                query = query.filter(id__gt=UUID(after))
-            except ValueError:
-                raise ValidationError({"after": "Invalid continuation cursor."}) from None
-        rows = list(query[:26])
-        return Response(
-            {
-                "results": JobSerializer(rows[:25], many=True).data,
-                "next": str(rows[24].id) if len(rows) > 25 else None,
-            }
-        )
+        rows, next_cursor = job_page(workspace_id, request.query_params)
+        return Response({"results": JobSerializer(rows, many=True).data, "next": next_cursor})
 
     def post(self, request, workspace_id):
         membership_for(request.user, workspace_id)

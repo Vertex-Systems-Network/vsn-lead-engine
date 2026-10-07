@@ -1,27 +1,44 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { backend } from "../../../../lib/backend";
-import { jobs, usage, uuid, counterNames } from "../../../../lib/contracts";
+import {
+  jobs,
+  usage,
+  uuid,
+  counterNames,
+  jobStates,
+  jobState,
+} from "../../../../lib/contracts";
 import { State } from "../../../components/state";
 export default async function Workspace({
   params,
   searchParams,
 }: {
   params: Promise<{ workspaceId: string }>;
-  searchParams: Promise<{ after?: string }>;
+  searchParams: Promise<{ after?: string; status?: string }>;
 }) {
-  const [{ workspaceId }, { after }] = await Promise.all([
+  const [{ workspaceId }, { after, status }] = await Promise.all([
     params,
     searchParams,
   ]);
   if (!uuid(workspaceId) || (after !== undefined && !uuid(after))) notFound();
+  if (status !== undefined && status !== "" && !jobState(status)) notFound();
+  const selected = status || undefined;
+  const query = new URLSearchParams();
+  if (selected) query.set("status", selected);
+  if (after) query.set("after", after);
   const base = `/api/v1/workspaces/${workspaceId}/`;
   const [history, counters] = await Promise.all([
-    backend(`${base}jobs/${after ? `?after=${after}` : ""}`, jobs),
+    backend(`${base}jobs/${query.size ? `?${query}` : ""}`, jobs),
     backend(`${base}usage/`, usage),
   ]);
   if (history.kind !== "ok") return <State kind={history.kind} />;
-  if (history.data.results.some((j) => j.workspace_id !== workspaceId))
+  if (
+    history.data.results.some(
+      (j) =>
+        j.workspace_id !== workspaceId || (selected && j.status !== selected),
+    )
+  )
     return <State kind="unavailable" />;
   return (
     <>
@@ -89,6 +106,26 @@ export default async function Workspace({
         <p>Usage is currently unavailable.</p>
       )}
       <h2>Saved searches</h2>
+      <form
+        className="actions"
+        method="get"
+        action={`/dashboard/workspaces/${workspaceId}`}
+      >
+        <label htmlFor="job-status">Job status</label>
+        <select id="job-status" name="status" defaultValue={selected ?? ""}>
+          <option value="">All jobs</option>
+          {jobStates.map((value) => (
+            <option value={value} key={value}>
+              {value}
+            </option>
+          ))}
+        </select>
+        <button type="submit">Apply filter</button>
+      </form>
+      <p className="muted">
+        Filters apply to saved job state. Requested business status remains part
+        of each search.
+      </p>
       <p className="muted">
         Ordered by stable job identity; up to 25 records per page.
       </p>
@@ -105,13 +142,29 @@ export default async function Workspace({
           </article>
         ))}
       </div>
-      {history.data.results.length === 0 ? <p>No saved searches yet.</p> : null}
+      {history.data.results.length === 0 ? (
+        <p>
+          {after
+            ? "No saved searches on this page."
+            : selected
+              ? "No saved searches match this status."
+              : "No saved searches yet."}
+        </p>
+      ) : null}
       <nav aria-label="Search pages" className="pagination">
         {after ? (
-          <Link href={`/dashboard/workspaces/${workspaceId}`}>First page</Link>
+          <Link
+            href={`/dashboard/workspaces/${workspaceId}${selected ? `?status=${selected}` : ""}`}
+          >
+            First page
+          </Link>
         ) : null}
         {history.data.next ? (
-          <Link href={`?after=${history.data.next}`}>Next page</Link>
+          <Link
+            href={`?${selected ? `status=${selected}&` : ""}after=${history.data.next}`}
+          >
+            Next page
+          </Link>
         ) : null}
       </nav>
     </>

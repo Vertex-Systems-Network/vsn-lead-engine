@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "6c6460c095778b27235272bd6f5ea608900614e1",
+  "reconciliation_base_ref": "4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01",
   "phases": [
     {
       "id": "PHASE-HISTORICAL-BASELINE",
@@ -651,7 +651,8 @@
         "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
         "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).",
         "PR #180 merged at 6c6460c095778b27235272bd6f5ea608900614e1; head 3c24b14fd0e263cc4fa24fd15ed2279752738961 passed all required checks/Actions CodeQL, PostgreSQL 37703540378 (138 tests/migration/settings) and Next/HTTP 37703540308 (native draft/replay/role/tenant/queued cancellation/CSRF/auth flows).",
-        "Native Next readonly source configuration and private bounded API implemented; sanitized capabilities and byte-limited unknown metadata, evidence/controls omitted. Local 125 pass/16 PostgreSQL skips (141 cases), Next lint/format/seven tests/build/type and HTTP empty/configured/XSS/viewer/foreign flows pass; exact-head CI pending. No source activation/rights/customer/browser certification."
+        "PR #181 merged at 4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01; head 66152035d4f4da7f75d8c656fe3eae0224590076 passed required checks/Actions CodeQL, PostgreSQL 37703955016 (141 tests/migration/settings), and Next/HTTP 37703954934 (bounded native source/XSS/viewer/tenant and earlier form/auth flows).",
+        "Native saved-job state filter/cursor continuity and private bounded validated query implemented; local 129 pass/16 PostgreSQL skips (145 cases), eight transport tests, Next build/type/lint/format and HTTP filtered/empty/Next/First page flow pass; final-head CI pending. No mutation/provider or full browser/customer acceptance."
       ],
       "update_notes": [
         "Frontend selection partially supersedes templates UI decision only: docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md."

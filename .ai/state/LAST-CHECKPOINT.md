@@ -3,15 +3,16 @@
 ## Snapshot
 
 - Repository Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 PKT / 2026-10-07 UTC.
-- Protected main re-read: `6c6460c095778b27235272bd6f5ea608900614e1` / PR #180. Current branch `codex/next-source-configuration`; inspect live main/issues/PRs before future mutation replay.
+- Protected main re-read: `4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01` / PR #181. Current branch `codex/next-job-state-filter`; inspect live main/issues/PRs before future mutation replay.
 - Owner selected Next.js + TypeScript. Django/DRF/PostgreSQL remain session, tenant, role and mutation authority; isolated SaaS work preserves production CLI/R2/Google behavior.
 
 ## Current candidate
 
-- Native Next readonly source configuration and private bounded API implemented; sanitized capabilities and byte-limited unknown metadata, evidence/controls omitted. Local 125 pass/16 PostgreSQL skips (141 cases), Next lint/format/seven tests/build/type and HTTP empty/configured/XSS/viewer/foreign flows pass; exact-head CI pending. No source activation/rights/customer/browser certification.
+- Native saved-job state filter/cursor continuity and private bounded validated query implemented; local 129 pass/16 PostgreSQL skips (145 cases), eight transport tests, Next build/type/lint/format and HTTP filtered/empty/Next/First page flow pass; final-head CI pending. No mutation/provider or full browser/customer acceptance.
 
 ## Verified
 
+- PR #181 merged at 4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01; head 66152035d4f4da7f75d8c656fe3eae0224590076 passed required checks/Actions CodeQL, PostgreSQL 37703955016 (141 tests/migration/settings), and Next/HTTP 37703954934 (bounded native source/XSS/viewer/tenant and earlier form/auth flows).
 - PR #180 merged at 6c6460c095778b27235272bd6f5ea608900614e1; head 3c24b14fd0e263cc4fa24fd15ed2279752738961 passed all required checks/Actions CodeQL, PostgreSQL 37703540378 (138 tests/migration/settings) and Next/HTTP 37703540308 (native draft/replay/role/tenant/queued cancellation/CSRF/auth flows).
 - PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).
 - PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870.
@@ -20,7 +21,7 @@
 - Internal dispatch write-ahead/unknown state keeps uncertain reservations; terminal proof reconciles whole-job usage only after all operations resolve. Accepted leads/exports remain zero. Generic usage APIs cannot release/settle attached job reservations.
 - Explicit manual period windows retain legacy counters and late receipt accounting; unresolved reservations block rollover. Closed totals archive once, expired periods stop new work, old receipt/key replay cannot reset or charge a new window. Next/Django show explicit dates without automatic reset claims.
 - Next workspace/jobs/detail/usage uses bounded server-only session GET transport, fixed origin/path checks and no shared cache/redirects. Real disposable Django/Next HTTP rendering checks pass; Django draft/cancel forms remain in use.
-- Local SaaS suite: 130 cases, 114 passed/16 PostgreSQL-only skipped; final PostgreSQL CI runs all 130 without skips. Next password/CSRF cookie/return/confirmation/logout and old-session denial verified by HTTP CI. Root 376 passed, 1 skipped, 28 subtests, ANPOS and local lint/drift/settings pass. M5 85%, M6 70%, M7 60% candidate, overall ~45% are engineering indicators only. Work-unit counts: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
+- Local SaaS suite: 130 cases, 114 passed/16 PostgreSQL-only skipped; final PostgreSQL CI runs all 130 without skips. Next password/CSRF cookie/return/confirmation/logout and old-session denial verified by HTTP CI. Root 376 passed, 1 skipped, 28 subtests, ANPOS and local lint/drift/settings pass. M5 85%, M6 70%, M7 65% candidate, overall ~45% are engineering indicators only. Work-unit counts: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
 
 ## Not Verified
 
@@ -32,12 +33,12 @@
 ## Known Risk
 
 - Unknown external outcomes retain capacity until valid terminal evidence arrives; provider adapters need reviewed proof contracts and replay semantics. Evidence/history migrations refuse destructive rollback.
-- Fixed session return/logout is tested over localhost HTTP, with opt-in trusted origin. Native Next account/draft/cancel forms and production shared-origin TLS/cookie/CSRF acceptance remain open.
+- Fixed session return/logout is tested over localhost HTTP, with opt-in trusted origin. Native Next account/error flows and production shared-origin TLS/cookie/CSRF acceptance remain open; native draft/cancel/screens are verified.
 - ESLint 9 is upstream unsupported while current plugin peers exclude 10; compatible maintained tooling remains a production gate.
 - Manual windows do not automatically reset or activate paid plans. Schedules are disabled configurations and draft decisions, not a working customer execution scheduler; timezone data and activation/overlap/retention need deployment review.
 
 ## Next Action
 
-1. Verify/merge native source candidate, then continue native validation/error and account flows. Retain Django CSRF/session/mutation authority.
+1. Verify/merge saved-job filter candidate, then continue native validation/error and account flows under Django authority.
 2. Continue account forms, signed billing-event and accepted-lead/results contracts where independent, without activating payments/providers. Native browser/proxy acceptance remains explicit.
 3. Continue ready work within invocation budget; checkpoints are recovery aids, not permission gates. No execution after turn end is claimed.
