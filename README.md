@@ -24,6 +24,32 @@ The 12,000/day figure is a target, not a guarantee; output depends on source
 coverage, public contact completeness, query execution, classification precision
 and dedupe.
 
+
+## SaaS milestone roadmap
+
+Snapshot: **2026-10-07 PKT**. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is a work-unit progress indicator, not market validation.
+
+| Milestone | Start date | Status | Progress |
+|---|---:|---|---|
+| M0 — Current engine audit and SaaS boundary | 2026-10-04 | Complete | `██████████` 100% |
+| M1 — User/market and competitor desk research | 2026-10-04 | Desk research complete; external validation pending | `███████░░░` 70% |
+| M2 — MVP options, scope and success criteria | 2026-10-05 | In progress / owner decisions pending | `████░░░░░░` 40% |
+| M3 — System, tenant and threat-model design | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
+| M4 — Technology stack and repository decision | 2026-10-07 | Not approved | `░░░░░░░░░░` 0% |
+| M5 — SaaS foundation: workspace, roles and entitlements | 2026-10-07 | In progress; contracts and authorization boundary added | `███░░░░░░░` 30% |
+| M6 — Source policy, adapters and job orchestration | 2026-10-07 | Source-policy authorization implemented; adapters not selected | `░░░░░░░░░░` 0% |
+| M7 — Lead web workflow, filters and export | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
+| M8 — Admin controls and bounded AI | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
+| M9 — Production readiness, desktop/mobile and launch | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
+| **Overall SaaS direction** | **2026-10-04** | **Implementation started; validation, stack and provider gates remain open** | **`███░░░░░░░` ~25% of current planned milestones** |
+
+Progress notes:
+- M0 is complete from repository audit evidence.
+- M1 is complete only as desk research; no external interviews, prototype sessions or provider benchmark are counted.
+- M5 is the first implementation milestone. The current slice is stack-neutral and does not alter the production collector, scheduler, Google Sheets delivery or R2 dedupe authority.
+- M6 now has a stack-neutral authorization boundary and tests; no provider adapter is enabled or implied.
+- Overall progress is a planning/implementation status, not a claim of customer demand, source rights, coverage or launch readiness.
+
 ## Daily dated workbook model
 
 Every real event resolves the current date in `Asia/Karachi` and targets

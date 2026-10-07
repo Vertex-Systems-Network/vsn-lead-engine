@@ -2,7 +2,1537 @@
   "schema_version": 1,
   "status": "active_registry",
   "activation_scope": "child_project",
-  "entries": [],
+  "entries": [
+    {
+      "id": "EVID-000001",
+      "claim_or_question": "The current lead engine is a production operations system with explicit US/Canada, Overture, phone-required, R2 dedupe, dated Sheets and daily target constraints.",
+      "source_type": "repository",
+      "source_ref": "https://github.com/Vertex-Systems-Network/vsn-lead-engine/blob/main/README.md",
+      "source_title": "VSN Lead Engine README",
+      "publisher_or_owner": "VSN",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": "main as of ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Current runtime and target are already operational; SaaS tenant, subscription and client app capabilities are not evidenced in planning snapshot. Preserve existing invariants.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-USER-SCHEDULES"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCTION-RUNTIME",
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Current-state and README evidence need re-read before each execution."
+      ]
+    },
+    {
+      "id": "EVID-000002",
+      "claim_or_question": "Places API content generally must not be pre-fetched, cached or stored beyond allowed exceptions; Place IDs are exempt.",
+      "source_type": "primary",
+      "source_ref": "https://developers.google.com/maps/documentation/places/web-service/policies",
+      "source_title": "Policies and attributions for Places API",
+      "publisher_or_owner": "Google for Developers",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Any Google Places adapter requires policy-specific storage/display/attribution behavior; user-visible lead database retention cannot assume Places content may be stored.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Re-open current terms/policies with qualified reviewer before any integration."
+      ]
+    },
+    {
+      "id": "EVID-000003",
+      "claim_or_question": "Google Maps Platform prices services by SKU and billable usage; usage/free events vary by product.",
+      "source_type": "primary",
+      "source_ref": "https://developers.google.com/maps/billing-and-pricing/pricing",
+      "source_title": "Google Maps Platform pricing list",
+      "publisher_or_owner": "Google for Developers",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "A generic paid toggle is inadequate; provider/call-level estimates, budgets and hard caps are required.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Re-check live rates during provider evaluation; no rate copied into plan."
+      ]
+    },
+    {
+      "id": "EVID-000004",
+      "claim_or_question": "Apollo publicly presents prospecting, contact data credits, sequences, AI, and analytics.",
+      "source_type": "primary",
+      "source_ref": "https://www.apollo.io/pricing",
+      "source_title": "Apollo public pricing and product overview",
+      "publisher_or_owner": "Apollo.io",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "medium",
+      "summary": "Public product descriptions indicate an integrated outbound workflow and usage-credit model. Marketing claims do not prove internal implementation or independent efficacy.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-AI-ASSIST",
+        "OPT-SUBSCRIPTIONS-ENTITLEMENTS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Detailed UX/pricing/complaint comparison remains pending."
+      ]
+    },
+    {
+      "id": "EVID-000005",
+      "claim_or_question": "Clay publicly describes enrichment with multiple providers and waterfall ordering.",
+      "source_type": "primary",
+      "source_ref": "https://university.clay.com/docs/building-a-data-waterfall",
+      "source_title": "Building a data waterfall",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "medium",
+      "summary": "Supports evaluation of provider order, field-level provenance, confidence and cost as product requirements; doesn't prove coverage claims.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Independent and user research still needed."
+      ]
+    },
+    {
+      "id": "EVID-000006",
+      "claim_or_question": "Hunter publicly offers email finding, verification, API access and credit-based plans.",
+      "source_type": "primary",
+      "source_ref": "https://hunter.io/pricing",
+      "source_title": "Hunter plans and pricing",
+      "publisher_or_owner": "Hunter",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "medium",
+      "summary": "Illustrates focused provider integration and credit-based usage; it does not establish VSN eligibility/resale rights or a selected provider.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Provider's current API terms/prices must be separately researched."
+      ]
+    },
+    {
+      "id": "EVID-000007",
+      "claim_or_question": "GitHub Marketplace uses purchase and plan-change webhooks to reconcile app entitlements; it only applies if Marketplace distribution is selected.",
+      "source_type": "primary",
+      "source_ref": "https://docs.github.com/en/apps/github-marketplace/using-the-github-marketplace-api-in-your-app",
+      "source_title": "Using the GitHub Marketplace API in your app",
+      "publisher_or_owner": "GitHub Docs",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Billing provider is a product decision; GitHub Marketplace is not a generic consumer SaaS billing substitute.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SUBSCRIPTIONS-ENTITLEMENTS"
+      ],
+      "supports_module_ids": [
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Current listing eligibility and terms require re-check if considered."
+      ]
+    },
+    {
+      "id": "EVID-000008",
+      "claim_or_question": "Apple supports auto-renewable subscription purchases in-app; storefront rules may differ by jurisdiction and current policy.",
+      "source_type": "primary",
+      "source_ref": "https://developer.apple.com/app-store/review/guidelines/",
+      "source_title": "App Store Review Guidelines",
+      "publisher_or_owner": "Apple Developer",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "medium",
+      "summary": "Mobile monetization/distribution must be decided and re-verified for intended storefronts before checkout design.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MOBILE-CLIENT",
+        "OPT-SUBSCRIPTIONS-ENTITLEMENTS"
+      ],
+      "supports_module_ids": [
+        "MOD-MOBILE-CLIENT",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Region-specific exceptions and requirements need current legal/platform review."
+      ]
+    },
+    {
+      "id": "EVID-000009",
+      "claim_or_question": "Microsoft Store allows commerce options for non-game PC products and offers its own store commerce path.",
+      "source_type": "primary",
+      "source_ref": "https://learn.microsoft.com/en-us/windows/apps/publish/get-started",
+      "source_title": "Get started with Microsoft Store",
+      "publisher_or_owner": "Microsoft Learn",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "medium",
+      "summary": "Desktop packaging and payments/distribution model are separate decisions; current Store terms must be checked before selecting a route.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-DESKTOP-CLIENT",
+        "OPT-SUBSCRIPTIONS-ENTITLEMENTS"
+      ],
+      "supports_module_ids": [
+        "MOD-DESKTOP-CLIENT",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Windows Store eligibility and current policy remain unverified for VSN."
+      ]
+    },
+    {
+      "id": "EVID-000010",
+      "claim_or_question": "The audited main ref is a Python CLI production lead pipeline with fixed US/Canada, 12-category and free-mode constraints, Overture plus optional self-hosted Overpass, GitHub Actions scheduling, Google Sheets output and R2 dedupe; SaaS identity/billing/API/client runtime is not present in the audited repository tree.",
+      "source_type": "repository",
+      "source_ref": "https://github.com/Vertex-Systems-Network/vsn-lead-engine/commit/ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+      "source_title": "VSN Lead Engine source and runtime configuration audit",
+      "publisher_or_owner": "VSN",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": "ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Code/config/workflow inspection completed read-only; detailed evidence and component reuse/gap assessment are in docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md. This is not a live yield, privacy/security certification, or architecture selection.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-IDENTITY-WORKSPACES",
+        "OPT-SUBSCRIPTIONS-ENTITLEMENTS",
+        "OPT-USER-SCHEDULES",
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-LEAD-PROVENANCE",
+        "OPT-WEB-CLIENT"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCTION-RUNTIME",
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-IDENTITY",
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG",
+        "MOD-JOB-ORCHESTRATION",
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Read-only audit; no production workflow, source, credentials or runtime behavior changed.",
+        "Repository boundary remains unresolved."
+      ]
+    },
+    {
+      "id": "EVID-000011",
+      "claim_or_question": "Overture Places is a global candidate dataset whose records can have optional fields and source-specific license metadata; operating status is distinct from opening hours/current-time open.",
+      "source_type": "primary",
+      "source_ref": "https://docs.overturemaps.org/guides/places/",
+      "source_title": "Overture Places documentation",
+      "publisher_or_owner": "Overture Maps Foundation",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Potential free discovery input; coverage and optional phone/email/site fields vary. Mixed upstream licenses and per-record provenance require policy-aware ingestion.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-LEAD-PROVENANCE"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Field coverage and commercial SaaS use require country/category sample and qualified rights review."
+      ]
+    },
+    {
+      "id": "EVID-000012",
+      "claim_or_question": "OpenStreetMap data is under ODbL and public Overpass instances have finite capacity/policies; large/repeated workloads should not assume unrestricted shared endpoint capacity.",
+      "source_type": "primary",
+      "source_ref": "https://www.openstreetmap.org/copyright",
+      "source_title": "OpenStreetMap Copyright and License",
+      "publisher_or_owner": "OpenStreetMap",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Attribution/share-alike and service capacity constraints must be evaluated for the exact workflow; self-hosting/extracts have operating cost.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-PRODUCTION-RUNTIME"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "OSM ODbL and Overpass operational guidance recorded separately in source matrix."
+      ]
+    },
+    {
+      "id": "EVID-000013",
+      "claim_or_question": "Google Places has content storage/caching restrictions beyond specified exceptions and SKU-based usage billing.",
+      "source_type": "primary",
+      "source_ref": "https://developers.google.com/maps/documentation/places/web-service/policies",
+      "source_title": "Policies and attributions for Places API",
+      "publisher_or_owner": "Google for Developers",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Poor default for a persistent lead database without exact policy review; usage budget must be SKU-specific.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Rates are time-sensitive and need re-check at provider evaluation."
+      ]
+    },
+    {
+      "id": "EVID-000014",
+      "claim_or_question": "Apollo standard API/data terms do not establish general rights to expose or resell its data to VSN SaaS tenants; custom agreement/reseller route may be required.",
+      "source_type": "primary",
+      "source_ref": "https://www.apollo.io/terms",
+      "source_title": "Apollo Terms and Reseller Program",
+      "publisher_or_owner": "Apollo.io",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Conditional candidate only after written resale/storage rights and commercial quote; public marketing/pricing cannot settle unit economics.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Need vendor contract review before activation."
+      ]
+    },
+    {
+      "id": "EVID-000015",
+      "claim_or_question": "Hunter offers email-oriented search/enrichment/verification APIs with request-rate and credit-plan constraints; public plan claims do not establish VSN resale rights.",
+      "source_type": "primary",
+      "source_ref": "https://hunter.io/api-documentation/v2",
+      "source_title": "Hunter API documentation",
+      "publisher_or_owner": "Hunter",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Potential optional email enrichment adapter after contract, retention, coverage and cost tests; not primary POI discovery.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Plan pricing and API constraints must be refreshed during actual procurement."
+      ]
+    },
+    {
+      "id": "EVID-000016",
+      "claim_or_question": "Clay sells a provider-orchestration workflow with credit/action-based tiers; public comparator pricing does not establish embedded or resale rights for VSN.",
+      "source_type": "primary",
+      "source_ref": "https://www.clay.com/pricing",
+      "source_title": "Clay pricing",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Useful competitor/workflow comparator for waterfall controls and usage presentation; not selected as VSN provider.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Price page observed on 2026-10-05 and may change."
+      ]
+    },
+    {
+      "id": "EVID-000017",
+      "claim_or_question": "Apollo documents advanced search filters, saved searches/lists, enrichment, exports and optional sequence/workflow engagement.",
+      "source_type": "primary",
+      "source_ref": "https://knowledge.apollo.io/hc/en-us/articles/4412665755661-Use-Search-Filters-to-Find-Prospects",
+      "source_title": "Use Search Filters to Find Prospects",
+      "publisher_or_owner": "Apollo",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Competitor journey suggests explainable filter logic, reusable search/list, and separation of discovery, enrichment and outreach. This is workflow evidence only, not VSN demand evidence.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-AI-ASSIST"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Official docs accessed 2026-10-05; no independent usability evaluation."
+      ]
+    },
+    {
+      "id": "EVID-000018",
+      "claim_or_question": "Clay documents a configurable enrichment waterfall with provider order, skips, required inputs, run conditions and optional successful-provider output.",
+      "source_type": "primary",
+      "source_ref": "https://university.clay.com/docs/building-a-data-waterfall",
+      "source_title": "Waterfalls",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Comparator suggests explicit provider order, run conditions, reusable workflows and result-provider visibility as potential product concepts. Does not establish user demand or license rights.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Official docs accessed 2026-10-05; product workflow observation only."
+      ]
+    },
+    {
+      "id": "EVID-000019",
+      "claim_or_question": "Hunter documents discovery filters for companies/contacts, saving leads, email finding/verification and CSV export.",
+      "source_type": "primary",
+      "source_ref": "https://help.hunter.io/en/articles/12269815-hunter-discover-faqs",
+      "source_title": "Hunter Discover FAQs",
+      "publisher_or_owner": "Hunter",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Competitor workflow separates company discovery from optional email enrichment/verification and export. Does not establish VSN's user demand, coverage or resale rights.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Official docs accessed 2026-10-05; no independent usability evaluation."
+      ]
+    },
+    {
+      "id": "EVID-000020",
+      "claim_or_question": "Apollo's public page describes team-pooled credits with per-user caps and says standard plans are internal-use only; customer-facing products/sharing/resale need a separate custom-priced agreement.",
+      "source_type": "primary",
+      "source_ref": "https://www.apollo.io/pricing",
+      "source_title": "Apollo pricing and plan FAQ",
+      "publisher_or_owner": "Apollo.io",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Useful credit-governance comparator, but standard seat pricing is not a resale/API wholesale quote. Exact figures were not exposed in the page text fetched.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Accessed 2026-10-05."
+      ]
+    },
+    {
+      "id": "EVID-000021",
+      "claim_or_question": "Hunter's public pricing page lists $0/50 monthly credits Free, $34/month Starter (24,000 credits/year), $104/month Growth (120,000/year), $209/month Scale (300,000/year), and custom Enterprise; a separate API-only Data Platform sells search and verification credits.",
+      "source_type": "primary",
+      "source_ref": "https://hunter.io/pricing",
+      "source_title": "Hunter plans and pricing",
+      "publisher_or_owner": "Hunter",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Retail app plans and API-only credit purchase are distinct economics; neither establishes VSN redistribution rights or cost per usable lead.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Observed public page on 2026-10-05; verify at checkout/vendor before procurement."
+      ]
+    },
+    {
+      "id": "EVID-000022",
+      "claim_or_question": "Clay's pricing page showed inconsistent/dynamic Launch and Growth figures in the captured view: card figures differed from summary starting prices, while usage allowances varied with billing selection.",
+      "source_type": "primary",
+      "source_ref": "https://www.clay.com/pricing",
+      "source_title": "Clay plans and pricing",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Do not use one captured Clay price as canonical; re-check selected billing mode/checkout. Competitor prices do not define VSN wholesale data cost or end-user rights.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Accessed 2026-10-05; captured Launch card $167/mo vs summary $185/mo, Growth card $446/mo vs summary $495/mo."
+      ]
+    },
+    {
+      "id": "EVID-000023",
+      "claim_or_question": "Seamless.AI Prospector describes real-time B2B contact discovery and dynamic AI-enhanced filters; its official FAQ advertises 50 free search credits with no credit card commitment, while further plan details are sales-customized.",
+      "source_type": "primary",
+      "source_ref": "https://seamless.ai/products/prospector",
+      "source_title": "Seamless.AI Prospector",
+      "publisher_or_owner": "Seamless.AI",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Contact-first prospecting comparator with an advertised 50-search-credit free start. It does not validate VSN demand, independently verify contact quality, or establish VSN resale/storage rights. Official pricing page text was not accessible in this capture.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Official product FAQ states 50 free search credits without credit-card commitment; further plans are customized.",
+        "Keep business/place discovery distinct from named-contact prospecting."
+      ]
+    },
+    {
+      "id": "EVID-000024",
+      "claim_or_question": "Outscraper markets Google Maps crawling by location/category with parameter selection, task start and file download; its pricing page shows metered prices for business/place, contact and enrichment products.",
+      "source_type": "primary",
+      "source_ref": "https://outscraper.com/pricing/",
+      "source_title": "Outscraper pricing",
+      "publisher_or_owner": "Outscraper",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Relevant comparator for map/business scraping workflow and usage-meter presentation. The vendor markets Google Maps crawling; price does not establish source permission, end-customer distribution rights, legal compliance, accuracy, or VSN eligibility. Do not select or integrate without qualified source-specific review and written rights confirmation.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Pricing page observed $2 per 1,000 businesses for first 5k in the displayed B2B Lead Generation Database tier; page contains other products/tiers and may change.",
+        "Google Maps crawler guide says select location/category, parameters, run task, download result.",
+        "Comparator observation only; no permission or legal conclusion."
+      ]
+    },
+    {
+      "id": "EVID-000025",
+      "claim_or_question": "Outscraper Terms of Service say a payment method is required before first usage; terms also require lawful/authorized use, note prices may change, and point to a separate Global Services Agreement available by request or during signup.",
+      "source_type": "primary",
+      "source_ref": "https://outscraper.com/terms-of-service/",
+      "source_title": "Outscraper Terms of Service",
+      "publisher_or_owner": "Outscraper",
+      "published_at": "2025-07-10",
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Advertised free usage thresholds are not necessarily a no-payment-method path. Full commercial/API conditions are not established by the public short terms; obtain and review the Global Services Agreement and exact distribution rights before any evaluation or use.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "ToS lines 69-75 describe payment method and billing; lines 124-129 explain Global Services Agreement availability.",
+        "This is a vendor-stated term, not legal advice or a conclusion about third-party source rights."
+      ]
+    },
+    {
+      "id": "EVID-000026",
+      "claim_or_question": "Google Places API (New) usage documentation says Place Details, Nearby Search and Text Search require field masks, and a request containing fields across Essentials and Pro is billed at the highest applicable SKU.",
+      "source_type": "primary",
+      "source_ref": "https://developers.google.com/maps/documentation/places/web-service/usage-and-billing",
+      "source_title": "Places API Usage and Billing",
+      "publisher_or_owner": "Google for Developers",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Field selection changes billable SKU, so provider/call estimates must use the exact field mask and be recalculated if requested fields change. This does not itself establish a suitable storage/export design.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Official usage/billing doc explicitly describes field masks and highest applicable SKU."
+      ]
+    },
+    {
+      "id": "EVID-000027",
+      "claim_or_question": "Foursquare's public Places API pricing page accessed 2026-10-05 lists Pro calls at 0–500 free, then $15 CPM for 501–100,000, $12 CPM for 100,001–500,000, and $9 CPM for 500,001+; Premium endpoint/field pricing starts at $18.75 CPM up to 100,000. The same page footer advertises up to 10,000 free Pro calls.",
+      "source_type": "primary",
+      "source_ref": "https://foursquare.com/pricing/",
+      "source_title": "Foursquare pricing",
+      "publisher_or_owner": "Foursquare",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "The page's own Pro free-call statements conflict (500 in the tier table versus up to 10,000 in the footer). It also makes pricing endpoint/field-tier-dependent. Treat displayed pricing as an observed snapshot, not a confirmed quote; resolve plan eligibility, counting semantics and current SKU before modeling cost.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Pricing page accessed 2026-10-05 shows both figures.",
+        "Upcoming Changes doc also lists 500 free Pro calls and rates effective June 1, 2026: https://docs.foursquare.com/developer/reference/upcoming-changes.",
+        "CPM is the unit as displayed; confirm exact billing semantics with Foursquare before procurement."
+      ]
+    },
+    {
+      "id": "EVID-000028",
+      "claim_or_question": "Foursquare's official Places delivery page markets 100M+ commercial points of interest, 200+ countries and territories, and 1,100+ venue categories, and describes API and flat-file delivery.",
+      "source_type": "primary",
+      "source_ref": "https://docs.foursquare.com/data-products/docs/places-delivery-overview",
+      "source_title": "Places Delivery Overview",
+      "publisher_or_owner": "Foursquare",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "This establishes the vendor's published product/coverage claims and delivery options only. It does not independently validate country/niche yield, field completeness, phone availability, price, or VSN's redistribution/storage rights.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Vendor claims need market/niche benchmark before any coverage promise.",
+        "Related pages: https://docs.foursquare.com/data-products/docs/places-overview and https://foursquare.com/pricing/."
+      ]
+    },
+    {
+      "id": "EVID-000029",
+      "claim_or_question": "For VSN's proposed multi-tenant lead SaaS, the reviewed public Foursquare Places product/pricing pages do not establish current new-API and flat-file rights for persistent storage, customer export/redistribution, attribution, or exact contact-field availability; these remain provider/legal review questions.",
+      "source_type": "primary",
+      "source_ref": "https://docs.foursquare.com/developer/docs/developer-console-get-started",
+      "source_title": "Foursquare Developer Console Get Started",
+      "publisher_or_owner": "Foursquare",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "unknown",
+      "confidence": "medium",
+      "summary": "Foursquare's developer onboarding says users must accept its Developer Master Terms, but this review did not establish that contract's application to VSN's proposed lead-database and resale use. A separate Usage Guidelines page explicitly addresses the Personalization API; do not assume it governs the newer Places API without confirming scope. Obtain and review the exact applicable agreement before integration or export.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Current API migration notice: https://docs.foursquare.com/developer/reference/upcoming-changes.",
+        "Personalization API usage guidelines (scope must be checked): https://docs.foursquare.com/developer/reference/usage-guidelines-personalization-apis.",
+        "No vendor contact, account, API key, or agreement was used/obtained."
+      ]
+    },
+    {
+      "source_type": "primary",
+      "source_title": "Yelp Places API FAQ and Rate Limiting",
+      "publisher_or_owner": "Yelp",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Primary FAQ: https://docs.developer.yelp.com/docs/places-faq",
+        "The listed terms are public documentation, not a negotiated VSN license or legal review."
+      ],
+      "id": "EVID-000030",
+      "claim_or_question": "What do Yelp Places public docs say about trial/paid quotas, caching, commercial analysis, supported geographies, data coverage bias and search caps?",
+      "source_ref": "https://docs.developer.yelp.com/docs/places-faq",
+      "summary": "Yelp Places FAQ states trial up to 5,000 calls during 30 days for evaluation only (not commercial deployment); paid plans default to 30,000 calls/month with daily limit up to 5,000 and overage increments of 1,000, while exact price is linked through signup/sales rather than exposed. Yelp says API content may be cached up to 24 hours and Yelp Business IDs indefinitely; commercial analysis is not permitted for Places integrations. Results are available where Yelp operates; listings need Yelp user-generated content or other user-contributed enhancement. Search supports up to 50 results per request and 240 per originating query."
+    },
+    {
+      "source_type": "primary",
+      "source_title": "Yelp Places API Getting Started",
+      "publisher_or_owner": "Yelp",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Primary guide: https://docs.developer.yelp.com/docs/places-intro",
+        "No vendor account, API key, or agreement was used/obtained."
+      ],
+      "id": "EVID-000031",
+      "claim_or_question": "Does Yelp signal a separate commercial product route for consumer products and what fields does Places expose?",
+      "source_ref": "https://docs.developer.yelp.com/docs/places-intro",
+      "summary": "Yelp's Getting Started guide describes Search, Phone Search, Business Match, and Details endpoints, with fields including business name, address, phone, ratings, categories, coordinates and review counts. Its page directs commercial use in a consumer product to Yelp Places Enterprise. This does not establish VSN's proposed persistent lead storage/export rights; exact terms must be confirmed."
+    },
+    {
+      "source_type": "primary",
+      "source_title": "Yelp Places Rate Limiting",
+      "publisher_or_owner": "Yelp",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Primary rate-limiting page: https://docs.developer.yelp.com/docs/places-rate-limiting",
+        "Do not normalize these figures into one trial allowance; confirm actual plan and headers."
+      ],
+      "id": "EVID-000032",
+      "claim_or_question": "What quota does Yelp document for rate limiting, and does it align with its FAQ trial totals?",
+      "source_ref": "https://docs.developer.yelp.com/docs/places-rate-limiting",
+      "summary": "Yelp's Rate Limiting page describes signup-selected Starter trials as limited to 300 API calls per 24 hours, with remaining/max/reset quota headers; the FAQ separately says trial users receive up to 5,000 calls during 30 days and describes the paid default. This is a public-docs discrepancy or plan-level distinction and cannot be resolved without the selected plan/account quota."
+    },
+    {
+      "id": "EVID-000033",
+      "claim_or_question": "What concrete lead-collection job and constraints are already present in VSN's incumbent engine, and which can serve as a first-party comparison baseline without being treated as market validation?",
+      "source_type": "repository",
+      "source_ref": "https://github.com/Vertex-Systems-Network/vsn-lead-engine/blob/0be495f0035df485089c33b1a74bdb93e96b959d/docs/ai/LEAD-SAAS-CURRENT-ENGINE-AUDIT.md",
+      "source_title": "VSN Lead Engine SaaS Direction — Existing Lead Engine Capability Audit",
+      "publisher_or_owner": "VSN",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": "Audit states production repository main at ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "The repository audit records one internal lead workflow: 56 configured US/Canada geographies, 12 fixed categories, free-only source mode, a 1,000-record/category operating target, normalized phone required for accepted leads, Google Sheets output, R2-backed cross-day deduplication, and fixed GitHub Actions scheduling with Asia/Karachi safeguards. This is an incumbent operating case only; it does not establish customer demand, delivered yield, or the suitability of these constraints for a multi-tenant product.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-USER-SCHEDULES",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Read-only source/config/runtime audit; no live production run, customer workbook, provider account, or yield sample was accessed.",
+        "Keep VSN-specific operating choices separate from external user evidence and SaaS acceptance criteria."
+      ]
+    },
+    {
+      "id": "EVID-000034",
+      "claim_or_question": "What workflow does LinkedIn Sales Navigator document for finding, saving and reusing lead/account searches?",
+      "source_type": "primary",
+      "source_ref": "https://www.linkedin.com/help/sales-navigator/answer/a10728097",
+      "source_title": "Get started prospecting in Sales Navigator by finding and saving leads",
+      "publisher_or_owner": "LinkedIn",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "LinkedIn's help page describes filtering lead searches, reviewing and saving leads/accounts to lists, saving searches for alerts, and plan-dependent CRM workflows. This supports a competitor interaction-flow description only; it does not establish user demand or permission to extract, retain, or resell LinkedIn data.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Official workflow help page.",
+        "Do not infer data acquisition, storage, export, or resale rights from use of Sales Navigator UI."
+      ]
+    },
+    {
+      "id": "EVID-000035",
+      "claim_or_question": "What does the Foursquare Places API self-service EULA say about third-party sharing, bulk/systematic place-data access and lead generation?",
+      "source_type": "primary",
+      "source_ref": "https://foursquare.com/legal/terms/apilicenseagreement/",
+      "source_title": "Places API - PAYG (Self-Service EULA)",
+      "publisher_or_owner": "Foursquare",
+      "published_at": null,
+      "accessed_at": "2026-10-05",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "The self-service EULA states restrictions on making Places Data available to third parties in bulk or enabling systematic querying of all or substantially all data for a locality/region/country, and restricts lead generation unless expressly authorized via the subscription. This makes the self-service offer unselected for VSN's intended SaaS lead workflow absent explicit subscription authorization. It is a public-term reading, not qualified legal advice or a conclusion about a separately negotiated agreement.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Review exact executed subscription and contract with qualified counsel before any integration or customer-facing use.",
+        "Do not generalize this self-service EULA to a separate negotiated license."
+      ]
+    },
+    {
+      "id": "EVID-000036",
+      "claim_or_question": "How do current Apollo product docs describe saved-search reuse, sharing and alerts?",
+      "source_type": "primary",
+      "source_ref": "https://knowledge.apollo.io/hc/en-us/articles/4409803718669-Save-Share-and-Set-Alerts-for-Searches",
+      "source_title": "Save, Share, and Set Alerts for Searches",
+      "publisher_or_owner": "Apollo",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Apollo help documents creating reusable people/company/deal/task searches, sharing searches with selected teammates or company members at defined access levels, and daily/weekly/monthly alerts for new matches. This verifies a vendor-described workflow only; no usability test or customer-demand claim is made.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Official help center page reviewed 2026-10-06.",
+        "Vendor-described capability is not proof of VSN user demand."
+      ]
+    },
+    {
+      "id": "EVID-000037",
+      "claim_or_question": "Do Apollo's currently displayed standard plans permit VSN to use records in a customer-facing SaaS or resell them?",
+      "source_type": "primary",
+      "source_ref": "https://www.apollo.io/pricing",
+      "source_title": "Apollo pricing and external-product restriction",
+      "publisher_or_owner": "Apollo",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Apollo's pricing page states the listed plans are for internal business use and use to power external products, share with customers, or resell is not permitted under standard terms; those use cases require a separate agreement with custom pricing. This is a vendor-page summary, not legal advice or a review of any negotiated contract.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Recheck the exact contract and current checkout terms before a provider decision."
+      ]
+    },
+    {
+      "id": "EVID-000038",
+      "claim_or_question": "Does Clay currently separate platform usage from third-party data/AI consumption in its pricing model?",
+      "source_type": "primary",
+      "source_ref": "https://www.clay.com/pricing",
+      "source_title": "Clay current plan and usage pricing page",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Clay's current pricing page distinguishes platform Actions for enrichment/GTM execution from Data Credits used to buy data and AI from vendors; it also lists credit reporting and plan-dependent top-ups/budgets. This confirms separate metering concepts, not that VSN users prefer usage-based pricing. Displayed prices vary across page/version views and are not frozen here.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "No current price point is adopted; quote/checkout and regional terms must be rechecked before purchase."
+      ]
+    },
+    {
+      "id": "EVID-000039",
+      "claim_or_question": "How does Hunter describe team credit governance and the separation between data plans and outreach sequences?",
+      "source_type": "primary",
+      "source_ref": "https://help.hunter.io/en/articles/11131690-pricing-plans-and-feature-faqs",
+      "source_title": "Pricing, Plans and Feature FAQs",
+      "publisher_or_owner": "Hunter",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Hunter's current FAQ says credits are shared across a team, per-member limits can be set, paid plans can purchase additional credit packs, and Data Platform plans do not include Sequences. This supports a documented distinction between data usage and outreach features; it does not establish local-business coverage, VSN buyer demand, or resale rights.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-COST-CONTROLS",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Official FAQ reviewed 2026-10-06."
+      ]
+    },
+    {
+      "id": "EVID-000040",
+      "claim_or_question": "What do current Sales Navigator docs say about reusable lead/account searches and alerts?",
+      "source_type": "primary",
+      "source_ref": "https://www.linkedin.com/help/sales-navigator/answer/a102024/",
+      "source_title": "Save lead and account searches in Sales Navigator",
+      "publisher_or_owner": "LinkedIn",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "LinkedIn's help page states saved lead/account searches retain filter criteria, can generate weekly email and in-product alerts for new matches, and can be shared with colleagues. This is a workflow benchmark only and does not grant permission to extract, store, or resell LinkedIn content.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [
+        "EVID-000034"
+      ],
+      "notes": [
+        "Official help content rechecked 2026-10-06; prior EVID-000034 covered a different Sales Navigator guide."
+      ]
+    },
+    {
+      "id": "EVID-000041",
+      "claim_or_question": "How does Outscraper document local map search submission and task retrieval?",
+      "source_type": "primary",
+      "source_ref": "https://docs.outscraper.com/endpoints/maps-search/",
+      "source_title": "Maps Search API Reference",
+      "publisher_or_owner": "Outscraper",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "The Maps Search API documentation describes multi-query place search and a synchronous/asynchronous submission option; its Tasks API documents later task lookup. This is evidence of an async job interaction pattern only; it does not establish data accuracy, upstream permission, VSN customer-facing rights, or provider selection.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Task retrieval documentation: https://docs.outscraper.com/endpoints/tasks/.",
+        "No paid account or sample was run."
+      ]
+    },
+    {
+      "id": "EVID-000042",
+      "claim_or_question": "What storage/cache limit does the current Google Places API policy state?",
+      "source_type": "primary",
+      "source_ref": "https://developers.google.com/maps/documentation/places/web-service/policies",
+      "source_title": "Policies and attributions for Places API (New)",
+      "publisher_or_owner": "Google Maps Platform",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Google's current Places policy says Places content generally must not be prefetched, cached, or stored except for specified exceptions; place IDs are exempt from caching restrictions. This highlights a material constraint for persistent lead export workflows. It is not a complete legal analysis of any proposed implementation or separately licensed arrangement.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [
+        "EVID-000013"
+      ],
+      "notes": [
+        "Re-check field-specific terms and implementation guidance before integration."
+      ]
+    },
+    {
+      "id": "EVID-000043",
+      "claim_or_question": "What does the current Overture Places guide say about the Places theme's upstream sources, licensing model, data properties and release characteristics?",
+      "source_type": "primary",
+      "source_ref": "https://docs.overturemaps.org/guides/places/",
+      "source_title": "Places Guide: sources, licensing, schema and quality",
+      "publisher_or_owner": "Overture Maps Foundation",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "The official guide describes the Places theme as having no OpenStreetMap data and says licensing depends on source, with CDLA Permissive 2.0 and Apache 2.0 among the stated licenses. It documents place properties such as names, taxonomy, confidence, addresses, websites, phones/emails when present, and GERS identity. The guide's September 2026 source table reports roughly 81 million feature records across named contributors; this is vendor-published aggregate data, not independent coverage or yield evidence for VSN's target market.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Vendor documentation does not guarantee phone/email completeness or currentness for any chosen niche/geography.",
+        "No sample benchmark, vendor contact, or independent data-quality test was performed."
+      ]
+    },
+    {
+      "id": "EVID-000044",
+      "claim_or_question": "What source-specific licenses and attribution does Overture currently document for the Places theme?",
+      "source_type": "primary",
+      "source_ref": "https://docs.overturemaps.org/attribution/",
+      "source_title": "Attribution and Licensing",
+      "publisher_or_owner": "Overture Maps Foundation",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Overture's licensing page lists Places sources and applicable licenses: several named sources under CDLA Permissive 2.0, Foursquare-derived data under Apache 2.0, and AllThePlaces under CC0 1.0. This supports maintaining a release/source-to-license mapping; it does not establish that any particular VSN storage, transformation, joining, or customer-export model is approved.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Do not generalize the Places theme's no-OSM statement to all Overture themes or to a VSN dataset later joined with OSM.",
+        "Obtain qualified review for the intended product use and applicable release/source terms."
+      ]
+    },
+    {
+      "id": "EVID-000045",
+      "claim_or_question": "How does Overture publish and version its source data releases?",
+      "source_type": "primary",
+      "source_ref": "https://docs.overturemaps.org/getting-data/cloud-sources/",
+      "source_title": "Accessing the Overture Catalog",
+      "publisher_or_owner": "Overture Maps Foundation",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Official documentation says Overture publishes monthly releases, retains dated releases, and provides a STAC catalog; release assets include GERS registry/bridge files and a changelog. This makes release identifiers and lineage relevant for reproducible freshness/deduplication tests. It does not establish update timeliness for any individual business record.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-MARKET-SEARCH",
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "No release was downloaded or benchmarked for VSN."
+      ]
+    },
+    {
+      "id": "EVID-000046",
+      "claim_or_question": "What data license and public-service boundary does OpenStreetMap document?",
+      "source_type": "primary",
+      "source_ref": "https://www.openstreetmap.org/copyright",
+      "source_title": "Copyright and License",
+      "publisher_or_owner": "OpenStreetMap Foundation",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "OpenStreetMap states its data is licensed under ODbL, requiring attribution and share-alike when distributing an altered or built-upon database. The page separately states OSMF does not provide a free third-party map API or tile service and links to usage policies. Data-license permission and operational permission/capacity of a particular public service are separate questions.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "This is a primary-source summary, not a legal conclusion about a specific VSN database or derived-work design.",
+        "Review service-specific policies and capacity before any production use."
+      ]
+    },
+    {
+      "id": "EVID-000047",
+      "claim_or_question": "What contract does Apollo say is required to share, expose, or resell data to non-Apollo users?",
+      "source_type": "primary",
+      "source_ref": "https://docs.apollo.io/docs/developer-faqs",
+      "source_title": "Developer FAQs: Data Licensing",
+      "publisher_or_owner": "Apollo",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Apollo's current Developer FAQ says integrations that share, expose, or resell data to non-Apollo users require a custom contract with Apollo. This is a vendor-stated boundary for evaluation; no VSN contract has been negotiated or approved.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [
+        "EVID-000037"
+      ],
+      "notes": [
+        "Prior EVID-000037 summarizes the pricing-page restriction; this entry adds the current developer FAQ wording.",
+        "Do not infer a custom contract will be offered or commercially viable."
+      ]
+    },
+    {
+      "id": "EVID-000048",
+      "claim_or_question": "What restrictions do Apollo's current API Terms place on third-party API access or sublicensing?",
+      "source_type": "primary",
+      "source_ref": "https://www.apollo.io/terms/api",
+      "source_title": "Apollo API Terms of Service",
+      "publisher_or_owner": "Apollo",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Apollo API Terms say users must not sell, access, or sublicense the API for third-party use and prohibit use to replicate or compete with Apollo absent an applicable Apollo Agreement. This is a direct summary of published API restrictions, not legal advice or review of a negotiated agreement.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-SOURCE-POLICY-CATALOG",
+        "OPT-PAID-SOURCE-MODE"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Re-read applicable agreement and obtain qualified review before any provider decision."
+      ]
+    },
+    {
+      "id": "EVID-000049",
+      "claim_or_question": "What workflow does Lusha document for searching, revealing, saving and exporting B2B contacts?",
+      "source_type": "primary",
+      "source_ref": "https://info.lusha.com/en/articles/163897-getting-started-with-lusha-prospecting",
+      "source_title": "Getting started with Lusha Prospecting",
+      "publisher_or_owner": "Lusha",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Lusha's official help guide describes contact/company search with role, industry, size and location filters; CSV bulk input; separate reveal and save-to-table actions; a credit charge per reveal; saved/recent searches; and CSV or CRM export with plan-specific batch limits. This is a vendor-described named-contact prospecting workflow, not user-demand or independent contact-quality evidence.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Credits and limits are plan-dependent and time-sensitive; verify current terms/pricing at procurement.",
+        "No VSN trial, source access, or downstream data rights were tested."
+      ]
+    },
+    {
+      "id": "EVID-000050",
+      "claim_or_question": "What local-business lead delivery workflow does Lead411 advertise for its SMB Sales Boost product?",
+      "source_type": "primary",
+      "source_ref": "https://www.lead411.com/sales-tools/smb-sales-boost/",
+      "source_title": "SMB Sales Boost: newly registered small-business leads",
+      "publisher_or_owner": "Lead411",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Lead411's product page advertises a newly registered small-business lead database delivered through a filterable dashboard, daily email schedules, CSV exports, a REST API and an MCP server, and explicitly markets it to agencies/consultants among other SMB users. These are vendor-described product and positioning claims, not independently verified registration coverage, timeliness, data quality, user demand, or rights for VSN.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Treat advertised lead freshness/coverage as claims until independently tested.",
+        "Public product page does not establish VSN's rights to reuse Lead411 data."
+      ]
+    },
+    {
+      "id": "EVID-000051",
+      "claim_or_question": "What scale and price does Lead411's SMB Sales Boost product page advertise, and is that offer directly reconcilable with Lead411's general pricing page?",
+      "source_type": "primary",
+      "source_ref": "https://www.lead411.com/sales-tools/smb-sales-boost/",
+      "source_title": "SMB Sales Boost product claims and public pricing cross-check",
+      "publisher_or_owner": "Lead411",
+      "published_at": null,
+      "accessed_at": "2026-10-06",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Lead411's SMB Sales Boost page advertises over 1.1 million leads across 1,400+ SMB categories, business access within days of formation, daily delivery through dashboard/email/CSV/API/MCP, and plans starting at $49/month. A separate general Lead411 pricing page displays Basic at $99/month per user with 200 US contacts/month and a 3-month minimum. The reviewed pages do not explain whether these are the same product, plan, billing conditions or included quantities, so they cannot be treated as a reconciled apples-to-apples price. Scale, freshness and conversion statements remain vendor claims.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Product pricing/plan scope must be confirmed from current checkout or written quote before use in a competitor price comparison.",
+        "No VSN provider rights, coverage benchmark or data-quality validation follows from these pages."
+      ]
+    },
+    {
+      "id": "EVID-000052",
+      "claim_or_question": "What self-service plan and per-field credit details does Lusha's current public pricing page display?",
+      "source_type": "primary",
+      "source_ref": "https://www.lusha.com/pricing/",
+      "source_title": "Lusha plans, credit allowances and public pricing snapshot",
+      "publisher_or_owner": "Lusha",
+      "published_at": null,
+      "accessed_at": "2026-10-07",
+      "source_revision_or_hash": null,
+      "evidence_class": "verified_fact",
+      "confidence": "high",
+      "summary": "Lusha's pricing page displayed Free at $0/month with 40 credits/month; Starter at $37.45 USD/month billed yearly with 4,800 credits/year and 1 seat; Pro at $52.45 USD/month billed yearly with 7,200 credits/year and 2 seats; Premium at $299.95 USD/month billed yearly with 40,800 credits/year and 5 seats; Scale custom. Its page states email reveals consume 1 credit and phone reveals 5 credits, and monthly unused credits can roll over up to twice the plan allowance while annual credits are issued upfront and reset at year-end. The selected configuration is a rendered pricing-page snapshot, not a guaranteed quote; public prices and plan configuration can change. These are retail workspace prices, not wholesale/API resale economics or evidence of VSN willingness to pay.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SAAS-BILLING"
+      ],
+      "validation_status": "validated",
+      "supersedes": [],
+      "notes": [
+        "Pricing page uses a dynamic credit/billing selector; preserve billing period and selected allowance when comparing.",
+        "No Lusha customer-facing redistribution rights for VSN are inferred."
+      ]
+    },
+    {
+      "id": "EVID-000053",
+      "claim_or_question": "Seamless.AI documents targeted contact search, saved searches/lists, credit-based Find/Find All enrichment, CRM/CSV export, Chrome-extension capture and plan-dependent API access.",
+      "source_type": "primary",
+      "source_ref": "https://seamless.ai/customers/education/articles/seamless-ai-your-quick-start-guide",
+      "source_title": "Seamless.AI Quick Start Guide",
+      "publisher_or_owner": "Seamless.AI",
+      "published_at": null,
+      "accessed_at": "2026-10-07",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Official documentation confirms a mature named-contact prospecting workflow baseline. It does not establish VSN demand, data accuracy, downstream rights, or economic feasibility.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Workflow capability only; no hands-on trial or independent quality benchmark was performed."
+      ]
+    },
+    {
+      "id": "EVID-000054",
+      "claim_or_question": "Clay documents reusable enrichment Functions, multi-provider waterfall ordering, conditional fallback runs and per-action credit consumption.",
+      "source_type": "primary",
+      "source_ref": "https://university.clay.com/fr/docs/functions",
+      "source_title": "Clay Functions documentation",
+      "publisher_or_owner": "Clay",
+      "published_at": null,
+      "accessed_at": "2026-10-07",
+      "source_revision_or_hash": null,
+      "evidence_class": "supported_inference",
+      "confidence": "high",
+      "summary": "Official documentation supports provider orchestration requirements such as reusable logic, fallback visibility, credit accounting and auditability. It does not establish VSN demand, provider rights or unit economics.",
+      "supports_requirement_ids": [],
+      "supports_option_ids": [
+        "OPT-LEAD-PROVENANCE",
+        "OPT-COST-CONTROLS"
+      ],
+      "supports_module_ids": [
+        "MOD-PRODUCT-DISCOVERY",
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "validation_status": "unverified",
+      "supersedes": [],
+      "notes": [
+        "Workflow capability only; no provider benchmark or customer validation was performed."
+      ]
+    }
+  ],
   "entry_contract": {
     "id": "EVID-000001",
     "claim_or_question": "",

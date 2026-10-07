@@ -165,6 +165,169 @@
       "consent_ref": null,
       "accepted_at": null,
       "review_or_expiry_at": null
+    },
+    {
+      "id": "RISK-0006",
+      "category": "security",
+      "title": "Cross-tenant lead or credential exposure",
+      "description": "Shared SaaS data, jobs, caches, AI contexts or exports may expose one tenant's records/credentials to another if tenant scoping is incomplete.",
+      "evidence_refs": [
+        "docs/ai/PRE-PLAN.md"
+      ],
+      "likelihood": "medium",
+      "impact": "high",
+      "owner": "VSN product/security owner",
+      "mitigations": [
+        "Tenant-scoped authorization on every API/query/job/export",
+        "Cross-tenant adversarial integration suite",
+        "Encrypted server-side credentials and secret-free logs"
+      ],
+      "residual_risk": "Must be re-evaluated against selected architecture and threat model.",
+      "linked_requirements": [
+        "REQ-45",
+        "REQ-90",
+        "REQ-96"
+      ],
+      "linked_modules_or_findings": [
+        "MOD-SAAS-IDENTITY",
+        "MOD-SAAS-ADMIN"
+      ],
+      "disposition": "open",
+      "consent_ref": null,
+      "accepted_at": null,
+      "review_or_expiry_at": null
+    },
+    {
+      "id": "RISK-0007",
+      "category": "compliance",
+      "title": "Provider terms may prohibit intended collection, storage or resale",
+      "description": "Public accessibility does not grant permission for automated collection, persistent storage or redistribution. Rules differ by source, country, field and use.",
+      "evidence_refs": [
+        "EVID-000011",
+        "EVID-000012",
+        "EVID-000013",
+        "EVID-000014",
+        "EVID-000015",
+        "docs/ai/LEAD-SAAS-SOURCE-FEASIBILITY.md"
+      ],
+      "likelihood": "medium",
+      "impact": "high",
+      "owner": "VSN management / qualified reviewer",
+      "mitigations": [
+        "Per-provider policy review before activation",
+        "Allowlist fields/countries/storage/attribution",
+        "Kill switch and deletion propagation",
+        "Maintain source/field/country-specific rights and provenance catalog; require qualified review and written vendor rights before activation."
+      ],
+      "residual_risk": "Qualified legal/provider review pending.",
+      "linked_requirements": [
+        "REQ-90",
+        "REQ-96"
+      ],
+      "linked_modules_or_findings": [
+        "MOD-SOURCE-CATALOG",
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "disposition": "open",
+      "consent_ref": null,
+      "accepted_at": null,
+      "review_or_expiry_at": null
+    },
+    {
+      "id": "RISK-0008",
+      "category": "financial",
+      "title": "Paid API and AI costs can exceed SaaS plan revenue",
+      "description": "Usage-based source and model providers can produce unpredictable variable costs, including retries and concurrent schedules.",
+      "evidence_refs": [
+        "EVID-000013",
+        "EVID-000015",
+        "EVID-000016",
+        "docs/ai/LEAD-SAAS-SOURCE-FEASIBILITY.md"
+      ],
+      "likelihood": "medium",
+      "impact": "high",
+      "owner": "VSN product/finance owner",
+      "mitigations": [
+        "Per-run estimate and explicit confirmation",
+        "Atomic hard budgets per tenant/provider",
+        "Circuit breakers and anomaly alerts",
+        "Measure per-country/niche yield and per-accepted-lead cost; enforce tenant/source hard caps and never silently fall back to paid sources."
+      ],
+      "residual_risk": "Plan economics cannot be accepted until real vendor prices and expected usage are modeled.",
+      "linked_requirements": [
+        "REQ-85",
+        "REQ-96"
+      ],
+      "linked_modules_or_findings": [
+        "MOD-SAAS-BILLING",
+        "MOD-SOURCE-CATALOG",
+        "MOD-AI-ASSISTANT"
+      ],
+      "disposition": "open",
+      "consent_ref": null,
+      "accepted_at": null,
+      "review_or_expiry_at": null
+    },
+    {
+      "id": "RISK-0009",
+      "category": "operational",
+      "title": "User schedules may drift, duplicate or starve jobs",
+      "description": "Timezone/DST changes, duplicate events, queue outages and retry storms can create missed/overlapping jobs or unfair tenant capacity.",
+      "evidence_refs": [
+        "docs/ai/PRE-PLAN.md"
+      ],
+      "likelihood": "medium",
+      "impact": "high",
+      "owner": "VSN engineering owner",
+      "mitigations": [
+        "Durable scheduler and idempotency key",
+        "Per-tenant fair-use/concurrency budgets",
+        "DST, replay, outage and failure-injection tests"
+      ],
+      "residual_risk": "Queue/provider choice and SLOs are not yet designed.",
+      "linked_requirements": [
+        "REQ-57",
+        "REQ-64",
+        "REQ-94",
+        "REQ-96"
+      ],
+      "linked_modules_or_findings": [
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "disposition": "open",
+      "consent_ref": null,
+      "accepted_at": null,
+      "review_or_expiry_at": null
+    },
+    {
+      "id": "RISK-0010",
+      "category": "compliance",
+      "title": "Mobile subscription flow may conflict with storefront rules",
+      "description": "In-app digital subscription and external web checkout treatment depends on store, storefront, app type and current rules.",
+      "evidence_refs": [
+        "config/research/evidence-registry.json"
+      ],
+      "likelihood": "medium",
+      "impact": "medium",
+      "owner": "VSN product/legal owner",
+      "mitigations": [
+        "Defer mobile billing design until storefronts are selected",
+        "Re-check official current policies before implementation/submission",
+        "Maintain provider-specific entitlement adapters"
+      ],
+      "residual_risk": "Current target stores and markets are undecided.",
+      "linked_requirements": [
+        "REQ-90",
+        "REQ-96"
+      ],
+      "linked_modules_or_findings": [
+        "MOD-MOBILE-CLIENT",
+        "MOD-SAAS-BILLING"
+      ],
+      "disposition": "open",
+      "consent_ref": null,
+      "accepted_at": null,
+      "review_or_expiry_at": null
     }
   ],
   "risk_template": {
