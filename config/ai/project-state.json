@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PRs #154\u2013#157 merged with all required checks and real PostgreSQL security/concurrency/migration tests passing. Isolated lint/format/compile gates added on review branch.",
+  "last_verified_completion": "PRs #154\u2013#158 merged with required checks and real PostgreSQL tenant/security/idempotency/usage/migration tests passing. Compatible dependency maintenance and requirement traceability checkpoint prepared on review branch.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -18,10 +18,10 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify/merge pinned isolated lint/format/compile gates and synchronized lifecycle documents.",
-    "Wire job intent, usage reservation and outbox transactionally with source policy fail-closed and no provider dispatch.",
-    "Add worker lease/cancellation/expiry/recovery controls and billing-event reconciliation contracts.",
-    "External customer/provider/privacy/billing/deployment/launch gates remain open; no quota refresh claimed."
+    "Verify/merge reviewed dependency lock regeneration replacing failed #136.",
+    "Continue transactionally safe job/reservation/outbox, source-policy recheck and bounded worker lease/recovery work with providers disabled.",
+    "Complete web workflows, billing event contracts/period policy and release evidence separately.",
+    "External customer/provider/privacy/payment-account/launch gates remain open; no refreshed quota claimed."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -34,9 +34,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "merged_foundation_slices_postgresql_verified_quality_ci_pending",
+  "qa_readiness": "saas_foundation_postgresql_lint_verified_dependency_maintenance_pending",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "453d835cdd29eadae5805b04e4420a33cb3c00a2",
+  "last_reconciled_repository_ref": "4ad90efdfd19e89cb5584c31614c5359f7e1077a",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

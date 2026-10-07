@@ -632,6 +632,166 @@
       ],
       "status": "verified",
       "verification_status": "verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-TENANT-IDENTITY",
+      "source": "VSN Lead Engine product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-SAAS-IDENTITY"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-FOUNDATION"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-API-DATA-CONTRACTS-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-django-foundation",
+        "codex/saas-membership-lifecycle",
+        "codex/saas-login-abuse-controls",
+        "codex/saas-usage-reservations",
+        "codex/saas-quality-baseline"
+      ],
+      "pull_request_refs": [
+        "PR #154",
+        "PR #155",
+        "PR #156",
+        "PR #158"
+      ],
+      "test_evidence": [
+        "apps/saas/core/tests.py: TenantAPITests, MemberLifecycleTests, ConcurrentOwnerTests, LoginAbuseTests, ConcurrentLoginTests",
+        "Merged PR PostgreSQL CI passed; no production/customer acceptance claimed."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-FOUNDATION-ENGINEERING-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [
+        "docs/ai/SAAS-SYSTEM-THREAT-MODEL-BASELINE-20261007.md"
+      ],
+      "migration_refs": [
+        "apps/saas/core/migrations/"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/services.py",
+        "apps/saas/core/login_security.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:4ad90efdfd19e89cb5584c31614c5359f7e1077a"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-DRAFT-IDEMPOTENCY",
+      "source": "VSN Lead Engine product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-SAAS-IDENTITY"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-FOUNDATION"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-API-DATA-CONTRACTS-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-django-foundation",
+        "codex/saas-membership-lifecycle",
+        "codex/saas-login-abuse-controls",
+        "codex/saas-usage-reservations",
+        "codex/saas-quality-baseline"
+      ],
+      "pull_request_refs": [
+        "PR #154",
+        "PR #158"
+      ],
+      "test_evidence": [
+        "apps/saas/core/tests.py: TenantAPITests, ConcurrentDraftTests",
+        "Merged PR PostgreSQL CI passed; no production/customer acceptance claimed."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-FOUNDATION-ENGINEERING-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [
+        "docs/ai/SAAS-SYSTEM-THREAT-MODEL-BASELINE-20261007.md"
+      ],
+      "migration_refs": [
+        "apps/saas/core/migrations/"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/services.py",
+        "apps/saas/core/serializers.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:4ad90efdfd19e89cb5584c31614c5359f7e1077a"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-ATOMIC-USAGE",
+      "source": "VSN Lead Engine product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-SAAS-BILLING"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-FOUNDATION"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-API-DATA-CONTRACTS-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-django-foundation",
+        "codex/saas-membership-lifecycle",
+        "codex/saas-login-abuse-controls",
+        "codex/saas-usage-reservations",
+        "codex/saas-quality-baseline"
+      ],
+      "pull_request_refs": [
+        "PR #157",
+        "PR #158"
+      ],
+      "test_evidence": [
+        "apps/saas/core/tests.py: UsageReservationTests, ConcurrentUsageTests",
+        "Merged PR PostgreSQL CI passed; no production/customer acceptance claimed."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-FOUNDATION-ENGINEERING-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [
+        "docs/ai/SAAS-SYSTEM-THREAT-MODEL-BASELINE-20261007.md"
+      ],
+      "migration_refs": [
+        "apps/saas/core/migrations/"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/usage.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:4ad90efdfd19e89cb5584c31614c5359f7e1077a"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

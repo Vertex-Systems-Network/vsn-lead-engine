@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "453d835cdd29eadae5805b04e4420a33cb3c00a2",
-  "observed_main_semantics": "Exact protected main inspected before this Django foundation branch.",
+  "observed_main_sha": "4ad90efdfd19e89cb5584c31614c5359f7e1077a",
+  "observed_main_semantics": "Exact protected main inspected immediately before this dependency/checkpoint reconciliation branch.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": null,
@@ -58,7 +58,8 @@
     "saas_foundation": "PR #154: validate, repository-integrity, analyze-actions, CodeQL and saas-postgres successful",
     "saas_membership": "PR #155: all required checks and PostgreSQL concurrent last-owner verification successful",
     "saas_login_security": "PR #156: required checks and SaaS Quality 37688331442 successful",
-    "saas_usage": "PR #157: validate, repository-integrity, analyze-actions, CodeQL and PostgreSQL concurrent usage-cap tests successful"
+    "saas_usage": "PR #157: validate, repository-integrity, analyze-actions, CodeQL and PostgreSQL concurrent usage-cap tests successful",
+    "saas_quality_baseline": "PR #158: lint/format/compile, required checks, CodeQL, PostgreSQL tests and migrations successful"
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -105,7 +106,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify/merge SaaS quality baseline; continue source-gated transactional job/reservation/outbox and lease/recovery work. Do not reactivate superseded stale-state PRs.",
+  "exact_next_safe_action": "Verify/merge compatible dependency lock refresh, then continue transactional job/reservation/outbox and source-gated lease/recovery implementation. Superseded PRs #135/#144/#152/#153 are closed; foundation remains in progress.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

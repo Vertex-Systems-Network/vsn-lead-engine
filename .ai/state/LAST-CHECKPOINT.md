@@ -127,3 +127,15 @@ Do not turn workflow success or ANPOS completion into a false quota-complete cla
 - Next ready work: transactional job/reservation/outbox, source-policy recheck, bounded leases/cancellation/expiry/recovery, web workflows. External provider/customer/privacy/billing/deployment/launch activation remains gated.
 
 - Quality baseline also adopts reviewed Dependabot #135 CodeQL v4.38.2 immutable SHA after upstream tag verification; #144 Stage 9 delegation correction is preserved while stale state is superseded. #152 frontier state is superseded by current merged implementation.
+
+
+## Verified main and dependency repair checkpoint — 2026-10-08 PKT
+
+- Exact main before this branch: `4ad90efdfd19e89cb5584c31614c5359f7e1077a` / merged PR #158. All required checks, CodeQL and PostgreSQL SaaS lint/format/concurrency/migration gates passed on `e8856dfa2e44b4463a51ad0530b978790b19ea73`.
+- Main README re-read after #158; it reflects delivered capability and foundation 80% engineering indicator, with billing/queue/web/release acceptance still open.
+- Superseded #135/#144/#152/#153 are closed after their useful changes were preserved. #136's failed dependency update is being replaced by canonical resolver-generated Linux/CPython 3.12 locks, preserving strict validators and exact hash verification.
+- Branch `deps/verified-runtime-refresh`; runtime/dev locks refreshed within existing pyproject ranges. No algorithm, source geography, taxonomy, phone requirement, R2 dedupe, Google delivery configuration, credential, paid source or production-run trigger change.
+- Requirement traceability now links project-specific tenancy, draft idempotency and atomic usage to real files/migrations/merged PRs/PostgreSQL test evidence; full production/customer acceptance remains partial.
+- Next ready frontier: transactional job intent/reservation/outbox; source-policy recheck; bounded worker leases/cancellation/expiry/recovery; web workflows. External rights/customer/privacy/billing/deployment/launch evidence remains open. No persistent Supervisor/background execution is claimed.
+
+- Dependency repair verification: canonical lock regeneration check and hash-verified install/pip check passed; full repository suite 376 passed, 1 skipped, 28 subtests passed; ANPOS integrity/hardening passed. Remote CI remains the merge gate.
