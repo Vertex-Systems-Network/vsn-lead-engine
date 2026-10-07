@@ -33,9 +33,9 @@ Snapshot: **2026-10-07 PKT**. This table covers the new SaaS direction only; the
 |---|---:|---|---|
 | M0 — Current engine audit and SaaS boundary | 2026-10-04 | Complete | `██████████` 100% |
 | M1 — User/market and competitor desk research | 2026-10-04 | Desk research complete; external validation pending | `███████░░░` 70% |
-| M2 — MVP options, scope and success criteria | 2026-10-05 | In progress / owner decisions pending | `████░░░░░░` 40% |
-| M3 — System, tenant and threat-model design | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
-| M4 — Technology stack and repository decision | 2026-10-07 | Not approved | `░░░░░░░░░░` 0% |
+| M2 — MVP options, scope and success criteria | 2026-10-05 | Owner MVP boundary recorded; external validation pending | `████░░░░░░` 40% |
+| M3 — System, tenant and threat-model design | 2026-10-07 | In progress; system/threat-model baseline merged | `███░░░░░░░` 30% |
+| M4 — Technology stack and repository decision | 2026-10-07 | Next after M3 contract review; autonomous zero-new-spend decision | `░░░░░░░░░░` 0% |
 | M5 — SaaS foundation: workspace, roles, entitlements and tenant-safety contracts | 2026-10-07 | Contract slice complete; runtime auth/persistence still gated | `█████░░░░░` 50% |
 | M6 — Source policy, adapters and job orchestration | 2026-10-07 | Source-policy authorization implemented; adapters not selected | `░░░░░░░░░░` 0% |
 | M7 — Lead web workflow, filters and export | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
@@ -46,6 +46,7 @@ Snapshot: **2026-10-07 PKT**. This table covers the new SaaS direction only; the
 Progress notes:
 - M0 is complete from repository audit evidence.
 - M1 is complete only as desk research; no external interviews, prototype sessions or provider benchmark are counted.
+- M2's owner-approved MVP boundary is recorded in PR #140. M3's stack-neutral threat-model baseline is recorded in PR #141; API/data/UX contracts remain in progress.
 - M5 is the first implementation milestone. The current slice is stack-neutral and does not alter the production collector, scheduler, Google Sheets delivery or R2 dedupe authority.
 - M6 now has a stack-neutral authorization boundary and tests; no provider adapter is enabled or implied.
 - M5 contract slice now covers role permissions and incremental usage enforcement; no persistent auth, database or billing runtime is claimed.
