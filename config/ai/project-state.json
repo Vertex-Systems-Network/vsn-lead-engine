@@ -2,10 +2,10 @@
   "schema_version": 1,
   "lifecycle_stage": "implementation_started",
   "current_phase": "PHASE-SAAS-WEB-MVP",
-  "current_module": "MOD-WEB-EXPERIENCE",
-  "current_work_unit": "WU-SAAS-LEAD-WEB",
-  "last_verified_completion": "PR #166 pending cancellation merged at 485cf9bc9e456878f779c14adc4bed6721f95646 after required checks, CodeQL and PostgreSQL 37695788773 passed at cb323bf27e51f89bfae5380f933bc7932b7f6fca.",
-  "next_valid_work_unit": "WU-SAAS-LEAD-WEB",
+  "current_module": "MOD-JOB-ORCHESTRATION",
+  "current_work_unit": "WU-SAAS-COLLECTION",
+  "last_verified_completion": "PRs #164\u2013#167 merged tenant job history/detail, signed CSRF/idempotent draft form, confirmed pending cancellation and bounded source configuration preview. Final #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks/CodeQL/PostgreSQL 37696123260.",
+  "next_valid_work_unit": "WU-SAAS-COLLECTION",
   "progress": {
     "total_work_units": 21,
     "complete": 9,
@@ -18,9 +18,9 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify/merge bounded read-only source configuration preview.",
-    "Continue dispatch-start/provider-idempotency/uncertain-outcome reconciliation and operational scheduling, plus browser/accessibility verification.",
-    "Complete lead results/export, billing periods/events and external rights/customer/privacy/deployment/launch evidence."
+    "Implement internal write-ahead dispatch ledger and stable provider-idempotency identity with uncertain-outcome reconciliation; keep provider dispatch disabled.",
+    "Verify browser/accessibility when a usable browser runtime is available; durable scheduling and billing period/event contracts remain open.",
+    "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "pending_cancellation_verified_source_preview_local_pass_ci_pending",
+  "qa_readiness": "web_slices_ci_verified_full_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "485cf9bc9e456878f779c14adc4bed6721f95646",
+  "last_reconciled_repository_ref": "5dd939146477451e34c64c7281f1d9e1eca607dc",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

@@ -27,7 +27,7 @@ and dedupe.
 
 ## SaaS milestone roadmap
 
-Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `485cf9b` / PR #166; bounded read-only source configuration preview implemented in this change with provider dispatch disabled. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is an engineering work-unit indicator, not customer validation, legal clearance, provider-rights approval, deployment, or launch certification.
+Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `5dd9391` / merged PR #167; session usage/jobs/drafts/pending cancellation/source preview verified through required checks and PostgreSQL CI with provider dispatch disabled. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is an engineering work-unit indicator, not customer validation, legal clearance, provider-rights approval, deployment, or launch certification.
 
 | Milestone | Start date | Status | Progress |
 |---|---:|---|---|
@@ -2253,3 +2253,10 @@ PR #165 draft form passed exact-head required checks, CodeQL and SaaS PostgreSQL
 ### Source configuration preview (development)
 
 PR #166 pending cancellation passed required checks, CodeQL and real PostgreSQL regression/concurrency/migration gates (SaaS Quality 37695788773). A session-only source page now shows at most 100 application policy codes/versions and recorded switch, free-collection declaration and capability values after tenant membership checks. It explicitly distinguishes configuration from live availability, collection/storage/export rights, entitlement eligibility, freshness and coverage. It creates no policy rows, seeds no synthetic rights, activates no source and exposes no private evidence/control references. Invalid/oversized capability metadata is unknown, all text is escaped, viewers can read and mutation methods are rejected. Local SaaS suite is 76 passed with 8 explicit PostgreSQL-only skips; final-head PostgreSQL/required/CodeQL gates remain required. Source activation, live adapters, dispatch reconciliation, browser/WCAG/customer acceptance and launch remain open. Engineering progress remains foundation 80%, orchestration 55%, web 40%; this bounded preview does not complete source feasibility or collection.
+
+
+### Verified web checkpoint and next frontier
+
+PRs #164–#167 are merged: tenant job history/detail, signed CSRF/idempotent saved-search form, revision-bound pending cancellation and bounded source configuration preview. Final source head `868e4df27281ed80b4503f129af840c463cdfcca` passed validate (37696123475), repository-integrity (37696123330), analyze-actions/CodeQL (37696123356) and real PostgreSQL/migration/security-setting regression (37696123260). Local source suite was 76 passed plus 8 explicit PostgreSQL-only skips; CI ran the PostgreSQL cases. Root suite after final source state was 376 passed, 1 skipped, 28 subtests passed. This is repository implementation verification, not a deployed service or customer/WCAG/rights acceptance.
+
+Next independent implementation unit: an internal write-ahead dispatch-operation ledger with stable provider idempotency identity and explicit uncertain-outcome reconciliation. `docs/ai/SAAS-DISPATCH-RECONCILIATION-NEXT-SLICE.md` records the state/locking/recovery and acceptance tests; it is a plan, not delivered runtime. Browser validation remains blocked by missing Chromium/invalid download archives. Billing period/events, durable scheduling, live source/worker, lead results/export, customer/privacy/rights/deployment and launch acceptance remain open. Existing collector and retained quota evidence are unchanged. Engineering indicators remain foundation 80%, orchestration 55%, web 40%, overall approximately 45%.
