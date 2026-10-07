@@ -83,9 +83,9 @@ Keep desktop/mobile clients after the shared API and web workflows are stable. B
 - Depend on vendor APIs/terms, payment availability for Pakistan-based VSN, source coverage, GitHub/Cloudflare/Google controls, design/user research and qualified compliance review.
 
 ## 9. Technology Decisions
-No stack approved.
+Standing technical autonomy is active for this initialized project. After system design, the AI selects the technology stack from documented alternatives using safety, reversibility, compatibility, maintainability and zero-new-paid-spend as defaults; no separate owner technology-confirmation prompt is required.
 Candidate architecture for evaluation: shared versioned API, relational system of record with tenant-scoped authorization, durable queue/scheduler, object storage only for suitable artifacts, provider adapter interfaces, web-first frontend, desktop/mobile clients later. Compare options for current team skills, cost at idle/scale, free-tier limits, queue durability, database isolation, secrets/OIDC, observability, vendor lock-in, deployment and migration burden.
-`Approve Technology Stack` remains a required ANPOS gate after system design. No paid infrastructure/API should be enabled without cost and account authorization.
+New paid infrastructure/API commitments, credentials/account actions, provider commercial rights and legally binding/compliance decisions remain external gates and must not be inferred from technical delegation.
 
 ## 10. Proposed Options and Modules
 Canonical option IDs are in `config/ai/options-bank.json`; module IDs, boundaries, dependencies and acceptance gates are in `config/ai/modules-bank.json`.
@@ -129,16 +129,16 @@ Threat-model tenant boundary, authentication/session theft, provider-secret comp
 ## 15. Deployment / Operations
 Isolate dev/staging/prod credentials and data. Use managed durable queue/scheduler and DB only after cost/plan approval; do not base customer schedules on ephemeral GitHub Actions cron. Define queue SLO/latency, success and partial-result metrics, per-provider health/circuit breakers, cost alarms, tenant quotas, support/runbooks, backups and restore targets, migrations expand→migrate→verify→contract, signed desktop release and store review. Roll out behind tenant/feature controls; maintain stop/rollback path.
 
-## 16. Unresolved Human Decisions
-1. Product boundary: evolve this repository/runtime or create a separate SaaS application repository before code work.
-2. Launch market/countries/niches and first user segment.
-3. Provider model: platform-funded, BYOK, or both; first source providers.
-4. MVP field policy and phone/email requirements.
-5. Subscription plans, trial, quotas, overage behavior, payment provider and billing currency.
-6. Windows/macOS/Linux desktop and Android/iOS storefront scope/order.
-7. Hosting/API/AI budget ceiling and acceptable ongoing monthly spend.
-8. User research contacts and success targets.
-These decisions do not block documentation/research. Technology approval and external paid/production changes remain gated.
+## 16. Standing Development Defaults and External Gates
+The repository owner delegates ordinary software-development decisions to the AI. The active reversible defaults are:
+1. Keep SaaS development additive in this repository while isolating the production lead runtime; split repositories later only if engineering evidence justifies it.
+2. Preserve US + Canada compatibility as the initial engineering scope while external market validation continues.
+3. Build responsive web and shared versioned APIs first; desktop/mobile follow stable contracts.
+4. Prefer free/zero-new-paid-spend development paths; design BYOK/provider adapters without activating paid providers.
+5. Preserve current lead-quality/dedupe invariants and make SaaS field handling source-aware rather than weakening the production phone-qualified pipeline.
+6. AI selects implementation architecture, libraries, migrations, CI fixes and the technology stack after evidence/cost comparison without asking for technical confirmation.
+
+External gates that may still require human/provider/legal action are limited to new paid/recurring spend, credentials/OAuth/account actions unavailable to authenticated tooling, provider commercial rights/contract acceptance, qualified legal/compliance attestations, final commercial pricing/payment activation, irreversible destructive production actions, and public/commercial launch commitment. These gates do not block independent safe development.
 
 ## 17. Execution Readiness
 - [x] User overview captured and normalized without converting assumptions to facts.
@@ -149,8 +149,8 @@ These decisions do not block documentation/research. Technology approval and ext
 - [x] VSN incumbent workflow captured as a repository-grounded first-party case; EVID-000033 (not customer validation).
 - [ ] External user/job validation through interviews or task evidence.
 - [ ] Source contract, qualified rights review, target-market yield and quote gates.
-- [ ] Product boundary, launch market, source model, billing, platform and budget decisions.
-- [ ] System/data/threat/UX design and architecture records.
-- [ ] Technology alternatives evaluated and owner approval recorded.
+- [x] Reversible development defaults for repository boundary, engineering market compatibility, source model and platform order recorded under standing technical autonomy; external commercial/budget activation remains gated.
+- [ ] System/data/threat/UX design and architecture records — now ready and not blocked by owner technical confirmation.
+- [ ] Technology alternatives evaluated and AI-selected ADR recorded after system design; no owner technical-confirmation prompt required.
 - [ ] Implementation acceptance criteria refined with approved MVP.
 - [x] Stack-neutral SaaS contract implementation started and merged via PR #134; production SaaS runtime remains gated.
