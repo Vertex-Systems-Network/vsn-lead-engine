@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from .attempts import check_pre_dispatch
 from .jobs import RevisionConflict
-from .models import DispatchOperation, Job, JobOutbox, Workspace
+from .models import DispatchOperation, Job, JobOutbox, SourcePolicy, Workspace
 from .services import membership_for
 from .usage import lock_workspace
 
@@ -36,6 +36,7 @@ def begin_dispatch(outbox_id, token):
             request_hash=job.request_hash,
             policy_version=policy["version"],
             policy_fingerprint=policy["hash"],
+            call_limit=SourcePolicy.objects.get(pk=code).max_provider_calls,
         )
         for code, policy in sorted(intent.source_snapshot.items())
     ]

@@ -6,6 +6,11 @@
 - Exact protected main re-read: `4ed6a6a2b2bc29771afc2547c98e076e3686829c` / merged PR #169. This following branch reconciles documentation/state only. Inspect live main/issues/PRs before future mutation replay.
 - Owner-selected frontend: Next.js + TypeScript. Django/DRF/PostgreSQL remain the session, tenant, role, data and mutation authority.
 
+## Current candidate
+
+- codex/saas-terminal-receipts on protected base 511af9cae7f44e3dfb5ab23f6d75b975c692986a: Internal signed terminal receipt reconciliation and job-usage bypass guards implemented; local 92 pass / 12 PostgreSQL skips; duplicate/conflicting receipt races and final-head CI remain merge gates. No verifier/provider/sender/results/billing activated.
+- Local root/ANPOS checks rerun after state reconciliation; final-head CI must pass before merge. This is not provider or release certification.
+
 ## Verified
 
 - PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).
@@ -31,6 +36,6 @@
 
 ## Next Action
 
-1. Reconcile live main/issues/PRs and continue M6 confirmed-receipt success/no-effect reconciliation with server-derived bounded settlement, duplicate/conflicting receipt tests and PostgreSQL concurrency. Keep provider adapter/consumer disabled.
+1. Verify/merge receipt candidate, then continue M5 explicit period/rollover contracts and M6 durable scheduling. Keep provider adapter/consumer disabled.
 2. Implement M5 billing period/rollover and signed-event contracts without activating payments. Continue M7 Next-native login-return/logout and draft/cancel with Django CSRF, then results/export when backend/source contracts permit. Browser/accessibility remains a separate verified-runtime gate.
 3. Continue the ready independent frontier within invocation budget. Checkpoint is not a stop condition; no work after turn end is claimed.

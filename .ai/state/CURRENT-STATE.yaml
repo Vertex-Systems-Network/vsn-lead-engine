@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "4ed6a6a2b2bc29771afc2547c98e076e3686829c",
+  "observed_main_sha": "511af9cae7f44e3dfb5ab23f6d75b975c692986a",
   "observed_main_semantics": "Exact protected main re-read after PR #169 merge and before the documentation-only verification checkpoint.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": null,
+  "active_branch": "codex/saas-terminal-receipts",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -70,7 +70,8 @@
     "saas_pending_cancellation": "PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks, CodeQL and PostgreSQL 37695788773",
     "saas_source_preview": "PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks, CodeQL and PostgreSQL 37696123260",
     "checkpoint_168": "PR #168 head 7d4bfc9e69138f7424405a9c88691ecea2fb8a03 passed required checks, CodeQL/actions and SaaS PostgreSQL 37696425439 (84 tests).",
-    "saas_dispatch_next": "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks)."
+    "saas_dispatch_next": "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
+    "saas_terminal_receipts_candidate": "Internal signed terminal receipt reconciliation and job-usage bypass guards implemented; local 92 pass / 12 PostgreSQL skips; duplicate/conflicting receipt races and final-head CI remain merge gates. No verifier/provider/sender/results/billing activated."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -117,7 +118,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled.",
+  "exact_next_safe_action": "Verify/merge internal terminal receipts, then continue M5 explicit billing-period/rollover contracts, M6 durable scheduling and M7 Next auth/mutation migration; external services remain disabled.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
