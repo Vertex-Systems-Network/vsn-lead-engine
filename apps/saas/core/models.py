@@ -34,7 +34,7 @@ class Membership(models.Model):
 
 
 class Job(models.Model):
-    """Saved draft intent only. This slice cannot enqueue or dispatch a provider."""
+    """Saved search intent. Internal enqueue persists an outbox; no provider dispatch."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
@@ -140,3 +140,41 @@ class UsageReservation(models.Model):
             ),
         ]
         indexes = [models.Index(fields=["workspace", "status"], name="saas_reservation_workspace")]
+
+
+class SourcePolicy(models.Model):
+    """Trusted internal catalog only. Empty/unknown rights and costs fail closed."""
+
+    code = models.CharField(max_length=64, primary_key=True)
+    version = models.PositiveIntegerField(default=1)
+    enabled = models.BooleanField(default=False)
+    free_collection = models.BooleanField(default=False)
+    countries = models.JSONField(default=list)
+    categories = models.JSONField(default=list)
+    statuses = models.JSONField(default=list)
+    fields = models.JSONField(default=list)
+    evidence = models.JSONField(default=dict)
+    controls = models.JSONField(default=dict)
+    max_provider_calls = models.PositiveIntegerField(default=0)
+
+
+class JobOutbox(models.Model):
+    """Durable pre-dispatch intent. No consumer or external call is enabled."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    job = models.OneToOneField(Job, on_delete=models.CASCADE)
+    reservation = models.OneToOneField(UsageReservation, on_delete=models.PROTECT)
+    submitted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    submitted_revision = models.PositiveIntegerField()
+    source_snapshot = models.JSONField()
+    status = models.CharField(max_length=9, default="pending")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(status__in=["pending", "cancelled"]),
+                name="saas_outbox_status",
+            )
+        ]

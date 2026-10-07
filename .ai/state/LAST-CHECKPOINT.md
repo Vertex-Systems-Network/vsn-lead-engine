@@ -139,3 +139,10 @@ Do not turn workflow success or ANPOS completion into a false quota-complete cla
 - Next ready frontier: transactional job intent/reservation/outbox; source-policy recheck; bounded worker leases/cancellation/expiry/recovery; web workflows. External rights/customer/privacy/billing/deployment/launch evidence remains open. No persistent Supervisor/background execution is claimed.
 
 - Dependency repair verification: canonical lock regeneration check and hash-verified install/pip check passed; full repository suite 376 passed, 1 skipped, 28 subtests passed; ANPOS integrity/hardening passed. Remote CI remains the merge gate.
+
+## Atomic job intent checkpoint — 2026-10-08 PKT
+
+- Exact main before this branch: `91caa5884564fcd49f3984524bb916a6f15ee83e` / merged PR #159. All required checks, CodeQL, canonical lock verify and `saas-postgres` successful on `e60e8d214b87d0b747f7b7a9a6b9f88af8d68798`. Main README re-read; failed dependency PR #136 closed as superseded.
+- Branch `codex/saas-transactional-outbox`, intended PR #160: internal source catalog defaults disabled/empty; atomic revision-checked draft enqueue reserves server-derived caps and saves a unique outbox; draft/queued cancellation releases pre-dispatch capacity transactionally. No real source policy, client submit/activation endpoint or consumer is enabled.
+- Local SaaS regression: 36 passed and 6 explicit PostgreSQL-only skips; real concurrency and migration gates remain remote merge requirements. Ruff lint/format, migration drift and ANPOS integrity passed. Synthetic fixture references do not represent approval evidence.
+- Next ready frontier: bounded attempt leases, dispatch-time membership/entitlement/source/cancellation rechecks, expiry/recovery, followed by web and billing-period workflows. Existing collector phone/taxonomy/US+CA/R2/Google behavior preserved; external launch/rights/customer/privacy gates remain open.

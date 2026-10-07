@@ -580,7 +580,8 @@
         "PR #155 merged at d221dc7742f2cc03ca9bc02d7fe6eb783b8fdedf after PostgreSQL concurrent last-owner and all required CI checks passed.",
         "Login abuse slice adds transactional 15-minute account/IP caps, keyed fingerprints and concurrent budget regression (next CI pending).",
         "PR #156 merged at e00a0459abf1010bb7141391d28b3fe084dd52a6 after required checks and real PostgreSQL login budget concurrency passed (SaaS Quality run 37688331442).",
-        "core.usage implements persisted fail-closed entitlements and workspace-serialized reserve/settle/release services with idempotency, hard caps and tenant checks; PostgreSQL concurrent reservation regression added (next CI pending)."
+        "core.usage implements persisted fail-closed entitlements and workspace-serialized reserve/settle/release services with idempotency, hard caps and tenant checks; PostgreSQL concurrent reservation regression added (next CI pending).",
+        "PR #157 usage reservations and PR #158 isolated lint/format/compile gates merged after all required checks and PostgreSQL tests; #159 canonical compatible dependency repair also verified. Billing events/period policy and full release acceptance remain open."
       ]
     },
     {
@@ -594,7 +595,7 @@
         "WU-SAAS-SOURCE-FEASIBILITY"
       ],
       "priority": 70,
-      "status": "not_started",
+      "status": "in_progress",
       "blockers": [],
       "acceptance_criteria": [
         "Cost/source policy preflight blocks disallowed work.",
@@ -605,7 +606,10 @@
         "Scheduler/failure tests",
         "Cost cap tests"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "Independent provider-disabled orchestration primitives implemented on codex/saas-transactional-outbox: transactional job intent/reservation/outbox, source catalog defaults disabled, revision replay/conflict, draft/queued cancellation. PostgreSQL race/migration CI required before merge.",
+        "Foundation primitives support independent orchestration development; full foundation acceptance and externally approved adapter activation remain separate gates."
+      ]
     },
     {
       "id": "WU-SAAS-LEAD-WEB",
@@ -736,5 +740,5 @@
     "deferred",
     "deprecated"
   ],
-  "progress_note": "Standing technical autonomy is active: ordinary development choices, technical errors, CI repair, stack selection and reversible implementation decisions must not be routed back to the user. WU-SAAS-MVP-DECISIONS is complete on reversible development defaults; WU-SAAS-SYSTEM-DESIGN is ready. External user validation, provider rights, paid spend, credentials and legally binding/commercial activation remain evidence/authorization gates but must not stop independent safe work. Production quota operations remain independent and evidence-driven."
+  "progress_note": "Standing technical autonomy active. System/API/UX design contracts are complete; development stack selected; foundation and provider-disabled job primitives advancing. Full billing/source/adapter/customer/privacy/deployment/launch acceptance remains open. Continue safe independent implementation without per-step confirmation."
 }

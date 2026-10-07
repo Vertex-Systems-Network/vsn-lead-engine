@@ -4,24 +4,23 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PRs #154\u2013#158 merged with required checks and real PostgreSQL tenant/security/idempotency/usage/migration tests passing. Compatible dependency maintenance and requirement traceability checkpoint prepared on review branch.",
+  "last_verified_completion": "PRs #154\u2013#159 merged with required checks, CodeQL, verified dependency locks and real PostgreSQL SaaS gates passing. Internal atomic job/reservation/outbox and source-policy catalog prepared for CI.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
     "complete": 9,
     "ready": 0,
-    "in_progress": 3,
+    "in_progress": 4,
     "blocked": 1,
     "deferred": 2,
-    "not_started": 6,
+    "not_started": 5,
     "needs_update": 0,
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify/merge reviewed dependency lock regeneration replacing failed #136.",
-    "Continue transactionally safe job/reservation/outbox, source-policy recheck and bounded worker lease/recovery work with providers disabled.",
-    "Complete web workflows, billing event contracts/period policy and release evidence separately.",
-    "External customer/provider/privacy/payment-account/launch gates remain open; no refreshed quota claimed."
+    "Verify internal job/outbox PostgreSQL concurrency and reversible migration gates before merge.",
+    "Continue worker leases, dispatch-time policy/membership/entitlement/cancellation rechecks and bounded reservation recovery with providers disabled.",
+    "Complete web workflows, billing event/period policy and external release evidence separately."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -34,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_foundation_postgresql_lint_verified_dependency_maintenance_pending",
+  "qa_readiness": "saas_foundation_verified_internal_outbox_ci_pending",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "4ad90efdfd19e89cb5584c31614c5359f7e1077a",
+  "last_reconciled_repository_ref": "91caa5884564fcd49f3984524bb916a6f15ee83e",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [
