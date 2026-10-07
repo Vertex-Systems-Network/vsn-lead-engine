@@ -28,12 +28,13 @@ export default async function Workspace({
       <Link href="/dashboard">← Workspaces</Link>
       <h1>Workspace overview</h1>
       <div className="actions">
-        <a
+        <Link
           className="button"
-          href={backendLink(`/workspaces/${workspaceId}/search/new/`)}
+          prefetch={false}
+          href={`/dashboard/workspaces/${workspaceId}/search/new`}
         >
           Create draft search
-        </a>
+        </Link>
         <a href={backendLink(`/workspaces/${workspaceId}/sources/`)}>
           Source configuration
         </a>

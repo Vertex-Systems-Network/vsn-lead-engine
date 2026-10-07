@@ -35,7 +35,16 @@ def main():
         import django
 
         django.setup()
-        from core.models import Entitlement, User
+        from core.jobs import CONTROLS, EVIDENCE, enqueue_job
+        from core.models import (
+            Entitlement,
+            Job,
+            JobOutbox,
+            Membership,
+            SourcePolicy,
+            UsageReservation,
+            User,
+        )
         from core.periods import advance_period
         from core.serializers import SearchSerializer
         from core.services import create_draft, create_workspace
@@ -94,6 +103,8 @@ def main():
                 # Fixed trusted configuration, not a browser-provided next host.
                 settings.LOGIN_REDIRECT_URL = origin + "/dashboard"
                 settings.LOGOUT_REDIRECT_URL = origin + "/dashboard"
+                settings.WEB_DASHBOARD_URL = origin + "/dashboard"
+                settings.CSRF_TRUSTED_ORIGINS = [origin]
 
                 def read(path, authenticated=True):
                     headers = {"Cookie": f"sessionid={session}"} if authenticated else {}
@@ -123,7 +134,11 @@ def main():
                     and "Settled and reserved usage" in page
                 )
                 Entitlement.objects.create(
-                    workspace=workspace, active=True, lead_limit=10, job_limit=2
+                    workspace=workspace,
+                    active=True,
+                    lead_limit=10,
+                    job_limit=2,
+                    provider_call_limit=4,
                 )
                 now = timezone.now()
                 advance_period(
@@ -152,22 +167,37 @@ def main():
                         return None
 
                 class Csrf(HTMLParser):
-                    token = None
+                    def __init__(self):
+                        super().__init__()
+                        self.token = None
+                        self.hidden = {}
+                        self.action = None
 
                     def handle_starttag(self, tag, attrs):
                         fields = dict(attrs)
+                        if tag == "form":
+                            self.action = fields.get("action")
+                        if tag == "input" and fields.get("type") == "hidden" and fields.get("name"):
+                            self.hidden[fields["name"]] = fields.get("value", "")
                         if tag == "input" and fields.get("name") == "csrfmiddlewaretoken":
                             self.token = fields.get("value")
 
                 jar = CookieJar()
                 opener = build_opener(HTTPCookieProcessor(jar), NoRedirect())
 
-                def account(path, data=None):
-                    payload = None if data is None else urlencode(data).encode()
+                def account(path, data=None, request_origin=None):
+                    payload = None if data is None else urlencode(data, doseq=True).encode()
                     try:
-                        response = opener.open(Request(backend + path, data=payload), timeout=10)
+                        response = opener.open(
+                            Request(
+                                backend + path,
+                                data=payload,
+                                headers={"Origin": request_origin} if request_origin else {},
+                            ),
+                            timeout=10,
+                        )
                     except HTTPError as error:
-                        if error.code not in {302, 303, 403, 405}:
+                        if error.code not in {302, 303, 400, 403, 405, 409}:
                             raise
                         response = error
                     with response:
@@ -190,6 +220,79 @@ def main():
                 # The real login session, shared by localhost ports, must render Next.
                 with opener.open(origin + "/dashboard", timeout=10) as response:
                     assert "Synthetic &lt;workspace&gt;" in response.read().decode()
+
+                def native_form(path):
+                    with opener.open(origin + path, timeout=10) as response:
+                        body = response.read().decode()
+                        assert "no-store" in response.headers.get("Cache-Control", "")
+                    parser = Csrf()
+                    parser.feed(body)
+                    return body, parser
+
+                draft_path = f"/dashboard/workspaces/{workspace.id}/search/new"
+                body, native = native_form(draft_path)
+                assert "Create draft search" in body and "Phone (always required)" in body
+                draft_action = f"/workspaces/{workspace.id}/search/new/"
+                assert native.action == backend + draft_action
+                assert "draft_token" in native.hidden and native.token
+                payload = {
+                    **native.hidden,
+                    "countries": ["US", "CA"],
+                    "categories": "Native bakery",
+                    "source_codes": "http-fixture",
+                    "result_limit": "5",
+                }
+                assert account(draft_action, payload, "http://localhost:3999")[0] == 403
+                before = Job.objects.count()
+                code, _, returned = account(draft_action, payload, origin)
+                assert code == 303
+                created = Job.objects.get(search__categories=["Native bakery"])
+                detail_path = f"/dashboard/workspaces/{workspace.id}/jobs/{created.id}"
+                assert returned["Location"] == origin + detail_path
+                assert created.search["required_fields"] == ["phone"]
+                assert Job.objects.count() == before + 1
+                assert not UsageReservation.objects.exists() and not JobOutbox.objects.exists()
+                assert account(draft_action, payload, origin)[0] == 303
+                assert Job.objects.count() == before + 1
+                assert account(draft_action, {**payload, "result_limit": "6"}, origin)[0] == 409
+                Membership.objects.filter(user=user, workspace=workspace).update(role="viewer")
+                denied_form, parser = native_form(draft_path)
+                assert "draft_token" not in parser.hidden
+                assert account(draft_action, payload, origin)[0] == 403
+                Membership.objects.filter(user=user, workspace=workspace).update(role="owner")
+                foreign_form, parser = native_form(f"/dashboard/workspaces/{other.id}/search/new")
+                assert (
+                    "Foreign private marker" not in foreign_form
+                    and "draft_token" not in parser.hidden
+                )
+                _, stale = native_form(detail_path + "/cancel")
+                cancel_action = f"/workspaces/{workspace.id}/jobs/{created.id}/cancel/"
+                assert stale.action == backend + cancel_action and "confirmation" in stale.hidden
+                # Synthetic catalog and internal enqueue only, never a source call.
+                SourcePolicy.objects.create(
+                    code="http-fixture",
+                    enabled=True,
+                    free_collection=True,
+                    countries=["CA", "US"],
+                    categories=["Native bakery"],
+                    fields=["phone"],
+                    evidence={k: "synthetic-only" for k in EVIDENCE},
+                    controls={k: "synthetic-only" for k in CONTROLS},
+                    max_provider_calls=1,
+                )
+                enqueue_job(user, workspace.id, created.id, 0)
+                assert account(cancel_action, stale.hidden, origin)[0] == 409
+                assert UsageReservation.objects.get().status == "reserved"
+                cancel_body, current = native_form(detail_path + "/cancel")
+                assert "Current status: " in cancel_body and "queued" in cancel_body
+                assert account(cancel_action, current.hidden, origin)[0] == 303
+                assert account(cancel_action, current.hidden, origin)[0] == 303
+                created.refresh_from_db()
+                assert (created.status, created.revision) == ("cancelled", 2)
+                assert UsageReservation.objects.get().status == "released"
+                assert JobOutbox.objects.get().status == "cancelled"
+                _, closed_form = native_form(detail_path + "/cancel")
+                assert "confirmation" not in closed_form.hidden
                 active_session = next(cookie.value for cookie in jar if cookie.name == "sessionid")
                 code, form, _ = account("/accounts/sign-out/")
                 assert code == 200 and "End your session" in form
@@ -215,7 +318,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native draft/replay/role/tenant/cancel flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

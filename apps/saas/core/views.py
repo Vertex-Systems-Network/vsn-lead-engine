@@ -9,6 +9,7 @@ from django.http import (
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -40,6 +41,22 @@ def overview(request):
 @never_cache
 def sign_out_page(request):
     return render(request, "core/sign_out.html", {"dashboard_url": settings.LOGIN_REDIRECT_URL})
+
+
+@login_required
+@require_GET
+@never_cache
+@ensure_csrf_cookie
+def check_session_page(request):
+    return render(
+        request, "core/check_session.html", {"dashboard_url": settings.LOGIN_REDIRECT_URL}
+    )
+
+
+def job_return(workspace_id, job_id):
+    if settings.WEB_DASHBOARD_URL:
+        return f"{settings.WEB_DASHBOARD_URL}/workspaces/{workspace_id}/jobs/{job_id}"
+    return reverse("job-detail-page", args=[workspace_id, job_id])
 
 
 class WorkspaceList(generics.ListCreateAPIView):
@@ -223,9 +240,7 @@ def draft_search_page(request, workspace_id):
                     None, "The draft could not be saved. Open a new draft form and try again."
                 )
             else:
-                return HttpResponseRedirect(
-                    reverse("job-detail-page", args=[workspace_id, job.id]), status=303
-                )
+                return HttpResponseRedirect(job_return(workspace_id, job.id), status=303)
     return render(
         request,
         "core/draft_search.html",
@@ -269,9 +284,7 @@ def cancel_pending_page(request, workspace_id, job_id):
             except ValidationError:
                 form.add_error(None, "Cancellation is unavailable. Review the job again.")
             else:
-                return HttpResponseRedirect(
-                    reverse("job-detail-page", args=[workspace_id, job_id]), status=303
-                )
+                return HttpResponseRedirect(job_return(workspace_id, job_id), status=303)
     return render(
         request,
         "core/cancel_pending.html",

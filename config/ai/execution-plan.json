@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "90f90a6952932d7ef8a43d5d6bcaa6decb964139",
+  "reconciliation_base_ref": "c32d17fa53b8031a251d7ba289b160ab2752b868",
   "phases": [
     {
       "id": "PHASE-HISTORICAL-BASELINE",
@@ -649,7 +649,8 @@
         "PRs #163\u2013#165 usage/job visibility and signed CSRF/idempotent draft form verified with required checks, CodeQL and real PostgreSQL regression/migrations (draft 37695370079).",
         "PRs #164\u2013#167 history/detail, signed session draft form, confirmed pending cancellation and bounded source configuration preview merged with required checks/CodeQL/real PostgreSQL regression and migration gates. Final source head 868e4df27281ed80b4503f129af840c463cdfcca / PostgreSQL 37696123260. No full browser/WCAG/customer/result/export/source-rights or release acceptance claimed.",
         "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
-        "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial)."
+        "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).",
+        "Native Next draft/cancel screens and private bounded Django form contexts implemented; exact frontend CSRF trust, cookie reseed and fixed job return preserve Django mutation authority. Local 122 pass/16 PostgreSQL skips (138 cases), seven transport tests/build/type/lint and real native-form HTTP flow pass; final-head CI pending. Invalid submissions use existing Django review; browser/proxy/native account acceptance stays open."
       ],
       "update_notes": [
         "Frontend selection partially supersedes templates UI decision only: docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md."

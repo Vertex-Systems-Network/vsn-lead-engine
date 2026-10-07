@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "90f90a6952932d7ef8a43d5d6bcaa6decb964139",
-  "observed_main_semantics": "Exact protected main feature snapshot after PR #178 merge and before following documentation-only progress reconciliation. Re-read live main before new mutations.",
+  "observed_main_sha": "c32d17fa53b8031a251d7ba289b160ab2752b868",
+  "observed_main_semantics": "Protected main read after documentation PR #179; native Next forms candidate requires exact-head CI.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "main",
+  "active_branch": "codex/next-native-draft-cancel",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -75,7 +75,8 @@
     "saas_periods": "PR #176 merged at 52653cfbd7d3ccffee0cf1685afcc99be9877183; head d3707b30d5284fb94cd39e80c9b4474a6aa749be passed required checks/Actions CodeQL, PostgreSQL 37701109983 (114 tests including period races/migration/security gates), and Next/HTTP 37701109984.",
     "saas_daily_occurrences": "PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870.",
     "saas_session_navigation": "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).",
-    "latest_saas_verified_head": "71af41df128f1a2f54d19a6132d859ac0b492187"
+    "latest_saas_verified_head": "71af41df128f1a2f54d19a6132d859ac0b492187",
+    "saas_native_next_forms_candidate": "Native Next draft/cancel screens and private bounded Django form contexts implemented; exact frontend CSRF trust, cookie reseed and fixed job return preserve Django mutation authority. Local 122 pass/16 PostgreSQL skips (138 cases), seven transport tests/build/type/lint and real native-form HTTP flow pass; final-head CI pending. Invalid submissions use existing Django review; browser/proxy/native account acceptance stays open."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -122,7 +123,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Continue M7 native Next draft/cancel screens with narrow Django form context and session/CSRF authority using docs/ai/SAAS-NEXT-MUTATIONS-NEXT-SLICE.md; retain fixed return/logout. Signed billing events and accepted-lead/results contracts remain independent work without activating payments/providers/customer scheduler.",
+  "exact_next_safe_action": "Verify/merge native Next draft/cancel, then port bounded source configuration visibility to Next and improve native validation/error/account flows under Django authority; billing/results contracts remain independent without provider/payment activation.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

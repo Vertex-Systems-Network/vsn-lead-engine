@@ -157,3 +157,36 @@ footer {
     gap: 14px;
   }
 }
+
+.search-form {
+  display: grid;
+  gap: 12px;
+}
+.search-form fieldset {
+  border: 1px solid #d8e1eb;
+  border-radius: 8px;
+  padding: 14px;
+}
+.search-form fieldset label {
+  display: block;
+  margin: 8px 0;
+}
+.search-form textarea,
+.search-form input[type="number"] {
+  width: 100%;
+  max-width: 100%;
+  font: inherit;
+  padding: 10px;
+  border: 1px solid #768cab;
+  border-radius: 6px;
+}
+.search-form input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+.search-form button {
+  justify-self: start;
+  font: inherit;
+  cursor: pointer;
+}

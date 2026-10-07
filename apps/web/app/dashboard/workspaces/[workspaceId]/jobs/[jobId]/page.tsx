@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { backend, backendLink } from "../../../../../../lib/backend";
+import { backend } from "../../../../../../lib/backend";
 import { job, uuid } from "../../../../../../lib/contracts";
 import { State } from "../../../../../components/state";
 export default async function Detail({
@@ -36,13 +36,12 @@ export default async function Detail({
           <dd>{new Date(j.created_at).toISOString()}</dd>
         </dl>
         {["draft", "queued"].includes(j.status) ? (
-          <a
-            href={backendLink(
-              `/workspaces/${workspaceId}/jobs/${jobId}/cancel/`,
-            )}
+          <Link
+            prefetch={false}
+            href={`/dashboard/workspaces/${workspaceId}/jobs/${jobId}/cancel`}
           >
             Review cancellation
-          </a>
+          </Link>
         ) : null}
       </section>
     </>

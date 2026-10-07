@@ -20,6 +20,7 @@ class WebOriginTests(SimpleTestCase):
     def test_credentials_paths_queries_controls_and_remote_http_fail_closed(self):
         for origin in [
             "http://web.example.test",
+            "https://*.example.test",
             "//web.example.test",
             "https://user:secret@web.example.test",
             "https://@web.example.test",

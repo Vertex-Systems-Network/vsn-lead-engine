@@ -13,7 +13,7 @@ def dashboard_return(origin, *, debug):
             not isinstance(origin, str)
             or len(origin) > 2048
             or any(ord(c) <= 32 or ord(c) >= 127 for c in origin)
-            or any(c in origin for c in "\\?#")
+            or any(c in origin for c in "\\?#*")
         ):
             raise ValueError
         parsed = urlsplit(origin)

@@ -136,3 +136,7 @@ Reservations bind the current window; new reservations/pre-dispatch checks fail 
 ### Next session navigation
 
 For localhost Next development, set `SAAS_WEB_ORIGIN=http://localhost:3000` in the Django process; default login/logout then returns to `/dashboard`. The optional value must be an origin only, without credentials/path/query/fragment; production accepts HTTPS only. Omit it for standalone Django defaults. Next's sign-out link opens `/accounts/sign-out/`; confirmation posts the existing CSRF-protected logout route. No GET logout or request-derived external redirect hosts are added. The [session integration review](../../docs/ai/SAAS-NEXT-SESSION-NAVIGATION-REVIEW-20261008.md) records HTTP evidence and remaining native forms/proxy acceptance.
+
+### Native Next forms
+
+Authenticated `draft-form/` and job `cancel-form/` API contexts expose only bounded workspace/job snapshots, masked CSRF and signed bound tokens. Missing CSRF cookies must be seeded through `/accounts/check-session/`. Native Next forms submit to the existing Django handlers; configured successful submissions return to fixed Next job paths. Invalid submissions use the existing Django validation review. `SAAS_WEB_ORIGIN` also explicitly trusts that single frontend Origin for CSRF; wildcard origins are rejected. Shared session cookie scope and production proxy/TLS remain deployment acceptance gates. See [security and compatibility review](../../docs/ai/SAAS-NEXT-NATIVE-FORMS-REVIEW-20261008.md).

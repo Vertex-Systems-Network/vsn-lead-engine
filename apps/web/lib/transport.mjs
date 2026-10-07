@@ -14,8 +14,18 @@ export function trustedOrigin(value) {
   }
   return url.origin;
 }
-export async function readBackend(origin, path, session, fetcher = fetch) {
+const formPath =
+  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|jobs\/[0-9a-f-]{36}\/cancel-form\/)$/;
+export async function readBackend(
+  origin,
+  path,
+  session,
+  fetcher = fetch,
+  csrf,
+) {
+  const form = formPath.test(path);
   if (
+    !form &&
     !/^\/api\/v1\/workspaces\/(?:[0-9a-f-]{36}\/(?:usage\/|jobs\/(?:[0-9a-f-]{36}\/)?))?(?:\?(?:page=[1-9][0-9]{0,5}|after=[0-9a-f-]{36}))?$/.test(
       path,
     )
@@ -23,9 +33,13 @@ export async function readBackend(origin, path, session, fetcher = fetch) {
     throw new Error("Unsupported backend path");
   }
   if (!/^[a-z0-9]{32}$/.test(session ?? "")) return { kind: "signin" };
+  if (form && !/^[A-Za-z0-9]{32}$/.test(csrf ?? "")) return { kind: "denied" };
   try {
     const response = await fetcher(new URL(path, trustedOrigin(origin)), {
-      headers: { Accept: "application/json", Cookie: `sessionid=${session}` },
+      headers: {
+        Accept: "application/json",
+        Cookie: `sessionid=${session}${form ? `; csrftoken=${csrf}` : ""}`,
+      },
       cache: "no-store",
       redirect: "manual",
       signal: AbortSignal.timeout(5000),

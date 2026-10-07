@@ -14,11 +14,14 @@ export async function backend<T>(
   path: string,
   validate: (value: unknown) => value is T,
 ): Promise<Result<T>> {
-  const session = (await cookies()).get("sessionid")?.value;
+  const jar = await cookies();
+  const session = jar.get("sessionid")?.value;
   const result = await readBackend(
     process.env.SAAS_BACKEND_ORIGIN ?? "http://localhost:8000",
     path,
     session,
+    undefined,
+    jar.get("csrftoken")?.value,
   );
   if (result.kind !== "ok") return result as Result<T>;
   return validate(result.data)
