@@ -22,6 +22,7 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 - `/health/`: liveness and explicit disabled provider dispatch; no credentials/database details.
 - `/accounts/login/`, `/accounts/logout/`: Django same-origin sessions; CSRF-protected forms and POST logout.
 - `/`: authenticated workspace overview, with links to read-only workspace usage.
+- `/workspaces/{workspace_id}/search/new/`: CSRF-protected draft form for owners/admins/members, never execution.
 - `/workspaces/{workspace_id}/jobs/`: newest-first read-only history, 25-row signed workspace-bound continuation.
 - `/workspaces/{workspace_id}/jobs/{job_id}/`: read-only saved scope, recorded status/counts and UTC times.
 - `/workspaces/{workspace_id}/usage/`: session-authenticated read-only settled/reserved/limit table.
@@ -90,3 +91,8 @@ Owners, admins, members and viewers can read their workspace's server-derived se
 The read-only job history and detail pages recheck membership under the workspace lock. Viewers may read; foreign/revoked resources return 404. History orders by immutable creation time and UUID descending, fetches at most 26 rows, and displays 25. Continuations expire after one day, bind the workspace and are signed by the application key. Malformed/tampered/expired/foreign-workspace continuations return a generic 400 after tenant authorization. This is continuation through history, not a frozen snapshot; new inserts sort before the current cursor. API pagination stays compatible and unchanged.
 
 Saved scope is escaped text, never clickable provider HTML. Requested limits and recorded results are labeled separately; drafts/queue intents do not imply collection. No hashes, lease tokens, raw errors or provider credentials are rendered. All displayed dates explicitly use UTC. Start/finish/attempt/failure details and retry/cancel/export actions remain unavailable. The table scroll region is keyboard-focusable at narrow widths. Route/template tests are implemented; comprehensive WCAG/customer acceptance is not certified.
+
+
+## Draft-only search form
+
+The session form accepts supported country/status/field choices, bounded categories/source preferences and result limits through `SearchSerializer`. Phone is always included. Its hidden idempotency token is signed, expires in one day and binds user/workspace; it is independent of the CSRF token, which is also required. Owner/admin/member role is required both before rendering and inside the existing transactional save. Duplicate POST returns the same 303 detail redirect; changed payload with a used token returns 409. Invalid forms preserve input and token and return 400 with escaped field/error summaries. GET creates no database rows. No outbox/reservation, source activation, billing or schedule is triggered.
