@@ -90,6 +90,73 @@ class MembershipAudit(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class DailySchedule(models.Model):
+    """Immutable daily draft configuration. No scheduler/activation endpoint exists."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    key = models.CharField(max_length=128)
+    timezone = models.CharField(max_length=64)
+    local_time = models.TimeField()
+    search = models.JSONField()
+    request_hash = models.CharField(max_length=64)
+    revision = models.PositiveIntegerField(default=1)
+    enabled = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["workspace", "key"], name="saas_schedule_key"),
+            models.CheckConstraint(
+                condition=models.Q(revision__gte=1), name="saas_schedule_revision"
+            ),
+        ]
+
+
+class ScheduleOccurrence(models.Model):
+    """One local-day decision with a linked draft, never an execution claim."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    schedule = models.ForeignKey(DailySchedule, on_delete=models.PROTECT)
+    workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
+    schedule_revision = models.PositiveIntegerField()
+    local_date = models.DateField()
+    local_time = models.TimeField()
+    timezone = models.CharField(max_length=64)
+    request_hash = models.CharField(max_length=64)
+    scheduled_for = models.DateTimeField(null=True)
+    utc_offset_seconds = models.IntegerField(null=True)
+    resolution = models.CharField(max_length=20)
+    job = models.OneToOneField(Job, null=True, on_delete=models.PROTECT)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            # Revisions cannot create a second draft for the same local day.
+            models.UniqueConstraint(
+                fields=["schedule", "local_date"], name="saas_daily_occurrence"
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        resolution="skipped_day",
+                        scheduled_for__isnull=True,
+                        utc_offset_seconds__isnull=True,
+                        job__isnull=True,
+                    )
+                    | models.Q(
+                        resolution__in=["normal", "gap_forward", "ambiguous_earlier"],
+                        scheduled_for__isnull=False,
+                        utc_offset_seconds__isnull=False,
+                        job__isnull=False,
+                    )
+                ),
+                name="saas_occurrence_decision",
+            ),
+        ]
+
+
 class LoginBucket(models.Model):
     """Short-lived keyed fingerprints only; no raw username or IP."""
 

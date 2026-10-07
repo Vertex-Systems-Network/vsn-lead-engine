@@ -3,39 +3,38 @@
 ## Snapshot
 
 - Repository Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 PKT / 2026-10-07 UTC.
-- Exact protected main re-read: `4ed6a6a2b2bc29771afc2547c98e076e3686829c` / merged PR #169. This following branch reconciles documentation/state only. Inspect live main/issues/PRs before future mutation replay.
-- Owner-selected frontend: Next.js + TypeScript. Django/DRF/PostgreSQL remain the session, tenant, role, data and mutation authority.
+- Protected main re-read: `52653cfbd7d3ccffee0cf1685afcc99be9877183` / PR #176. Current branch `codex/saas-daily-occurrences`; inspect live main/issues/PRs before future mutation replay.
+- Owner selected Next.js + TypeScript. Django/DRF/PostgreSQL remain session, tenant, role and mutation authority; isolated SaaS work preserves production CLI/R2/Google behavior.
 
 ## Current candidate
 
-- Explicit internal period windows/rollover, legacy preservation, unresolved reservation blocking and Django/Next date visibility implemented locally; 100 pass/14 PostgreSQL skips, lint/build/type/HTTP pass. Final-head CI remains a merge gate; no payment/billing event/automatic reset activated.
-- PR #175 merged at d29cffd520c5eca4152f76633035aab540f5f18b; head 1a1e321ecdf7e93d6597653c20e1d7070eb5ffca passed required checks/actions CodeQL, PostgreSQL 37700238737 (104 tests and receipt races/migration/security gates), and Next/HTTP 37700238777.
+- Internal disabled daily schedule/occurrence foundation implemented: M3 IANA/DST resolution, atomic bounded draft materialization and creator/replay guards; local 108 pass/16 PostgreSQL skips; final-head PostgreSQL duplicate/revocation CI pending. No timer/activation endpoint/consumer/source work.
 
 ## Verified
 
-- PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).
-- Root regression 376 pass, 1 skip, 28 subtests pass; ANPOS integrity, Ruff and migration drift pass locally. Local SaaS 83 pass / 10 explicit PostgreSQL skips; all 93 are exercised without skips in the retained CI evidence.
-- M6 start write-ahead operation identity, request/policy binding and atomic rollback exist. Unknown outcome keeps reservation/key; started evidence blocks unsafe cancellation/expiry/rollback. There is no outbound sender.
-- M7 Next workspace/jobs/detail/usage workflow exists with server-only GET transport, origin/path validation, bounded response/timeout, session-only forwarding, no redirects/shared cache, generic failures and preserved Django forms. Disposable HTTP checks verify rendered data, pagination presence, tenant denial and anonymous/no-store isolation.
-- ADR-SAAS-002 / registry ADR-0008 partially supersede only the old templates UI decision. M5→M6→M7 dependency order retained; M5 80%, M6 60%, M7 45%, overall ~45% are engineering indicators, not full acceptance. Work-unit totals remain 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
-- Production US/Canada phone qualification, exact R2 dedupe, Google delivery and 12,000/day target preserved.
+- PR #176 merged at 52653cfbd7d3ccffee0cf1685afcc99be9877183; head d3707b30d5284fb94cd39e80c9b4474a6aa749be passed required checks/Actions CodeQL, PostgreSQL 37701109983 (114 tests including period races/migration/security gates), and Next/HTTP 37701109984.
+- PR #175 receipts merged at d29cffd520c5eca4152f76633035aab540f5f18b; head 1a1e321ecdf7e93d6597653c20e1d7070eb5ffca passed PostgreSQL 37700238737 (104 tests), Web 37700238777 and all required checks. Exact proof replay/conflict, source event identity, bounded call budgets and concurrent terminal reconciliation are covered.
+- Internal dispatch write-ahead/unknown state keeps uncertain reservations; terminal proof reconciles whole-job usage only after all operations resolve. Accepted leads/exports remain zero. Generic usage APIs cannot release/settle attached job reservations.
+- Explicit manual period windows retain legacy counters and late receipt accounting; unresolved reservations block rollover. Closed totals archive once, expired periods stop new work, old receipt/key replay cannot reset or charge a new window. Next/Django show explicit dates without automatic reset claims.
+- Next workspace/jobs/detail/usage uses bounded server-only session GET transport, fixed origin/path checks and no shared cache/redirects. Real disposable Django/Next HTTP rendering checks pass; Django draft/cancel forms remain in use.
+- Local SaaS candidate suite: 124 cases, 108 passed/16 PostgreSQL-only skipped; root 376 passed, 1 skipped, 28 subtests and ANPOS retained; final candidate checks rerun before publication. M5 85%, M6 70% candidate, M7 45%, overall ~45% are engineering indicators only. Work-unit counts: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
 
 ## Not Verified
 
-- No live SaaS source/provider/consumer, scheduler, terminal receipt/settlement, billing period/payment, results/export or production Next deployment activated. Provider idempotency/exactly-once is not certified.
-- Browser executable remains unavailable after prior invalid download archives. HTTP rendering does not certify visual/responsive interaction, WCAG or customer acceptance.
-- No persistent Development AI/Supervisor identity or distributed execution claimed. No execution after turn end claimed.
-- Rights/privacy/customer/deployment/launch review open; retained production quota remains 6,855/12,000 on 2026-10-04, no new production observation.
+- Daily occurrence candidate requires final-head PostgreSQL duplicate/revocation CI before merge. No schedule timer/scanner, public activation endpoint, automatic enqueue or live source consumer is enabled. Synthetic fixtures do not prove provider compatibility or rights.
+- No configured terminal proof verifier, signed billing-event/payment activation, accepted-lead/results/export store or production Next deployment. Provider exactly-once is not certified.
+- Browser executable unavailable; HTTP checks do not certify visual/responsive/WCAG/customer acceptance. Rights/privacy/customer/deployment/launch review remains open.
+- No persistent distributed-agent runtime identity or work after turn end claimed. Production quota retained at 6,855/12,000 on 2026-10-04; no new production observation.
 
 ## Known Risk
 
-- Started/unknown evidence retains reservations until an evidence-bound terminal reconciliation contract exists. Migration reversal refuses to erase evidence; existing records require a reviewed reconciliation/migration plan.
-- Local login opens Django then requires returning to Next. Shared-origin TLS/cookie/CSRF/proxy login-return/logout and native Next mutations require integration acceptance; links do not grant write permissions.
-- ESLint 9 is upstream-unsupported while current React/a11y plugin peer ranges exclude 10. Maintained compatible lint tooling remains required before production approval.
-- Usage remains cumulative without billing periods/reset. Source metadata does not establish rights or availability. Results/export/retention acceptance remains open.
+- Unknown external outcomes retain capacity until valid terminal evidence arrives; provider adapters need reviewed proof contracts and replay semantics. Evidence/history migrations refuse destructive rollback.
+- Native Next login-return/logout and draft/cancel require shared-origin TLS, session cookie and Django CSRF acceptance. Local Django login requires returning to Next.
+- ESLint 9 is upstream unsupported while current plugin peers exclude 10; compatible maintained tooling remains a production gate.
+- Manual windows do not automatically reset or activate paid plans. Schedules are disabled configurations and draft decisions, not a working customer execution scheduler; timezone data and activation/overlap/retention need deployment review.
 
 ## Next Action
 
-1. Verify/merge period candidate, then continue bounded internal daily schedule occurrences with DST/idempotency and no worker/consumer.
-2. Implement M5 billing period/rollover and signed-event contracts without activating payments. Continue M7 Next-native login-return/logout and draft/cancel with Django CSRF, then results/export when backend/source contracts permit. Browser/accessibility remains a separate verified-runtime gate.
-3. Continue the ready independent frontier within invocation budget. Checkpoint is not a stop condition; no work after turn end is claimed.
+1. Verify/merge daily occurrence final head; read protected README and reconcile actual CI/state evidence.
+2. Continue M7 Next-native login-return/logout and draft/cancel with Django CSRF. Continue signed billing-event and accepted-lead/results contracts where independent, without activating payments/providers.
+3. Continue ready work within invocation budget; checkpoints are recovery aids, not permission gates. No execution after turn end is claimed.
