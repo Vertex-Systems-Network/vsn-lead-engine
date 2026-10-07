@@ -576,7 +576,9 @@
         "apps/saas implements custom user/session identity, transactional workspace ownership and tenant-scoped draft API; local smoke has 15 passing tests and one explicit PostgreSQL-only skip. PostgreSQL CI and production acceptance are separate gates.",
         "In-memory repository from PR #153 hardened to enforce write role and defensive copies; tests/test_saas_repository.py.",
         "PR #154 merged at cf58cf808b16ec142b882625aca4e99cdb27958a after all required checks and saas-postgres CI passed, including duplicate-create concurrency and reversible migration tests.",
-        "apps/saas/core/services.py implements role changes/removal with last-owner protection and transactional audit; PostgreSQL concurrent owner regression added (next branch CI pending)."
+        "apps/saas/core/services.py implements role changes/removal with last-owner protection and transactional audit; PostgreSQL concurrent owner regression added (next branch CI pending).",
+        "PR #155 merged at d221dc7742f2cc03ca9bc02d7fe6eb783b8fdedf after PostgreSQL concurrent last-owner and all required CI checks passed.",
+        "Login abuse slice adds transactional 15-minute account/IP caps, keyed fingerprints and concurrent budget regression (next CI pending)."
       ]
     },
     {

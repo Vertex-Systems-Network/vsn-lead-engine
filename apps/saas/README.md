@@ -34,8 +34,14 @@ Drafts never enqueue, reserve usage, dispatch source calls, collect data, export
 
 ## Security and recovery
 
-Non-debug settings require HTTPS, secure cookies, HSTS, CSRF, HTTP-only sessions and a supplied secret. No production collector variables, R2/Google credentials or customer contact data are consumed. Do not expose the development server publicly. Do not use this scaffold as production certification: login abuse controls, operational deployment, independent security review and the external rights/privacy gates remain open.
+Non-debug settings require HTTPS, secure cookies, HSTS, CSRF, HTTP-only sessions and a supplied secret. No production collector variables, R2/Google credentials or customer contact data are consumed. Do not expose the development server publicly. Do not use this scaffold as production certification: operational deployment, independent security review and the external rights/privacy gates remain open.
 
 Initial migration reversal deletes disposable SaaS tables; never reverse it against customer data. For live migrations use the project expand/migrate/verify/contract policy and a verified restorable backup. This scaffold contains no existing-data migration and has no path to modify collector stores.
 
 Dependency evidence: [Django 5.2.18 release notes](https://docs.djangoproject.com/en/5.2/releases/5.2.18/) and [DRF 3.18.3 / security release notes](https://www.django-rest-framework.org/community/release-notes/), reviewed 2026-10-08 PKT. The production collector dependency lock is separate and unchanged.
+
+## Login abuse controls
+
+The login form allows at most 10 attempts per normalized username and 20 per connection IP within a fixed 15-minute window. Successful attempts count too; success does not reset an attacker’s budget. Limits apply whether or not an account exists, return a generic 429 and do not trust forwarded address headers. Concurrent PostgreSQL requests lock keyed HMAC fingerprints. Raw usernames/IPs are not stored in these buckets. Rows older than one day are cleaned on login traffic; this is not a guarantee of timed deletion on an idle service. A periodic cleanup/operations policy must be configured before deployment.
+
+A global account bucket can temporarily block a legitimate user during a targeted attack. This bounded development default requires production traffic/abuse review; distributed edge controls, recovery/MFA, proxy-aware address configuration and deployment monitoring remain release work. Do not treat this throttle as production security certification.

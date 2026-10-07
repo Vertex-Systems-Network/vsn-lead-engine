@@ -96,3 +96,12 @@ Do not turn workflow success or ANPOS completion into a false quota-complete cla
 - Branch: `codex/saas-membership-lifecycle`. Adds member list/role-change/removal, transactional audit and concurrent last-owner test; no invitations or provider activation.
 - Local SaaS suite: 21 passing tests, 2 explicit PostgreSQL-only skips. Next CI must verify both concurrency tests before merge.
 - Next ready frontier: atomic persisted entitlements/usage and job/outbox, plus login abuse controls.
+
+
+## Login controls checkpoint — 2026-10-08 PKT
+
+- Exact main: `d221dc7742f2cc03ca9bc02d7fe6eb783b8fdedf` / merged PR #155; required checks, CodeQL and saas-postgres successful on `f1aa761dc201a077275da4ec109fdbfdff0606d5`.
+- Main README re-read and synchronized with delivered membership behavior.
+- Branch `codex/saas-login-abuse-controls` adds bounded transactional account/IP login controls and anonymized HMAC bucket storage; no forwarded-header trust.
+- Local SaaS suite: 25 passing tests, 3 explicit PostgreSQL-only skips. Remote login concurrency gate pending.
+- Next ready frontier remains atomic persisted entitlement/usage and durable job/outbox; deployment cleanup/abuse/recovery evidence remains open.

@@ -4,6 +4,7 @@ from unittest import skipUnless
 from uuid import uuid4
 from django.db import close_old_connections, connection, IntegrityError, transaction
 from django.test import TestCase, TransactionTestCase
+from django.utils import timezone
 from rest_framework.test import APIClient
 from .models import Job, Membership, MembershipAudit, User, Workspace
 from .services import create_draft, create_workspace
@@ -237,3 +238,71 @@ class ConcurrentOwnerTests(TransactionTestCase):
         self.assertCountEqual(results, ["changed", "retained"])
         self.assertEqual(Membership.objects.filter(workspace=workspace, role="owner").count(), 1)
         self.assertEqual(MembershipAudit.objects.count(), 1)
+
+
+class LoginAbuseTests(TestCase):
+    def test_ip_and_account_caps_do_not_reveal_or_store_identity(self):
+        from .login_security import ACCOUNT_LIMIT, allow_login
+        from .models import LoginBucket
+        for _ in range(ACCOUNT_LIMIT):
+            self.assertTrue(allow_login("private-user", "192.0.2.1"))
+        self.assertFalse(allow_login("ＰＲＩＶＡＴＥ－ＵＳＥＲ", "192.0.2.2"))
+        self.assertEqual(LoginBucket.objects.count(), 3)
+        for row in LoginBucket.objects.all():
+            self.assertEqual(len(row.fingerprint), 64)
+            self.assertNotIn("private-user", row.fingerprint)
+            self.assertNotIn("192.0.2", row.fingerprint)
+
+    def test_ip_cap_survives_username_rotation(self):
+        from .login_security import IP_LIMIT, allow_login
+        for index in range(IP_LIMIT):
+            self.assertTrue(allow_login(f"user-{index}", "192.0.2.1"))
+        self.assertFalse(allow_login("different-user", "192.0.2.1"))
+
+    def test_window_reset_and_retention_cleanup(self):
+        from datetime import timedelta
+        from .login_security import ACCOUNT_LIMIT, RETENTION, WINDOW, allow_login
+        from .models import LoginBucket
+        now = timezone.now()
+        LoginBucket.objects.create(fingerprint="a" * 64, started_at=now-RETENTION-timedelta(seconds=1), attempts=2)
+        for _ in range(ACCOUNT_LIMIT):
+            self.assertTrue(allow_login("user", "192.0.2.1", now=now))
+        self.assertFalse(allow_login("user", "192.0.2.1", now=now))
+        self.assertTrue(allow_login("user", "192.0.2.1", now=now+WINDOW))
+        self.assertFalse(LoginBucket.objects.filter(pk="a" * 64).exists())
+
+    def test_login_endpoint_enforces_limit_and_ignores_forwarded_header(self):
+        from .login_security import ACCOUNT_LIMIT
+        user = User.objects.create_user(username="login-user", password="valid-test-password")
+        client = APIClient(enforce_csrf_checks=True)
+        client.get("/accounts/login/")
+        token = client.cookies["csrftoken"].value
+        for _ in range(ACCOUNT_LIMIT):
+            response = client.post("/accounts/login/", {"username": user.username, "password": "wrong", "csrfmiddlewaretoken": token})
+            self.assertEqual(response.status_code, 200)
+        response = client.post("/accounts/login/", {"username": user.username, "password": "valid-test-password", "csrfmiddlewaretoken": token}, HTTP_X_FORWARDED_FOR="192.0.2.200")
+        self.assertEqual(response.status_code, 429)
+        self.assertContains(response, "Too many sign-in attempts", status_code=429)
+        self.assertEqual(response["Retry-After"], "900")
+        self.assertEqual(client.get("/").status_code, 302)
+
+
+@skipUnless(connection.vendor == "postgresql", "Requires real PostgreSQL row locking")
+class ConcurrentLoginTests(TransactionTestCase):
+    def test_concurrent_requests_cannot_exceed_account_budget(self):
+        from .login_security import ACCOUNT_LIMIT, allow_login
+        from .models import LoginBucket
+        for _ in range(ACCOUNT_LIMIT-1):
+            self.assertTrue(allow_login("user", "192.0.2.1"))
+        barrier = Barrier(2)
+        def attempt(_):
+            close_old_connections()
+            try:
+                barrier.wait(timeout=10)
+                return allow_login("user", "192.0.2.1")
+            finally:
+                close_old_connections()
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(attempt, range(2)))
+        self.assertCountEqual(results, [True, False])
+        self.assertTrue(all(row.attempts <= 20 for row in LoginBucket.objects.all()))
