@@ -18,7 +18,10 @@
     "circuit_breaker_after_repeated_identical_failure": true,
     "stop_on_budget_exhaustion": true,
     "require_owner_approval_to_raise_material_cost_limits": true,
-    "never_recursively_delegate_without_bounded_depth": true
+    "never_recursively_delegate_without_bounded_depth": true,
+    "continue_across_ready_frontier_until_runtime_budget_exhaustion": true,
+    "checkpoint_completion_is_not_a_stop_condition": true,
+    "skip_blocked_units_and_continue_independent_safe_work": true
   },
-  "notes": "Null monetary/token values mean the child project must set a limit when cost-sensitive autonomous execution is enabled; they do not mean unlimited budget."
+  "notes": "Null monetary/token values do not mean an invented unlimited budget. During an interactive workspace invocation, use the host-exposed remaining token/tool budget as the hard ceiling and continue across newly-unblocked authorized work until that ceiling, a circuit breaker, no-ready-work state, or genuine human/external authority gate is reached. Set explicit repository limits when a persistent cost-sensitive autonomous runtime is enabled."
 }

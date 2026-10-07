@@ -200,11 +200,14 @@ For every fresh development session, `continue`, resume, or timeout recovery:
 3. Resolve exact live protected/default `main`.
 4. Reconcile OPEN GitHub Issues first, then OPEN PRs.
 5. Prefer live repository/runtime evidence over chat memory.
-6. Execute one bounded logical milestone by default.
-7. Do not replay completed mutations after a timeout without proving they did not happen.
-8. Avoid tight CI polling; refresh at meaningful boundaries.
-9. Keep README status synchronized when a durable milestone changes.
-10. End with repo name, completed milestone, next safe action, module progress, and overall operational status.
+6. Execute continuously across the ready dependency frontier within the current workspace invocation. Completing one logical milestone is a checkpoint, not a stop condition: reconcile the newly-unblocked frontier and immediately continue with the next highest-priority safe work while runtime token/tool budget remains.
+7. Use the loop `ready frontier -> all safe work -> failure repair -> PR/CI/merge -> newly-unblocked dependent work -> repeat`. A blocked work unit must not stop unrelated authorized work; record the blocker with evidence, skip it, and continue the remaining ready frontier.
+8. Stop the development loop only when no authorized ready work remains, the host/runtime token or tool budget is exhausted, a configured circuit breaker opens, or every remaining path requires genuine human approval/credentials/external legal-provider authority. Never invent a numeric token budget when the host does not expose one; use the host-provided remaining budget as the ceiling.
+9. Do not replay completed mutations after a timeout without proving they did not happen.
+10. Avoid tight CI polling; use useful waiting time for independent safe work and refresh CI at meaningful merge/checkpoint boundaries.
+11. Keep README and machine state synchronized whenever durable milestone/module status changes.
+12. Before ending an invocation, checkpoint exact main/branch/PR/check evidence plus the next ready frontier so the next workspace turn resumes without rediscovery.
+13. End with repo name, completed milestones/work units, blocked work with evidence, next ready frontier, module progress, and overall operational status.
 
 Security and correctness rules:
 
