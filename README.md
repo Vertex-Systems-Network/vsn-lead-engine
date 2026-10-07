@@ -36,8 +36,8 @@ Snapshot: **2026-10-07 PKT**. This table covers the new SaaS direction only; the
 | M2 — MVP options, scope and success criteria | 2026-10-05 | In progress / owner decisions pending | `████░░░░░░` 40% |
 | M3 — System, tenant and threat-model design | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
 | M4 — Technology stack and repository decision | 2026-10-07 | Not approved | `░░░░░░░░░░` 0% |
-| M5 — SaaS foundation: workspace, roles and entitlements | 2026-10-07 | In progress; domain contracts added | `██░░░░░░░░` 20% |
-| M6 — Source policy, adapters and job orchestration | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
+| M5 — SaaS foundation: workspace, roles and entitlements | 2026-10-07 | In progress; contracts and authorization boundary added | `███░░░░░░░` 30% |
+| M6 — Source policy, adapters and job orchestration | 2026-10-07 | Source-policy boundary started; adapters not selected | `░░░░░░░░░░` 0% |
 | M7 — Lead web workflow, filters and export | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
 | M8 — Admin controls and bounded AI | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
 | M9 — Production readiness, desktop/mobile and launch | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
