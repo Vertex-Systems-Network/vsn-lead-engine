@@ -175,7 +175,7 @@ class JobOutbox(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(status__in=["pending", "cancelled", "started"]),
+                condition=models.Q(status__in=["pending", "cancelled", "started", "done"]),
                 name="saas_outbox_status",
             )
         ]
@@ -202,14 +202,16 @@ class JobAttempt(models.Model):
                 name="saas_one_active_attempt",
             ),
             models.CheckConstraint(
-                condition=models.Q(status__in=["leased", "expired", "cancelled", "started"]),
+                condition=models.Q(
+                    status__in=["leased", "expired", "cancelled", "started", "done"]
+                ),
                 name="saas_attempt_status",
             ),
         ]
 
 
 class DispatchOperation(models.Model):
-    """Write-ahead uncertainty ledger; no external caller or terminal receipt yet."""
+    """Write-ahead uncertainty ledger; no external caller is enabled."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
@@ -221,7 +223,8 @@ class DispatchOperation(models.Model):
     request_hash = models.CharField(max_length=64)
     policy_version = models.PositiveIntegerField()
     policy_fingerprint = models.CharField(max_length=64)
-    status = models.CharField(max_length=7, default="started")
+    call_limit = models.PositiveIntegerField(default=0)
+    status = models.CharField(max_length=8, default="started")
     created_at = models.DateTimeField(auto_now_add=True)
     unknown_at = models.DateTimeField(null=True)
 
@@ -229,7 +232,8 @@ class DispatchOperation(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["outbox", "source_code"], name="saas_dispatch_source"),
             models.CheckConstraint(
-                condition=models.Q(status__in=["started", "unknown"]), name="saas_dispatch_status"
+                condition=models.Q(status__in=["started", "unknown", "success", "noeffect"]),
+                name="saas_dispatch_status",
             ),
             models.CheckConstraint(
                 condition=models.Q(policy_version__gte=1), name="saas_dispatch_policy_version"
@@ -238,7 +242,37 @@ class DispatchOperation(models.Model):
                 condition=(
                     models.Q(status="started", unknown_at__isnull=True)
                     | models.Q(status="unknown", unknown_at__isnull=False)
+                    | models.Q(status__in=["success", "noeffect"])
                 ),
                 name="saas_dispatch_unknown_time",
+            ),
+        ]
+
+
+class DispatchReceipt(models.Model):
+    """Redacted terminal proof metadata. Raw body, signatures and secrets are omitted."""
+
+    operation = models.OneToOneField(DispatchOperation, on_delete=models.PROTECT)
+    source_code = models.CharField(max_length=64)
+    receipt_ref = models.CharField(max_length=96)
+    key_id = models.CharField(max_length=64)
+    body_hash = models.CharField(max_length=64)
+    outcome = models.CharField(max_length=8)
+    provider_calls = models.PositiveIntegerField()
+    issued_at = models.DateTimeField()
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["source_code", "receipt_ref"], name="saas_receipt_ref"),
+            models.CheckConstraint(
+                condition=models.Q(outcome__in=["success", "noeffect"]), name="saas_receipt_outcome"
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(outcome="noeffect", provider_calls=0)
+                    | models.Q(outcome="success", provider_calls__gte=1)
+                ),
+                name="saas_receipt_effect_calls",
             ),
         ]

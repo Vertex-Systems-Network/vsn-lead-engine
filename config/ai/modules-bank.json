@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "4ed6a6a2b2bc29771afc2547c98e076e3686829c",
+  "reconciliation_base_ref": "511af9cae7f44e3dfb5ab23f6d75b975c692986a",
   "modules": [
     {
       "id": "MOD-HISTORICAL-ROADMAP",
@@ -554,7 +554,8 @@
         "PR #160 atomic outbox/source catalog verified and merged after PostgreSQL race/migration gates. Bounded pre-dispatch lease/live recheck slice prepared for CI; external execution remains unavailable.",
         "PR #161 pre-dispatch lease/current-gate tests verified and merged. Bounded operator-driven expiry/recovery prepared for CI; no consumer/schedule/external execution activated.",
         "PR #162 operator-driven pre-dispatch expiry/recovery verified on PostgreSQL and merged; no cleanup schedule or provider execution activated.",
-        "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks)."
+        "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
+        "Internal signed terminal receipt reconciliation and job-usage bypass guards implemented; local 92 pass / 12 PostgreSQL skips; duplicate/conflicting receipt races and final-head CI remain merge gates. No verifier/provider/sender/results/billing activated."
       ],
       "update_notes": [
         "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled."

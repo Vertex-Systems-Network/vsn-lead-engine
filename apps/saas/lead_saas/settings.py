@@ -97,3 +97,7 @@ TIME_ZONE = "UTC"
 USE_TZ = True
 STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Internal verifier registry is empty by default. Provision only through trusted
+# server settings after provider-specific review; no environment/HTTP key input.
+SAAS_RECEIPT_VERIFIERS = {}

@@ -9,9 +9,9 @@ from django.http import Http404
 from django.utils import timezone
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
-from .models import Job, JobAttempt, JobOutbox, SourcePolicy
+from .models import Job, JobAttempt, JobOutbox, SourcePolicy, UsageReservation
 from .serializers import SearchSerializer
-from .usage import lock_workspace, release_usage, reserve_usage
+from .usage import _release_locked, lock_workspace, reserve_usage
 
 EVIDENCE = {"collection", "storage", "display", "export", "territory", "fields", "cost"}
 CONTROLS = {"attribution", "retention_deletion", "rate_limit", "freshness", "failure_behavior"}
@@ -155,7 +155,10 @@ def cancel_pending_job(user, workspace_id, job_id, expected_revision):
     if job.status == "queued":
         if outbox is None or outbox.status != "pending":
             raise RevisionConflict()
-        release_usage(user, workspace_id, outbox.reservation_id)
+        reservation = UsageReservation.objects.select_for_update().get(
+            pk=outbox.reservation_id, workspace_id=workspace_id
+        )
+        _release_locked(reservation)
         JobAttempt.objects.filter(outbox=outbox, status="leased").update(status="cancelled")
         outbox.status = "cancelled"
         outbox.save(update_fields=["status", "updated_at"])

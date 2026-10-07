@@ -1231,6 +1231,48 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-TERMINAL-RECEIPTS",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-JOB-ORCHESTRATION",
+        "MOD-SAAS-IDENTITY"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-COLLECTION"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-DISPATCH-RECONCILIATION-NEXT-SLICE.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-terminal-receipts"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "apps/saas/core/test_receipts.py: Internal signed terminal receipt reconciliation and job-usage bypass guards implemented; local 92 pass / 12 PostgreSQL skips; duplicate/conflicting receipt races and final-head CI remain merge gates. No verifier/provider/sender/results/billing activated."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-RECEIPT-ENGINEERING-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [
+        "apps/saas/core/migrations/0009_terminal_receipts.py"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/receipts.py",
+        "apps/saas/core/usage.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

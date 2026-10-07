@@ -17,7 +17,6 @@ from .models import JobAttempt, JobOutbox, Membership, UsageCounter
 from .recovery import expire_one, expire_pending_intents
 from .services import create_draft
 from .test_jobs import fixture
-from .usage import settle_usage
 
 
 class RecoveryTests(TestCase):
@@ -66,12 +65,17 @@ class RecoveryTests(TestCase):
         self.assertEqual(expire_pending_intents()["expired"], 0)
         self.job.status = "queued"
         self.job.save(update_fields=["status"])
-        settle_usage(
-            self.user,
-            self.workspace.id,
-            self.intent.reservation_id,
-            {"jobs": 1, "provider_calls": 1},
-        )
+        # Simulate retained legacy settled state; normal job settlement now
+        # requires verified reconciliation rather than the generic usage service.
+        self.intent.reservation.status = "settled"
+        self.intent.reservation.settlement = {
+            "leads": 0,
+            "jobs": 1,
+            "provider_calls": 1,
+            "exports": 0,
+        }
+        self.intent.reservation.save()
+        UsageCounter.objects.filter(workspace=self.workspace).update(jobs=1, provider_calls=1)
         self.assertFalse(expire_one(self.intent.id))
         self.assertEqual(expire_pending_intents()["expired"], 0)
         self.assertEqual(UsageCounter.objects.get(workspace=self.workspace).jobs, 1)

@@ -9,7 +9,7 @@ from django.db.models import Sum
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from .models import Entitlement, UsageCounter, UsageReservation, Workspace
+from .models import Entitlement, JobOutbox, UsageCounter, UsageReservation, Workspace
 from .services import IdempotencyConflict, membership_for
 
 COUNTERS = {
@@ -80,6 +80,15 @@ def settle_usage(user, workspace_id, reservation_id, actual):
     )
     if reservation is None:
         raise Http404("Workspace resource not found.")
+    if JobOutbox.objects.filter(reservation=reservation).exists():
+        raise ValidationError("Job usage must finalize through job reconciliation.")
+    return _settle_locked(reservation, actual)
+
+
+def _settle_locked(reservation, actual):
+    """Private primitive: caller holds workspace and reservation locks in a transaction."""
+    workspace_id = reservation.workspace_id
+    actual = amounts(actual)
     if reservation.status == "settled":
         if reservation.settlement != actual:
             raise IdempotencyConflict()
@@ -108,6 +117,15 @@ def release_usage(user, workspace_id, reservation_id):
     )
     if reservation is None:
         raise Http404("Workspace resource not found.")
+    if JobOutbox.objects.filter(reservation=reservation).exists():
+        raise ValidationError(
+            "Job usage must release through pending cancellation or reconciliation."
+        )
+    return _release_locked(reservation)
+
+
+def _release_locked(reservation):
+    """Private primitive: caller holds workspace and reservation locks in a transaction."""
     if reservation.status == "settled":
         raise ValidationError("Settled usage cannot be refunded through release.")
     if reservation.status == "reserved":

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "4ed6a6a2b2bc29771afc2547c98e076e3686829c",
+  "reconciliation_base_ref": "511af9cae7f44e3dfb5ab23f6d75b975c692986a",
   "phases": [
     {
       "id": "PHASE-HISTORICAL-BASELINE",
@@ -614,7 +614,8 @@
         "PR #161 merged at 920c5dc5ab5c64d25ff73616676af50ef8aa6dd9 after PostgreSQL concurrent lease exclusion, earlier races, required checks and reversible migrations passed.",
         "Bounded operator pre-dispatch recovery and server-derived expiry implemented on codex/saas-predispatch-recovery. No scheduled cleanup or external execution enabled; PostgreSQL cleanup exclusion CI pending.",
         "PR #162 merged at 70c6c961c2a6034340f6b5f6bab4246c883c1fef after required checks, CodeQL and PostgreSQL duplicate cleanup/earlier races/reversible migrations passed. No operational schedule or external provider activated.",
-        "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks)."
+        "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
+        "Internal signed terminal receipt reconciliation and job-usage bypass guards implemented; local 92 pass / 12 PostgreSQL skips; duplicate/conflicting receipt races and final-head CI remain merge gates. No verifier/provider/sender/results/billing activated."
       ],
       "update_notes": [
         "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled."
