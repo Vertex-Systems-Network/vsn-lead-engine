@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-WEB-EXPERIENCE",
   "current_work_unit": "WU-SAAS-LEAD-WEB",
-  "last_verified_completion": "PRs #154\u2013#163 merged with required checks, CodeQL and real PostgreSQL SaaS concurrency/migration gates passing. #163 usage visibility verified on c09996045b92214f58f152c71ea54ea4e46327a7 (SaaS Quality 37692371317).",
+  "last_verified_completion": "PR #164 tenant job history/detail merged at f0c9c1586c4ff2482b28d784d6582eaabf8ccc8f. Required checks, CodeQL and SaaS PostgreSQL/migrations pass at 387a4ff23964f2d839a80f30201d30dd03ec0214 (SaaS Quality 37695051762).",
   "next_valid_work_unit": "WU-SAAS-LEAD-WEB",
   "progress": {
     "total_work_units": 21,
@@ -18,9 +18,9 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify/merge read-only tenant job history/detail with signed bounded continuation.",
-    "Continue saved-search draft web form, browser/accessibility verification and lead workflows; dispatch-start/idempotency/uncertain-outcome reconciliation.",
-    "Complete billing period/events and external rights/customer/privacy/deployment/launch evidence separately."
+    "Verify/merge saved-search draft web form with session/CSRF/signed idempotency.",
+    "Continue guarded pending-job cancellation, source-availability preview and browser/accessibility verification; dispatch-start/idempotency/uncertain-outcome reconciliation.",
+    "Complete lead results/export, billing periods/events and external rights/customer/privacy/deployment/launch evidence."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "usage_visibility_verified_job_history_local_tests_pass_ci_pending",
+  "qa_readiness": "job_history_verified_draft_form_local_pass_ci_pending",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "0f0430b5f318749f9dba599053e1777fed008c44",
+  "last_reconciled_repository_ref": "f0c9c1586c4ff2482b28d784d6582eaabf8ccc8f",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

@@ -989,9 +989,11 @@
       "branch_refs": [
         "codex/saas-job-history"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #164"
+      ],
       "test_evidence": [
-        "apps/saas/core/test_job_history.py: JobHistoryTests; local SaaS 58 pass, 8 PostgreSQL-only skips; root 376 pass, 1 skip, 28 subtests pass. CI verification pending."
+        "apps/saas/core/test_job_history.py: JobHistoryTests; merged PR #164 repaired head 387a4ff23964f2d839a80f30201d30dd03ec0214 passed required checks, CodeQL and PostgreSQL 37695051762."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1002,6 +1004,47 @@
         "apps/saas/core/job_history.py",
         "apps/saas/templates/core/jobs.html",
         "apps/saas/templates/core/job_detail.html"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:f0c9c1586c4ff2482b28d784d6582eaabf8ccc8f"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-DRAFT-WEB",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-draft-form"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "apps/saas/core/test_draft_web.py: DraftWebTests; local SaaS 65 pass, 8 PostgreSQL-only skips; CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-JOB-WEB-ENGINEERING-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/forms.py",
+        "apps/saas/templates/core/draft_search.html"
       ],
       "sbom_refs": [],
       "attestation_refs": [],

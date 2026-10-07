@@ -10,15 +10,15 @@
     "status": "stable",
     "lifecycle_stage": "production_operations",
     "current_phase": "PHASE-SAAS-WEB-MVP",
-    "active_task": "WU-SAAS-FOUNDATION",
+    "active_task": "WU-SAAS-LEAD-WEB",
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "0f0430b5f318749f9dba599053e1777fed008c44",
+  "observed_main_sha": "f0c9c1586c4ff2482b28d784d6582eaabf8ccc8f",
   "observed_main_semantics": "Exact protected main inspected immediately before this dependency/checkpoint reconciliation branch.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "codex/saas-job-history",
+  "active_branch": "codex/saas-draft-form",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -64,7 +64,8 @@
     "saas_atomic_outbox": "PR #160: all required checks, CodeQL and PostgreSQL enqueue/cancel races/migration gates successful on c8d736c59455e786f0eb8a8da7b2f784456cf808",
     "saas_predispatch_leases": "PR #161: all required checks, CodeQL and PostgreSQL lease exclusion/earlier concurrency/migration gates successful on 31c72ee16dbdc3b462b6a6e6260408a4cb19d306",
     "saas_predispatch_recovery": "PR #162: required checks, CodeQL and PostgreSQL duplicate cleanup/earlier concurrency/migration gates successful on ac1c8093f8a697b7c17ff13ea8b6b3425523c996",
-    "saas_usage_visibility": "PR #163 required checks, CodeQL and SaaS PostgreSQL/migration gates successful on c09996045b92214f58f152c71ea54ea4e46327a7; SaaS Quality 37692371317"
+    "saas_usage_visibility": "PR #163 required checks, CodeQL and SaaS PostgreSQL/migration gates successful on c09996045b92214f58f152c71ea54ea4e46327a7; SaaS Quality 37692371317",
+    "saas_job_history": "PR #164 repaired head 387a4ff23964f2d839a80f30201d30dd03ec0214 passed required checks, CodeQL and SaaS PostgreSQL 37695051762"
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -111,7 +112,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify/merge tenant job history/detail, continue draft web form and browser/accessibility verification plus dispatch-start/idempotency/reconciliation; external activation remains gated.",
+  "exact_next_safe_action": "Verify/merge draft session form; continue guarded pending cancellation/source preview, browser/accessibility and dispatch-start/reconciliation contracts. External provider/billing/launch activation gated.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

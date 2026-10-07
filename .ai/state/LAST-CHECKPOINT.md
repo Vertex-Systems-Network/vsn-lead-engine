@@ -2,35 +2,36 @@
 
 ## Snapshot
 
-- Repository: `Vertex-Systems-Network/vsn-lead-engine`
-- Evidence date: 2026-10-08 PKT / 2026-10-07 UTC.
-- Verified main: `0f0430b5f318749f9dba599053e1777fed008c44` / merged PR #163.
-- Active branch: `codex/saas-job-history`; read-only history/detail implemented, local tests passed, PR #164 published at f3c32d2d360cfc384cce800f55ffc8ee084e0e31; checkpoint repair CI pending. Inspect live refs before replaying any mutation.
-- Historical checkpoint evidence remains in `docs/ai/CHECKPOINT-HISTORY-20261008.md`.
+- Repository: `Vertex-Systems-Network/vsn-lead-engine`; evidence date 2026-10-08 PKT / 2026-10-07 UTC.
+- Verified main: `f0c9c1586c4ff2482b28d784d6582eaabf8ccc8f` / merged PR #164.
+- Active branch: `codex/saas-draft-form`; signed session draft form implemented; publication/CI pending. Inspect live refs before replaying mutations.
+- History retained in `docs/ai/CHECKPOINT-HISTORY-20261008.md`.
 
 ## Verified
 
-- PRs #154–#163 merged identity/workspaces/drafts, owner-safe memberships, bounded login, internal entitlements/usage, quality gates, dependency locks, source-gated outbox/cancellation, bounded fenced leases, operator expiry/recovery and read-only usage visibility.
-- #163 exact head `c09996045b92214f58f152c71ea54ea4e46327a7`: Lead Engine 37692371356, AI Native Quality Gates 37692371462, CodeQL 37692371510 and SaaS PostgreSQL/migration 37692371317 all successful.
-- Job history/detail local suite: 58 passed, 8 explicit PostgreSQL-only skips; Ruff lint/format and ANPOS integrity pass. Root suite 376 passed, 1 skipped, 28 subtests passed. Tenant/revoked/viewer reads, mutation denial, escaping, timestamp ties/new inserts, malformed/expired/cross-workspace cursors covered.
-- Foundation 80%, orchestration 55%, web visibility 30% engineering indicators; full product/release/customer acceptance remains open.
+- PRs #154–#164 merged foundation/security/usage/quality/dependency/outbox/lease/recovery and usage/job-history visibility.
+- #164 repaired exact head `387a4ff23964f2d839a80f30201d30dd03ec0214`: validate 37695051763, repository-integrity 37695051760, analyze-actions 37695051772 and SaaS PostgreSQL/migration 37695051762 all successful. Original CI caught omitted Known Risk checkpoint heading; restored without weakening tests.
+- Draft local SaaS: 65 pass, 8 explicit PostgreSQL-only skips. Ruff lint/format and migration drift pass. Root suite before final draft state reconciliation: 376 pass, 1 skip, 28 subtests pass; rerun after this update.
+- Form covers token actor/workspace/expiry/tamper, CSRF, normalized phone-qualified data, bounds, tenant/role/revocation, duplicate replay and payload conflict. Saving creates no reservation/outbox/schedule/provider call.
+- Foundation 80%, orchestration 55%, web 35% engineering indicators; full product/customer/release acceptance remains open.
 
 ## Not Verified
 
-- PR #164 initial PostgreSQL and CodeQL passed; validate failed because this checkpoint omitted the required Known Risk heading. Heading restored without changing the test contract; repaired head must pass all gates before merge. Local SQLite smoke tests do not certify PostgreSQL concurrency.
-- Browser/accessibility/customer task acceptance, live SaaS provider/worker/scheduler, payment/billing periods, deployment/recovery/launch acceptance and qualified privacy review remain open.
-- Browser harness prepared with isolated synthetic fixtures. Chromium executable absent; Playwright install failed because network returned invalid/truncated ZIP archives. Browser verification isolated/deferred; no passing browser result claimed.
-- No Development AI/Supervisor identity/persistent background runtime verified; distributed coordination disabled.
-- Latest retained production quota is 6,855/12,000 on 2026-10-04; no refreshed production quota claimed.
+- Draft branch publication/final-head CI/merge pending; local SQLite is not concurrency certification.
+- Browser executable absent and Playwright download returned invalid/truncated ZIP archives. Harness/isolated synthetic fixtures exist; no visual/responsive/WCAG/customer acceptance claimed.
+- No live SaaS provider/consumer/scheduler/billing period/payment/deployment/public launch activated. Qualified privacy/source-rights review remains separate.
+- No persistent Development AI/Supervisor runtime identity verified; distributed coordination disabled.
+- Latest retained production quota remains 6,855/12,000 on 2026-10-04.
 
 ## Known Risk
 
-- History continuation is signed and workspace-bound but does not freeze the job database; new inserts appear before the current cursor.
-- Usage is cumulative with undefined billing/reset policy. Pending leases/expiry are pre-dispatch only; ambiguous external outcomes have no refund or retry certification.
-- Existing collector US/Canada scope, phone-only qualification, exact R2 dedupe, taxonomy and quota target remain preserved.
+- Cumulative usage has undefined period/reset. Predispatch expiry/leases do not certify ambiguous external outcome recovery/refunds.
+- History continuation is signed and workspace-bound but not a frozen snapshot; newer inserts appear before the cursor.
+- Draft tokens bind actor/workspace and are replayable only through unchanged-payload idempotency; membership/write role is rechecked on every save.
+- Existing US/Canada collector scope, phone-only accepted leads, exact R2 dedupe, taxonomy and quota target remain preserved.
 
 ## Next Action
 
-1. Resolve current PR/head/checks, verify and merge job history/detail only after required checks, CodeQL and real PostgreSQL gates pass. Re-read protected main README.
-2. Continue saved-search draft form and browser/accessibility validation; explicit dispatch-start/provider idempotency/uncertain-outcome reconciliation; billing periods/events and operational scheduling.
-3. External rights/privacy/customer/payment/deployment/launch gates do not block independent zero-new-spend development. A checkpoint is not a stop condition; continue within invocation budget. Never claim execution after turn ends.
+1. Verify final draft head with required checks, CodeQL and real PostgreSQL regression/concurrency/migrations; merge and re-read main README.
+2. Continue guarded pending-job cancellation, current source-availability preview, browser/accessibility verification and explicit dispatch-start/provider-idempotency/uncertain-outcome reconciliation. Complete lead results/export and billing periods/events independently of external activation.
+3. Continue ready frontier within host invocation budget; never claim execution after turn ends. External paid/provider/privacy/credential/launch gates do not block independent development.

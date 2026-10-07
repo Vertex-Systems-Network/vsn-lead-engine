@@ -1,7 +1,13 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import (
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, render
-from django.views.decorators.http import require_GET
+from django.urls import reverse
+from django.views.decorators.http import require_GET, require_http_methods
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -143,7 +149,13 @@ def job_history_page(request, workspace_id):
     return render(
         request,
         "core/jobs.html",
-        {"workspace": workspace, "jobs": jobs, "next_cursor": next_cursor},
+        {
+            "workspace": workspace,
+            "jobs": jobs,
+            "next_cursor": next_cursor,
+            "can_save_draft": membership_for(request.user, workspace_id).role
+            in {"owner", "admin", "member"},
+        },
     )
 
 
@@ -154,3 +166,51 @@ def job_detail_page(request, workspace_id, job_id):
 
     workspace, job = detail_snapshot(request.user, workspace_id, job_id)
     return render(request, "core/job_detail.html", {"workspace": workspace, "job": job})
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def draft_search_page(request, workspace_id):
+    from rest_framework.exceptions import PermissionDenied, ValidationError
+
+    from .forms import DraftSearchForm, new_draft_token
+    from .services import IdempotencyConflict
+
+    member = membership_for(request.user, workspace_id)
+    if member.role not in {"owner", "admin", "member"}:
+        return HttpResponseForbidden("This role cannot save search drafts.")
+    workspace = Workspace.objects.get(pk=workspace_id)
+    if request.method == "GET":
+        form = DraftSearchForm(
+            user=request.user,
+            workspace_id=workspace_id,
+            initial={"draft_token": new_draft_token(request.user, workspace_id)},
+        )
+        response_status = 200
+    else:
+        form = DraftSearchForm(request.POST, user=request.user, workspace_id=workspace_id)
+        response_status = 400
+        if form.is_valid():
+            try:
+                job, _ = create_draft(request.user, workspace_id, form.search, form.key)
+            except PermissionDenied:
+                return HttpResponseForbidden("This role cannot save search drafts.")
+            except IdempotencyConflict:
+                form.add_error(
+                    None, "This form already saved a different search. Open a new draft form."
+                )
+                response_status = 409
+            except ValidationError:
+                form.add_error(
+                    None, "The draft could not be saved. Open a new draft form and try again."
+                )
+            else:
+                return HttpResponseRedirect(
+                    reverse("job-detail-page", args=[workspace_id, job.id]), status=303
+                )
+    return render(
+        request,
+        "core/draft_search.html",
+        {"workspace": workspace, "form": form},
+        status=response_status,
+    )
