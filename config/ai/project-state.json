@@ -4,13 +4,13 @@
   "current_phase": "PHASE-SAAS-SYSTEM-DESIGN",
   "current_module": "MOD-SAAS-SYSTEM-DESIGN",
   "current_work_unit": "WU-SAAS-SYSTEM-DESIGN",
-  "last_verified_completion": "Reconciled protected main at f088b56; SaaS system/threat/API/data/UX contracts and stack ADR are merged. Continuous implementation is advancing into the first runtime foundation slice.",
-  "next_valid_work_unit": "WU-SAAS-WEB-MVP-FOUNDATION",
+  "last_verified_completion": "Additive tenant-scoped repository seam implemented with authorization binding, hidden cross-tenant reads and idempotency conflict handling; tests added.",
+  "next_valid_work_unit": "WU-SAAS-WEB-MVP-DJANGO-ADAPTER",
   "progress": {
     "total_work_units": 21,
-    "complete": 7,
-    "ready": 0,
-    "in_progress": 4,
+    "complete": 8,
+    "ready": 1,
+    "in_progress": 3,
     "blocked": 2,
     "deferred": 2,
     "not_started": 6,
@@ -18,10 +18,9 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Implement the additive SaaS runtime foundation using Django/DRF/PostgreSQL contracts without changing the production collector.",
-    "Add tenant-scoped persistence and API tests before enabling any provider or paid infrastructure.",
-    "Continue WU-OPS-DAILY-QUOTA independently from real workbook/health evidence.",
-    "Keep external user validation, provider rights, OAuth credentials, legal review and paid infrastructure explicitly gated."
+    "Add Django/PostgreSQL adapter behind the repository seam without changing the production collector.",
+    "Expose versioned API service handlers with request validation and authorization context.",
+    "Keep cross-workspace, idempotency and stale-membership tests as mandatory gates."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -36,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "ci_verified_for_merged_foundation",
   "security_readiness": "planning_only_tenant_and_provider_controls_required",
-  "last_reconciled_repository_ref": "f088b56",
+  "last_reconciled_repository_ref": "67c568829dd131aad0c68edc70aa9b2b6ab26375",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [
