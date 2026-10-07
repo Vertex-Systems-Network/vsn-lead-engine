@@ -97,8 +97,10 @@
   "timeout_control": {
     "tight_polling_forbidden": true,
     "duplicate_replay_forbidden": true,
-    "one_logical_milestone_per_continue_default": true
+    "one_logical_milestone_per_continue_default": false,
+    "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
+    "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Continue normal production quota operations from real runtime/workbook evidence. Treat ANPOS repository-side hardening as complete; only pursue external OAuth, qualified compliance review, Dependency graph, independent reviewer/team, or persistent Supervisor identity when real capability/authorization exists.",
+  "exact_next_safe_action": "Within each workspace invocation, continuously execute the highest-priority authorized ready frontier, repair technical failures, pass PR/CI/merge boundaries, then immediately continue newly-unblocked safe work until the host runtime budget is exhausted or only genuine external/human gates remain. Production quota operations remain evidence-driven and external gates must not be bypassed.",
   "last_reconciled_at": "2026-10-04T19:12:35Z"
 }
