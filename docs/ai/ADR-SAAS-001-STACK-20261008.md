@@ -10,6 +10,8 @@ The current repository is a mature Python CLI/workflow for one production lead p
 
 The chosen design should reuse the team's existing Python capability, provide secure workspace/session and admin foundations, support a versioned API, and keep early development runnable without a new recurring paid service. Future desktop/mobile clients can use the API. The public-production host, identity vendor, email delivery, billing gateway, lead provider and qualified compliance conclusions remain separate decisions.
 
+The Web UI selection below is partially superseded by [ADR-SAAS-002](ADR-SAAS-002-NEXT-FRONTEND-20261008.md), following the owner's Next.js preference. Backend and collector boundaries remain authoritative.
+
 ## Decision
 
 Use an additive, isolated SaaS application in this repository:

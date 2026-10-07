@@ -4,14 +4,16 @@ from pathlib import Path
 CONFIG=Path(".github/dependabot.yml")
 
 
-def test_dependabot_monitors_actions_and_python_weekly():
+def test_dependabot_monitors_actions_python_and_next_weekly():
     content=CONFIG.read_text(encoding="utf-8")
     assert content.startswith("version: 2\n")
     assert 'package-ecosystem: "github-actions"' in content
     assert 'package-ecosystem: "pip"' in content
+    assert 'package-ecosystem: "npm"' in content
+    assert 'directory: "/apps/web"' in content
     assert content.count('directory: "/"') == 2
-    assert content.count('interval: "weekly"') == 2
-    assert content.count('timezone: "Asia/Karachi"') == 2
+    assert content.count('interval: "weekly"') == 3
+    assert content.count('timezone: "Asia/Karachi"') == 3
     assert 'versioning-strategy: "increase-if-necessary"' in content
 
 
@@ -19,5 +21,6 @@ def test_dependabot_groups_updates_to_limit_pr_noise():
     content=CONFIG.read_text(encoding="utf-8")
     assert "github-actions:" in content
     assert "python-dependencies:" in content
-    assert content.count('open-pull-requests-limit: 4') == 2
-    assert content.count('patterns:') == 2
+    assert "next-runtime:" in content
+    assert content.count('open-pull-requests-limit: 4') == 3
+    assert content.count('patterns:') == 3

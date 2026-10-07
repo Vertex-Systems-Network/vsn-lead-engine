@@ -269,6 +269,43 @@
       "decided_at": "2026-10-07",
       "supersedes": [],
       "superseded_by": null
+    },
+    {
+      "id": "ADR-0008",
+      "title": "Use Next.js for the additive SaaS frontend and retain Django authority",
+      "status": "accepted",
+      "context": "Owner requested Next frontend and milestone-sequenced continuation on the existing Django/DRF SaaS foundation.",
+      "alternatives": [
+        "Retain Django templates for all UI",
+        "Vite/React client-only frontend",
+        "Next.js App Router/TypeScript with Django API"
+      ],
+      "evidence_refs": [
+        "docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md",
+        "docs/ai/ADR-SAAS-001-STACK-20261008.md",
+        "apps/web/README.md"
+      ],
+      "decision": "Select Next.js App Router and TypeScript under apps/web; partially supersede only the earlier stack ADR Web UI selection. Django/DRF/PostgreSQL/session authority and production collector isolation remain.",
+      "consequences": [
+        "Adds a pinned Node build/runtime and npm dependency review.",
+        "Preserved Django forms allow incremental UI migration.",
+        "Frontend does not certify source rights, billing or release acceptance."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "Server-only session GET transport; Django checks membership; no shared customer cache or public proxy.",
+        "CSRF mutations stay on tested Django forms.",
+        "No paid service or deployment activated."
+      ],
+      "reversibility": "Route UI back to preserved Django pages without changing backend or collector data.",
+      "affected_modules_or_contracts": [
+        "MOD-WEB-EXPERIENCE",
+        "MOD-SAAS-IDENTITY",
+        "apps/web"
+      ],
+      "decided_by": "Owner Next.js preference and standing technical implementation delegation",
+      "decided_at": "2026-10-08",
+      "supersedes": [],
+      "superseded_by": null
     }
   ],
   "decision_template": {
