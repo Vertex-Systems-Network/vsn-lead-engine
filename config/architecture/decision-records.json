@@ -306,6 +306,41 @@
       "decided_at": "2026-10-08",
       "supersedes": [],
       "superseded_by": null
+    },
+    {
+      "id": "ADR-0009",
+      "title": "Explicit manual accounting windows preserving unresolved reservations",
+      "status": "accepted",
+      "context": "Cumulative accounting lacks subscription-window contracts and must not reset uncertain execution.",
+      "alternatives": [
+        "Retain cumulative only",
+        "Automatic date reset with unresolved jobs",
+        "Explicit internal windows without payment activation"
+      ],
+      "evidence_refs": [
+        "docs/ai/ADR-SAAS-003-ACCOUNTING-WINDOWS-20261008.md"
+      ],
+      "decision": "Use explicit nullable periods, immutable closed snapshots and reservation binding. Advance only expired contiguous windows with no outstanding reservations; preserve legacy cumulative usage.",
+      "consequences": [
+        "Late receipts account to the original period.",
+        "Configured windows deny new work after expiry.",
+        "No signed billing/payment/automatic rollover is activated."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "Current admin role and workspace locks guard internal transitions.",
+        "No customer period mutation or paid entitlement claims.",
+        "History and unknown capacity cannot be silently erased."
+      ],
+      "reversibility": "Empty migration reverses; populated evidence requires preservation/roll-forward planning.",
+      "affected_modules_or_contracts": [
+        "MOD-SAAS-BILLING",
+        "MOD-SAAS-IDENTITY",
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "decided_by": "Standing owner technical delegation",
+      "decided_at": "2026-10-08",
+      "supersedes": [],
+      "superseded_by": null
     }
   ],
   "decision_template": {

@@ -56,6 +56,9 @@ def reserve_usage(user, workspace_id, key, requested):
             raise IdempotencyConflict()
         return previous
     counter, _ = UsageCounter.objects.get_or_create(workspace_id=workspace_id)
+    from .periods import active_window
+
+    active_window(counter)
     pending = UsageReservation.objects.filter(
         workspace_id=workspace_id, status="reserved"
     ).aggregate(**{name: Sum(name) for name in COUNTERS})
@@ -65,7 +68,11 @@ def reserve_usage(user, workspace_id, key, requested):
         ):
             raise ValidationError(f"{name} budget exceeded.")
     return UsageReservation.objects.create(
-        workspace_id=workspace_id, key=key, request_hash=request_hash, **requested
+        workspace_id=workspace_id,
+        period_id=counter.period_id,
+        key=key,
+        request_hash=request_hash,
+        **requested,
     )
 
 
@@ -98,6 +105,8 @@ def _settle_locked(reservation, actual):
     if any(actual[name] > getattr(reservation, name) for name in COUNTERS):
         raise ValidationError("Actual usage cannot exceed reserved usage.")
     counter, _ = UsageCounter.objects.get_or_create(workspace_id=workspace_id)
+    if counter.period_id != reservation.period_id:
+        raise ValidationError("Reservation accounting window no longer matches.")
     for name in COUNTERS:
         setattr(counter, name, getattr(counter, name) + actual[name])
     counter.save(update_fields=list(COUNTERS))

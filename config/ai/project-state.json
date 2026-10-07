@@ -2,9 +2,9 @@
   "schema_version": 1,
   "lifecycle_stage": "implementation_started",
   "current_phase": "PHASE-SAAS-WEB-MVP",
-  "current_module": "MOD-JOB-ORCHESTRATION",
-  "current_work_unit": "WU-SAAS-COLLECTION",
-  "last_verified_completion": "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
+  "current_module": "MOD-SAAS-BILLING",
+  "current_work_unit": "WU-SAAS-FOUNDATION",
+  "last_verified_completion": "PR #175 merged at d29cffd520c5eca4152f76633035aab540f5f18b; head 1a1e321ecdf7e93d6597653c20e1d7070eb5ffca passed required checks/actions CodeQL, PostgreSQL 37700238737 (104 tests and receipt races/migration/security gates), and Next/HTTP 37700238777.",
   "next_valid_work_unit": "WU-SAAS-COLLECTION",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify/merge internal receipts and continue explicit period/rollover contracts without payments, then durable scheduling and Next auth/mutations.",
+    "Verify explicit period windows, then internal daily occurrence materialization; signed billing/payment, Next native auth/mutations and provider/result gates stay open.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "next_and_dispatch_ci_verified_full_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "511af9cae7f44e3dfb5ab23f6d75b975c692986a",
+  "last_reconciled_repository_ref": "d29cffd520c5eca4152f76633035aab540f5f18b",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

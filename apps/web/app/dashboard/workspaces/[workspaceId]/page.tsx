@@ -46,8 +46,19 @@ export default async function Workspace({
       {counters.kind === "ok" && counters.data.workspace_id === workspaceId ? (
         <>
           <p className="muted">
-            Cumulative development counters. No billing period or reset is
-            configured.
+            {counters.data.period ? (
+              <>
+                Internal accounting window:{" "}
+                {new Date(counters.data.period.starts_at).toISOString()} to{" "}
+                {new Date(counters.data.period.ends_at).toISOString()}. Rollover
+                waits for unresolved reservations; billing is unavailable.
+              </>
+            ) : (
+              <>
+                Cumulative development counters. No billing period or reset is
+                configured.
+              </>
+            )}
           </p>
           <div className="table-scroll">
             <table>

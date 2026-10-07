@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Usage — {{ workspace.name }} — VSN Lead Engine</title></head>
 <body><main><p><a href="/">Your workspaces</a></p><h1>{{ workspace.name }} usage</h1>
 <p>Internal entitlement: {% if usage.entitlement_active %}active{% else %}inactive{% endif %}. Billing and collection are unavailable.</p>
-<p>Usage counters are cumulative in this development model. No billing period or reset date is configured. Reserved capacity is pending work, not completed results.</p>
+{% if usage.period %}<p>Internal accounting window: {{ usage.period.starts_at }} to {{ usage.period.ends_at }}. Rollover is manual and waits for unresolved reservations; billing is unavailable.</p>{% else %}<p>Usage counters are cumulative in this development model. No billing period or reset date is configured. Reserved capacity is pending work, not completed results.</p>{% endif %}
 <table><caption>Server-derived workspace usage and limits</caption><thead><tr><th scope="col">Counter</th><th scope="col">Settled</th><th scope="col">Reserved</th><th scope="col">Limit</th></tr></thead>
 <tbody>{% for name, amounts in usage.counters.items %}<tr><th scope="row">{{ name }}</th><td>{{ amounts.settled }}</td><td>{{ amounts.reserved }}</td><td>{{ amounts.limit }}</td></tr>{% endfor %}</tbody></table>
 <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit">Sign out</button></form>

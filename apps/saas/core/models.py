@@ -109,7 +109,42 @@ class Entitlement(models.Model):
     export_limit = models.PositiveIntegerField(default=0)
 
 
+class UsagePeriod(models.Model):
+    """Explicit internal window only; no payment, automatic reset or activation."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
+    key = models.CharField(max_length=128)
+    starts_at = models.DateTimeField()
+    ends_at = models.DateTimeField()
+    status = models.CharField(max_length=6, default="open")
+    settled_snapshot = models.JSONField(null=True)
+    closed_at = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["workspace", "key"], name="saas_period_key"),
+            models.UniqueConstraint(
+                fields=["workspace"], condition=models.Q(status="open"), name="saas_one_open_period"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(ends_at__gt=models.F("starts_at")), name="saas_period_order"
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(status="open", closed_at__isnull=True, settled_snapshot__isnull=True)
+                    | models.Q(
+                        status="closed", closed_at__isnull=False, settled_snapshot__isnull=False
+                    )
+                ),
+                name="saas_period_close_evidence",
+            ),
+        ]
+
+
 class UsageCounter(models.Model):
+    period = models.OneToOneField(UsagePeriod, null=True, on_delete=models.PROTECT)
     workspace = models.OneToOneField(Workspace, primary_key=True, on_delete=models.CASCADE)
     leads = models.PositiveIntegerField(default=0)
     jobs = models.PositiveIntegerField(default=0)
@@ -118,6 +153,7 @@ class UsageCounter(models.Model):
 
 
 class UsageReservation(models.Model):
+    period = models.ForeignKey(UsagePeriod, null=True, on_delete=models.PROTECT)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
     key = models.CharField(max_length=128)

@@ -8,8 +8,8 @@
 
 ## Current candidate
 
-- codex/saas-terminal-receipts on protected base 511af9cae7f44e3dfb5ab23f6d75b975c692986a: Internal signed terminal receipt reconciliation and job-usage bypass guards implemented; local 92 pass / 12 PostgreSQL skips; duplicate/conflicting receipt races and final-head CI remain merge gates. No verifier/provider/sender/results/billing activated.
-- Local root/ANPOS checks rerun after state reconciliation; final-head CI must pass before merge. This is not provider or release certification.
+- Explicit internal period windows/rollover, legacy preservation, unresolved reservation blocking and Django/Next date visibility implemented locally; 100 pass/14 PostgreSQL skips, lint/build/type/HTTP pass. Final-head CI remains a merge gate; no payment/billing event/automatic reset activated.
+- PR #175 merged at d29cffd520c5eca4152f76633035aab540f5f18b; head 1a1e321ecdf7e93d6597653c20e1d7070eb5ffca passed required checks/actions CodeQL, PostgreSQL 37700238737 (104 tests and receipt races/migration/security gates), and Next/HTTP 37700238777.
 
 ## Verified
 
@@ -36,6 +36,6 @@
 
 ## Next Action
 
-1. Verify/merge receipt candidate, then continue M5 explicit period/rollover contracts and M6 durable scheduling. Keep provider adapter/consumer disabled.
+1. Verify/merge period candidate, then continue bounded internal daily schedule occurrences with DST/idempotency and no worker/consumer.
 2. Implement M5 billing period/rollover and signed-event contracts without activating payments. Continue M7 Next-native login-return/logout and draft/cancel with Django CSRF, then results/export when backend/source contracts permit. Browser/accessibility remains a separate verified-runtime gate.
 3. Continue the ready independent frontier within invocation budget. Checkpoint is not a stop condition; no work after turn end is claimed.
