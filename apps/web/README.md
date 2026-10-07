@@ -19,7 +19,7 @@ Open `http://localhost:3000/dashboard`. Set `SAAS_WEB_ORIGIN=http://localhost:30
 ## Delivered
 
 - Session-authenticated workspace dashboard with bounded pagination.
-- Tenant-scoped jobs, saved scope/detail and settled/reserved/limit usage.
+- Tenant-scoped jobs, saved scope/detail and settled/reserved/limit usage. Saved-job state filters reset continuation on change and persist through Next/First page links.
 - Parallel job/usage reads, loading/error/empty/access-denied states, semantic tables, skip link, focus styles and responsive CSS.
 - Server-only GET transport with fixed API path allowlist, validated trusted origin, session cookie only, no shared cache, no redirects, five-second timeout and bounded JSON responses. No backend errors or credentials are logged/rendered.
 - Native read-only source configuration with empty/unknown/truncated metadata states, omitted evidence/controls and explicit limits on configuration claims.

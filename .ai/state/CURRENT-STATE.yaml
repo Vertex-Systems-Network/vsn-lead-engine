@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "6c6460c095778b27235272bd6f5ea608900614e1",
-  "observed_main_semantics": "Protected main read after PR #180 merge; source screen candidate requires exact-head CI.",
+  "observed_main_sha": "4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01",
+  "observed_main_semantics": "Protected main read after PR #181 merge; saved-job state filter candidate requires exact-head CI.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "codex/next-source-configuration",
+  "active_branch": "codex/next-job-state-filter",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -77,7 +77,8 @@
     "saas_session_navigation": "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).",
     "latest_saas_verified_head": "71af41df128f1a2f54d19a6132d859ac0b492187",
     "saas_native_next_forms": "PR #180 merged at 6c6460c095778b27235272bd6f5ea608900614e1; head 3c24b14fd0e263cc4fa24fd15ed2279752738961 passed all required checks/Actions CodeQL, PostgreSQL 37703540378 (138 tests/migration/settings) and Next/HTTP 37703540308 (native draft/replay/role/tenant/queued cancellation/CSRF/auth flows).",
-    "saas_next_source_configuration_candidate": "Native Next readonly source configuration and private bounded API implemented; sanitized capabilities and byte-limited unknown metadata, evidence/controls omitted. Local 125 pass/16 PostgreSQL skips (141 cases), Next lint/format/seven tests/build/type and HTTP empty/configured/XSS/viewer/foreign flows pass; exact-head CI pending. No source activation/rights/customer/browser certification."
+    "saas_next_source_configuration": "PR #181 merged at 4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01; head 66152035d4f4da7f75d8c656fe3eae0224590076 passed required checks/Actions CodeQL, PostgreSQL 37703955016 (141 tests/migration/settings), and Next/HTTP 37703954934 (bounded native source/XSS/viewer/tenant and earlier form/auth flows).",
+    "saas_job_state_filter_candidate": "Native saved-job state filter/cursor continuity and private bounded validated query implemented; local 129 pass/16 PostgreSQL skips (145 cases), eight transport tests, Next build/type/lint/format and HTTP filtered/empty/Next/First page flow pass; final-head CI pending. No mutation/provider or full browser/customer acceptance."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -124,7 +125,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify/merge native source screen, then native validation/error and account flows under Django session/CSRF authority; signed billing-event and accepted-lead/results contracts remain independent. Browser/proxy/provider/payment/customer scheduler gates stay open.",
+  "exact_next_safe_action": "Verify/merge saved-job state filter, then native validation/error and account flows under Django session/CSRF authority; signed billing events and accepted-lead/results contracts remain independent without provider/payment activation.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

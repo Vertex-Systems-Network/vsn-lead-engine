@@ -201,3 +201,16 @@ export function sourceCatalog(v: unknown): v is SourceCatalog {
     )
   );
 }
+
+export const jobStates = [
+  "draft",
+  "queued",
+  "running",
+  "partial",
+  "completed",
+  "failed",
+  "paused",
+  "cancelled",
+] as const;
+export const jobState = (v: unknown): v is (typeof jobStates)[number] =>
+  typeof v === "string" && jobStates.some((s) => s === v);

@@ -163,3 +163,38 @@ test("form paths require a bounded CSRF cookie and ordinary reads never forward 
     ),
   );
 });
+test("saved-job state filters stay on the exact job-list path", async () => {
+  const id =
+    "a".repeat(8) +
+    "-" +
+    "a".repeat(4) +
+    "-" +
+    "a".repeat(4) +
+    "-" +
+    "a".repeat(4) +
+    "-" +
+    "a".repeat(12);
+  const path = `/api/v1/workspaces/${id}/jobs/?status=draft&after=${id}`;
+  assert.equal(
+    (
+      await readBackend(
+        "http://localhost:8000",
+        path,
+        session,
+        async (_, options) => {
+          assert.equal(options.headers.Cookie, `sessionid=${session}`);
+          return new Response("{}", {
+            headers: { "content-type": "application/json" },
+          });
+        },
+      )
+    ).kind,
+    "ok",
+  );
+  for (const bad of [
+    `/api/v1/workspaces/${id}/usage/?status=draft`,
+    `/api/v1/workspaces/${id}/jobs/?status=evil`,
+    `/api/v1/workspaces/${id}/jobs/?status=draft&target=evil`,
+  ])
+    await assert.rejects(readBackend("http://localhost:8000", bad, session));
+});

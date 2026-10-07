@@ -1486,9 +1486,11 @@
       "branch_refs": [
         "codex/next-source-configuration"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #181"
+      ],
       "test_evidence": [
-        "Native Next readonly source configuration and private bounded API implemented; sanitized capabilities and byte-limited unknown metadata, evidence/controls omitted. Local 125 pass/16 PostgreSQL skips (141 cases), Next lint/format/seven tests/build/type and HTTP empty/configured/XSS/viewer/foreign flows pass; exact-head CI pending. No source activation/rights/customer/browser certification."
+        "PR #181 merged at 4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01; head 66152035d4f4da7f75d8c656fe3eae0224590076 passed required checks/Actions CodeQL, PostgreSQL 37703955016 (141 tests/migration/settings), and Next/HTTP 37703954934 (bounded native source/XSS/viewer/tenant and earlier form/auth flows)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1501,6 +1503,50 @@
         "apps/saas/core/source_preview.py",
         "apps/saas/core/test_source_preview.py",
         "apps/web/lib/contracts.ts",
+        "apps/web/test/integration_smoke.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-JOB-STATE-FILTER",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-WEB-EXPERIENCE",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/next-job-state-filter"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Native saved-job state filter/cursor continuity and private bounded validated query implemented; local 129 pass/16 PostgreSQL skips (145 cases), eight transport tests, Next build/type/lint/format and HTTP filtered/empty/Next/First page flow pass; final-head CI pending. No mutation/provider or full browser/customer acceptance."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-JOB-STATE-FILTER-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/job_query.py",
+        "apps/saas/core/test_job_query.py",
+        "apps/web/lib/transport.mjs",
         "apps/web/test/integration_smoke.py"
       ],
       "sbom_refs": [],
