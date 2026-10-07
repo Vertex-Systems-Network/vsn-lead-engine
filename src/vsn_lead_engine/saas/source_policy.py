@@ -14,6 +14,7 @@ class SourcePolicy:
     countries: FrozenSet[str]
     categories: FrozenSet[str] = frozenset()
     allowed_required_fields: FrozenSet[str] = frozenset()
+    allowed_export_fields: FrozenSet[str] = frozenset()
     storage_allowed: bool = True
     export_allowed: bool = True
     enabled: bool = True
@@ -85,5 +86,5 @@ def authorize_export(
             raise SearchAuthorizationError(f"source policy identity mismatch: {code}")
         if not policy.export_allowed:
             raise SearchAuthorizationError(f"source does not permit export: {code}")
-        if not set(export.fields).issubset(policy.allowed_required_fields):
+        if not set(export.fields).issubset(policy.allowed_export_fields):
             raise SearchAuthorizationError(f"source does not permit exported fields: {code}")
