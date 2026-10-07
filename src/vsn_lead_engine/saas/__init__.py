@@ -2,6 +2,7 @@
 
 from .contracts import (
     Entitlement,
+    ExportSpec,
     Job,
     JobStatus,
     Membership,
@@ -11,6 +12,7 @@ from .contracts import (
 
 __all__ = [
     "Entitlement",
+    "ExportSpec",
     "Job",
     "JobStatus",
     "Membership",
