@@ -11,6 +11,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .jobs import RevisionConflict, eligible_sources
 from .models import Entitlement, JobAttempt, JobOutbox, UsageCounter, UsageReservation, Workspace
+from .periods import active_window
 from .serializers import SearchSerializer
 from .usage import COUNTERS, lock_workspace
 
@@ -56,6 +57,7 @@ def preflight(outbox):
     # An administrator can reduce a cap after enqueue. Include all outstanding
     # reservations and settled usage rather than trusting the historical snapshot.
     counter = UsageCounter.objects.get(workspace_id=job.workspace_id)
+    active_window(counter, reservation)
     pending = UsageReservation.objects.filter(
         workspace_id=job.workspace_id, status="reserved"
     ).aggregate(**{name: Sum(name) for name in COUNTERS})

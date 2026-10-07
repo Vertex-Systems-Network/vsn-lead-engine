@@ -72,7 +72,8 @@ export const counterNames = [
 export type Usage = {
   workspace_id: string;
   entitlement_active: boolean;
-  accounting: "cumulative_development";
+  accounting: "cumulative_development" | "period_development";
+  period: null | { id: string; starts_at: string; ends_at: string };
   counters: Record<
     (typeof counterNames)[number],
     { settled: number; reserved: number; limit: number }
@@ -83,10 +84,24 @@ export function usage(v: unknown): v is Usage {
     !object(v) ||
     !uuid(v.workspace_id) ||
     typeof v.entitlement_active !== "boolean" ||
-    v.accounting !== "cumulative_development" ||
+    !["cumulative_development", "period_development"].includes(
+      String(v.accounting),
+    ) ||
     !object(v.counters)
   )
     return false;
+  if (v.accounting === "period_development") {
+    if (
+      !object(v.period) ||
+      !uuid(v.period.id) ||
+      typeof v.period.starts_at !== "string" ||
+      typeof v.period.ends_at !== "string" ||
+      !Number.isFinite(Date.parse(v.period.starts_at)) ||
+      !Number.isFinite(Date.parse(v.period.ends_at)) ||
+      Date.parse(v.period.ends_at) <= Date.parse(v.period.starts_at)
+    )
+      return false;
+  } else if (v.period !== null) return false;
   const counters = v.counters;
   return counterNames.every((key) => {
     const c = counters[key];

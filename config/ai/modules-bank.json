@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "511af9cae7f44e3dfb5ab23f6d75b975c692986a",
+  "reconciliation_base_ref": "d29cffd520c5eca4152f76633035aab540f5f18b",
   "modules": [
     {
       "id": "MOD-HISTORICAL-ROADMAP",
@@ -376,7 +376,8 @@
       ],
       "status": "in_progress",
       "completion_evidence": [
-        "apps/saas custom UUID user, session login/logout, transactional workspace ownership, tenant-scoped draft/API and regression tests (review branch; PostgreSQL CI pending)."
+        "apps/saas custom UUID user, session login/logout, transactional workspace ownership, tenant-scoped draft/API and regression tests (review branch; PostgreSQL CI pending).",
+        "Explicit internal period windows/rollover, legacy preservation, unresolved reservation blocking and Django/Next date visibility implemented locally; 100 pass/14 PostgreSQL skips, lint/build/type/HTTP pass. Final-head CI remains a merge gate; no payment/billing event/automatic reset activated."
       ],
       "update_notes": [
         "Membership administration, login abuse protection, entitlement persistence and production identity/release evidence remain open."
@@ -434,7 +435,8 @@
       ],
       "status": "in_progress",
       "completion_evidence": [
-        "PR #157 internal fail-closed entitlements and atomic usage reserve/settle/release verified on real PostgreSQL. No payment/billing period/event provider activated."
+        "PR #157 internal fail-closed entitlements and atomic usage reserve/settle/release verified on real PostgreSQL. No payment/billing period/event provider activated.",
+        "Explicit internal period windows/rollover, legacy preservation, unresolved reservation blocking and Django/Next date visibility implemented locally; 100 pass/14 PostgreSQL skips, lint/build/type/HTTP pass. Final-head CI remains a merge gate; no payment/billing event/automatic reset activated."
       ],
       "update_notes": [
         "Payment provider/tiers and storefront routes unresolved."
@@ -555,7 +557,7 @@
         "PR #161 pre-dispatch lease/current-gate tests verified and merged. Bounded operator-driven expiry/recovery prepared for CI; no consumer/schedule/external execution activated.",
         "PR #162 operator-driven pre-dispatch expiry/recovery verified on PostgreSQL and merged; no cleanup schedule or provider execution activated.",
         "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
-        "Internal signed terminal receipt reconciliation and job-usage bypass guards implemented; local 92 pass / 12 PostgreSQL skips; duplicate/conflicting receipt races and final-head CI remain merge gates. No verifier/provider/sender/results/billing activated."
+        "PR #175 merged at d29cffd520c5eca4152f76633035aab540f5f18b; head 1a1e321ecdf7e93d6597653c20e1d7070eb5ffca passed required checks/actions CodeQL, PostgreSQL 37700238737 (104 tests and receipt races/migration/security gates), and Next/HTTP 37700238777."
       ],
       "update_notes": [
         "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled."

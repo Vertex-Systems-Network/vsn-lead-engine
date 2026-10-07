@@ -134,7 +134,9 @@ def enqueue_job(user, workspace_id, job_id, expected_revision):
         reservation=reservation,
         submitted_revision=expected_revision,
         source_snapshot=snapshot,
-        expires_at=timezone.now() + timedelta(days=1),
+        expires_at=min(timezone.now() + timedelta(days=1), reservation.period.ends_at)
+        if reservation.period_id
+        else timezone.now() + timedelta(days=1),
     )
     job.status = "queued"
     job.revision += 1

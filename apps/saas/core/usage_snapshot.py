@@ -21,9 +21,17 @@ def usage_snapshot(user, workspace_id):
     return {
         "workspace_id": str(workspace_id),
         "entitlement_active": bool(entitlement and entitlement.active),
-        "period": None,
+        "period": {
+            "id": str(counter.period_id),
+            "starts_at": counter.period.starts_at,
+            "ends_at": counter.period.ends_at,
+        }
+        if counter and counter.period_id
+        else None,
         "reset_at": None,
-        "accounting": "cumulative_development",
+        "accounting": "period_development"
+        if counter and counter.period_id
+        else "cumulative_development",
         "counters": {
             name: {
                 "settled": getattr(counter, name, 0),

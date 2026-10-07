@@ -8,6 +8,7 @@ import sys
 import tempfile
 import threading
 import time
+from datetime import timedelta
 from pathlib import Path
 from urllib.request import Request, urlopen
 from wsgiref.simple_server import WSGIRequestHandler, make_server
@@ -30,12 +31,14 @@ def main():
         import django
 
         django.setup()
-        from core.models import User
+        from core.models import Entitlement, User
+        from core.periods import advance_period
         from core.serializers import SearchSerializer
         from core.services import create_draft, create_workspace
         from django.core.management import call_command
         from django.core.wsgi import get_wsgi_application
         from django.test import Client
+        from django.utils import timezone
 
         call_command("migrate", verbosity=0)
         user = User.objects.create_user(username="synthetic-next-owner")
@@ -110,6 +113,20 @@ def main():
                     "Cumulative development counters" in page
                     and "Settled and reserved usage" in page
                 )
+                Entitlement.objects.create(
+                    workspace=workspace, active=True, lead_limit=10, job_limit=2
+                )
+                now = timezone.now()
+                advance_period(
+                    user,
+                    workspace.id,
+                    now - timedelta(seconds=1),
+                    now + timedelta(minutes=5),
+                    "http-period",
+                )
+                period_page, _ = read(f"/dashboard/workspaces/{workspace.id}")
+                assert "Internal accounting window" in period_page
+                assert "Rollover waits for unresolved reservations" in period_page
                 detail, _ = read(f"/dashboard/workspaces/{workspace.id}/jobs/{saved[0].id}")
                 assert "Saved search" in detail and "Review cancellation" in detail
                 denied, _ = read(f"/dashboard/workspaces/{other.id}")
@@ -121,7 +138,7 @@ def main():
                 again, _ = read("/dashboard", False)
                 assert "Synthetic &lt;workspace&gt;" not in again
                 print(
-                    "PASS: Next/Django HTTP workspace, usage, jobs/detail, tenant denial, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

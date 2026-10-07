@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "511af9cae7f44e3dfb5ab23f6d75b975c692986a",
+  "reconciliation_base_ref": "d29cffd520c5eca4152f76633035aab540f5f18b",
   "phases": [
     {
       "id": "PHASE-HISTORICAL-BASELINE",
@@ -581,7 +581,8 @@
         "Login abuse slice adds transactional 15-minute account/IP caps, keyed fingerprints and concurrent budget regression (next CI pending).",
         "PR #156 merged at e00a0459abf1010bb7141391d28b3fe084dd52a6 after required checks and real PostgreSQL login budget concurrency passed (SaaS Quality run 37688331442).",
         "core.usage implements persisted fail-closed entitlements and workspace-serialized reserve/settle/release services with idempotency, hard caps and tenant checks; PostgreSQL concurrent reservation regression added (next CI pending).",
-        "PR #157 usage reservations and PR #158 isolated lint/format/compile gates merged after all required checks and PostgreSQL tests; #159 canonical compatible dependency repair also verified. Billing events/period policy and full release acceptance remain open."
+        "PR #157 usage reservations and PR #158 isolated lint/format/compile gates merged after all required checks and PostgreSQL tests; #159 canonical compatible dependency repair also verified. Billing events/period policy and full release acceptance remain open.",
+        "Explicit internal period windows/rollover, legacy preservation, unresolved reservation blocking and Django/Next date visibility implemented locally; 100 pass/14 PostgreSQL skips, lint/build/type/HTTP pass. Final-head CI remains a merge gate; no payment/billing event/automatic reset activated."
       ]
     },
     {
@@ -615,7 +616,7 @@
         "Bounded operator pre-dispatch recovery and server-derived expiry implemented on codex/saas-predispatch-recovery. No scheduled cleanup or external execution enabled; PostgreSQL cleanup exclusion CI pending.",
         "PR #162 merged at 70c6c961c2a6034340f6b5f6bab4246c883c1fef after required checks, CodeQL and PostgreSQL duplicate cleanup/earlier races/reversible migrations passed. No operational schedule or external provider activated.",
         "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
-        "Internal signed terminal receipt reconciliation and job-usage bypass guards implemented; local 92 pass / 12 PostgreSQL skips; duplicate/conflicting receipt races and final-head CI remain merge gates. No verifier/provider/sender/results/billing activated."
+        "PR #175 merged at d29cffd520c5eca4152f76633035aab540f5f18b; head 1a1e321ecdf7e93d6597653c20e1d7070eb5ffca passed required checks/actions CodeQL, PostgreSQL 37700238737 (104 tests and receipt races/migration/security gates), and Next/HTTP 37700238777."
       ],
       "update_notes": [
         "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled."
