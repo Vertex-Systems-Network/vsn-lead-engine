@@ -169,3 +169,9 @@ Do not turn workflow success or ANPOS completion into a false quota-complete cla
 - Local SaaS 52 passed, 8 explicit PostgreSQL-only skips; root full suite 376 passed, 1 skipped, 28 subtests on reviewed dependency repair. Follow-up changes remain isolated app/state/docs. All remote PostgreSQL regressions/migrations and required checks are merge gates. No full browser/accessibility/customer task certification claimed.
 - Delivered this invocation: #154–#162 identity/workspaces/drafts, membership, login controls, atomic usage, quality/CodeQL, canonical dependency repair, atomic source-gated outbox, lease rechecks and bounded recovery. Old #135/#136/#144/#152/#153 closed as superseded. Current slice advances M7 to 25%, overall ~45% engineering indicator; product/release acceptance remains incomplete.
 - Next ready frontier: saved search/job history web workflows and browser/accessibility verification; dispatch-start/provider-idempotency/uncertain-outcome reconciliation; operational scheduling; billing period/events. External source rights/customer/privacy/payment/deployment/launch evidence remains open. Production phone/taxonomy/US+CA/R2/Google behavior preserved; no refreshed quota or persistent background execution claimed.
+
+## Next frontend and dispatch write-ahead verification
+
+PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).
+
+Next choice is owner-directed; no backend replatform, provider activation, paid service or production deployment. Browser/WCAG/customer/release gates remain open.
