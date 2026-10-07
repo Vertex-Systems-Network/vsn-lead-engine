@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "ba7a8bcc224f429d5ab85d8cff076a3c9eccffa2",
+  "reconciliation_base_ref": "07397ce991c84a9e58595ce8944158e290b44fbc",
   "phases": [
     {
       "id": "PHASE-HISTORICAL-BASELINE",
@@ -552,7 +552,7 @@
         "WU-SAAS-STACK-CONSENT"
       ],
       "priority": 60,
-      "status": "not_started",
+      "status": "in_progress",
       "blockers": [],
       "acceptance_criteria": [
         "Cross-tenant access tests pass.",
@@ -564,7 +564,12 @@
         "Tenant isolation",
         "Billing sandbox"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "PR #134 merged to main at 07397ce991c84a9e58595ce8944158e290b44fbc after Lead Engine, AI Native Quality Gates and CodeQL success.",
+        "src/vsn_lead_engine/saas/contracts.py defines Workspace, Membership, Entitlement, SearchSpec and guarded Job lifecycle.",
+        "src/vsn_lead_engine/saas/source_policy.py defines the stack-neutral source authorization boundary; tests/test_saas_contracts.py and tests/test_saas_source_policy.py cover contracts and rejection paths.",
+        "Scope remains reversible and does not alter the production collector, scheduler, Google Sheets delivery or R2 dedupe authority."
+      ]
     },
     {
       "id": "WU-SAAS-COLLECTION",
