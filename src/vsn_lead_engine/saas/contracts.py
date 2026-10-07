@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import StrEnum
-from typing import FrozenSet, Mapping, Optional
+from typing import ClassVar, FrozenSet, Mapping
 from uuid import UUID, uuid4
 
 
@@ -38,7 +38,7 @@ class Membership:
     user_id: UUID
     role: str = "member"
 
-    VALID_ROLES: FrozenSet[str] = frozenset({"owner", "admin", "member", "viewer"})
+    VALID_ROLES: ClassVar[FrozenSet[str]] = frozenset({"owner", "admin", "member", "viewer"})
 
     def __post_init__(self) -> None:
         if self.role not in self.VALID_ROLES:
@@ -92,7 +92,7 @@ class Job:
     status: JobStatus = JobStatus.DRAFT
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    error: Optional[str] = None
+    error: str | None = None
     result_count: int = 0
     metadata: Mapping[str, str] = field(default_factory=dict)
 
@@ -100,8 +100,20 @@ class Job:
         allowed = {
             JobStatus.DRAFT: {JobStatus.QUEUED, JobStatus.CANCELLED},
             JobStatus.QUEUED: {JobStatus.RUNNING, JobStatus.CANCELLED, JobStatus.FAILED},
-            JobStatus.RUNNING: {JobStatus.PARTIAL, JobStatus.COMPLETED, JobStatus.PAUSED, JobStatus.FAILED, JobStatus.CANCELLED},
-            JobStatus.PARTIAL: {JobStatus.RUNNING, JobStatus.COMPLETED, JobStatus.PAUSED, JobStatus.FAILED, JobStatus.CANCELLED},
+            JobStatus.RUNNING: {
+                JobStatus.PARTIAL,
+                JobStatus.COMPLETED,
+                JobStatus.PAUSED,
+                JobStatus.FAILED,
+                JobStatus.CANCELLED,
+            },
+            JobStatus.PARTIAL: {
+                JobStatus.RUNNING,
+                JobStatus.COMPLETED,
+                JobStatus.PAUSED,
+                JobStatus.FAILED,
+                JobStatus.CANCELLED,
+            },
             JobStatus.PAUSED: {JobStatus.QUEUED, JobStatus.CANCELLED},
             JobStatus.COMPLETED: set(),
             JobStatus.FAILED: {JobStatus.QUEUED},
