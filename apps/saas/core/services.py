@@ -1,9 +1,11 @@
 import hashlib
 import json
 import re
+
 from django.db import transaction
 from django.http import Http404
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
+
 from .models import Job, Membership, MembershipAudit, Workspace
 
 
@@ -40,15 +42,24 @@ def create_draft(user, workspace_id, search, key):
     if membership.role not in {"owner", "admin", "member"}:
         raise PermissionDenied("This role cannot create jobs.")
     if not key or not re.fullmatch(r"[A-Za-z0-9._:-]{1,128}", key):
-        raise ValidationError({"idempotency_key": "Use 1–128 letters, digits, dots, underscores, colons or hyphens."})
-    request_hash = hashlib.sha256(json.dumps(search, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        raise ValidationError(
+            {"idempotency_key": "Use 1–128 letters, digits, dots, underscores, colons or hyphens."}
+        )
+    request_hash = hashlib.sha256(
+        json.dumps(search, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
     previous = Job.objects.filter(workspace_id=workspace_id, idempotency_key=key).first()
     if previous:
         if previous.request_hash != request_hash:
             raise IdempotencyConflict()
         return previous, False
-    job = Job.objects.create(workspace_id=workspace_id, created_by=user, search=search,
-                             idempotency_key=key, request_hash=request_hash)
+    job = Job.objects.create(
+        workspace_id=workspace_id,
+        created_by=user,
+        search=search,
+        idempotency_key=key,
+        request_hash=request_hash,
+    )
     return job, True
 
 
@@ -71,10 +82,14 @@ def change_membership(user, workspace_id, target_user_id, *, role=None, remove=F
     if not remove and role == target.role:
         return target
     previous = target.role
-    MembershipAudit.objects.create(workspace_id=workspace_id, actor=user,
-                                   target_user_id=target.user_id,
-                                   action="removed" if remove else "role_changed",
-                                   previous_role=previous, new_role="" if remove else role)
+    MembershipAudit.objects.create(
+        workspace_id=workspace_id,
+        actor=user,
+        target_user_id=target.user_id,
+        action="removed" if remove else "role_changed",
+        previous_role=previous,
+        new_role="" if remove else role,
+    )
     if remove:
         target.delete()
         return None

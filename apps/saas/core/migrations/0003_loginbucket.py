@@ -4,18 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0002_membershipaudit'),
+        ("core", "0002_membershipaudit"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='LoginBucket',
+            name="LoginBucket",
             fields=[
-                ('fingerprint', models.CharField(max_length=64, primary_key=True, serialize=False)),
-                ('started_at', models.DateTimeField(db_index=True)),
-                ('attempts', models.PositiveIntegerField(default=0)),
+                ("fingerprint", models.CharField(max_length=64, primary_key=True, serialize=False)),
+                ("started_at", models.DateTimeField(db_index=True)),
+                ("attempts", models.PositiveIntegerField(default=0)),
             ],
         ),
     ]

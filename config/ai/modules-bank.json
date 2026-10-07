@@ -899,7 +899,7 @@
         "Costed technology alternatives"
       ],
       "boundaries": [
-        "Does not approve or implement a technology stack.",
+        "Development stack is selected under standing technical delegation; paid external commitments remain separately gated.",
         "Provider/legal claims require primary evidence and qualified review where needed."
       ],
       "dependencies": [
@@ -941,10 +941,16 @@
         "Threat model review",
         "Accessibility/design review"
       ],
-      "status": "not_started",
-      "completion_evidence": [],
+      "status": "complete",
+      "completion_evidence": [
+        "PR #141 system/threat baseline",
+        "PR #145 API/data contract",
+        "PR #146 stack ADR",
+        "PR #150 UX interaction contract",
+        "PR #154 reconciled design/stack work-unit state"
+      ],
       "update_notes": [
-        "Required before technology consent and stack-specific code."
+        "Design contracts are complete; runtime foundation and product/release validation are tracked separately."
       ],
       "removal_or_deprecation_notes": []
     }

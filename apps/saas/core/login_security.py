@@ -1,9 +1,11 @@
 from datetime import timedelta
 from unicodedata import normalize
+
 from django.contrib.auth.views import LoginView
 from django.db import transaction
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
+
 from .models import LoginBucket
 
 WINDOW = timedelta(minutes=15)
@@ -26,8 +28,10 @@ def allow_login(username, remote_addr, *, now=None):
     """
     now = now or timezone.now()
     LoginBucket.objects.filter(started_at__lt=now - RETENTION).delete()
-    keys = [(fingerprint("ip", remote_addr), IP_LIMIT),
-            (fingerprint("account", normalize("NFKC", username).strip().casefold()), ACCOUNT_LIMIT)]
+    keys = [
+        (fingerprint("ip", remote_addr), IP_LIMIT),
+        (fingerprint("account", normalize("NFKC", username).strip().casefold()), ACCOUNT_LIMIT),
+    ]
     allowed = True
     for key, limit in sorted(keys):
         LoginBucket.objects.get_or_create(fingerprint=key, defaults={"started_at": now})

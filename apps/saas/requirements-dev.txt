@@ -1,0 +1,2 @@
+-r requirements.txt
+ruff==0.16.10 --hash=sha256:f33f43a864a8483eebd160e713336c8bab02c934feaff0a33cf5ccb41546d09a

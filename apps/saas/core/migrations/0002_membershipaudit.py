@@ -6,23 +6,39 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0001_initial'),
+        ("core", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MembershipAudit',
+            name="MembershipAudit",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('target_user_id', models.UUIDField()),
-                ('action', models.CharField(max_length=16)),
-                ('previous_role', models.CharField(max_length=8)),
-                ('new_role', models.CharField(blank=True, max_length=8)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='membership_actions', to=settings.AUTH_USER_MODEL)),
-                ('workspace', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.workspace')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("target_user_id", models.UUIDField()),
+                ("action", models.CharField(max_length=16)),
+                ("previous_role", models.CharField(max_length=8)),
+                ("new_role", models.CharField(blank=True, max_length=8)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "actor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="membership_actions",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "workspace",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.workspace"
+                    ),
+                ),
             ],
         ),
     ]

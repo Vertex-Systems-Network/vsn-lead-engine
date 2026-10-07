@@ -48,8 +48,11 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: apps/saas/requirements.txt
-      - run: python -m pip install --require-hashes -r apps/saas/requirements.txt
+          cache-dependency-path: apps/saas/requirements-dev.txt
+      - run: python -m pip install --require-hashes -r apps/saas/requirements-dev.txt
+      - run: ruff check --config apps/saas/ruff.toml apps/saas
+      - run: ruff format --check --config apps/saas/ruff.toml apps/saas
+      - run: python -m compileall -q apps/saas
       - run: python -m pip check
       - run: python apps/saas/manage.py check
       - run: python apps/saas/manage.py makemigrations --check --dry-run

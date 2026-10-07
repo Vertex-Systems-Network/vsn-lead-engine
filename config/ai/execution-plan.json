@@ -493,7 +493,7 @@
     {
       "id": "WU-SAAS-SYSTEM-DESIGN",
       "phase_id": "PHASE-SAAS-SYSTEM-DESIGN",
-      "module_id": "MOD-SAAS-IDENTITY",
+      "module_id": "MOD-SAAS-SYSTEM-DESIGN",
       "title": "Design tenancy, billing, data, scheduler and client contracts",
       "objective": "Create system context, trust boundaries, tenant data flow, job state model and client API contracts using the accepted reversible development defaults.",
       "dependencies": [
