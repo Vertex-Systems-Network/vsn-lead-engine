@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_GET
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -109,3 +110,20 @@ class MemberDetail(APIView):
     def delete(self, request, workspace_id, user_id):
         change_membership(request.user, workspace_id, user_id, remove=True)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UsageDetail(APIView):
+    def get(self, request, workspace_id):
+        from .usage_snapshot import usage_snapshot
+
+        return Response(usage_snapshot(request.user, workspace_id))
+
+
+@login_required
+@require_GET
+def usage_page(request, workspace_id):
+    from .usage_snapshot import usage_snapshot
+
+    snapshot = usage_snapshot(request.user, workspace_id)
+    workspace = Workspace.objects.get(pk=workspace_id)
+    return render(request, "core/usage.html", {"workspace": workspace, "usage": snapshot})

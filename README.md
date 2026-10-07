@@ -27,7 +27,7 @@ and dedupe.
 
 ## SaaS milestone roadmap
 
-Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `920c5dc` / PR #161; bounded operator-driven pre-dispatch expiry/recovery is implemented in this change with provider dispatch disabled. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is an engineering work-unit indicator, not customer validation, legal clearance, provider-rights approval, deployment, or launch certification.
+Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `70c6c96` / PR #162; tenant-safe read-only usage API/page implemented in this change with provider dispatch disabled. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is an engineering work-unit indicator, not customer validation, legal clearance, provider-rights approval, deployment, or launch certification.
 
 | Milestone | Start date | Status | Progress |
 |---|---:|---|---|
@@ -38,10 +38,10 @@ Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `920c5d
 | M4 — Technology stack and repository decision | 2026-10-07 | Development stack selected: Django 5.2 LTS + DRF + PostgreSQL, additive current-repo boundary; production vendors/hosting remain gated | `███████░░░` 70% |
 | M5 — SaaS foundation: workspace, roles, entitlements and tenant-safety contracts | 2026-10-07 | Isolated Django session/workspace/draft API and initial migrations implemented; owner-safe membership lifecycle and bounded login protection implemented; persisted internal entitlements and atomic usage reservations added; billing reconciliation and complete foundation acceptance remain open | `████████░░` 80% |
 | M6 — Source policy, adapters and job orchestration | 2026-10-07 | Source-policy identity and source-aware export authorization hardened; internal source-gated atomic job/reservation/outbox and pre-dispatch cancellation implemented; bounded pre-dispatch lease fencing and membership/entitlement/source rechecks implemented; operator-driven expiry/recovery implemented; consumer/live adapter/durable scheduler remain open | `█████░░░░░` 55% |
-| M7 — Lead web workflow, filters and export | 2026-10-07 | UX interaction contract and export-policy backend contracts exist; deployable web workflow/UI not yet implemented | `██░░░░░░░░` 20% |
+| M7 — Lead web workflow, filters and export | 2026-10-07 | UX/export-policy contracts and session workspace overview exist; tenant-safe read-only usage API/page implemented; full lead search/results/export workflow remains open | `██░░░░░░░░` 25% |
 | M8 — Admin controls and bounded AI | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
 | M9 — Production readiness, desktop/mobile and launch | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
-| **Overall SaaS direction** | **2026-10-04** | **Design and contract implementation advancing; runtime, provider, validation and launch gates remain open** | **`████░░░░░░` ~44% engineering-plan indicator** |
+| **Overall SaaS direction** | **2026-10-04** | **Design and contract implementation advancing; runtime, provider, validation and launch gates remain open** | **`████░░░░░░` ~45% engineering-plan indicator** |
 
 Progress notes:
 - M0 is complete from repository audit evidence.
@@ -2227,3 +2227,7 @@ PR #160 passed all required checks, CodeQL and real PostgreSQL enqueue/cancel co
 ### Pre-dispatch recovery development checkpoint
 
 PR #161 passed all required checks, CodeQL and real PostgreSQL lease exclusion/earlier concurrency/migration gates before merge. New internal intents now have one-day server deadlines, and leases cannot extend beyond them. The trusted `expire_pending_intents` command processes at most 100 overdue pre-dispatch intents per invocation, transactionally cancelling jobs/outbox/active tokens and releasing unused reservations. Running, settled, mismatched-tenant and unknown legacy deadlines are skipped. Local failure-injection tests verify rollback and safe replay; PostgreSQL CI verifies duplicate cleanup commits once. No cleanup schedule, consumer, external provider execution or ambiguous-outcome refund is activated. Next implementation boundaries are dispatch-start/idempotency/reconciliation, operational scheduling and complete web/billing workflows; external rights/customer/privacy/deployment/launch evidence remains open.
+
+### Usage visibility development checkpoint
+
+PR #162 passed all required checks, CodeQL and PostgreSQL duplicate cleanup/earlier concurrency/migration gates before merge. The isolated app now exposes a read-only workspace usage API and session page showing server-derived settled/reserved counters and limits, with membership checks and no balance mutation. Missing entitlement/counter rows remain inactive/zero without provisioning; billing period/reset fields are null. Route/template tests verify tenant boundaries, revoked access, viewer reads, method rejection and escaped workspace names. This starts independent web visibility work while full lead workflows, browser/accessibility/customer task validation and provider/data/billing/release acceptance remain open.

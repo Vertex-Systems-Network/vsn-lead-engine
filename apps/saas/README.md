@@ -21,7 +21,9 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 
 - `/health/`: liveness and explicit disabled provider dispatch; no credentials/database details.
 - `/accounts/login/`, `/accounts/logout/`: Django same-origin sessions; CSRF-protected forms and POST logout.
-- `/`: authenticated workspace overview.
+- `/`: authenticated workspace overview, with links to read-only workspace usage.
+- `/workspaces/{workspace_id}/usage/`: session-authenticated read-only settled/reserved/limit table.
+- `/api/v1/workspaces/{workspace_id}/usage/`: tenant-scoped server-derived counters/limits; no mutation methods.
 - `/api/v1/workspaces/`: list only the actor's workspaces; creation atomically installs an owner membership.
 - `/api/v1/workspaces/{workspace_id}/members/`: owner/admin list, bounded at 100 rows.
 - `/api/v1/workspaces/{workspace_id}/members/{user_id}/`: PATCH role or DELETE membership; last owner protected transactionally; only owners change ownership.
@@ -75,3 +77,7 @@ These services do not mark work running or invoke a provider; no HTTP route, wor
 New internal outbox intents receive a server-derived one-day expiry; claims/checks fail at the deadline and lease duration cannot outlive it. Existing rows have a nullable deadline with no invented backfill. Run `python apps/saas/manage.py expire_pending_intents --limit 100` with trusted operator database access to process one batch of at most 100 overdue queued/pending/reserved intents. No command is scheduled or HTTP cleanup endpoint exposed. Each intent locks its workspace, rechecks current state and commits job cancellation, active-token invalidation and reservation release together. Replays are harmless; the command reports examined/expired counts. A failure stops the batch after earlier independently committed intents, which can safely be replayed.
 
 Recovery does not rely on the original actor retaining membership. It skips running, settled, legacy-null-deadline, mismatched-tenant and unsupported state/revision records. Settled usage is never refunded. Unknown outcomes after future external dispatch need a separate reconciliation protocol; this pre-dispatch command cannot certify that recovery. Timely expiry requires an independently configured operational schedule and monitoring. PostgreSQL CI verifies concurrent cleanup commits once, alongside earlier lease and enqueue/cancel races.
+
+## Usage visibility
+
+Owners, admins, members and viewers can read their workspace's server-derived settled counters, outstanding reservations and internal limits. The snapshot takes the workspace lock and rechecks membership to keep quota reads consistent with reserve/settle/release. Unknown entitlements/counters show inactive/zero values without provisioning new balances. `period` and `reset_at` are explicitly null; counters are cumulative in this development model. The session page uses escaped workspace names, semantic table headings and a POST logout form. Cross-tenant and revoked access return 404; client usage mutation is unavailable. Automated route/template tests cover these boundaries; complete browser/accessibility/customer task validation remains open.
