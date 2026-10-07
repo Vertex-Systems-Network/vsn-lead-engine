@@ -895,7 +895,7 @@
         "Costed technology alternatives"
       ],
       "boundaries": [
-        "Does not approve or implement a technology stack.",
+        "Technology selection is recorded under the standing technical-autonomy delegation; new paid external commitments remain separately gated.",
         "Provider/legal claims require primary evidence and qualified review where needed."
       ],
       "dependencies": [
@@ -937,10 +937,12 @@
         "Threat model review",
         "Accessibility/design review"
       ],
-      "status": "not_started",
+      "status": "in_progress",
       "completion_evidence": [],
       "update_notes": [
-        "Required before technology consent and stack-specific code."
+        "Owner-approved MVP boundary merged in PR #140 (2026-10-08).",
+        "Stack-neutral system and threat-model baseline merged in PR #141 (2026-10-08).",
+        "Continue API/data/UX contracts and technology alternatives; record the reversible stack decision under standing technical autonomy before stack-specific implementation."
       ],
       "removal_or_deprecation_notes": []
     }
