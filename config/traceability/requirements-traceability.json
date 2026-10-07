@@ -792,6 +792,50 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-ATOMIC-JOB-INTENT",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-JOB-ORCHESTRATION",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-COLLECTION"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-API-DATA-CONTRACTS-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-transactional-outbox"
+      ],
+      "pull_request_refs": [
+        "PR #160"
+      ],
+      "test_evidence": [
+        "apps/saas/core/test_jobs.py: OutboxTests, ConcurrentOutboxTests; local 36 pass, 6 PostgreSQL skips. Remote CI required before merge."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [],
+      "threat_model_refs": [
+        "docs/ai/SAAS-SYSTEM-THREAT-MODEL-BASELINE-20261007.md"
+      ],
+      "migration_refs": [
+        "apps/saas/core/migrations/0005_sourcepolicy_joboutbox.py"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/jobs.py",
+        "apps/saas/core/models.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

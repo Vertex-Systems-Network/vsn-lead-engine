@@ -27,7 +27,7 @@ and dedupe.
 
 ## SaaS milestone roadmap
 
-Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `4ad90ef` / PR #158; compatible dependency-lock maintenance is included in this change. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is an engineering work-unit indicator, not customer validation, legal clearance, provider-rights approval, deployment, or launch certification.
+Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `91caa58` / PR #159; internal transactional job intents are implemented in this change with provider dispatch disabled. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is an engineering work-unit indicator, not customer validation, legal clearance, provider-rights approval, deployment, or launch certification.
 
 | Milestone | Start date | Status | Progress |
 |---|---:|---|---|
@@ -37,11 +37,11 @@ Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `4ad90e
 | M3 — System, tenant and threat-model design | 2026-10-07 | System/threat, API/data and UX design contracts reconciled; runtime assurance tracked separately | `██████████` 100% |
 | M4 — Technology stack and repository decision | 2026-10-07 | Development stack selected: Django 5.2 LTS + DRF + PostgreSQL, additive current-repo boundary; production vendors/hosting remain gated | `███████░░░` 70% |
 | M5 — SaaS foundation: workspace, roles, entitlements and tenant-safety contracts | 2026-10-07 | Isolated Django session/workspace/draft API and initial migrations implemented; owner-safe membership lifecycle and bounded login protection implemented; persisted internal entitlements and atomic usage reservations added; billing reconciliation and complete foundation acceptance remain open | `████████░░` 80% |
-| M6 — Source policy, adapters and job orchestration | 2026-10-07 | Source-policy identity and source-aware export authorization hardened; first live provider adapter/durable scheduler not yet implemented | `███░░░░░░░` 30% |
+| M6 — Source policy, adapters and job orchestration | 2026-10-07 | Source-policy identity and source-aware export authorization hardened; internal source-gated atomic job/reservation/outbox and pre-dispatch cancellation implemented; consumer/leases/live adapter/durable scheduler remain open | `████░░░░░░` 40% |
 | M7 — Lead web workflow, filters and export | 2026-10-07 | UX interaction contract and export-policy backend contracts exist; deployable web workflow/UI not yet implemented | `██░░░░░░░░` 20% |
 | M8 — Admin controls and bounded AI | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
 | M9 — Production readiness, desktop/mobile and launch | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
-| **Overall SaaS direction** | **2026-10-04** | **Design and contract implementation advancing; runtime, provider, validation and launch gates remain open** | **`████░░░░░░` ~40% engineering-plan indicator** |
+| **Overall SaaS direction** | **2026-10-04** | **Design and contract implementation advancing; runtime, provider, validation and launch gates remain open** | **`████░░░░░░` ~42% engineering-plan indicator** |
 
 Progress notes:
 - M0 is complete from repository audit evidence.
@@ -2215,3 +2215,7 @@ After this certification, `registry.mode = r2`. New accepted leads no longer
 append to the legacy Google Master Registry. Full lead records continue to be
 written only to their dated Google workbooks; R2 keeps permanent hashed
 cross-day dedupe fingerprints.
+
+### Durable job intent development checkpoint
+
+PR #159 restored canonical reviewed hash locks with all CI gates passing and superseded the failed #136 update. The additive SaaS app now implements internal transactional enqueue and pre-dispatch cancellation: membership/revision/source-policy gates, server-derived usage caps and a unique job outbox commit together. Default source policies remain disabled; synthetic test evidence is never seeded as real rights approval. Local regression verification covers rollback, tenant/role/revision denial, source/entitlement failure, replay and cancellation; real PostgreSQL CI additionally verifies concurrent duplicate enqueue and enqueue/cancel races. This advances M6 implementation only. No worker/provider/scheduler/payment/production launch is activated; lease recovery, dispatch-time rechecks, reservation expiry and web/billing/release acceptance remain open.

@@ -432,8 +432,10 @@
         "Billing sandbox conformance",
         "Race/replay tests"
       ],
-      "status": "not_started",
-      "completion_evidence": [],
+      "status": "in_progress",
+      "completion_evidence": [
+        "PR #157 internal fail-closed entitlements and atomic usage reserve/settle/release verified on real PostgreSQL. No payment/billing period/event provider activated."
+      ],
       "update_notes": [
         "Payment provider/tiers and storefront routes unresolved."
       ],
@@ -486,8 +488,10 @@
         "Adapter contract tests",
         "Security/license review"
       ],
-      "status": "not_started",
-      "completion_evidence": [],
+      "status": "in_progress",
+      "completion_evidence": [
+        "Internal source-gated atomic job/reservation/outbox and pre-dispatch cancellation on codex/saas-transactional-outbox; no real policies seeded and no consumer/provider enabled. PostgreSQL CI merge gate pending."
+      ],
       "update_notes": [],
       "removal_or_deprecation_notes": []
     },
@@ -541,8 +545,10 @@
         "Failure injection",
         "Queue fairness tests"
       ],
-      "status": "not_started",
-      "completion_evidence": [],
+      "status": "in_progress",
+      "completion_evidence": [
+        "Internal source-gated atomic job/reservation/outbox and pre-dispatch cancellation on codex/saas-transactional-outbox; no real policies seeded and no consumer/provider enabled. PostgreSQL CI merge gate pending."
+      ],
       "update_notes": [],
       "removal_or_deprecation_notes": []
     },
