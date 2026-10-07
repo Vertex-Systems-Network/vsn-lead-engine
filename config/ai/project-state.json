@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-WEB-EXPERIENCE",
   "current_work_unit": "WU-SAAS-LEAD-WEB",
-  "last_verified_completion": "PR #165 draft session form merged at 5ecd65cf2c0a130bae7f62a34921e6cd7bd9245f. Required checks, CodeQL and SaaS PostgreSQL/migrations pass at 7bb1124545a230a3349e383d4fe30d5dcff6ecc2 (SaaS Quality 37695370079).",
+  "last_verified_completion": "PR #166 pending cancellation merged at 485cf9bc9e456878f779c14adc4bed6721f95646 after required checks, CodeQL and PostgreSQL 37695788773 passed at cb323bf27e51f89bfae5380f933bc7932b7f6fca.",
   "next_valid_work_unit": "WU-SAAS-LEAD-WEB",
   "progress": {
     "total_work_units": 21,
@@ -18,8 +18,8 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify/merge signed pending cancellation review/confirmation.",
-    "Continue current-policy source availability preview, browser/accessibility verification and dispatch-start/idempotency/uncertain-outcome reconciliation.",
+    "Verify/merge bounded read-only source configuration preview.",
+    "Continue dispatch-start/provider-idempotency/uncertain-outcome reconciliation and operational scheduling, plus browser/accessibility verification.",
     "Complete lead results/export, billing periods/events and external rights/customer/privacy/deployment/launch evidence."
   ],
   "outstanding_removals": [],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "draft_form_verified_pending_cancellation_local_pass_ci_pending",
+  "qa_readiness": "pending_cancellation_verified_source_preview_local_pass_ci_pending",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "5ecd65cf2c0a130bae7f62a34921e6cd7bd9245f",
+  "last_reconciled_repository_ref": "485cf9bc9e456878f779c14adc4bed6721f95646",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

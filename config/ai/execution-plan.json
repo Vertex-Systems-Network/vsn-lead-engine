@@ -640,7 +640,8 @@
       ],
       "completion_evidence": [
         "PRs #163\u2013#165 usage/job visibility and signed CSRF/idempotent draft form verified with required checks, CodeQL and real PostgreSQL regression/migrations (draft 37695370079).",
-        "Confirmed signed pending cancellation implemented on codex/saas-pending-cancellation; local SaaS 72 pass, 8 PostgreSQL-only skips. Cancellation release/replay/revision/role/state/token/CSRF tests pass; final CI pending. Browser/WCAG/customer/results/export acceptance remains open."
+        "Confirmed signed pending cancellation implemented on codex/saas-pending-cancellation; local SaaS 72 pass, 8 PostgreSQL-only skips. Cancellation release/replay/revision/role/state/token/CSRF tests pass; final CI pending. Browser/WCAG/customer/results/export acceptance remains open.",
+        "PR #166 signed pending cancellation verified by required checks/CodeQL/PostgreSQL 37695788773. Bounded read-only source configuration preview implemented on codex/saas-source-catalog; local SaaS 76 pass, 8 PostgreSQL-only skips; final CI pending. No source rights, availability, provider execution or browser/customer acceptance inferred."
       ]
     },
     {

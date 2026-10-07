@@ -1074,9 +1074,11 @@
       "branch_refs": [
         "codex/saas-pending-cancellation"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #166"
+      ],
       "test_evidence": [
-        "apps/saas/core/test_cancellation_web.py: CancellationWebTests; local SaaS 72 pass, 8 PostgreSQL-only skips; CI pending."
+        "apps/saas/core/test_cancellation_web.py: CancellationWebTests; merged PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks/CodeQL/PostgreSQL 37695788773."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1089,6 +1091,48 @@
         "apps/saas/core/cancellation_forms.py",
         "apps/saas/templates/core/cancel_pending.html",
         "apps/saas/core/jobs.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:485cf9bc9e456878f779c14adc4bed6721f95646"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-SOURCE-CONFIG-PREVIEW",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-WEB-EXPERIENCE",
+        "MOD-SOURCE-CATALOG"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-source-catalog"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "apps/saas/core/test_source_preview.py: SourcePreviewTests; local SaaS 76 pass, 8 PostgreSQL-only skips; CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-JOB-WEB-ENGINEERING-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/source_preview.py",
+        "apps/saas/templates/core/source_preview.html"
       ],
       "sbom_refs": [],
       "attestation_refs": [],
