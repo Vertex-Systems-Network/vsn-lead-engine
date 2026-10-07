@@ -67,7 +67,7 @@ def test_authorize_search_rejects_out_of_boundary(change, expected):
 
     with pytest.raises(SearchAuthorizationError, match=expected):
         authorize_search(
-            _search(workspace_id, **change),
+            _search(**({"workspace_id": workspace_id} | change)),
             entitlement,
             {policy.code: policy},
         )
