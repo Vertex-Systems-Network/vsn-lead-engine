@@ -24,6 +24,7 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 - `/`: authenticated workspace overview, with links to read-only workspace usage.
 - `/workspaces/{workspace_id}/search/new/`: CSRF-protected draft form for owners/admins/members, never execution.
 - `/workspaces/{workspace_id}/jobs/`: newest-first read-only history, 25-row signed workspace-bound continuation.
+- `/workspaces/{workspace_id}/jobs/{job_id}/cancel/`: review then signed, revision-bound pending cancellation for writers.
 - `/workspaces/{workspace_id}/jobs/{job_id}/`: read-only saved scope, recorded status/counts and UTC times.
 - `/workspaces/{workspace_id}/usage/`: session-authenticated read-only settled/reserved/limit table.
 - `/api/v1/workspaces/{workspace_id}/usage/`: tenant-scoped server-derived counters/limits; no mutation methods.
@@ -96,3 +97,8 @@ Saved scope is escaped text, never clickable provider HTML. Requested limits and
 ## Draft-only search form
 
 The session form accepts supported country/status/field choices, bounded categories/source preferences and result limits through `SearchSerializer`. Phone is always included. Its hidden idempotency token is signed, expires in one day and binds user/workspace; it is independent of the CSRF token, which is also required. Owner/admin/member role is required both before rendering and inside the existing transactional save. Duplicate POST returns the same 303 detail redirect; changed payload with a used token returns 409. Invalid forms preserve input and token and return 400 with escaped field/error summaries. GET creates no database rows. No outbox/reservation, source activation, billing or schedule is triggered.
+
+
+## Confirmed pending cancellation
+
+Draft/queued job details show a cancellation-review link only to owner/admin/member roles. GET review does not mutate the job. POST requires CSRF and a signed ten-minute actor/workspace/job/revision confirmation; the existing transactional service rechecks membership/write role/state/revision. Only draft or queued jobs can be cancelled; an identical completed cancellation replays safely. Queued cancellation releases unused reserved capacity and invalidates the active attempt. Saved job/scope stays accessible, settled usage is never refunded, and cancelled jobs have no resume action. Unsupported or stale job state returns 409 with a safe review path; tampered/expired/context-mismatched confirmation returns 400. Running work, automatic retries and external providers remain unavailable. Tests use synthetic source fixtures only.

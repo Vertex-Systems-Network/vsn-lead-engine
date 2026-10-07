@@ -750,8 +750,8 @@
       ],
       "status": "in_progress",
       "completion_evidence": [
-        "PRs #163 and #164 usage visibility/job history/detail verified through required checks, CodeQL and PostgreSQL regression/migrations (history 37695051762).",
-        "Signed idempotent CSRF/session draft form implemented on codex/saas-draft-form; local SaaS 65 pass, 8 explicit PostgreSQL-only skips. Draft/replay/conflict/token/CSRF/tenant/access revocation tests pass; real PostgreSQL CI pending. Browser/WCAG/customer/results/export acceptance remains open."
+        "PRs #163\u2013#165 usage/job visibility and signed CSRF/idempotent draft form verified with required checks, CodeQL and real PostgreSQL regression/migrations (draft 37695370079).",
+        "Confirmed signed pending cancellation implemented on codex/saas-pending-cancellation; local SaaS 72 pass, 8 PostgreSQL-only skips. Cancellation release/replay/revision/role/state/token/CSRF tests pass; final CI pending. Browser/WCAG/customer/results/export acceptance remains open."
       ],
       "update_notes": [],
       "removal_or_deprecation_notes": []

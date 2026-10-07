@@ -165,7 +165,16 @@ def job_detail_page(request, workspace_id, job_id):
     from .job_history import detail_snapshot
 
     workspace, job = detail_snapshot(request.user, workspace_id, job_id)
-    return render(request, "core/job_detail.html", {"workspace": workspace, "job": job})
+    return render(
+        request,
+        "core/job_detail.html",
+        {
+            "workspace": workspace,
+            "job": job,
+            "can_cancel_pending": job.status in {"draft", "queued"}
+            and membership_for(request.user, workspace_id).role in {"owner", "admin", "member"},
+        },
+    )
 
 
 @login_required
@@ -212,5 +221,51 @@ def draft_search_page(request, workspace_id):
         request,
         "core/draft_search.html",
         {"workspace": workspace, "form": form},
+        status=response_status,
+    )
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def cancel_pending_page(request, workspace_id, job_id):
+    from rest_framework.exceptions import PermissionDenied, ValidationError
+
+    from .cancellation_forms import PendingCancellationForm, cancellation_token
+    from .job_history import detail_snapshot
+    from .jobs import RevisionConflict, cancel_pending_job
+
+    member = membership_for(request.user, workspace_id)
+    if member.role not in {"owner", "admin", "member"}:
+        return HttpResponseForbidden("This role cannot cancel pending jobs.")
+    workspace, job = detail_snapshot(request.user, workspace_id, job_id)
+    kwargs = {"user": request.user, "workspace_id": workspace_id, "job_id": job_id}
+    if request.method == "GET":
+        if job.status not in {"draft", "queued"}:
+            return HttpResponseBadRequest("Only draft or queued jobs can be cancelled.", status=409)
+        form = PendingCancellationForm(
+            initial={"confirmation": cancellation_token(request.user, workspace_id, job)}, **kwargs
+        )
+        response_status = 200
+    else:
+        form = PendingCancellationForm(request.POST, **kwargs)
+        response_status = 400
+        if form.is_valid():
+            try:
+                cancel_pending_job(request.user, workspace_id, job_id, form.expected_revision)
+            except PermissionDenied:
+                return HttpResponseForbidden("This role cannot cancel pending jobs.")
+            except RevisionConflict:
+                form.add_error(None, "The job changed. Review its details before cancelling again.")
+                response_status = 409
+            except ValidationError:
+                form.add_error(None, "Cancellation is unavailable. Review the job again.")
+            else:
+                return HttpResponseRedirect(
+                    reverse("job-detail-page", args=[workspace_id, job_id]), status=303
+                )
+    return render(
+        request,
+        "core/cancel_pending.html",
+        {"workspace": workspace, "job": job, "form": form},
         status=response_status,
     )

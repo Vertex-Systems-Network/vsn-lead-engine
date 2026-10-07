@@ -26,6 +26,11 @@ urlpatterns = [
         views.job_detail_page,
         name="job-detail-page",
     ),
+    path(
+        "workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/cancel/",
+        views.cancel_pending_page,
+        name="cancel-pending-page",
+    ),
     path("api/v1/workspaces/", views.WorkspaceList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/", views.JobList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/", views.JobDetail.as_view()),
