@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PR #154 merged with validate, repository-integrity, analyze-actions, CodeQL and real PostgreSQL SaaS CI all successful. Membership role/removal lifecycle implemented on next review branch.",
+  "last_verified_completion": "PR #155 merged after PostgreSQL concurrent last-owner tests and all required CI passed. Login abuse control slice implemented with keyed fingerprints and transactional caps; CI pending.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -18,10 +18,10 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify and merge membership lifecycle with PostgreSQL concurrent last-owner tests.",
-    "Continue atomic entitlement/usage reservation and durable job/outbox foundation while provider dispatch remains disabled.",
-    "Implement login abuse protection before exposing SaaS environments.",
-    "External provider/customer/privacy/billing/launch evidence remains gated separately."
+    "Verify/merge login attempt controls including PostgreSQL concurrent cap tests.",
+    "Continue persisted entitlements, atomic usage reservations and durable job/outbox with provider dispatch disabled.",
+    "Prepare periodic security-state cleanup, recovery/MFA and deployment abuse review before any exposed SaaS environment.",
+    "Keep external provider/customer/privacy/billing/launch evidence separate."
   ],
   "outstanding_removals": [],
   "unresolved_decisions": [
@@ -34,9 +34,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "merged_foundation_postgresql_verified_membership_ci_pending",
+  "qa_readiness": "merged_membership_postgresql_verified_login_security_ci_pending",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "cf58cf808b16ec142b882625aca4e99cdb27958a",
+  "last_reconciled_repository_ref": "d221dc7742f2cc03ca9bc02d7fe6eb783b8fdedf",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

@@ -59,3 +59,10 @@ class MembershipAudit(models.Model):
     previous_role = models.CharField(max_length=8)
     new_role = models.CharField(max_length=8, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class LoginBucket(models.Model):
+    """Short-lived keyed fingerprints only; no raw username or IP."""
+    fingerprint = models.CharField(max_length=64, primary_key=True)
+    started_at = models.DateTimeField(db_index=True)
+    attempts = models.PositiveIntegerField(default=0)
