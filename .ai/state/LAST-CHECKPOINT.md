@@ -73,3 +73,16 @@ Do not turn workflow success or ANPOS completion into a false quota-complete cla
 1. Continue real production scheduling/recovery and verify quota from workbook/health evidence.
 2. Complete external gates only when their real identity/platform/legal authorization is available.
 3. Do not replay completed ANPOS adoption/hardening work.
+
+
+## SaaS foundation checkpoint — 2026-10-08 PKT
+
+- Exact protected main before this branch: `ab0d30898c255d3b3927dd09e75ac0a9873fba13` (PR #151).
+- Open issue reconciliation: no standalone open issues; PRs #153/#152/#144/#136/#135 remain open at inspection.
+- Branch: `codex/saas-django-foundation`. PR number and remote CI evidence are pending publication.
+- Design and stack work units reconciled from merged PRs #141, #145, #146, #150.
+- Added opt-in Django session/workspace/draft API, initial migration, isolated hash lock and PostgreSQL CI. Hardened #153 repository seam against viewer writes and mutable-reference leaks.
+- Local SaaS smoke: 15 passed, PostgreSQL-only concurrency test explicitly skipped; deployment settings checks passed. Production collector tests/remote CI evidence recorded after verification.
+- Foundation remains in progress: member lifecycle, login abuse protection, persisted entitlement/reservation/outbox and complete web flows remain ready safe work.
+- Provider dispatch, customer source data, billing and deployment are disabled. Historical quota snapshot is retained, not refreshed or claimed complete.
+- No verified persistent Supervisor; distributed claims/background execution are not asserted.

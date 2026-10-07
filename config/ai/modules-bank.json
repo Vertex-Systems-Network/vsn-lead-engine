@@ -163,7 +163,7 @@
         "Google authorized-user credential stored only as secret"
       ],
       "contracts": [
-        "Strict user-OAuth create→trash probe before autonomy claim"
+        "Strict user-OAuth create\u2192trash probe before autonomy claim"
       ],
       "ui_surfaces": [],
       "security_responsibilities": [
@@ -374,9 +374,13 @@
         "Security review",
         "Auth/tenant integration tests"
       ],
-      "status": "not_started",
-      "completion_evidence": [],
-      "update_notes": [],
+      "status": "in_progress",
+      "completion_evidence": [
+        "apps/saas custom UUID user, session login/logout, transactional workspace ownership, tenant-scoped draft/API and regression tests (review branch; PostgreSQL CI pending)."
+      ],
+      "update_notes": [
+        "Membership administration, login abuse protection, entitlement persistence and production identity/release evidence remain open."
+      ],
       "removal_or_deprecation_notes": []
     },
     {
@@ -873,7 +877,7 @@
         "Security/privacy review, response drills and audit integrity."
       ],
       "acceptance_criteria": [
-        "Applicable ANPOS REQ-83–96 evidenced; external legal review remains external until performed."
+        "Applicable ANPOS REQ-83\u201396 evidenced; external legal review remains external until performed."
       ],
       "quality_gates": [
         "Full CI/security/accessibility/performance/restore/release verification"
