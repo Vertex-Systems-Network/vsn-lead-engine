@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET
 from rest_framework import generics, status
@@ -127,3 +127,30 @@ def usage_page(request, workspace_id):
     snapshot = usage_snapshot(request.user, workspace_id)
     workspace = Workspace.objects.get(pk=workspace_id)
     return render(request, "core/usage.html", {"workspace": workspace, "usage": snapshot})
+
+
+@login_required
+@require_GET
+def job_history_page(request, workspace_id):
+    from .job_history import InvalidHistoryCursor, history_snapshot
+
+    try:
+        workspace, jobs, next_cursor = history_snapshot(
+            request.user, workspace_id, request.GET.get("after")
+        )
+    except InvalidHistoryCursor:
+        return HttpResponseBadRequest("Invalid or expired job history continuation.")
+    return render(
+        request,
+        "core/jobs.html",
+        {"workspace": workspace, "jobs": jobs, "next_cursor": next_cursor},
+    )
+
+
+@login_required
+@require_GET
+def job_detail_page(request, workspace_id, job_id):
+    from .job_history import detail_snapshot
+
+    workspace, job = detail_snapshot(request.user, workspace_id, job_id)
+    return render(request, "core/job_detail.html", {"workspace": workspace, "job": job})

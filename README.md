@@ -27,7 +27,7 @@ and dedupe.
 
 ## SaaS milestone roadmap
 
-Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `70c6c96` / PR #162; tenant-safe read-only usage API/page implemented in this change with provider dispatch disabled. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is an engineering work-unit indicator, not customer validation, legal clearance, provider-rights approval, deployment, or launch certification.
+Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `0f0430b` / PR #163; tenant-scoped read-only job history/detail implemented in this change with provider dispatch disabled. This table covers the new SaaS direction only; the existing P01–P70 production runtime is tracked separately below. A bar is an engineering work-unit indicator, not customer validation, legal clearance, provider-rights approval, deployment, or launch certification.
 
 | Milestone | Start date | Status | Progress |
 |---|---:|---|---|
@@ -38,7 +38,7 @@ Snapshot: **2026-10-08 PKT**, reconciled through protected `main` commit `70c6c9
 | M4 — Technology stack and repository decision | 2026-10-07 | Development stack selected: Django 5.2 LTS + DRF + PostgreSQL, additive current-repo boundary; production vendors/hosting remain gated | `███████░░░` 70% |
 | M5 — SaaS foundation: workspace, roles, entitlements and tenant-safety contracts | 2026-10-07 | Isolated Django session/workspace/draft API and initial migrations implemented; owner-safe membership lifecycle and bounded login protection implemented; persisted internal entitlements and atomic usage reservations added; billing reconciliation and complete foundation acceptance remain open | `████████░░` 80% |
 | M6 — Source policy, adapters and job orchestration | 2026-10-07 | Source-policy identity and source-aware export authorization hardened; internal source-gated atomic job/reservation/outbox and pre-dispatch cancellation implemented; bounded pre-dispatch lease fencing and membership/entitlement/source rechecks implemented; operator-driven expiry/recovery implemented; consumer/live adapter/durable scheduler remain open | `█████░░░░░` 55% |
-| M7 — Lead web workflow, filters and export | 2026-10-07 | UX/export-policy contracts and session workspace overview exist; tenant-safe read-only usage API/page implemented; full lead search/results/export workflow remains open | `██░░░░░░░░` 25% |
+| M7 — Lead web workflow, filters and export | 2026-10-07 | UX/export-policy contracts and session workspace overview exist; tenant-safe usage API/page plus bounded chronological job history/detail pages implemented; draft form, lead results/export workflow and full browser/customer acceptance remain open | `███░░░░░░░` 30% |
 | M8 — Admin controls and bounded AI | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
 | M9 — Production readiness, desktop/mobile and launch | 2026-10-07 | Not started | `░░░░░░░░░░` 0% |
 | **Overall SaaS direction** | **2026-10-04** | **Design and contract implementation advancing; runtime, provider, validation and launch gates remain open** | **`████░░░░░░` ~45% engineering-plan indicator** |
@@ -2233,3 +2233,8 @@ PR #161 passed all required checks, CodeQL and real PostgreSQL lease exclusion/e
 PR #162 passed all required checks, CodeQL and PostgreSQL duplicate cleanup/earlier concurrency/migration gates before merge. The isolated app now exposes a read-only workspace usage API and session page showing server-derived settled/reserved counters and limits, with membership checks and no balance mutation. Missing entitlement/counter rows remain inactive/zero without provisioning; billing period/reset fields are null. Route/template tests verify tenant boundaries, revoked access, viewer reads, method rejection and escaped workspace names. This starts independent web visibility work while full lead workflows, browser/accessibility/customer task validation and provider/data/billing/release acceptance remain open.
 
 Current resume checkpoint stays within its existing compact-state size contract; prior checkpoint history is preserved in `docs/ai/CHECKPOINT-HISTORY-20261008.md`. No validator limits were relaxed.
+
+
+### Read-only job history and details (development)
+
+PR #163 passed all required checks, CodeQL and SaaS PostgreSQL regression/concurrency/migration gates (SaaS Quality run 37692371317). The session overview now links to tenant-scoped job history and saved-search details. History uses newest-first ordering, a 25-row bound and signed workspace-bound expiring continuation with a timestamp/UUID tie breaker. Reads recheck membership under the workspace lock; foreign and revoked access returns 404, viewers can read, and mutation methods are unavailable. Detail exposes saved scope, recorded status/counts and UTC timestamps without request hashes, lease tokens, provider errors or credentials. Draft/queued intent is not represented as execution or achieved results. No migration, provider call, retry/cancel/export control or schedule is introduced. Local route tests cover tenant isolation, escaping, pagination ties/inserts, malformed/expired/cross-workspace cursors and method rejection; full browser/accessibility/customer acceptance remains separate.

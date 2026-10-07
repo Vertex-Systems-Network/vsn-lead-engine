@@ -15,6 +15,12 @@ urlpatterns = [
     ),
     path("workspaces/<uuid:workspace_id>/usage/", views.usage_page, name="usage-page"),
     path("api/v1/workspaces/<uuid:workspace_id>/usage/", views.UsageDetail.as_view()),
+    path("workspaces/<uuid:workspace_id>/jobs/", views.job_history_page, name="job-history-page"),
+    path(
+        "workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/",
+        views.job_detail_page,
+        name="job-detail-page",
+    ),
     path("api/v1/workspaces/", views.WorkspaceList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/", views.JobList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/", views.JobDetail.as_view()),

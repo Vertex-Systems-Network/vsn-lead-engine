@@ -1,0 +1,9 @@
+{% extends "core/job_base.html" %}
+{% block title %}Job history{% endblock %}
+{% block content %}<h1>{{ workspace.name }} job history</h1>
+<p>Newest first. All times are UTC. Drafts are saved requests; queued work is pending intent. Collection is unavailable.</p>
+{% if jobs %}<div class="table-scroll" role="region" aria-label="Job history table" tabindex="0"><table><caption>Saved jobs and recorded status</caption><thead><tr><th scope="col">Job</th><th scope="col">Status</th><th scope="col">Categories</th><th scope="col">Requested limit</th><th scope="col">Recorded results</th><th scope="col">Created (UTC)</th></tr></thead><tbody>
+{% for job in jobs %}<tr><th scope="row"><a href="{% url 'job-detail-page' workspace.id job.id %}">{{ job.id }}</a></th><td>{{ job.status|capfirst }}</td><td>{{ job.search.categories|join:", "|default:"Not recorded" }}</td><td>{{ job.search.result_limit|default_if_none:"Not recorded" }}</td><td>{{ job.result_count }}</td><td><time datetime="{{ job.created_at|date:'c' }}">{{ job.created_at|date:"Y-m-d H:i:s" }}</time></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<p>No jobs on this page. Searches can be saved as drafts through the API.</p>{% endif %}
+{% if next_cursor %}<p><a href="?after={{ next_cursor|urlencode }}">Older jobs</a></p>{% endif %}
+{% endblock %}

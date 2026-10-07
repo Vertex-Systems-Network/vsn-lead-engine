@@ -1,0 +1,15 @@
+{% extends "core/job_base.html" %}
+{% block title %}Job details{% endblock %}
+{% block content %}<h1>{{ workspace.name }} job details</h1>
+<p>Job {{ job.id }}</p><p>Status: <strong>{{ job.status|capfirst }}</strong>. Revision: {{ job.revision }}.</p>
+<p>Recorded results: {{ job.result_count }}. Requested limits are not achieved counts. Collection, result downloads and retry controls are unavailable.</p>
+<dl><dt>Countries</dt><dd>{{ job.search.countries|join:", "|default:"Not recorded" }}</dd>
+<dt>Categories</dt><dd>{{ job.search.categories|join:", "|default:"Not recorded" }}</dd>
+<dt>Requested business statuses</dt><dd>{{ job.search.statuses|join:", "|default:"No preference" }}</dd>
+<dt>Required fields</dt><dd>{{ job.search.required_fields|join:", "|default:"Not recorded" }}</dd>
+<dt>Requested sources</dt><dd>{{ job.search.source_codes|join:", "|default:"No sources selected" }}</dd>
+<dt>Requested result limit</dt><dd>{{ job.search.result_limit|default_if_none:"Not recorded" }}</dd>
+<dt>Created (UTC)</dt><dd><time datetime="{{ job.created_at|date:'c' }}">{{ job.created_at|date:"Y-m-d H:i:s" }}</time></dd>
+<dt>Updated (UTC)</dt><dd><time datetime="{{ job.updated_at|date:'c' }}">{{ job.updated_at|date:"Y-m-d H:i:s" }}</time></dd></dl>
+<p>Source selections describe the saved request; they do not establish source availability or approved rights. Attempt and start/finish details are not exposed by this preview.</p>
+{% endblock %}
