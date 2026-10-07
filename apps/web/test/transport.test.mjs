@@ -94,3 +94,72 @@ test("oversized and malformed JSON rejected", async () => {
       "unavailable",
     );
 });
+test("form paths require a bounded CSRF cookie and ordinary reads never forward it", async () => {
+  const id =
+    "a".repeat(8) +
+    "-" +
+    "a".repeat(4) +
+    "-" +
+    "a".repeat(4) +
+    "-" +
+    "a".repeat(4) +
+    "-" +
+    "a".repeat(12);
+  const csrf = "B".repeat(32);
+  for (const path of [
+    `/api/v1/workspaces/${id}/draft-form/`,
+    `/api/v1/workspaces/${id}/jobs/${id}/cancel-form/`,
+  ]) {
+    for (const bad of [undefined, "bad", csrf + ";evil=1"])
+      assert.equal(
+        (
+          await readBackend(
+            "http://localhost:8000",
+            path,
+            session,
+            () => {
+              throw Error("must not fetch");
+            },
+            bad,
+          )
+        ).kind,
+        "denied",
+      );
+    const result = await readBackend(
+      "http://localhost:8000",
+      path,
+      session,
+      async (_, options) => {
+        assert.equal(
+          options.headers.Cookie,
+          `sessionid=${session}; csrftoken=${csrf}`,
+        );
+        assert.equal(options.cache, "no-store");
+        return new Response("{}", {
+          headers: { "content-type": "application/json" },
+        });
+      },
+      csrf,
+    );
+    assert.equal(result.kind, "ok");
+  }
+  await readBackend(
+    "http://localhost:8000",
+    "/api/v1/workspaces/",
+    session,
+    async (_, options) => {
+      assert.equal(options.headers.Cookie, `sessionid=${session}`);
+      return new Response("{}", {
+        headers: { "content-type": "application/json" },
+      });
+    },
+    csrf,
+  );
+  await assert.rejects(
+    readBackend(
+      "http://localhost:8000",
+      `/api/v1/workspaces/${id}/draft-form/?target=evil`,
+      session,
+    ),
+  );
+});

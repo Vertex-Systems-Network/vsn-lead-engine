@@ -1417,6 +1417,50 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-NEXT-NATIVE-FORMS",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-WEB-EXPERIENCE",
+        "MOD-SAAS-IDENTITY",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB",
+        "WU-SAAS-FOUNDATION"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-NEXT-MUTATIONS-NEXT-SLICE.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/next-native-draft-cancel"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Native Next draft/cancel screens and private bounded Django form contexts implemented; exact frontend CSRF trust, cookie reseed and fixed job return preserve Django mutation authority. Local 122 pass/16 PostgreSQL skips (138 cases), seven transport tests/build/type/lint and real native-form HTTP flow pass; final-head CI pending. Invalid submissions use existing Django review; browser/proxy/native account acceptance stays open."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-NEXT-NATIVE-FORMS-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/form_context.py",
+        "apps/saas/core/test_form_context.py",
+        "apps/web/lib/transport.mjs",
+        "apps/web/test/integration_smoke.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

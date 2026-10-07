@@ -3,8 +3,12 @@
 ## Snapshot
 
 - Repository Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 PKT / 2026-10-07 UTC.
-- Protected main re-read: `90f90a6952932d7ef8a43d5d6bcaa6decb964139` / PR #178. Following documentation PR only reconciles verified evidence; inspect live main/issues/PRs before future mutation replay.
+- Protected main re-read: `c32d17fa53b8031a251d7ba289b160ab2752b868` / checkpoint PR #179. Current branch `codex/next-native-draft-cancel`; inspect live main/issues/PRs before future mutation replay.
 - Owner selected Next.js + TypeScript. Django/DRF/PostgreSQL remain session, tenant, role and mutation authority; isolated SaaS work preserves production CLI/R2/Google behavior.
+
+## Current candidate
+
+- Native Next draft/cancel screens and private bounded Django form contexts implemented; exact frontend CSRF trust, cookie reseed and fixed job return preserve Django mutation authority. Local 122 pass/16 PostgreSQL skips (138 cases), seven transport tests/build/type/lint and real native-form HTTP flow pass; final-head CI pending. Invalid submissions use existing Django review; browser/proxy/native account acceptance stays open.
 
 ## Verified
 
@@ -15,7 +19,7 @@
 - Internal dispatch write-ahead/unknown state keeps uncertain reservations; terminal proof reconciles whole-job usage only after all operations resolve. Accepted leads/exports remain zero. Generic usage APIs cannot release/settle attached job reservations.
 - Explicit manual period windows retain legacy counters and late receipt accounting; unresolved reservations block rollover. Closed totals archive once, expired periods stop new work, old receipt/key replay cannot reset or charge a new window. Next/Django show explicit dates without automatic reset claims.
 - Next workspace/jobs/detail/usage uses bounded server-only session GET transport, fixed origin/path checks and no shared cache/redirects. Real disposable Django/Next HTTP rendering checks pass; Django draft/cancel forms remain in use.
-- Local SaaS suite: 130 cases, 114 passed/16 PostgreSQL-only skipped; final PostgreSQL CI runs all 130 without skips. Next password/CSRF cookie/return/confirmation/logout and old-session denial verified by HTTP CI. Root 376 passed, 1 skipped, 28 subtests, ANPOS and local lint/drift/settings pass. M5 85%, M6 70%, M7 50%, overall ~45% are engineering indicators only. Work-unit counts: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
+- Local SaaS suite: 130 cases, 114 passed/16 PostgreSQL-only skipped; final PostgreSQL CI runs all 130 without skips. Next password/CSRF cookie/return/confirmation/logout and old-session denial verified by HTTP CI. Root 376 passed, 1 skipped, 28 subtests, ANPOS and local lint/drift/settings pass. M5 85%, M6 70%, M7 60% candidate, overall ~45% are engineering indicators only. Work-unit counts: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
 
 ## Not Verified
 
@@ -33,6 +37,6 @@
 
 ## Next Action
 
-1. Re-read live main/issues/PRs and continue M7 native Next draft/cancel screens from docs/ai/SAAS-NEXT-MUTATIONS-NEXT-SLICE.md, with narrow Django form context, signed replay/revision tokens and retained CSRF/session authority.
+1. Verify/merge native form candidate, then continue bounded native source visibility and validation/account flows. Retain Django CSRF/session/mutation authority.
 2. Continue account forms, signed billing-event and accepted-lead/results contracts where independent, without activating payments/providers. Native browser/proxy acceptance remains explicit.
 3. Continue ready work within invocation budget; checkpoints are recovery aids, not permission gates. No execution after turn end is claimed.

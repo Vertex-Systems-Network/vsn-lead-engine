@@ -108,3 +108,45 @@ export function usage(v: unknown): v is Usage {
     return object(c) && count(c.settled) && count(c.reserved) && count(c.limit);
   });
 }
+
+export type DraftContext = {
+  kind: "draft";
+  workspace: { id: string; name: string };
+  csrf_token: string;
+  draft_token: string;
+};
+export type CancelContext = {
+  kind: "cancel";
+  workspace: { id: string; name: string };
+  csrf_token: string;
+  confirmation: string;
+  job: Job;
+};
+function formBase(v: unknown): v is Record<string, unknown> {
+  return (
+    object(v) &&
+    object(v.workspace) &&
+    uuid(v.workspace.id) &&
+    typeof v.workspace.name === "string" &&
+    v.workspace.name.length <= 120 &&
+    typeof v.csrf_token === "string" &&
+    /^[A-Za-z0-9]{64}$/.test(v.csrf_token)
+  );
+}
+function signedToken(v: unknown): v is string {
+  return typeof v === "string" && /^[A-Za-z0-9_.:-]{1,1024}$/.test(v);
+}
+export function draftContext(v: unknown): v is DraftContext {
+  return formBase(v) && v.kind === "draft" && signedToken(v.draft_token);
+}
+export function cancelContext(v: unknown): v is CancelContext {
+  return (
+    formBase(v) &&
+    v.kind === "cancel" &&
+    signedToken(v.confirmation) &&
+    job(v.job) &&
+    ["draft", "queued"].includes(v.job.status) &&
+    object(v.workspace) &&
+    v.job.workspace_id === v.workspace.id
+  );
+}
