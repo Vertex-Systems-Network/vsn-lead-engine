@@ -24,7 +24,7 @@ Trust boundaries:
 3. Application services to system-of-record and job/usage transactions.
 4. Worker to source adapters and object/export storage.
 5. Operator control plane to tenant data, with least privilege and tamper-evident audit.
-6. AI assistant to approved read-only context and explicitly confirmed actions.
+6. AI assistant to approved read-only context and explicitly confirmed user actions.
 
 No client, worker or AI component may receive another tenant's data or raw provider credentials.
 
@@ -92,6 +92,6 @@ Before stack-specific implementation:
 - documented schedule/DST/idempotency/overlap policy;
 - documented source-policy adapter contract and cost/rights gate;
 - documented repository boundary and migration/rollback plan;
-- technology alternatives and explicit owner stack approval.
+- technology alternatives and cost/operability trade-offs documented for a stack decision under the repository's standing technical-autonomy delegation; any new paid external commitment remains separately gated.
 
 This baseline is not proof that legal, privacy, provider-rights, billing or production gates have passed.

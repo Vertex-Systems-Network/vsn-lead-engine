@@ -9,13 +9,13 @@
   "execution": {
     "status": "stable",
     "lifecycle_stage": "production_operations",
-    "current_phase": "PHASE-PRODUCTION-OPERATIONS",
-    "active_task": "WU-OPS-DAILY-QUOTA",
+    "current_phase": "PHASE-SAAS-SYSTEM-DESIGN",
+    "active_task": "WU-SAAS-SYSTEM-DESIGN",
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
-    "next_control_plane_task": "external_gates_only"
+    "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "8922bc8c3e7e331c88e6506625e4d9cca5ea9173",
-  "observed_main_semantics": "Last fully reconciled repository head before this snapshot mutation.",
+  "observed_main_sha": "28971ea096e9e69c745f741af5dc0303b7e1623a",
+  "observed_main_semantics": "Last fully reconciled protected main before the technical-autonomy reconciliation mutation.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": null,
@@ -101,6 +101,28 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Within each workspace invocation, continuously execute the highest-priority authorized ready frontier, repair technical failures, pass PR/CI/merge boundaries, then immediately continue newly-unblocked safe work until the host runtime budget is exhausted or only genuine external/human gates remain. Production quota operations remain evidence-driven and external gates must not be bypassed.",
-  "last_reconciled_at": "2026-10-04T19:12:35Z"
+  "exact_next_safe_action": "Start WU-SAAS-SYSTEM-DESIGN immediately and continue across newly-unblocked safe work. Do not ask the user for technical choices, error-fix confirmation, retry approval, stack approval or continue confirmation. Resolve technical uncertainty from repository evidence using the safest reversible zero-new-spend option; isolate only genuine external gates and continue independent work.",
+  "last_reconciled_at": "2026-10-07",
+  "technical_autonomy": {
+    "status": "active_standing_owner_delegation",
+    "ask_for_technical_confirmation": false,
+    "ai_decides": [
+      "architecture_and_stack",
+      "implementation_choices",
+      "error_and_ci_repair",
+      "reversible_migrations",
+      "branch_pr_merge_strategy",
+      "dev_staging_troubleshooting",
+      "next_safe_work"
+    ],
+    "external_only_gates": [
+      "new_paid_or_recurring_spend",
+      "credentials_or_oauth_unavailable_to_authenticated_tools",
+      "provider_commercial_rights_or_contract_acceptance",
+      "legal_or_compliance_attestation",
+      "irreversible_destructive_production_action",
+      "public_or_commercial_launch_commitment"
+    ],
+    "blocked_unit_policy": "repair_within_budgets_then_isolate_and_continue_independent_safe_work"
+  }
 }
