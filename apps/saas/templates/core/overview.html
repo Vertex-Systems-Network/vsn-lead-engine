@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Workspaces — VSN Lead Engine</title></head>
 <body><main><h1>Your workspaces</h1><p>Development preview. Searches can be saved as drafts through the API. Collection, exports and billing are unavailable.</p>
-<ul>{% for workspace in workspaces %}<li>{{ workspace.name }} — {{ workspace.timezone }} — <a href="{% url 'usage-page' workspace.id %}">View usage</a></li>{% empty %}<li>No workspaces yet.</li>{% endfor %}</ul>
+<ul>{% for workspace in workspaces %}<li>{{ workspace.name }} — {{ workspace.timezone }} — <a href="{% url 'job-history-page' workspace.id %}">View jobs</a> — <a href="{% url 'usage-page' workspace.id %}">View usage</a></li>{% empty %}<li>No workspaces yet.</li>{% endfor %}</ul>
 <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit">Sign out</button></form>
 </main></body></html>

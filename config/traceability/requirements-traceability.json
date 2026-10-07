@@ -952,7 +952,7 @@
         "PR #163"
       ],
       "test_evidence": [
-        "apps/saas/core/test_usage_visibility.py: UsageVisibilityTests; local SaaS 52 pass, 8 explicit PostgreSQL skips. Remote CI required before merge."
+        "apps/saas/core/test_usage_visibility.py: UsageVisibilityTests; merged PR #163 exact head c09996045b92214f58f152c71ea54ea4e46327a7 passed SaaS Quality 37692371317, required checks and CodeQL."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -962,6 +962,46 @@
       "artifact_refs": [
         "apps/saas/core/usage_snapshot.py",
         "apps/saas/templates/core/usage.html"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:0f0430b5f318749f9dba599053e1777fed008c44"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-JOB-HISTORY",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-job-history"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "apps/saas/core/test_job_history.py: JobHistoryTests; local SaaS 58 pass, 8 PostgreSQL-only skips; root 376 pass, 1 skip, 28 subtests pass. CI verification pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/job_history.py",
+        "apps/saas/templates/core/jobs.html",
+        "apps/saas/templates/core/job_detail.html"
       ],
       "sbom_refs": [],
       "attestation_refs": [],

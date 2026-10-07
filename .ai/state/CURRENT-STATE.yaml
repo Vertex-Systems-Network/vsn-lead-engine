@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "70c6c961c2a6034340f6b5f6bab4246c883c1fef",
+  "observed_main_sha": "0f0430b5f318749f9dba599053e1777fed008c44",
   "observed_main_semantics": "Exact protected main inspected immediately before this dependency/checkpoint reconciliation branch.",
   "active_issue": null,
-  "active_pr": 163,
-  "active_branch": "codex/saas-usage-visibility",
+  "active_pr": null,
+  "active_branch": "codex/saas-job-history",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -63,7 +63,8 @@
     "dependency_refresh": "PR #159 all required checks, CodeQL, verify and saas-postgres successful on e60e8d214b87d0b747f7b7a9a6b9f88af8d68798",
     "saas_atomic_outbox": "PR #160: all required checks, CodeQL and PostgreSQL enqueue/cancel races/migration gates successful on c8d736c59455e786f0eb8a8da7b2f784456cf808",
     "saas_predispatch_leases": "PR #161: all required checks, CodeQL and PostgreSQL lease exclusion/earlier concurrency/migration gates successful on 31c72ee16dbdc3b462b6a6e6260408a4cb19d306",
-    "saas_predispatch_recovery": "PR #162: required checks, CodeQL and PostgreSQL duplicate cleanup/earlier concurrency/migration gates successful on ac1c8093f8a697b7c17ff13ea8b6b3425523c996"
+    "saas_predispatch_recovery": "PR #162: required checks, CodeQL and PostgreSQL duplicate cleanup/earlier concurrency/migration gates successful on ac1c8093f8a697b7c17ff13ea8b6b3425523c996",
+    "saas_usage_visibility": "PR #163 required checks, CodeQL and SaaS PostgreSQL/migration gates successful on c09996045b92214f58f152c71ea54ea4e46327a7; SaaS Quality 37692371317"
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -110,7 +111,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify/merge tenant-safe read-only usage API/page, then continue saved search/job history web workflows and browser/accessibility validation plus dispatch-start/idempotency/uncertain-outcome reconciliation. Providers, billing and launch remain gated.",
+  "exact_next_safe_action": "Verify/merge tenant job history/detail, continue draft web form and browser/accessibility verification plus dispatch-start/idempotency/reconciliation; external activation remains gated.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

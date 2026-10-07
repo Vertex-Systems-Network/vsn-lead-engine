@@ -639,7 +639,8 @@
         "Data contract/privacy tests"
       ],
       "completion_evidence": [
-        "Independent read-only workspace usage API/session page implemented on codex/saas-usage-visibility with server-derived counts, tenant membership checks and explicit undefined billing period/reset. Full collection/lead search/result/export workflow and browser/accessibility/customer validation remain open."
+        "PR #163 tenant usage API/session page verified with required checks, CodeQL and PostgreSQL suite (SaaS Quality 37692371317).",
+        "Read-only job history/detail implemented on codex/saas-job-history; local SaaS 58 pass with 8 explicit PostgreSQL-only skips. Signed bounded chronological continuation, tenant/viewer/revocation/escaping/read-only tests pass. Draft form, complete browser/accessibility/customer validation and results/export remain open."
       ]
     },
     {

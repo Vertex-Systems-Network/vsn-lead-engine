@@ -22,6 +22,8 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 - `/health/`: liveness and explicit disabled provider dispatch; no credentials/database details.
 - `/accounts/login/`, `/accounts/logout/`: Django same-origin sessions; CSRF-protected forms and POST logout.
 - `/`: authenticated workspace overview, with links to read-only workspace usage.
+- `/workspaces/{workspace_id}/jobs/`: newest-first read-only history, 25-row signed workspace-bound continuation.
+- `/workspaces/{workspace_id}/jobs/{job_id}/`: read-only saved scope, recorded status/counts and UTC times.
 - `/workspaces/{workspace_id}/usage/`: session-authenticated read-only settled/reserved/limit table.
 - `/api/v1/workspaces/{workspace_id}/usage/`: tenant-scoped server-derived counters/limits; no mutation methods.
 - `/api/v1/workspaces/`: list only the actor's workspaces; creation atomically installs an owner membership.
@@ -81,3 +83,10 @@ Recovery does not rely on the original actor retaining membership. It skips runn
 ## Usage visibility
 
 Owners, admins, members and viewers can read their workspace's server-derived settled counters, outstanding reservations and internal limits. The snapshot takes the workspace lock and rechecks membership to keep quota reads consistent with reserve/settle/release. Unknown entitlements/counters show inactive/zero values without provisioning new balances. `period` and `reset_at` are explicitly null; counters are cumulative in this development model. The session page uses escaped workspace names, semantic table headings and a POST logout form. Cross-tenant and revoked access return 404; client usage mutation is unavailable. Automated route/template tests cover these boundaries; complete browser/accessibility/customer task validation remains open.
+
+
+## Session job visibility
+
+The read-only job history and detail pages recheck membership under the workspace lock. Viewers may read; foreign/revoked resources return 404. History orders by immutable creation time and UUID descending, fetches at most 26 rows, and displays 25. Continuations expire after one day, bind the workspace and are signed by the application key. Malformed/tampered/expired/foreign-workspace continuations return a generic 400 after tenant authorization. This is continuation through history, not a frozen snapshot; new inserts sort before the current cursor. API pagination stays compatible and unchanged.
+
+Saved scope is escaped text, never clickable provider HTML. Requested limits and recorded results are labeled separately; drafts/queue intents do not imply collection. No hashes, lease tokens, raw errors or provider credentials are rendered. All displayed dates explicitly use UTC. Start/finish/attempt/failure details and retry/cancel/export actions remain unavailable. The table scroll region is keyboard-focusable at narrow widths. Route/template tests are implemented; comprehensive WCAG/customer acceptance is not certified.
