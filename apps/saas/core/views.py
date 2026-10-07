@@ -4,9 +4,10 @@ from django.http import JsonResponse
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Job, Workspace
-from .serializers import JobSerializer, SearchSerializer, WorkspaceSerializer
-from .services import create_draft, create_workspace, membership_for
+from .models import Job, Membership, Workspace
+from .serializers import (JobSerializer, MembershipRoleSerializer, MembershipSerializer,
+                          SearchSerializer, WorkspaceSerializer)
+from .services import change_membership, create_draft, create_workspace, membership_for
 
 
 def health(request):
@@ -60,3 +61,28 @@ class JobDetail(APIView):
         membership_for(request.user, workspace_id)
         job = get_object_or_404(Job, workspace_id=workspace_id, id=job_id)
         return Response(JobSerializer(job).data)
+
+
+class MemberList(generics.ListAPIView):
+    serializer_class = MembershipSerializer
+
+    def get_queryset(self):
+        from rest_framework.exceptions import PermissionDenied
+        membership = membership_for(self.request.user, self.kwargs["workspace_id"])
+        if membership.role not in {"owner", "admin"}:
+            raise PermissionDenied("This role cannot manage members.")
+        return Membership.objects.filter(workspace_id=self.kwargs["workspace_id"]).order_by("user_id")
+
+
+class MemberDetail(APIView):
+    def patch(self, request, workspace_id, user_id):
+        membership_for(request.user, workspace_id)
+        serializer = MembershipRoleSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        member = change_membership(request.user, workspace_id, user_id,
+                                   role=serializer.validated_data["role"])
+        return Response(MembershipSerializer(member).data)
+
+    def delete(self, request, workspace_id, user_id):
+        change_membership(request.user, workspace_id, user_id, remove=True)
+        return Response(status=status.HTTP_204_NO_CONTENT)

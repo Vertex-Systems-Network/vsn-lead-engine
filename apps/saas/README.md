@@ -23,12 +23,14 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 - `/accounts/login/`, `/accounts/logout/`: Django same-origin sessions; CSRF-protected forms and POST logout.
 - `/`: authenticated workspace overview.
 - `/api/v1/workspaces/`: list only the actor's workspaces; creation atomically installs an owner membership.
+- `/api/v1/workspaces/{workspace_id}/members/`: owner/admin list, bounded at 100 rows.
+- `/api/v1/workspaces/{workspace_id}/members/{user_id}/`: PATCH role or DELETE membership; last owner protected transactionally; only owners change ownership.
 - `/api/v1/workspaces/{workspace_id}/jobs/`: bounded tenant-scoped listing and draft creation.
 - `/api/v1/workspaces/{workspace_id}/jobs/{job_id}/`: tenant-scoped detail; foreign IDs return 404.
 
 Draft creation requires an `Idempotency-Key` header. Search JSON accepts countries (US/CA), categories, statuses, required_fields, source_codes and result_limit (1–1000). Unknown fields fail validation. Phone qualification is always included. A key replays the normalized original request; changing its payload returns 409. Membership and write role are rechecked inside the transaction. A workspace row lock and unique tenant/key constraint serialize concurrent duplicate creates.
 
-Drafts never enqueue, reserve usage, dispatch source calls, collect data, export, schedule or charge. Source codes and statuses in drafts are requested preferences, not verified capabilities. Entitlement/source policy enforcement and atomic usage/outbox work are required before dispatch is implemented. Public registration, membership management, source activation and billing remain unavailable. Users are created locally by the management command for development testing only.
+Drafts never enqueue, reserve usage, dispatch source calls, collect data, export, schedule or charge. Source codes and statuses in drafts are requested preferences, not verified capabilities. Entitlement/source policy enforcement and atomic usage/outbox work are required before dispatch is implemented. Public registration, member invitations, source activation and billing remain unavailable. Existing member role changes and removal are available to authorized owners/admins, with role-only audit records committed in the same transaction. Users are created locally by the management command for development testing only.
 
 ## Security and recovery
 

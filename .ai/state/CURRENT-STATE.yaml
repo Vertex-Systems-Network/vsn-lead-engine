@@ -14,7 +14,7 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "ab0d30898c255d3b3927dd09e75ac0a9873fba13",
+  "observed_main_sha": "cf58cf808b16ec142b882625aca4e99cdb27958a",
   "observed_main_semantics": "Exact protected main inspected before this Django foundation branch.",
   "active_issue": null,
   "active_pr": null,
@@ -54,7 +54,8 @@
       "validate",
       "repository-integrity",
       "analyze-actions"
-    ]
+    ],
+    "saas_foundation": "PR #154: validate, repository-integrity, analyze-actions, CodeQL and saas-postgres successful"
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -101,7 +102,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify and merge isolated Django foundation, then continue atomic entitlement/usage/outbox, membership lifecycle and web workflows with provider dispatch disabled.",
+  "exact_next_safe_action": "Verify/merge membership lifecycle, then implement atomic entitlement/usage/outbox and login abuse controls with providers disabled.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

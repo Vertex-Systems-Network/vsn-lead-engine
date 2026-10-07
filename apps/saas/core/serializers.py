@@ -1,6 +1,6 @@
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from rest_framework import serializers
-from .models import Job, Workspace
+from .models import Job, Membership, Workspace
 
 
 class WorkspaceSerializer(serializers.ModelSerializer):
@@ -44,3 +44,19 @@ class JobSerializer(serializers.ModelSerializer):
         model = Job
         fields = ["id", "workspace_id", "search", "status", "revision", "result_count", "created_at", "updated_at"]
         read_only_fields = fields
+
+
+class MembershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Membership
+        fields = ["user_id", "role"]
+        read_only_fields = fields
+
+
+class MembershipRoleSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=["owner", "admin", "member", "viewer"])
+
+    def to_internal_value(self, data):
+        if isinstance(data, dict) and set(data) != {"role"}:
+            raise serializers.ValidationError({"role": "Supply only the new role."})
+        return super().to_internal_value(data)

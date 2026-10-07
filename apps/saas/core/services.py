@@ -4,7 +4,7 @@ import re
 from django.db import transaction
 from django.http import Http404
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
-from .models import Job, Membership, Workspace
+from .models import Job, Membership, MembershipAudit, Workspace
 
 
 class IdempotencyConflict(APIException):
@@ -50,3 +50,34 @@ def create_draft(user, workspace_id, search, key):
     job = Job.objects.create(workspace_id=workspace_id, created_by=user, search=search,
                              idempotency_key=key, request_hash=request_hash)
     return job, True
+
+
+@transaction.atomic
+def change_membership(user, workspace_id, target_user_id, *, role=None, remove=False):
+    """Serialized owner-safe mutation. No client role or user lookup is trusted."""
+    membership_for(user, workspace_id)
+    Workspace.objects.select_for_update().get(pk=workspace_id)
+    actor = membership_for(user, workspace_id, lock=True)
+    if actor.role not in {"owner", "admin"}:
+        raise PermissionDenied("This role cannot manage members.")
+    target = membership_for(target_user_id, workspace_id, lock=True)
+    if role is not None and role not in {"owner", "admin", "member", "viewer"}:
+        raise ValidationError({"role": "Unsupported membership role."})
+    if actor.role != "owner" and (target.role == "owner" or role == "owner"):
+        raise PermissionDenied("Only an owner can change workspace ownership.")
+    if target.role == "owner" and (remove or role != "owner"):
+        if Membership.objects.filter(workspace_id=workspace_id, role="owner").count() <= 1:
+            raise ValidationError({"role": "The workspace must retain at least one owner."})
+    if not remove and role == target.role:
+        return target
+    previous = target.role
+    MembershipAudit.objects.create(workspace_id=workspace_id, actor=user,
+                                   target_user_id=target.user_id,
+                                   action="removed" if remove else "role_changed",
+                                   previous_role=previous, new_role="" if remove else role)
+    if remove:
+        target.delete()
+        return None
+    target.role = role
+    target.save(update_fields=["role"])
+    return target

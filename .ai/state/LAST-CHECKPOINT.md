@@ -86,3 +86,13 @@ Do not turn workflow success or ANPOS completion into a false quota-complete cla
 - Foundation remains in progress: member lifecycle, login abuse protection, persisted entitlement/reservation/outbox and complete web flows remain ready safe work.
 - Provider dispatch, customer source data, billing and deployment are disabled. Historical quota snapshot is retained, not refreshed or claimed complete.
 - No verified persistent Supervisor; distributed claims/background execution are not asserted.
+
+
+## Membership lifecycle checkpoint — 2026-10-08 PKT
+
+- Exact inspected main: `cf58cf808b16ec142b882625aca4e99cdb27958a` / merged PR #154. All required checks, CodeQL and `saas-postgres` succeeded on `ad7a9ec30fa11c73a9d1064803034a3cb9c3907f`.
+- Main README re-read after merge: reflects design/stack/foundation delivery and remaining gates.
+- PR #153 closed as superseded by #154 with the write-role and mutable-reference defects fixed.
+- Branch: `codex/saas-membership-lifecycle`. Adds member list/role-change/removal, transactional audit and concurrent last-owner test; no invitations or provider activation.
+- Local SaaS suite: 21 passing tests, 2 explicit PostgreSQL-only skips. Next CI must verify both concurrency tests before merge.
+- Next ready frontier: atomic persisted entitlements/usage and job/outbox, plus login abuse controls.
