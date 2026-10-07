@@ -1162,9 +1162,11 @@
       "branch_refs": [
         "codex/saas-next-decision-dispatch"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #169"
+      ],
       "test_evidence": [
-        "apps/saas/core/test_dispatch.py: local regression and explicit PostgreSQL-only concurrency tests; final-head PostgreSQL CI pending."
+        "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1181,7 +1183,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:4ed6a6a2b2bc29771afc2547c98e076e3686829c"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     },
@@ -1203,9 +1207,11 @@
       "branch_refs": [
         "codex/saas-next-decision-dispatch"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #169"
+      ],
       "test_evidence": [
-        "apps/web/test/transport.test.mjs: 6 pass; apps/web/test/integration_smoke.py: disposable Next/Django HTTP checks pass; lint/type/build pass locally; final-head CI pending."
+        "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1220,7 +1226,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:4ed6a6a2b2bc29771afc2547c98e076e3686829c"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }

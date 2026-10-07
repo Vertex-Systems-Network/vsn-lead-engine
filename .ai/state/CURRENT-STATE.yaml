@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "8ce3f55541bbacd0746f58da1536819570cfa022",
-  "observed_main_semantics": "Exact protected main inspected before the Next decision and dispatch ledger branch; final-head CI not yet asserted.",
+  "observed_main_sha": "4ed6a6a2b2bc29771afc2547c98e076e3686829c",
+  "observed_main_semantics": "Exact protected main re-read after PR #169 merge and before the documentation-only verification checkpoint.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "codex/saas-next-decision-dispatch",
+  "active_branch": null,
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -70,7 +70,7 @@
     "saas_pending_cancellation": "PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks, CodeQL and PostgreSQL 37695788773",
     "saas_source_preview": "PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks, CodeQL and PostgreSQL 37696123260",
     "checkpoint_168": "PR #168 head 7d4bfc9e69138f7424405a9c88691ecea2fb8a03 passed required checks, CodeQL/actions and SaaS PostgreSQL 37696425439 (84 tests).",
-    "dispatch_next_candidate": "Local verification only; PostgreSQL race/migration and Next CI remain merge gates for codex/saas-next-decision-dispatch"
+    "saas_dispatch_next": "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks)."
   },
   "governance": {
     "main_ruleset_id": 24086362,

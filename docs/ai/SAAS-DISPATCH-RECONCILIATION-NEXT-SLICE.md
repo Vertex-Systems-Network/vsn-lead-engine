@@ -46,4 +46,4 @@ Next unit should implement and verify the ledger before enabling an adapter. Bro
 
 ## Current implementation boundary
 
-The codex/saas-next-decision-dispatch candidate implements write-ahead start/unknown identities and reservation retention, not the full plan. Terminal confirmed receipts, evidence-bound success/no-effect transitions, bounded settlement and retry/reconciliation remain next work. No external sender is activated; final-head PostgreSQL races/migrations remain a merge gate.
+Merged PR #169 implements write-ahead start/unknown identities and reservation retention, not the full plan. Terminal confirmed receipts, evidence-bound success/no-effect transitions, bounded settlement and retry/reconciliation remain next work. No external sender is activated; PR #169 head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed real PostgreSQL start/start and start/cancel races plus reversible empty migrations.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "8ce3f55541bbacd0746f58da1536819570cfa022",
+  "reconciliation_base_ref": "4ed6a6a2b2bc29771afc2547c98e076e3686829c",
   "phases": [
     {
       "id": "PHASE-HISTORICAL-BASELINE",
@@ -614,7 +614,7 @@
         "PR #161 merged at 920c5dc5ab5c64d25ff73616676af50ef8aa6dd9 after PostgreSQL concurrent lease exclusion, earlier races, required checks and reversible migrations passed.",
         "Bounded operator pre-dispatch recovery and server-derived expiry implemented on codex/saas-predispatch-recovery. No scheduled cleanup or external execution enabled; PostgreSQL cleanup exclusion CI pending.",
         "PR #162 merged at 70c6c961c2a6034340f6b5f6bab4246c883c1fef after required checks, CodeQL and PostgreSQL duplicate cleanup/earlier races/reversible migrations passed. No operational schedule or external provider activated.",
-        "Internal write-ahead DispatchOperation ledger, stable provider key/request-policy binding, atomic start and idempotent unknown outcome retain reserved capacity. Local SaaS suite 83 pass / 10 PostgreSQL-only skips; new start/start and start/cancel races require real PostgreSQL CI before merge. No adapter/consumer/terminal settlement enabled."
+        "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks)."
       ],
       "update_notes": [
         "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled."
@@ -645,7 +645,7 @@
       "completion_evidence": [
         "PRs #163\u2013#165 usage/job visibility and signed CSRF/idempotent draft form verified with required checks, CodeQL and real PostgreSQL regression/migrations (draft 37695370079).",
         "PRs #164\u2013#167 history/detail, signed session draft form, confirmed pending cancellation and bounded source configuration preview merged with required checks/CodeQL/real PostgreSQL regression and migration gates. Final source head 868e4df27281ed80b4503f129af840c463cdfcca / PostgreSQL 37696123260. No full browser/WCAG/customer/result/export/source-rights or release acceptance claimed.",
-        "Owner-selected Next.js 16.4/TypeScript frontend under apps/web: workspace/jobs/detail/usage GET workflows, server-only bounded session transport and preserved Django mutation forms. Local lint/type/build, 6 transport tests and disposable SQLite Next/Django HTTP rendering/isolation pass; final-head CI required. Browser/WCAG/customer/deployment acceptance remains open."
+        "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks)."
       ],
       "update_notes": [
         "Frontend selection partially supersedes templates UI decision only: docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md."
