@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-WEB-EXPERIENCE",
   "current_work_unit": "WU-SAAS-LEAD-WEB",
-  "last_verified_completion": "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).",
+  "last_verified_completion": "PR #180 merged at 6c6460c095778b27235272bd6f5ea608900614e1; head 3c24b14fd0e263cc4fa24fd15ed2279752738961 passed all required checks/Actions CodeQL, PostgreSQL 37703540378 (138 tests/migration/settings) and Next/HTTP 37703540308 (native draft/replay/role/tenant/queued cancellation/CSRF/auth flows).",
   "next_valid_work_unit": "WU-SAAS-LEAD-WEB",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify native Next draft/cancel; continue bounded source configuration screen and native validation/account flows. Browser/proxy/provider/billing activation remains open.",
+    "Verify native source configuration; continue native validation/account flows and independent billing/results contracts without source/payment activation.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "saas_130_postgres_cases_and_next_http_auth_verified_full_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "c32d17fa53b8031a251d7ba289b160ab2752b868",
+  "last_reconciled_repository_ref": "6c6460c095778b27235272bd6f5ea608900614e1",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

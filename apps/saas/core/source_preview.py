@@ -35,3 +35,21 @@ def source_preview(user, workspace_id):
         for policy in policies[:CATALOG_LIMIT]
     ]
     return workspace, entries, len(policies) > CATALOG_LIMIT
+
+
+def source_api_snapshot(user, workspace_id):
+    """Keep worst-case ASCII-encoded wire data below the Next 128 KiB ceiling."""
+    import json
+
+    workspace, entries, truncated = source_preview(user, workspace_id)
+    for entry in entries:
+        entry["metadata_limited"] = False
+        if len(json.dumps(entry, ensure_ascii=True, separators=(",", ":")).encode()) > 1024:
+            for key in ("countries", "categories", "statuses", "fields"):
+                entry[key] = None
+            entry["metadata_limited"] = True
+    return {
+        "workspace": {"id": str(workspace.id), "name": workspace.name},
+        "sources": entries,
+        "truncated": truncated,
+    }

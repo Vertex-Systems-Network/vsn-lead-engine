@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "c32d17fa53b8031a251d7ba289b160ab2752b868",
+  "reconciliation_base_ref": "6c6460c095778b27235272bd6f5ea608900614e1",
   "modules": [
     {
       "id": "MOD-HISTORICAL-ROADMAP",
@@ -379,7 +379,7 @@
         "apps/saas custom UUID user, session login/logout, transactional workspace ownership, tenant-scoped draft/API and regression tests (review branch; PostgreSQL CI pending).",
         "PR #176 merged at 52653cfbd7d3ccffee0cf1685afcc99be9877183; head d3707b30d5284fb94cd39e80c9b4474a6aa749be passed required checks/Actions CodeQL, PostgreSQL 37701109983 (114 tests including period races/migration/security gates), and Next/HTTP 37701109984.",
         "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).",
-        "Native Next draft/cancel screens and private bounded Django form contexts implemented; exact frontend CSRF trust, cookie reseed and fixed job return preserve Django mutation authority. Local 122 pass/16 PostgreSQL skips (138 cases), seven transport tests/build/type/lint and real native-form HTTP flow pass; final-head CI pending. Invalid submissions use existing Django review; browser/proxy/native account acceptance stays open."
+        "PR #180 merged at 6c6460c095778b27235272bd6f5ea608900614e1; head 3c24b14fd0e263cc4fa24fd15ed2279752738961 passed all required checks/Actions CodeQL, PostgreSQL 37703540378 (138 tests/migration/settings) and Next/HTTP 37703540308 (native draft/replay/role/tenant/queued cancellation/CSRF/auth flows)."
       ],
       "update_notes": [
         "Membership administration, login abuse protection, entitlement persistence and production identity/release evidence remain open."
@@ -496,7 +496,8 @@
       "completion_evidence": [
         "Internal source-gated atomic job/reservation/outbox and pre-dispatch cancellation on codex/saas-transactional-outbox; no real policies seeded and no consumer/provider enabled. PostgreSQL CI merge gate pending.",
         "PR #160 atomic outbox/source catalog verified and merged after PostgreSQL race/migration gates. Bounded pre-dispatch lease/live recheck slice prepared for CI; external execution remains unavailable.",
-        "PRs #164\u2013#167 history/detail, signed session draft form, confirmed pending cancellation and bounded source configuration preview merged with required checks/CodeQL/real PostgreSQL regression and migration gates. Final source head 868e4df27281ed80b4503f129af840c463cdfcca / PostgreSQL 37696123260. No full browser/WCAG/customer/result/export/source-rights or release acceptance claimed."
+        "PRs #164\u2013#167 history/detail, signed session draft form, confirmed pending cancellation and bounded source configuration preview merged with required checks/CodeQL/real PostgreSQL regression and migration gates. Final source head 868e4df27281ed80b4503f129af840c463cdfcca / PostgreSQL 37696123260. No full browser/WCAG/customer/result/export/source-rights or release acceptance claimed.",
+        "Native Next readonly source configuration and private bounded API implemented; sanitized capabilities and byte-limited unknown metadata, evidence/controls omitted. Local 125 pass/16 PostgreSQL skips (141 cases), Next lint/format/seven tests/build/type and HTTP empty/configured/XSS/viewer/foreign flows pass; exact-head CI pending. No source activation/rights/customer/browser certification."
       ],
       "update_notes": [],
       "removal_or_deprecation_notes": []
@@ -765,7 +766,8 @@
         "PRs #164\u2013#167 history/detail, signed session draft form, confirmed pending cancellation and bounded source configuration preview merged with required checks/CodeQL/real PostgreSQL regression and migration gates. Final source head 868e4df27281ed80b4503f129af840c463cdfcca / PostgreSQL 37696123260. No full browser/WCAG/customer/result/export/source-rights or release acceptance claimed.",
         "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
         "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).",
-        "Native Next draft/cancel screens and private bounded Django form contexts implemented; exact frontend CSRF trust, cookie reseed and fixed job return preserve Django mutation authority. Local 122 pass/16 PostgreSQL skips (138 cases), seven transport tests/build/type/lint and real native-form HTTP flow pass; final-head CI pending. Invalid submissions use existing Django review; browser/proxy/native account acceptance stays open."
+        "PR #180 merged at 6c6460c095778b27235272bd6f5ea608900614e1; head 3c24b14fd0e263cc4fa24fd15ed2279752738961 passed all required checks/Actions CodeQL, PostgreSQL 37703540378 (138 tests/migration/settings) and Next/HTTP 37703540308 (native draft/replay/role/tenant/queued cancellation/CSRF/auth flows).",
+        "Native Next readonly source configuration and private bounded API implemented; sanitized capabilities and byte-limited unknown metadata, evidence/controls omitted. Local 125 pass/16 PostgreSQL skips (141 cases), Next lint/format/seven tests/build/type and HTTP empty/configured/XSS/viewer/foreign flows pass; exact-head CI pending. No source activation/rights/customer/browser certification."
       ],
       "update_notes": [
         "Frontend selection partially supersedes templates UI decision only: docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md."

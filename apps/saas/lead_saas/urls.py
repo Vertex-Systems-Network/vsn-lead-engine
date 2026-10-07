@@ -44,6 +44,7 @@ urlpatterns = [
         views.source_preview_page,
         name="source-preview-page",
     ),
+    path("api/v1/workspaces/<uuid:workspace_id>/sources/", views.SourceList.as_view()),
     path("api/v1/workspaces/", views.WorkspaceList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/", views.JobList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/", views.JobDetail.as_view()),

@@ -8,6 +8,7 @@ from django.http import (
 )
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
@@ -304,3 +305,12 @@ def source_preview_page(request, workspace_id):
         "core/source_preview.html",
         {"workspace": workspace, "sources": entries, "truncated": truncated},
     )
+
+
+@method_decorator(never_cache, name="dispatch")
+class SourceList(APIView):
+    def get(self, request, workspace_id):
+
+        from .source_preview import source_api_snapshot
+
+        return Response(source_api_snapshot(request.user, workspace_id))

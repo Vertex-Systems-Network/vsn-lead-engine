@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { backend, backendLink } from "../../../../lib/backend";
+import { backend } from "../../../../lib/backend";
 import { jobs, usage, uuid, counterNames } from "../../../../lib/contracts";
 import { State } from "../../../components/state";
 export default async function Workspace({
@@ -35,9 +35,9 @@ export default async function Workspace({
         >
           Create draft search
         </Link>
-        <a href={backendLink(`/workspaces/${workspaceId}/sources/`)}>
+        <Link href={`/dashboard/workspaces/${workspaceId}/sources`}>
           Source configuration
-        </a>
+        </Link>
       </div>
       <p className="notice">
         Drafts save your search preferences. Collection and exports are not yet

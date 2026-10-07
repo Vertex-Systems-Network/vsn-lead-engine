@@ -140,3 +140,7 @@ For localhost Next development, set `SAAS_WEB_ORIGIN=http://localhost:3000` in t
 ### Native Next forms
 
 Authenticated `draft-form/` and job `cancel-form/` API contexts expose only bounded workspace/job snapshots, masked CSRF and signed bound tokens. Missing CSRF cookies must be seeded through `/accounts/check-session/`. Native Next forms submit to the existing Django handlers; configured successful submissions return to fixed Next job paths. Invalid submissions use the existing Django validation review. `SAAS_WEB_ORIGIN` also explicitly trusts that single frontend Origin for CSRF; wildcard origins are rejected. Shared session cookie scope and production proxy/TLS remain deployment acceptance gates. See [security and compatibility review](../../docs/ai/SAAS-NEXT-NATIVE-FORMS-REVIEW-20261008.md).
+
+### Native source preview API
+
+The read-only workspace `sources/` API reuses the bounded shared catalog preview, omits internal evidence/controls and marks capability data exceeding its per-entry wire budget as unavailable. Responses remain private/no-store and tenant membership is checked. The native Next page displays configured switches and recorded capabilities without granting source/rights/cost/availability authority. See [review](../../docs/ai/SAAS-NEXT-SOURCE-CONFIGURATION-REVIEW-20261008.md).

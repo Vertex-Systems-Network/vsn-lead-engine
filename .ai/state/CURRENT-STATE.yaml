@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "c32d17fa53b8031a251d7ba289b160ab2752b868",
-  "observed_main_semantics": "Protected main read after documentation PR #179; native Next forms candidate requires exact-head CI.",
+  "observed_main_sha": "6c6460c095778b27235272bd6f5ea608900614e1",
+  "observed_main_semantics": "Protected main read after PR #180 merge; source screen candidate requires exact-head CI.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "codex/next-native-draft-cancel",
+  "active_branch": "codex/next-source-configuration",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -76,7 +76,8 @@
     "saas_daily_occurrences": "PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870.",
     "saas_session_navigation": "PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).",
     "latest_saas_verified_head": "71af41df128f1a2f54d19a6132d859ac0b492187",
-    "saas_native_next_forms_candidate": "Native Next draft/cancel screens and private bounded Django form contexts implemented; exact frontend CSRF trust, cookie reseed and fixed job return preserve Django mutation authority. Local 122 pass/16 PostgreSQL skips (138 cases), seven transport tests/build/type/lint and real native-form HTTP flow pass; final-head CI pending. Invalid submissions use existing Django review; browser/proxy/native account acceptance stays open."
+    "saas_native_next_forms": "PR #180 merged at 6c6460c095778b27235272bd6f5ea608900614e1; head 3c24b14fd0e263cc4fa24fd15ed2279752738961 passed all required checks/Actions CodeQL, PostgreSQL 37703540378 (138 tests/migration/settings) and Next/HTTP 37703540308 (native draft/replay/role/tenant/queued cancellation/CSRF/auth flows).",
+    "saas_next_source_configuration_candidate": "Native Next readonly source configuration and private bounded API implemented; sanitized capabilities and byte-limited unknown metadata, evidence/controls omitted. Local 125 pass/16 PostgreSQL skips (141 cases), Next lint/format/seven tests/build/type and HTTP empty/configured/XSS/viewer/foreign flows pass; exact-head CI pending. No source activation/rights/customer/browser certification."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -123,7 +124,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify/merge native Next draft/cancel, then port bounded source configuration visibility to Next and improve native validation/error/account flows under Django authority; billing/results contracts remain independent without provider/payment activation.",
+  "exact_next_safe_action": "Verify/merge native source screen, then native validation/error and account flows under Django session/CSRF authority; signed billing-event and accepted-lead/results contracts remain independent. Browser/proxy/provider/payment/customer scheduler gates stay open.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

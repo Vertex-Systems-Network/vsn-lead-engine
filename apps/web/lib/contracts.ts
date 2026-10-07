@@ -150,3 +150,54 @@ export function cancelContext(v: unknown): v is CancelContext {
     v.job.workspace_id === v.workspace.id
   );
 }
+
+export type SourceConfiguration = {
+  code: string;
+  version: number;
+  configured_enabled: boolean;
+  configured_free_collection: boolean;
+  metadata_limited: boolean;
+  countries: string[] | null;
+  categories: string[] | null;
+  statuses: string[] | null;
+  fields: string[] | null;
+};
+export type SourceCatalog = {
+  workspace: { id: string; name: string };
+  sources: SourceConfiguration[];
+  truncated: boolean;
+};
+function capabilityValues(v: unknown): v is string[] | null {
+  return (
+    v === null ||
+    (Array.isArray(v) &&
+      v.length <= 100 &&
+      v.every((s) => typeof s === "string" && s.length <= 120))
+  );
+}
+export function sourceCatalog(v: unknown): v is SourceCatalog {
+  return (
+    object(v) &&
+    object(v.workspace) &&
+    uuid(v.workspace.id) &&
+    typeof v.workspace.name === "string" &&
+    v.workspace.name.length <= 120 &&
+    typeof v.truncated === "boolean" &&
+    Array.isArray(v.sources) &&
+    v.sources.length <= 100 &&
+    v.sources.every(
+      (s) =>
+        object(s) &&
+        typeof s.code === "string" &&
+        s.code.length <= 64 &&
+        count(s.version) &&
+        typeof s.configured_enabled === "boolean" &&
+        typeof s.configured_free_collection === "boolean" &&
+        typeof s.metadata_limited === "boolean" &&
+        capabilityValues(s.countries) &&
+        capabilityValues(s.categories) &&
+        capabilityValues(s.statuses) &&
+        capabilityValues(s.fields),
+    )
+  );
+}

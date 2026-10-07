@@ -3,15 +3,16 @@
 ## Snapshot
 
 - Repository Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 PKT / 2026-10-07 UTC.
-- Protected main re-read: `c32d17fa53b8031a251d7ba289b160ab2752b868` / checkpoint PR #179. Current branch `codex/next-native-draft-cancel`; inspect live main/issues/PRs before future mutation replay.
+- Protected main re-read: `6c6460c095778b27235272bd6f5ea608900614e1` / PR #180. Current branch `codex/next-source-configuration`; inspect live main/issues/PRs before future mutation replay.
 - Owner selected Next.js + TypeScript. Django/DRF/PostgreSQL remain session, tenant, role and mutation authority; isolated SaaS work preserves production CLI/R2/Google behavior.
 
 ## Current candidate
 
-- Native Next draft/cancel screens and private bounded Django form contexts implemented; exact frontend CSRF trust, cookie reseed and fixed job return preserve Django mutation authority. Local 122 pass/16 PostgreSQL skips (138 cases), seven transport tests/build/type/lint and real native-form HTTP flow pass; final-head CI pending. Invalid submissions use existing Django review; browser/proxy/native account acceptance stays open.
+- Native Next readonly source configuration and private bounded API implemented; sanitized capabilities and byte-limited unknown metadata, evidence/controls omitted. Local 125 pass/16 PostgreSQL skips (141 cases), Next lint/format/seven tests/build/type and HTTP empty/configured/XSS/viewer/foreign flows pass; exact-head CI pending. No source activation/rights/customer/browser certification.
 
 ## Verified
 
+- PR #180 merged at 6c6460c095778b27235272bd6f5ea608900614e1; head 3c24b14fd0e263cc4fa24fd15ed2279752738961 passed all required checks/Actions CodeQL, PostgreSQL 37703540378 (138 tests/migration/settings) and Next/HTTP 37703540308 (native draft/replay/role/tenant/queued cancellation/CSRF/auth flows).
 - PR #178 merged at 90f90a6952932d7ef8a43d5d6bcaa6decb964139; head 71af41df128f1a2f54d19a6132d859ac0b492187 passed validate 37702109328, repository-integrity 37702109032, Actions CodeQL 37702109054, PostgreSQL 37702109091 (130 tests/migration/security gates), and Next/HTTP 37702108894 (real CSRF login-return/logout and old-session denial).
 - PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870.
 - PR #176 merged at 52653cfbd7d3ccffee0cf1685afcc99be9877183; head d3707b30d5284fb94cd39e80c9b4474a6aa749be passed required checks/Actions CodeQL, PostgreSQL 37701109983 (114 tests including period races/migration/security gates), and Next/HTTP 37701109984.
@@ -37,6 +38,6 @@
 
 ## Next Action
 
-1. Verify/merge native form candidate, then continue bounded native source visibility and validation/account flows. Retain Django CSRF/session/mutation authority.
+1. Verify/merge native source candidate, then continue native validation/error and account flows. Retain Django CSRF/session/mutation authority.
 2. Continue account forms, signed billing-event and accepted-lead/results contracts where independent, without activating payments/providers. Native browser/proxy acceptance remains explicit.
 3. Continue ready work within invocation budget; checkpoints are recovery aids, not permission gates. No execution after turn end is claimed.
