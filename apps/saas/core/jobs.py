@@ -2,9 +2,11 @@
 
 import hashlib
 import json
+from datetime import timedelta
 
 from django.db import transaction
 from django.http import Http404
+from django.utils import timezone
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
 from .models import Job, JobAttempt, JobOutbox, SourcePolicy
@@ -132,6 +134,7 @@ def enqueue_job(user, workspace_id, job_id, expected_revision):
         reservation=reservation,
         submitted_revision=expected_revision,
         source_snapshot=snapshot,
+        expires_at=timezone.now() + timedelta(days=1),
     )
     job.status = "queued"
     job.revision += 1

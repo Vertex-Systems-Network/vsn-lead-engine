@@ -861,7 +861,7 @@
         "PR #161"
       ],
       "test_evidence": [
-        "apps/saas/core/test_attempts.py: PreDispatchTests, ConcurrentAttemptTests; local 42 pass, 7 explicit PostgreSQL skips. Remote CI required before merge."
+        "apps/saas/core/test_attempts.py: PreDispatchTests, ConcurrentAttemptTests; merged PR #161 PostgreSQL CI passed."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -875,6 +875,51 @@
       "artifact_refs": [
         "apps/saas/core/attempts.py",
         "apps/saas/core/jobs.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:920c5dc5ab5c64d25ff73616676af50ef8aa6dd9"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-PREDISPATCH-RECOVERY",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-COLLECTION"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-API-DATA-CONTRACTS-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-predispatch-recovery"
+      ],
+      "pull_request_refs": [
+        "PR #162"
+      ],
+      "test_evidence": [
+        "apps/saas/core/test_recovery.py: RecoveryTests, ConcurrentRecoveryTests; local 48 pass, 8 explicit PostgreSQL skips. Remote CI required before merge."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [],
+      "threat_model_refs": [
+        "docs/ai/SAAS-SYSTEM-THREAT-MODEL-BASELINE-20261007.md"
+      ],
+      "migration_refs": [
+        "apps/saas/core/migrations/0007_joboutbox_expires_at.py"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/recovery.py",
+        "apps/saas/core/management/commands/expire_pending_intents.py"
       ],
       "sbom_refs": [],
       "attestation_refs": [],
