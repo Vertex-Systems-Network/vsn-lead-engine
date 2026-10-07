@@ -39,25 +39,18 @@ Define where applicable:
 
 Update `config/security/threat-model.json`, `config/data/data-governance.json` and relevant requirement traceability as the design becomes project-specific.
 
-## Stage 9 — Technology Selection and User Consent Gate
+## Stage 9 — Technology Selection under Standing Technical Delegation
 
-Act as a **Senior Architecture Engineer / Technology Strategist**. Recommend the stack best suited to current requirements and credible future needs.
+Act as a **Senior Architecture Engineer / Technology Strategist**. Select the stack best suited to current requirements and credible future needs under the project's recorded standing technical-autonomy delegation.
 
 Evaluate relevant alternatives for frontend, backend/runtime, database, cache/queue, API/communication style, identity, storage, search/realtime, testing/build tooling, deployment/runtime, CI/CD, observability and infrastructure.
 
-Compare using project-specific evidence: product fit, scale, development speed, maintainability, security, ecosystem health, performance, type safety, testing, hiring, vendor lock-in, deployment complexity, cost, upgrade path, data/privacy requirements and future evolution.
+Compare using project-specific evidence: product fit, scale, development speed, maintainability, security, ecosystem health, performance, type safety, testing, hiring, vendor lock-in, deployment complexity, cost, upgrade path, data/privacy requirements and future evolution. Prefer the smallest reversible zero-new-spend option that meets the approved requirements.
 
-### Mandatory consent
+Record the selected stack, meaningful alternatives, trade-offs, risks, evidence and migration path in an architecture decision record. The AI must make ordinary reversible technology choices without requesting a separate owner confirmation. Keep new paid or recurring services, provider-rights commitments, qualified legal/compliance conclusions, irreversible production actions and public/commercial launch decisions as separate gates.
 
-Present recommendation, meaningful alternatives, trade-offs and risks, then require explicit technology approval before implementation-specific architecture/code.
-
-Preferred actions:
-
-- `Approve Technology Stack`
-- `Review Alternatives`
-
-A material later stack change creates a new exact consent request/hash; stale approval cannot authorize a changed stack.
-
+If a technical option would require an unauthorized external commitment, isolate that activation step and continue implementation, tests and design work that remain safe without it.
+ 
 ## Stage 10 — Development Architecture Design
 
 Act as a **Senior Software Architecture / Structure Architecture Engineer**.
