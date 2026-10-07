@@ -5,6 +5,8 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
+from .web_origin import dashboard_return
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.environ.get("SAAS_DEBUG", "0") == "1"
 SECRET_KEY = os.environ.get("SAAS_SECRET_KEY", "")
@@ -90,8 +92,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 DATA_UPLOAD_MAX_MEMORY_SIZE = 65536
 LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/accounts/login/"
+WEB_DASHBOARD_URL = dashboard_return(os.environ.get("SAAS_WEB_ORIGIN", ""), debug=DEBUG)
+LOGIN_REDIRECT_URL = WEB_DASHBOARD_URL or "/"
+LOGOUT_REDIRECT_URL = WEB_DASHBOARD_URL or "/accounts/login/"
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_TZ = True

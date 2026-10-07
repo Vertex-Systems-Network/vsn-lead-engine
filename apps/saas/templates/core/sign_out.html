@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sign out — VSN Lead Engine</title></head>
+<body><main><h1>Sign out</h1><p>End your session on this browser?</p>
+<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form>
+<a href="{{ dashboard_url }}">Keep working</a>
+</main></body></html>

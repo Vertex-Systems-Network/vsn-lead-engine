@@ -20,7 +20,8 @@ export function State({ kind }: { kind: string }) {
         Sign in
       </a>
       <p className="muted">
-        For local development, return to this dashboard after signing in.
+        Sign in opens the account form. If your deployment has no dashboard
+        return configured, return here after signing in.
       </p>
     </section>
   );

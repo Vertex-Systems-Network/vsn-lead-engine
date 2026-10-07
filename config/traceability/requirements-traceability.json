@@ -1346,9 +1346,11 @@
       "branch_refs": [
         "codex/saas-daily-occurrences"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #177"
+      ],
       "test_evidence": [
-        "apps/saas/core/test_schedules.py: Internal disabled daily schedule/occurrence foundation implemented: M3 IANA/DST resolution, atomic bounded draft materialization and creator/replay guards; local 108 pass/16 PostgreSQL skips; final-head PostgreSQL duplicate/revocation CI pending. No timer/activation endpoint/consumer/source work."
+        "PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1361,6 +1363,50 @@
       ],
       "artifact_refs": [
         "apps/saas/core/schedules.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:b73d0de7ec1e5659c1573d4fc814973be765adbd"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-NEXT-SESSION-NAVIGATION",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-WEB-EXPERIENCE",
+        "MOD-SAAS-IDENTITY"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB",
+        "WU-SAAS-FOUNDATION"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/next-session-navigation"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "apps/saas/core/test_session_navigation.py and apps/web/test/integration_smoke.py: Optional trusted fixed dashboard login/logout return and Next sign-out confirmation link implemented; local SaaS 114 pass/16 PostgreSQL skips (130 cases), Next lint/format/6 transport tests/build/type and real password/CSRF HTTP login-return/logout/old-session denial passed. Final-head CI pending; native Next forms and production proxy/browser acceptance remain open."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-NEXT-SESSION-NAVIGATION-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/lead_saas/web_origin.py",
+        "apps/saas/templates/core/sign_out.html",
+        "apps/web/app/dashboard/page.tsx"
       ],
       "sbom_refs": [],
       "attestation_refs": [],
