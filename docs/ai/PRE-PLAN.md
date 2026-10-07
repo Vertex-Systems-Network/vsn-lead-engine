@@ -3,7 +3,7 @@
 Planning snapshot: 2026-10-07 PKT  
 Repository baseline: `07397ce991c84a9e58595ce8944158e290b44fbc`  
 Blueprint: ANPOS 1.4.0 child project  
-State: discovery with first stack-neutral SaaS contracts merged; no stack, provider, billing or launch approval.
+State: M3 system design in progress; owner-approved MVP boundary and stack-neutral threat-model baseline are merged. Technology selection is an autonomous technical decision under the standing delegation; provider rights, paid activation, billing and launch remain separately gated.
 
 ## 1. Product Objective
 Evolve VSN's lead-generation capability into a multi-tenant subscription product that helps a user define a target market, discover and manage business leads through permitted sources, schedule repeatable jobs, filter/export results, and understand source/usage costs. Provide coherent web, desktop, and mobile experiences over shared account, job, and data contracts. Product success is improved time-to-first-useful-lead and reliable, transparent, compliant job execution—not a guaranteed lead count.
