@@ -2231,3 +2231,5 @@ PR #161 passed all required checks, CodeQL and real PostgreSQL lease exclusion/e
 ### Usage visibility development checkpoint
 
 PR #162 passed all required checks, CodeQL and PostgreSQL duplicate cleanup/earlier concurrency/migration gates before merge. The isolated app now exposes a read-only workspace usage API and session page showing server-derived settled/reserved counters and limits, with membership checks and no balance mutation. Missing entitlement/counter rows remain inactive/zero without provisioning; billing period/reset fields are null. Route/template tests verify tenant boundaries, revoked access, viewer reads, method rejection and escaped workspace names. This starts independent web visibility work while full lead workflows, browser/accessibility/customer task validation and provider/data/billing/release acceptance remain open.
+
+Current resume checkpoint stays within its existing compact-state size contract; prior checkpoint history is preserved in `docs/ai/CHECKPOINT-HISTORY-20261008.md`. No validator limits were relaxed.
