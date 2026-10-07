@@ -1299,9 +1299,11 @@
       "branch_refs": [
         "codex/saas-period-windows"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #176"
+      ],
       "test_evidence": [
-        "apps/saas/core/test_periods.py and apps/web/test/integration_smoke.py: Explicit internal period windows/rollover, legacy preservation, unresolved reservation blocking and Django/Next date visibility implemented locally; 100 pass/14 PostgreSQL skips, lint/build/type/HTTP pass. Final-head CI remains a merge gate; no payment/billing event/automatic reset activated."
+        "PR #176 merged at 52653cfbd7d3ccffee0cf1685afcc99be9877183; head d3707b30d5284fb94cd39e80c9b4474a6aa749be passed required checks/Actions CodeQL, PostgreSQL 37701109983 (114 tests including period races/migration/security gates), and Next/HTTP 37701109984."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1316,6 +1318,49 @@
         "apps/saas/core/periods.py",
         "apps/saas/core/usage_snapshot.py",
         "apps/web/lib/contracts.ts"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:52653cfbd7d3ccffee0cf1685afcc99be9877183"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-DAILY-OCCURRENCES",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-JOB-ORCHESTRATION",
+        "MOD-SAAS-IDENTITY"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-COLLECTION"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-API-DATA-CONTRACTS-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/saas-daily-occurrences"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "apps/saas/core/test_schedules.py: Internal disabled daily schedule/occurrence foundation implemented: M3 IANA/DST resolution, atomic bounded draft materialization and creator/replay guards; local 108 pass/16 PostgreSQL skips; final-head PostgreSQL duplicate/revocation CI pending. No timer/activation endpoint/consumer/source work."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-DAILY-OCCURRENCES-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [
+        "apps/saas/core/migrations/0011_daily_occurrences.py"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/schedules.py"
       ],
       "sbom_refs": [],
       "attestation_refs": [],
