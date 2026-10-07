@@ -614,6 +614,9 @@
         "PR #161 merged at 920c5dc5ab5c64d25ff73616676af50ef8aa6dd9 after PostgreSQL concurrent lease exclusion, earlier races, required checks and reversible migrations passed.",
         "Bounded operator pre-dispatch recovery and server-derived expiry implemented on codex/saas-predispatch-recovery. No scheduled cleanup or external execution enabled; PostgreSQL cleanup exclusion CI pending.",
         "PR #162 merged at 70c6c961c2a6034340f6b5f6bab4246c883c1fef after required checks, CodeQL and PostgreSQL duplicate cleanup/earlier races/reversible migrations passed. No operational schedule or external provider activated."
+      ],
+      "update_notes": [
+        "Next internal zero-new-spend implementation: write-ahead dispatch-operation ledger, stable provider key and uncertain-outcome reconciliation. docs/ai/SAAS-DISPATCH-RECONCILIATION-NEXT-SLICE.md is a plan only; external dispatch remains disabled."
       ]
     },
     {
@@ -640,8 +643,7 @@
       ],
       "completion_evidence": [
         "PRs #163\u2013#165 usage/job visibility and signed CSRF/idempotent draft form verified with required checks, CodeQL and real PostgreSQL regression/migrations (draft 37695370079).",
-        "Confirmed signed pending cancellation implemented on codex/saas-pending-cancellation; local SaaS 72 pass, 8 PostgreSQL-only skips. Cancellation release/replay/revision/role/state/token/CSRF tests pass; final CI pending. Browser/WCAG/customer/results/export acceptance remains open.",
-        "PR #166 signed pending cancellation verified by required checks/CodeQL/PostgreSQL 37695788773. Bounded read-only source configuration preview implemented on codex/saas-source-catalog; local SaaS 76 pass, 8 PostgreSQL-only skips; final CI pending. No source rights, availability, provider execution or browser/customer acceptance inferred."
+        "PRs #164\u2013#167 history/detail, signed session draft form, confirmed pending cancellation and bounded source configuration preview merged with required checks/CodeQL/real PostgreSQL regression and migration gates. Final source head 868e4df27281ed80b4503f129af840c463cdfcca / PostgreSQL 37696123260. No full browser/WCAG/customer/result/export/source-rights or release acceptance claimed."
       ]
     },
     {

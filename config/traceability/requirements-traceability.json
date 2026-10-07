@@ -1119,9 +1119,11 @@
       "branch_refs": [
         "codex/saas-source-catalog"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #167"
+      ],
       "test_evidence": [
-        "apps/saas/core/test_source_preview.py: SourcePreviewTests; local SaaS 76 pass, 8 PostgreSQL-only skips; CI pending."
+        "apps/saas/core/test_source_preview.py: SourcePreviewTests; merged PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks/CodeQL/PostgreSQL 37696123260."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1136,7 +1138,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:5dd939146477451e34c64c7281f1d9e1eca607dc"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }

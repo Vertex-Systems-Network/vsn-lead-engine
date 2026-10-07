@@ -492,7 +492,7 @@
       "completion_evidence": [
         "Internal source-gated atomic job/reservation/outbox and pre-dispatch cancellation on codex/saas-transactional-outbox; no real policies seeded and no consumer/provider enabled. PostgreSQL CI merge gate pending.",
         "PR #160 atomic outbox/source catalog verified and merged after PostgreSQL race/migration gates. Bounded pre-dispatch lease/live recheck slice prepared for CI; external execution remains unavailable.",
-        "PR #166 signed pending cancellation verified by required checks/CodeQL/PostgreSQL 37695788773. Bounded read-only source configuration preview implemented on codex/saas-source-catalog; local SaaS 76 pass, 8 PostgreSQL-only skips; final CI pending. No source rights, availability, provider execution or browser/customer acceptance inferred."
+        "PRs #164\u2013#167 history/detail, signed session draft form, confirmed pending cancellation and bounded source configuration preview merged with required checks/CodeQL/real PostgreSQL regression and migration gates. Final source head 868e4df27281ed80b4503f129af840c463cdfcca / PostgreSQL 37696123260. No full browser/WCAG/customer/result/export/source-rights or release acceptance claimed."
       ],
       "update_notes": [],
       "removal_or_deprecation_notes": []
@@ -554,7 +554,9 @@
         "PR #161 pre-dispatch lease/current-gate tests verified and merged. Bounded operator-driven expiry/recovery prepared for CI; no consumer/schedule/external execution activated.",
         "PR #162 operator-driven pre-dispatch expiry/recovery verified on PostgreSQL and merged; no cleanup schedule or provider execution activated."
       ],
-      "update_notes": [],
+      "update_notes": [
+        "Next internal zero-new-spend implementation: write-ahead dispatch-operation ledger, stable provider key and uncertain-outcome reconciliation. docs/ai/SAAS-DISPATCH-RECONCILIATION-NEXT-SLICE.md is a plan only; external dispatch remains disabled."
+      ],
       "removal_or_deprecation_notes": []
     },
     {
@@ -752,8 +754,7 @@
       "status": "in_progress",
       "completion_evidence": [
         "PRs #163\u2013#165 usage/job visibility and signed CSRF/idempotent draft form verified with required checks, CodeQL and real PostgreSQL regression/migrations (draft 37695370079).",
-        "Confirmed signed pending cancellation implemented on codex/saas-pending-cancellation; local SaaS 72 pass, 8 PostgreSQL-only skips. Cancellation release/replay/revision/role/state/token/CSRF tests pass; final CI pending. Browser/WCAG/customer/results/export acceptance remains open.",
-        "PR #166 signed pending cancellation verified by required checks/CodeQL/PostgreSQL 37695788773. Bounded read-only source configuration preview implemented on codex/saas-source-catalog; local SaaS 76 pass, 8 PostgreSQL-only skips; final CI pending. No source rights, availability, provider execution or browser/customer acceptance inferred."
+        "PRs #164\u2013#167 history/detail, signed session draft form, confirmed pending cancellation and bounded source configuration preview merged with required checks/CodeQL/real PostgreSQL regression and migration gates. Final source head 868e4df27281ed80b4503f129af840c463cdfcca / PostgreSQL 37696123260. No full browser/WCAG/customer/result/export/source-rights or release acceptance claimed."
       ],
       "update_notes": [],
       "removal_or_deprecation_notes": []

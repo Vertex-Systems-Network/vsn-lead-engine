@@ -10,15 +10,15 @@
     "status": "stable",
     "lifecycle_stage": "production_operations",
     "current_phase": "PHASE-SAAS-WEB-MVP",
-    "active_task": "WU-SAAS-LEAD-WEB",
+    "active_task": "WU-SAAS-COLLECTION",
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "485cf9bc9e456878f779c14adc4bed6721f95646",
+  "observed_main_sha": "5dd939146477451e34c64c7281f1d9e1eca607dc",
   "observed_main_semantics": "Exact protected main inspected immediately before this dependency/checkpoint reconciliation branch.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "codex/saas-source-catalog",
+  "active_branch": null,
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -67,7 +67,8 @@
     "saas_usage_visibility": "PR #163 required checks, CodeQL and SaaS PostgreSQL/migration gates successful on c09996045b92214f58f152c71ea54ea4e46327a7; SaaS Quality 37692371317",
     "saas_job_history": "PR #164 repaired head 387a4ff23964f2d839a80f30201d30dd03ec0214 passed required checks, CodeQL and SaaS PostgreSQL 37695051762",
     "saas_draft_form": "PR #165 head 7bb1124545a230a3349e383d4fe30d5dcff6ecc2 passed required checks, CodeQL and SaaS PostgreSQL 37695370079",
-    "saas_pending_cancellation": "PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks, CodeQL and PostgreSQL 37695788773"
+    "saas_pending_cancellation": "PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks, CodeQL and PostgreSQL 37695788773",
+    "saas_source_preview": "PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks, CodeQL and PostgreSQL 37696123260"
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -114,7 +115,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify/merge source configuration preview; continue dispatch-start/idempotency/uncertain-outcome reconciliation, scheduling and browser/accessibility validation. External provider/billing/launch activation gated.",
+  "exact_next_safe_action": "Reconcile live main/issues/PRs; implement internal write-ahead dispatch ledger/provider-idempotency/uncertain-outcome tests from docs/ai/SAAS-DISPATCH-RECONCILIATION-NEXT-SLICE.md. No provider consumer enabled. Browser/billing/rights/customer/release gates remain open.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
