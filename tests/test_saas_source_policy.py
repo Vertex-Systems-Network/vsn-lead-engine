@@ -88,3 +88,26 @@ def test_authorize_search_rejects_disabled_source():
 
     with pytest.raises(SearchAuthorizationError, match="unavailable"):
         authorize_search(_search(workspace_id), entitlement, {policy.code: policy})
+
+
+
+def test_authorize_search_rejects_misidentified_policy_entry():
+    workspace_id = uuid4()
+    entitlement = Entitlement(
+        workspace_id=workspace_id,
+        plan_code="free",
+        source_codes=frozenset({"overture-free"}),
+    )
+    mislabeled_policy = SourcePolicy(
+        code="different-source",
+        countries=frozenset({"US"}),
+        categories=frozenset({"spa"}),
+        allowed_required_fields=frozenset({"phone"}),
+    )
+
+    with pytest.raises(SearchAuthorizationError, match="identity mismatch"):
+        authorize_search(
+            _search(workspace_id),
+            entitlement,
+            {"overture-free": mislabeled_policy},
+        )

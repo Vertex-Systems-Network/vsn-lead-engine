@@ -31,3 +31,11 @@ def test_job_lifecycle_rejects_invalid_transition():
 
     with pytest.raises(ValueError):
         job.transition(JobStatus.RUNNING)
+
+
+
+def test_job_rejects_search_from_another_workspace():
+    search = SearchSpec(workspace_id=uuid4(), countries=("US",), categories=("spa",))
+
+    with pytest.raises(ValueError, match="job workspace"):
+        Job(workspace_id=uuid4(), search=search)

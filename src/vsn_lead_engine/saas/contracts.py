@@ -96,6 +96,10 @@ class Job:
     result_count: int = 0
     metadata: Mapping[str, str] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        if self.workspace_id != self.search.workspace_id:
+            raise ValueError("job workspace must match search workspace")
+
     def transition(self, status: JobStatus, *, error: str | None = None) -> None:
         allowed = {
             JobStatus.DRAFT: {JobStatus.QUEUED, JobStatus.CANCELLED},
