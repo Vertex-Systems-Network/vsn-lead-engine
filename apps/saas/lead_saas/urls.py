@@ -13,6 +13,8 @@ urlpatterns = [
         "api/v1/workspaces/<uuid:workspace_id>/members/<uuid:user_id>/",
         views.MemberDetail.as_view(),
     ),
+    path("workspaces/<uuid:workspace_id>/usage/", views.usage_page, name="usage-page"),
+    path("api/v1/workspaces/<uuid:workspace_id>/usage/", views.UsageDetail.as_view()),
     path("api/v1/workspaces/", views.WorkspaceList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/", views.JobList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/", views.JobDetail.as_view()),

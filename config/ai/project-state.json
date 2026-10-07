@@ -4,22 +4,22 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PRs #154\u2013#161 merged with required checks, CodeQL, verified locks and real PostgreSQL SaaS tenant/usage/outbox/lease/concurrency/migration gates passing. Bounded operator-driven pre-dispatch expiry/recovery prepared for CI.",
+  "last_verified_completion": "PRs #154\u2013#162 merged with required checks, CodeQL, verified locks and real PostgreSQL SaaS tenant/usage/outbox/lease/recovery/concurrency/migration gates passing. Read-only tenant usage API/page prepared for CI.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
     "complete": 9,
     "ready": 0,
-    "in_progress": 4,
+    "in_progress": 5,
     "blocked": 1,
     "deferred": 2,
-    "not_started": 5,
+    "not_started": 4,
     "needs_update": 0,
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify/merge bounded pre-dispatch expiry/recovery on PostgreSQL.",
-    "Continue dispatch-start/provider-idempotency/uncertain-outcome reconciliation, operational scheduling and server-rendered web workflows with provider activation gated.",
+    "Verify/merge tenant-safe read-only usage API/page.",
+    "Continue saved search/job history web workflows and browser/accessibility validation; explicit dispatch-start/provider-idempotency/uncertain-outcome reconciliation plus operational scheduling.",
     "Complete billing period/events and external rights/customer/privacy/deployment/launch evidence separately."
   ],
   "outstanding_removals": [],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_leases_verified_predispatch_recovery_ci_pending",
+  "qa_readiness": "saas_recovery_verified_usage_visibility_ci_pending",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "920c5dc5ab5c64d25ff73616676af50ef8aa6dd9",
+  "last_reconciled_repository_ref": "70c6c961c2a6034340f6b5f6bab4246c883c1fef",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

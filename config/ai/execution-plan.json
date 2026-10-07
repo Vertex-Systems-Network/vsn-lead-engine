@@ -612,7 +612,8 @@
         "PR #160 merged at 02240c19fe348d6003519b221ba867ed5c7c19e3 after all required checks, CodeQL and real PostgreSQL atomic enqueue/cancel concurrency and reversible migrations passed.",
         "Bounded pre-dispatch lease/reclaim and live gate rechecks implemented on codex/saas-predispatch-leases; no external dispatch or consumer activated; PostgreSQL lease exclusion CI pending.",
         "PR #161 merged at 920c5dc5ab5c64d25ff73616676af50ef8aa6dd9 after PostgreSQL concurrent lease exclusion, earlier races, required checks and reversible migrations passed.",
-        "Bounded operator pre-dispatch recovery and server-derived expiry implemented on codex/saas-predispatch-recovery. No scheduled cleanup or external execution enabled; PostgreSQL cleanup exclusion CI pending."
+        "Bounded operator pre-dispatch recovery and server-derived expiry implemented on codex/saas-predispatch-recovery. No scheduled cleanup or external execution enabled; PostgreSQL cleanup exclusion CI pending.",
+        "PR #162 merged at 70c6c961c2a6034340f6b5f6bab4246c883c1fef after required checks, CodeQL and PostgreSQL duplicate cleanup/earlier races/reversible migrations passed. No operational schedule or external provider activated."
       ]
     },
     {
@@ -625,7 +626,7 @@
         "WU-SAAS-COLLECTION"
       ],
       "priority": 80,
-      "status": "not_started",
+      "status": "in_progress",
       "blockers": [],
       "acceptance_criteria": [
         "Product workflows meet validated tasks.",
@@ -637,7 +638,9 @@
         "Accessibility",
         "Data contract/privacy tests"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "Independent read-only workspace usage API/session page implemented on codex/saas-usage-visibility with server-derived counts, tenant membership checks and explicit undefined billing period/reset. Full collection/lead search/result/export workflow and browser/accessibility/customer validation remain open."
+      ]
     },
     {
       "id": "WU-SAAS-ADMIN-AI",

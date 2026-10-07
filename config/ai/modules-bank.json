@@ -550,7 +550,8 @@
       "completion_evidence": [
         "Internal source-gated atomic job/reservation/outbox and pre-dispatch cancellation on codex/saas-transactional-outbox; no real policies seeded and no consumer/provider enabled. PostgreSQL CI merge gate pending.",
         "PR #160 atomic outbox/source catalog verified and merged after PostgreSQL race/migration gates. Bounded pre-dispatch lease/live recheck slice prepared for CI; external execution remains unavailable.",
-        "PR #161 pre-dispatch lease/current-gate tests verified and merged. Bounded operator-driven expiry/recovery prepared for CI; no consumer/schedule/external execution activated."
+        "PR #161 pre-dispatch lease/current-gate tests verified and merged. Bounded operator-driven expiry/recovery prepared for CI; no consumer/schedule/external execution activated.",
+        "PR #162 operator-driven pre-dispatch expiry/recovery verified on PostgreSQL and merged; no cleanup schedule or provider execution activated."
       ],
       "update_notes": [],
       "removal_or_deprecation_notes": []
@@ -747,8 +748,10 @@
         "Accessibility",
         "Performance/SEO"
       ],
-      "status": "not_started",
-      "completion_evidence": [],
+      "status": "in_progress",
+      "completion_evidence": [
+        "Session workspace overview and read-only tenant usage page/API implemented; route/template safety tests pass locally. Complete browser/accessibility/user task validation and lead workflows remain open."
+      ],
       "update_notes": [],
       "removal_or_deprecation_notes": []
     },
