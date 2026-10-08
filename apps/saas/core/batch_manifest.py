@@ -156,12 +156,14 @@ def verified_batch_manifest(body, source_signature, dedupe_signature, binding):
             values = row["tokens"]
             if (
                 not isinstance(values, list)
-                or len(values) != 3
+                or not 3 <= len(values) <= 4
                 or any(
-                    not isinstance(t, str) or not re.fullmatch("[nls]:[0-9a-f]{24}", t)
+                    not isinstance(t, str) or not re.fullmatch("[dnls]:[0-9a-f]{24}", t)
                     for t in values
                 )
-                or {t[0] for t in values} != {"n", "l", "s"}
+                or len(set(values)) != len(values)
+                or len({t[0] for t in values}) != len(values)
+                or {t[0] for t in values} not in ({"n", "l", "s"}, {"n", "l", "s", "d"})
                 or tokens.intersection(values)
             ):
                 raise ValueError()
