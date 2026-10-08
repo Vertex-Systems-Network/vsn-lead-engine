@@ -441,7 +441,7 @@ class AcceptedResult(models.Model):
     workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
     job = models.ForeignKey(Job, on_delete=models.PROTECT)
     acceptance = models.ForeignKey(ResultAcceptance, on_delete=models.PROTECT)
-    record_ref = models.CharField(max_length=96)
+    record_ref = models.CharField(max_length=96, null=True)
     country = models.CharField(max_length=2)
     category = models.CharField(max_length=120)
     fields = models.JSONField()
@@ -450,6 +450,8 @@ class AcceptedResult(models.Model):
     delete_at = models.DateTimeField()
     purpose = models.CharField(max_length=64)
     retention_version = models.CharField(max_length=64)
+    erased_at = models.DateTimeField(null=True, editable=False)
+    erased_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.PROTECT)
 
     class Meta:
         constraints = [
@@ -459,8 +461,34 @@ class AcceptedResult(models.Model):
             models.CheckConstraint(
                 condition=models.Q(country__in=["US", "CA"]), name="saas_accepted_country"
             ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        erased_at__isnull=True, erased_by__isnull=True, record_ref__isnull=False
+                    )
+                    & ~models.Q(record_ref="")
+                )
+                | models.Q(
+                    erased_at__isnull=False,
+                    erased_by__isnull=False,
+                    record_ref__isnull=True,
+                    fields={},
+                    field_lineage={},
+                    category="",
+                    purpose="",
+                    retention_version="",
+                ),
+                name="saas_result_erasure_state",
+            ),
         ]
-        indexes = [models.Index(fields=["workspace", "job", "id"], name="saas_result_job")]
+        indexes = [
+            models.Index(fields=["workspace", "job", "id"], name="saas_result_job"),
+            models.Index(
+                fields=["workspace", "delete_at", "id"],
+                condition=models.Q(erased_at__isnull=True),
+                name="saas_result_expiry",
+            ),
+        ]
 
 
 class AcceptedFingerprint(models.Model):

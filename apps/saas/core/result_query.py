@@ -79,7 +79,8 @@ def results_snapshot(user, workspace_id, job_id):
     for row in rows:
         fields = row.fields
         if (
-            row.delete_at <= now
+            row.erased_at is not None
+            or row.delete_at <= now
             or row.purpose != rights["purpose"]
             or row.retention_version != rights["retention_version"]
             or row.country not in job.search["countries"]
