@@ -14,9 +14,20 @@ from .result_evidence import ALLOWED_FIELDS, RIGHTS, token
 from .services import membership_for
 
 
+def result_country(query):
+    if set(query) - {"country"} or len(query.getlist("country")) > 1:
+        raise ValidationError("Only one US or CA country filter is available.")
+    country = query.get("country", "")
+    if country not in {"", "US", "CA"}:
+        raise ValidationError("Only US or CA country filters are available.")
+    return country
+
+
 @transaction.atomic
-def results_snapshot(user, workspace_id, job_id):
+def results_snapshot(user, workspace_id, job_id, country=""):
     locked_workspace(user, workspace_id)
+    if country not in {"", "US", "CA"}:
+        raise ValidationError("Invalid country filter.")
     job = Job.objects.filter(pk=job_id, workspace_id=workspace_id).first()
     if job is None:
         raise Http404("Workspace resource not found.")
@@ -25,6 +36,8 @@ def results_snapshot(user, workspace_id, job_id):
         "job_id": str(job_id),
         "results": [],
         "withheld_count": min(job.result_count, 25),
+        "filtered_count": 0,
+        "country": country,
         "can_review_export": False,
     }
     acceptance = (
@@ -127,6 +140,10 @@ def results_snapshot(user, workspace_id, job_id):
             continue
         output["results"].append(entry)
     output["withheld_count"] = acceptance.accepted_count - len(output["results"])
+    if country:
+        visible = output["results"]
+        output["results"] = [r for r in visible if r["country"] == country]
+        output["filtered_count"] = len(visible) - len(output["results"])
     output["can_review_export"] = bool(output["results"]) and membership_for(
         user, workspace_id
     ).role in {"owner", "admin", "member"}

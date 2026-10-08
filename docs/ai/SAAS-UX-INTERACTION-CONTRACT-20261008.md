@@ -107,3 +107,7 @@ A screen is ready for implementation review when:
 4. Search preview, schedule DST preview, job recovery and export preview are keyboard and screen-reader usable.
 5. Test data is synthetic and cannot touch production Sheets/R2 or external providers.
 6. No control implies payment, provider access or production readiness that is not available.
+
+## Bounded implemented result-filter/selection refinement
+
+The first result filter is country: All, US or Canada, using one native GET select with a persistent label. Counts distinguish shown, otherwise available but filtered, and currently unavailable rows. Filtered CSV review retains country and shows row checkboxes with authorized names/countries plus common field checkboxes, each in a labelled fieldset. At least one record and field are required server-side. The direct CSRF confirmation contains IDs only in the POST body and must remain within the signed filtered preview scope; stale/invalid selection returns safe review without an automatic replacement request. This is a single complete accepted batch of at most 25, without multi-batch pagination. Browser and accessibility certification remain pending.

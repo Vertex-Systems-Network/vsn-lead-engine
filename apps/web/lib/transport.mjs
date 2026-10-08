@@ -17,7 +17,7 @@ export function trustedOrigin(value) {
 const filteredJobsPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/\?status=(?:draft|queued|running|partial|completed|failed|paused|cancelled)(?:&after=[0-9a-f-]{36})?$/;
 const resultsPath =
-  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/[0-9a-f-]{36}\/results\/$/;
+  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/[0-9a-f-]{36}\/results\/(?:\?country=(?:US|CA))?$/;
 const formPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/(?:cancel-form|export-form)\/)$/;
 export async function readBackend(
@@ -31,6 +31,9 @@ export async function readBackend(
   const form =
     publicForm ||
     formPath.test(path) ||
+    /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/[0-9a-f-]{36}\/export-form\/\?country=(?:US|CA)$/.test(
+      path,
+    ) ||
     path === "/api/v1/account/sign-out-form/";
   if (
     !form &&
