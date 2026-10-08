@@ -488,6 +488,23 @@ def main():
                 assert code == 409 and "Export needs review" in conflict
                 from core.models import UsageCounter
                 assert UsageCounter.objects.get(workspace=result_fixture.workspace).exports == 2
+                history_path = result_path.replace("/results", "/export-receipts")
+                history_html, history_headers = read(history_path)
+                assert "Export preparation receipts" in history_html and "one export unit" in history_html
+                assert "does not confirm a successful download" in history_html and "CSV files are not retained" in history_html
+                assert export_receipt in history_html and native_headers["X-Export-Receipt"] in history_html
+                assert "50123" not in history_html and "synthetic-result" not in history_html
+                assert "no-store" in history_headers["Cache-Control"]
+                # Two genuine settled preparations, smaller readonly page for transport navigation.
+                from unittest.mock import patch
+                with patch("core.export_history.PAGE_SIZE", 1):
+                    first_receipts, receipt_links = native_form(history_path)
+                    older_href = next(href for href in receipt_links.links if href.startswith("?after="))
+                    assert native_headers["X-Export-Receipt"] in first_receipts and export_receipt not in first_receipts
+                    older_receipts, _ = native_form(history_path + older_href)
+                    assert export_receipt in older_receipts and native_headers["X-Export-Receipt"] not in older_receipts
+                    assert "Older receipts" not in older_receipts
+                assert UsageCounter.objects.get(workspace=result_fixture.workspace).exports == 2
                 empty_results, _ = read(f"/dashboard/workspaces/{workspace.id}/jobs/{saved[0].id}/results")
                 assert "No available results" in empty_results
                 Membership.objects.filter(user=user, workspace=result_fixture.workspace).update(role="viewer")
@@ -498,7 +515,7 @@ def main():
                     assert exc.code == 403
                 viewer_results, _ = read(result_path)
                 assert "&lt;img src=x onerror=synthetic-result&gt;" in viewer_results
-                assert "Review CSV export" not in viewer_results
+                assert "Review CSV export" not in viewer_results and "View export preparation receipts" not in viewer_results
                 Membership.objects.filter(user=user, workspace=result_fixture.workspace).delete()
                 revoked_results, _ = read(result_path)
                 assert "synthetic-result" not in revoked_results
@@ -518,6 +535,10 @@ def main():
                 assert AcceptedFingerprint.objects.filter(workspace=result_fixture.workspace).count() == 6
                 erased_results, _ = read(result_path)
                 assert "No available results" in erased_results and "synthetic-result" not in erased_results
+                assert "View export preparation receipts" in erased_results
+                retained_history, _ = read(history_path)
+                assert export_receipt in retained_history and "50123" not in retained_history
+                assert UsageCounter.objects.get(workspace=result_fixture.workspace).exports == 2
                 active_session = next(cookie.value for cookie in jar if cookie.name == "sessionid")
                 form, csrf = native_form("/account/sign-out")
                 assert "End your session" in form and "Keep working" in form
@@ -542,7 +563,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, country/category/source result filters and native selected-row export preview/confirmation/empty/outside-filter denial/subset-only/conflict and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, country/category/source result filters and native selected-row export preview/confirmation/empty/outside-filter denial/subset-only/conflict and readonly redacted receipt-history/no-charge/retained-after-erasure flows and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

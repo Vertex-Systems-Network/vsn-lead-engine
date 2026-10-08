@@ -97,6 +97,16 @@ export default async function Results({
           Clear filters
         </Link>
       </p>
+      {data.can_review_receipts ? (
+        <p>
+          <Link
+            prefetch={false}
+            href={`/dashboard/workspaces/${workspaceId}/jobs/${jobId}/export-receipts`}
+          >
+            View export preparation receipts
+          </Link>
+        </p>
+      ) : null}
       {data.can_review_export ? (
         <p>
           <Link

@@ -354,6 +354,7 @@ export type SavedResults = ResultFilterMetadata & {
   withheld_count: number;
   filtered_count: number;
   can_review_export: boolean;
+  can_review_receipts: boolean;
 };
 export function savedResults(v: unknown): v is SavedResults {
   return (
@@ -361,6 +362,7 @@ export function savedResults(v: unknown): v is SavedResults {
     uuid(v.workspace_id) &&
     uuid(v.job_id) &&
     typeof v.can_review_export === "boolean" &&
+    typeof v.can_review_receipts === "boolean" &&
     count(v.filtered_count) &&
     resultFilterMetadata(v) &&
     count(v.withheld_count) &&
@@ -482,6 +484,56 @@ export function exportContext(v: unknown): v is ExportContext {
         s.code.length <= 64 &&
         typeof s.attribution === "string" &&
         s.attribution.length <= 240,
+    )
+  );
+}
+
+export type ExportReceipts = {
+  workspace_id: string;
+  job_id: string;
+  scope: "job" | "own";
+  receipts: {
+    id: string;
+    record_count: number;
+    export_units: 1;
+    prepared_at: string;
+    retention_deadline: string;
+    deadline_passed: boolean;
+  }[];
+  next_cursor: string | null;
+};
+export function receiptCursor(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    value.length > 0 &&
+    value.length <= 1024 &&
+    /^[A-Za-z0-9_:-]+$/.test(value)
+  );
+}
+export function exportReceipts(v: unknown): v is ExportReceipts {
+  return (
+    object(v) &&
+    uuid(v.workspace_id) &&
+    uuid(v.job_id) &&
+    (v.scope === "job" || v.scope === "own") &&
+    (v.next_cursor === null || receiptCursor(v.next_cursor)) &&
+    Array.isArray(v.receipts) &&
+    v.receipts.length <= 25 &&
+    new Set(v.receipts.map((r: unknown) => (object(r) ? r.id : null))).size ===
+      v.receipts.length &&
+    v.receipts.every(
+      (r: unknown) =>
+        object(r) &&
+        uuid(r.id) &&
+        count(r.record_count) &&
+        r.record_count >= 1 &&
+        r.record_count <= 25 &&
+        r.export_units === 1 &&
+        typeof r.deadline_passed === "boolean" &&
+        typeof r.prepared_at === "string" &&
+        Number.isFinite(Date.parse(r.prepared_at)) &&
+        typeof r.retention_deadline === "string" &&
+        Number.isFinite(Date.parse(r.retention_deadline)),
     )
   );
 }

@@ -520,6 +520,15 @@ class ResultExport(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        indexes = [
+            models.Index(
+                fields=["workspace", "job", "-created_at", "-id"], name="saas_export_job_history"
+            ),
+            models.Index(
+                fields=["workspace", "job", "created_by", "-created_at", "-id"],
+                name="saas_export_actor_history",
+            ),
+        ]
         constraints = [
             models.UniqueConstraint(fields=["workspace", "key"], name="saas_export_key"),
             models.CheckConstraint(
