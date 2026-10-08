@@ -134,3 +134,6 @@ SAAS_BATCH_ALLOCATION_ENABLED = False
 
 # Pure candidate-batch proof authority; no intake consumer is enabled.
 SAAS_BATCH_CANDIDATE_VERIFIERS = {}
+
+# Internal redacted evidence only; consumer and accepted payload intake remain off.
+SAAS_BATCH_CANDIDATE_EVENTS_ENABLED = False

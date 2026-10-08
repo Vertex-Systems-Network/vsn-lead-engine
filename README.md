@@ -33,7 +33,7 @@ and dedupe.
 - Verified plan snapshot: **2026-10-08**. Latest inspected feature main: `469c4ec8` (PR #216); v3 enrollment/allocation primitives are verified but disabled/quarantined. Durable candidate/payload intake/accounting remains open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
-- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: candidate proof review, then durable candidate/payload intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
+- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: candidate-event review, then accepted-payload intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
 - Continuation: **full ready frontier per invocation**; milestone/PR completion is a checkpoint, not an instruction to stop. Recoverable errors are AI-owned; human approval is reserved for genuine external authorization/consent/paid or irreversible commitments. CI runs `scripts/verify_readme_progress.py` to reject README/machine-state divergence and feature PRs that omit a README update.
 
 <!-- ANPOS-CONTINUITY:END -->
@@ -2383,7 +2383,7 @@ start v3 operations yet: future started contexts in tests are synthetic fixtures
 and no caller/endpoint/consumer is added. Counts and engineering estimates unchanged.
 
 
-### Pure v3 candidate proof — development review
+### Pure v3 candidate proof — verified PR #217
 
 The batch-bound v3 candidate validator uses a separate empty-default source-key
 registry and exact-byte scope/signature/issuance checks. Shared pure record rules
@@ -2392,4 +2392,17 @@ field lineage, retention and 1–25 row bounds. The legacy v1 envelope/key regis
 and exported rule constants remain compatible. Eight database-forbidden cases
 cover scope/key/schema/qualification/expiry/limits and a 1,000-target/25-row ceiling.
 This produces redacted immutable review metadata only: no durable candidate event,
-R2 uniqueness/phone reachability proof, payload intake or accounting. CI pending.
+R2 uniqueness/phone reachability proof, payload intake or accounting. PR #217 passed all five workflows, PostgreSQL 37824016673 (358 tests/migrations/settings) and Web 37824016597 (14 tests/HTTP).
+
+
+### Durable v3 candidate event ledger — development review
+
+A disabled internal service binds verified candidate proof to an allocated server
+batch identity. Allocation replay holds the workspace/current-admin/source/period/
+original-budget gates; proof keys and current candidate rights are rechecked on
+all retries. Equal bytes return the existing redacted event, while changed bytes or
+cross-batch source/event reuse conflict. Unknown operations can replay recorded
+evidence but cannot add a new event. Failed proof or event writes preserve identity
+and full reservation with no accepted payload or accounting changes. Eight new
+checks include two PostgreSQL duplicate/conflicting-event races; CI pending. No
+caller, v3 start, live signer/provider or payload consumer is enabled.
