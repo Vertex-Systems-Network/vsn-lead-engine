@@ -188,6 +188,28 @@
       "deletion_method": "No cleanup activated in this slice. Protected evidence/fingerprints must survive authorized payload tombstoning; migration rollback requires an explicit preservation plan.",
       "backup_policy": "No production deployment/backup exists; encryption, backup expiry/restore and downstream deletion acceptance remain open.",
       "non_production_policy": "Synthetic disposable databases only; never copy production R2/workbook payloads."
+    },
+    {
+      "id": "DATA-008",
+      "name": "Isolated redacted CSV export accounting",
+      "classification": "confidential",
+      "tags": [
+        "pii",
+        "customer_content"
+      ],
+      "owners": [
+        "VSN repository owner/operator"
+      ],
+      "storage_locations": [
+        "Isolated SaaS ResultExport ledger; transient authenticated response memory"
+      ],
+      "encryption_required": true,
+      "log_policy": "No CSV, selected fields/values, cookies, keys or signed URLs in logs; compact counts/status only.",
+      "ai_access": "Disposable synthetic fixtures only during development.",
+      "retention": "Source deadline restricts preparation and every replay; no CSV copy is persisted. Audit actor/key/hashes/counts/expiry retention remains before-production policy work.",
+      "deletion_method": "No retained CSV artifact to delete; downstream downloaded copies cannot be recalled. Ledger cleanup and backup expiry remain review gates.",
+      "backup_policy": "No production deployment/backup exists; encryption, backup expiry/restore and downstream deletion acceptance remain open.",
+      "non_production_policy": "Synthetic fixture CSV only; no production payloads exported."
     }
   ]
 }

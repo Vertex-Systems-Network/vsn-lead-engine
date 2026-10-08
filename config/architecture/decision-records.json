@@ -377,6 +377,39 @@
       "decided_at": "2026-10-08",
       "supersedes": [],
       "superseded_by": null
+    },
+    {
+      "id": "ADR-0011",
+      "title": "Bounded source-aware CSV preparation with redacted accounting",
+      "status": "accepted",
+      "context": "Display/storage grants cannot grant onward export; retries and concurrent downloads must not duplicate usage.",
+      "alternatives": [
+        "Persist signed download files (deferred)",
+        "Unmetered GET export (rejected)",
+        "Bounded POST prepare/replay with no payload copy (selected)"
+      ],
+      "evidence_refs": [
+        "docs/ai/SAAS-GUARDED-EXPORT-REVIEW-20261008.md"
+      ],
+      "decision": "Reuse canonical pure source policy authorization; explicit matching export grant, one bounded prepared CSV per export unit and redacted keyed digest receipt; recheck current rights on replay.",
+      "consequences": [
+        "UI preview/confirmation and copied-file downstream deletion remain future gates.",
+        "One batch/25 IDs/six fields only; CSV remains in memory for authenticated response."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "No new paid dependency/live intake.",
+        "CSV formula-like prefixes escaped; payload/signatures never logged or persisted in export receipt.",
+        "SECRET_KEY rotation fails replay closed; preparation is not confirmed delivery."
+      ],
+      "reversibility": "Additive migration reversible only while export ledger empty.",
+      "affected_modules_or_contracts": [
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "decided_by": "Standing owner technical delegation",
+      "decided_at": "2026-10-08",
+      "supersedes": [],
+      "superseded_by": null
     }
   ],
   "decision_template": {

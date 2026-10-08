@@ -12,6 +12,10 @@ from django.urls import path
 
 urlpatterns = [
     path(
+        "api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/exports/",
+        views.ResultExportDownload.as_view(),
+    ),
+    path(
         "api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/results/",
         views.ResultList.as_view(),
     ),

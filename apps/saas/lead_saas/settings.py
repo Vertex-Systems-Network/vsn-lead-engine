@@ -1,6 +1,7 @@
 """Opt-in SaaS settings. No production collector stores or credentials are used."""
 
 import os
+import sys
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -8,6 +9,8 @@ from django.core.exceptions import ImproperlyConfigured
 from .web_origin import dashboard_return
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Reuse the repository's pure SaaS policy contracts without importing collector services.
+sys.path.insert(0, str(BASE_DIR.parent.parent / "src"))
 DEBUG = os.environ.get("SAAS_DEBUG", "0") == "1"
 SECRET_KEY = os.environ.get("SAAS_SECRET_KEY", "")
 if not SECRET_KEY:

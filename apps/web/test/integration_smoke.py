@@ -1,5 +1,6 @@
 """Disposable HTTP integration, not browser or PostgreSQL concurrency evidence."""
 
+import json
 import os
 import signal
 import socket
@@ -419,10 +420,10 @@ def main():
                 assert "confirmation" not in closed_form.hidden
                 # Full synthetic dual-attested storage -> API -> actual Next rendering.
                 # No real signer/source/registry is activated by these fixtures.
-                from core.test_accepted_results import AcceptanceFixture
+                from core.test_result_exports import ExportFixture
                 from core.models import AcceptedResult
                 result_marker = "<img src=x onerror=synthetic-result>"
-                class HttpAcceptance(AcceptanceFixture):
+                class HttpAcceptance(ExportFixture):
                     def addCleanup(self, fn):
                         self.cleanup = fn
                     def candidate_signed(self, data=None):
@@ -441,9 +442,25 @@ def main():
                 assert "Available results" in rendered and "&lt;img src=x onerror=synthetic-result&gt;" in rendered
                 assert "synthetic-record-1" not in rendered and "registry-test" not in rendered
                 assert "no-store" in result_headers.get("Cache-Control", "")
+                export_url = backend + result_fixture.url
+                export_csrf = next(cookie.value for cookie in jar if cookie.name == "csrftoken")
+                export_request = Request(export_url, data=json.dumps(result_fixture.selection).encode(), headers={"Content-Type": "application/json", "Idempotency-Key": "http-synthetic-export", "X-CSRFToken": export_csrf, "Origin": origin}, method="POST")
+                with opener.open(export_request, timeout=10) as response:
+                    exported = response.read()
+                    export_receipt = response.headers["X-Export-Receipt"]
+                    assert "no-store" in response.headers["Cache-Control"]
+                    assert "attachment" in response.headers["Content-Disposition"]
+                assert result_marker.encode() in exported and b"'+1" in exported
+                with opener.open(export_request, timeout=10) as response:
+                    assert response.read() == exported and response.headers["X-Export-Receipt"] == export_receipt
                 empty_results, _ = read(f"/dashboard/workspaces/{workspace.id}/jobs/{saved[0].id}/results")
                 assert "No available results" in empty_results
                 Membership.objects.filter(user=user, workspace=result_fixture.workspace).update(role="viewer")
+                try:
+                    opener.open(export_request, timeout=10)
+                    raise AssertionError("Viewer export must be denied")
+                except HTTPError as exc:
+                    assert exc.code == 403
                 viewer_results, _ = read(result_path)
                 assert "&lt;img src=x onerror=synthetic-result&gt;" in viewer_results
                 Membership.objects.filter(user=user, workspace=result_fixture.workspace).delete()
@@ -482,7 +499,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

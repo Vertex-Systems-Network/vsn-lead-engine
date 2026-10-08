@@ -474,3 +474,28 @@ class AcceptedFingerprint(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["workspace", "token"], name="saas_accepted_token")
         ]
+
+
+class ResultExport(models.Model):
+    """Redacted once-only export accounting; CSV payloads are never persisted."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
+    job = models.ForeignKey(Job, on_delete=models.PROTECT)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reservation = models.OneToOneField(UsageReservation, on_delete=models.PROTECT)
+    key = models.CharField(max_length=128)
+    request_hash = models.CharField(max_length=64)
+    content_digest = models.CharField(max_length=64)
+    record_count = models.PositiveIntegerField()
+    delete_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["workspace", "key"], name="saas_export_key"),
+            models.CheckConstraint(
+                condition=models.Q(record_count__gte=1, record_count__lte=25),
+                name="saas_export_count",
+            ),
+        ]
