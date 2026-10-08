@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "5157f1cfd96abb01673b099ff3994034071c076e",
+  "reconciliation_base_ref": "bec879cb7b7ed925e64a623d2ce197c7c590eafa",
   "modules": [
     {
       "id": "MOD-HISTORICAL-ROADMAP",
@@ -769,7 +769,7 @@
         "PR #180 merged at 6c6460c095778b27235272bd6f5ea608900614e1; head 3c24b14fd0e263cc4fa24fd15ed2279752738961 passed all required checks/Actions CodeQL, PostgreSQL 37703540378 (138 tests/migration/settings) and Next/HTTP 37703540308 (native draft/replay/role/tenant/queued cancellation/CSRF/auth flows).",
         "PR #181 merged at 4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01; head 66152035d4f4da7f75d8c656fe3eae0224590076 passed required checks/Actions CodeQL, PostgreSQL 37703955016 (141 tests/migration/settings), and Next/HTTP 37703954934 (bounded native source/XSS/viewer/tenant and earlier form/auth flows).",
         "PR #182 merged at 9bc1065b403299b74b60dca52ce6d1cc46f4d810; head 593799c04edc7b03d888663362d655106da92eea passed required checks/Actions CodeQL, PostgreSQL 37704612846 (145 tests/migration/settings), and Next/HTTP 37704612908 (eight transport tests, native forms/source configuration and filtered/empty/Next/First-page flows).",
-        "Native Next draft feedback/correction/conflict and sign-out implemented; bounded five-minute session handoff retains signed identity and CSRF/tenant authority. Local 138 pass/16 PostgreSQL skips (154 cases), eight transport tests, Next lint/format/build/type and real correction/conflict/sign-out HTTP flows pass; final-head CI pending. Browser/login/cancellation-error/deployment acceptance remains open."
+        "PR #184 merged at bec879cb7b7ed925e64a623d2ce197c7c590eafa; head 034cd99a40dbd3c2254e1a3a832e01f05f56501c passed required checks/Actions CodeQL, PostgreSQL 37755784470 (154 tests/migration/settings) and Next/HTTP 37755784437 (eight transport tests, escaped feedback/correction/replay/conflict/missing-context recovery and native sign-out)."
       ],
       "update_notes": [
         "Frontend selection partially supersedes templates UI decision only: docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md."

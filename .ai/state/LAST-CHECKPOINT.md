@@ -2,41 +2,37 @@
 
 ## Snapshot
 
-- Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 PKT / 2026-10-07 UTC.
-- Protected feature main re-read: `9bc1065b403299b74b60dca52ce6d1cc46f4d810` / PR #182. This document records the verified feature base before its own documentation merge. Inspect live main/issues/PRs before mutation replay.
-- Owner selected Next.js + TypeScript; Django/DRF/PostgreSQL retain session, tenant, role and mutation authority. Additive SaaS work preserves production CLI/R2/Google behavior.
-
-## Current candidate
-
-- Native Next draft feedback/correction/conflict and sign-out implemented; bounded five-minute session handoff retains signed identity and CSRF/tenant authority. Local 138 pass/16 PostgreSQL skips (154 cases), eight transport tests, Next lint/format/build/type and real correction/conflict/sign-out HTTP flows pass; final-head CI pending. Browser/login/cancellation-error/deployment acceptance remains open.
+- Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 UTC / PKT.
+- Protected feature main re-read: `bec879cb7b7ed925e64a623d2ce197c7c590eafa` / PR #184. This records the verified feature base before its own documentation merge; reconcile live main/issues/PRs before mutation replay.
+- Owner selected Next.js + TypeScript; Django/DRF/PostgreSQL retain session, tenant, role, CSRF and mutation authority. Production CLI/R2/Google behavior is isolated.
 
 ## Verified
 
-- PR #182 merged at 9bc1065b403299b74b60dca52ce6d1cc46f4d810; head 593799c04edc7b03d888663362d655106da92eea passed required checks/Actions CodeQL, PostgreSQL 37704612846 (145 tests/migration/settings), and Next/HTTP 37704612908 (eight transport tests, native forms/source configuration and filtered/empty/Next/First-page flows).
-- PR #180 native forms: PostgreSQL 37703540378 (138 tests), Next/HTTP 37703540308, required checks/Actions CodeQL. Masked CSRF plus signed actor/workspace/revision context; fixed direct Django POST targets and configured Next 303 returns. Replay, stale revision, queued release-once, role/tenant and untrusted Origin tested.
-- PR #181 source configuration: PostgreSQL 37703955016 (141 tests), Next/HTTP 37703954934, required checks/Actions CodeQL. At most 100 rows, bounded public capability metadata, viewer reads and escaped names; no rights/control evidence exposure or activation.
-- PRs #175–#178: internal evidence-bound terminal receipts, usage bypass guards, explicit manual periods/rollover, bounded disabled daily draft occurrences/DST and fixed login/logout navigation. Earlier exact-head evidence remains in CURRENT-STATE and review documents.
-- Unknown outcomes retain reservations; verified whole-job proof settles only after all operations resolve. Accepted leads/exports remain zero. Generic usage APIs cannot release/settle attached job reservations. Unresolved reservations block period rollover; late receipts account to the original window.
-- Next workspace/job/detail/usage/source/filter reads use fixed-origin/path server transport, bounded response/timeouts and no shared cache/redirects. Only exact form-context paths forward a validated CSRF cookie; ordinary reads forward session only.
-- Local SaaS: 145 cases, 129 passed/16 PostgreSQL-only skipped; final CI all 145 passed on PostgreSQL. Next lint/format/eight transport tests/build/type and real HTTP flows passed. Root 376 passed, 1 skipped, 28 subtests; ANPOS/Ruff/migration/settings gates pass.
-- M5 85%, M6 70%, M7 65%, overall ~45% are engineering indicators. Work units remain 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
+- PR #184 merged at bec879cb7b7ed925e64a623d2ce197c7c590eafa; head 034cd99a40dbd3c2254e1a3a832e01f05f56501c passed required checks/Actions CodeQL, PostgreSQL 37755784470 (154 tests/migration/settings) and Next/HTTP 37755784437 (eight transport tests, escaped feedback/correction/replay/conflict/missing-context recovery and native sign-out).
+- Native draft validation uses a five-minute actor/workspace/session-bound UUID handoff, maximum three entries, bounded allowlisted values/errors and the original signed draft nonce. Reads recheck role, expiry and nonce, are private/no-store and do not consume/extend the handoff. Correction and accepted replay create one draft; changed accepted content renders conflict. Missing context links to a new form/workspace.
+- Invalid authority, oversized input, repeated scalars and unbounded errors retain Django validation fallback. Unknown fields/password/raw CSRF are omitted from handoff storage. Supported checkbox values/scalar text restore escaped; unknown choices require correction.
+- Native Next sign-out confirms direct Django POST logout using a narrowly scoped authenticated masked-CSRF context. GET/logout missing CSRF/untrusted Origin denied; successful logout invalidates the session and feedback. No Next mutation proxy.
+- PRs #180–#182 remain verified: native draft/cancel contexts/controls, bounded source configuration and saved-job state filtering/pagination. Earlier exact-head CI evidence is retained in CURRENT-STATE and review documents.
+- PRs #175–#178 delivered internal terminal receipts/usage bypass guards, manual periods/rollover, bounded disabled daily draft occurrences/DST and fixed login/logout return. Unknown outcomes retain capacity until valid whole-job proof; no accepted results are minted. Unresolved reservations block rollover, late receipts account to original periods.
+- Local SaaS 154 cases: 138 passed/16 PostgreSQL-only skipped. Final PostgreSQL CI all 154 passed; migrations/settings, Next lint/format/eight transport tests/build/type and real HTTP auth/CSRF/form/source/filter/recovery/sign-out flows pass. Root 376 passed, 1 skipped, 28 subtests; ANPOS/Ruff/drift pass.
+- M5 85%, M6 70%, M7 65%, overall ~45% are engineering indicators. Work-unit counts unchanged: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
 
 ## Not Verified
 
-- No scheduler timer/scanner, public activation endpoint, automatic enqueue, provider consumer, configured receipt verifier, payment activation or accepted-lead/results/export store. Synthetic fixtures do not establish rights or provider compatibility.
-- No production Next deployment or provider exactly-once certification. Browser executable unavailable; HTTP checks do not certify visual/responsive/WCAG/customer acceptance.
-- Native error/account flows remain open; invalid native form submissions render the existing escaped Django validation form.
-- No persistent distributed-agent runtime identity or work after turn end claimed. Latest retained production observation: 6,855/12,000 on 2026-10-04, with no new quota evidence.
+- Native login/cancellation-error screens and results/export store remain open. No provider consumer, configured receipt verifier, signed payment activation, scheduler timer/scanner or public automatic enqueue activation.
+- No production Next deployment, provider exactly-once or visual/responsive/WCAG/customer certification. Browser runtime remains unavailable; HTTP checks do not replace browser assessment.
+- Persistent distributed-agent identity remains unverified. No work after turn end is claimed. Latest retained production evidence remains 6,855/12,000 on 2026-10-04; no new quota observation.
 
 ## Known Risk
 
-- Unknown outcomes retain capacity until valid proof; provider adapters need reviewed evidence/replay contracts. Evidence/history migrations refuse destructive rollback.
-- Local HTTP confirms the opt-in fixed trusted origin; production shared-origin TLS/proxy/cookie/CSRF acceptance remains open. No wildcard or request-selected trust.
-- ESLint 9 is unsupported while existing plugin peers exclude 10; compatible maintained tooling remains a production gate.
-- Manual periods do not automatically reset or activate paid plans; disabled schedule configurations do not constitute a customer execution scheduler.
+- Feedback read expiry is not physical erasure: existing server-side session retention/clearsessions cleanup applies. Production encryption/retention/cleanup review remains open. Concurrent session last-write may evict/lose feedback; missing context fails closed without affecting transactional idempotency.
+- Unknown external outcomes retain capacity until valid proof; provider rights/evidence/replay contracts remain necessary. Evidence migrations refuse destructive rollback.
+- Opt-in fixed trusted frontend origin is verified locally; production shared-origin TLS/proxy/cookie/CSRF acceptance remains open. No wildcard/request-selected trust.
+- ESLint 9 is unsupported while plugin peers exclude 10; compatible maintained tooling remains a production gate.
+- Manual accounting windows do not automatically reset or activate paid plans; disabled draft occurrence configs do not constitute a customer scheduler.
 
 ## Next Action
 
-1. Continue native validation/error and account flows under Django session/CSRF authority; signed billing events and phone-qualified results/export contracts remain independent. No provider/payment/scheduler activation.
-2. Follow the native mutation next-slice contract for bounded validation preservation, role/revision rechecks and adversarial real HTTP/PostgreSQL coverage; browser acceptance remains separate.
+1. Continue native login and cancellation-error workflows under Django session/CSRF and abuse-control authority; signed billing events and phone-qualified results/export remain independent without provider/payment/scheduler activation.
+2. Native anonymous login needs explicit CSRF bootstrap/cookie propagation, existing account/IP budgets and generic errors; never preserve passwords. Cancellation errors must show current state and require reviewed fresh confirmation, without automatic cancellation or stale-authority refresh.
 3. Continue ready work within invocation budget. Checkpoints are recovery aids, not permission gates; no execution after turn end is claimed.

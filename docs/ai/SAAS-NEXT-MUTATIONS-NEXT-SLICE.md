@@ -1,20 +1,24 @@
 # Native Next mutations: delivered boundary and next slice
 
-PR #180 delivered native Next draft/cancellation screens and bounded Django form contexts. PR #181 delivered read-only source configuration; PR #182 delivered saved-job state filtering and retained pagination. Django retains session/tenant/role, signed draft idempotency and revision-bound cancellation authority. Successful direct HTML POSTs return to fixed configured Next job paths. Invalid input currently renders the existing escaped Django form with validation errors; it is not yet native Next error handling.
+PR #180 delivered native draft/cancellation controls and bounded Django contexts. PR #181 delivered read-only source configuration; PR #182 delivered saved-job state filtering/pagination. PR #184 now delivers native draft validation/correction/conflict, missing-feedback recovery and native sign-out confirmation. Django retains session/tenant/role, CSRF, signed idempotency, cancellation revision and login abuse-control authority.
 
 ## Delivered controls
 
-- Exact authenticated draft/cancellation context GET paths issue masked CSRF and signed actor/workspace/job/revision-bound tokens only after current authorization checks. Responses are private and uncached.
-- Next transport forwards a validated CSRF cookie only to those exact paths. Other reads forward session only; origin/path, response size, timeout and redirect constraints remain enforced.
-- Missing CSRF cookies require explicit authenticated reseeding. Native forms submit to fixed Django actions; one validated frontend origin supplies CSRF trust, with no wildcard or request-selected destination.
-- Real HTTP CI covers password login, cookies, Origin/CSRF, duplicate/conflicting draft submissions, viewer/tenant denial, stale cancellation and pending release-once. PostgreSQL concurrency, migration/settings and Next lint/format/type/build gates pass.
+- Native HTML forms post to fixed Django actions. Successful drafts/cancellations return 303 to configured Next job paths; sign-out confirms the existing Django POST logout. No Next mutation proxy or request-selected backend/redirect origin.
+- Rejected bounded drafts with valid authority use five-minute session/actor/workspace-bound feedback with the original draft identity. At most three entries; reads do not consume/refresh context. Invalid authority/oversized input retains Django fallback. Physical session retention differs from the read deadline; see the validation/sign-out engineering review.
+- Exact authenticated form contexts return bounded public data, masked CSRF and existing signed tokens. Validated CSRF-cookie forwarding applies only to their exact paths; ordinary reads remain session-only, fixed-origin/path, bounded, private and uncached.
+- PostgreSQL, migration/settings, Next lint/format/type/build/transport and real HTTP auth/CSRF/role/tenant/replay/correction/conflict/sign-out checks pass. Full browser/deployment acceptance is separate.
 
-## Next implementation: native validation and account flows
+## Next: native cancellation errors
 
-1. Choose a bounded validation handoff that keeps submitted search values out of URL query strings, arbitrary redirects and shared cache. Retain Django's existing POST validation and CSRF checks. Any server-side handoff must expire, be bound to the current actor/workspace and use bounded allowlisted fields/error messages; do not serialize credentials or authority-bearing backend internals.
-2. Render semantic field errors and an error summary on Next, preserving entered values and the original draft retry identity. Correcting a rejected payload may create one draft; replaying an accepted identity with changed content remains a conflict. Recheck membership before rendering or resubmitting; a handoff cannot authorize a mutation.
-3. Handle missing/expired handoff, lost session, rotated CSRF, role revocation and stale cancellation explicitly. Keep generic tenant/auth failures and the backend fallback usable. Do not invent fresh authority from browser-supplied status, roles or counters.
-4. Design native account/login/logout context separately from authenticated draft context. Anonymous login requires its own CSRF-cookie/bootstrap and bounded abuse-control review. Never pass passwords through validation handoff storage or render them back; existing Django login budgets and generic failure behavior remain authoritative.
-5. Verify real Django/Next HTTP correction/replay/conflict, escaping, expiry, cross-actor/workspace attempts and trusted-origin failures, then PostgreSQL gates. Browser keyboard, focus, errors and responsive checks require a usable browser runtime. Production shared-origin TLS/proxy/cookie acceptance remains separate.
+1. Present bounded generic cancellation errors alongside the current server job state. A stale revision must require reviewing current details and a fresh explicit confirmation; a feedback read must never auto-cancel, auto-retry or refresh mutation authority.
+2. Bind any error handoff to session/actor/workspace/job with expiry and bounded storage. Preserve pending-only rules; running/completed/unknown operations cannot become cancellable through UI recovery. Invalid/expired confirmation may retain Django fallback until an independently reviewed native recovery exists.
+3. Verify stale confirmation, changed role, foreign job, expired feedback and started/terminal state, plus release-once/idempotent replay and real PostgreSQL races. Browser focus/keyboard/responsive validation remains necessary.
 
-Current implementation surfaces: `apps/saas/core/form_context.py`, `core/forms.py`, `core/cancellation_forms.py`, `core/views.py`, `core/jobs.py`, `apps/web/lib/transport.mjs` and `apps/web/test/integration_smoke.py`. Signed billing events and accepted phone-qualified results/export remain independent later slices. No provider, payment or scheduler activation is needed for native validation work.
+## Next: native anonymous login
+
+1. Define explicit anonymous CSRF bootstrap and cookie propagation before rendering a native form. Server-component reads cannot silently seed browser cookies; use a narrow reviewed bootstrap path rather than bypassing CSRF or using the authenticated draft context.
+2. Post passwords only to the existing fixed Django login handler. Preserve account/IP attempt budgets, trusted connection-address policy, generic credential/rate-limit failures, session rotation and the fixed dashboard return. Never store or render passwords in feedback, query strings or logs.
+3. Keep user/account identifiers out of error URLs and review any bounded anonymous feedback mechanism separately. Test missing/mismatched/rotated CSRF, wrong Origin, failed login, attempt exhaustion, success/rotation and old-session denial with real HTTP and PostgreSQL budgets.
+
+Production shared-origin TLS/proxy/cookies, session encryption/retention/cleanup and browser/customer acceptance remain open. Signed billing events and phone-qualified accepted results/export are independent later slices. These frontend steps do not require provider, payment or scheduler activation.
