@@ -1,62 +1,35 @@
 # Last Checkpoint
 
-## Current invocation
-
-- Repository: Vertex-Systems-Network/vsn-lead-engine. Live protected main `7e93dc814e3bbf64ec95052a3a8f9df79c1c5450` after PR #208. Open Issues then open PRs reconciled: none. Older checkpoint references to open #174 are stale.
-- PR #207 ledger/expiry merged after all five workflows passed; PostgreSQL 37810735757 (all 290 tests/migrations), Web 37810735885 (14 transport/build/type/HTTP). Head d9be9ac1ef0303b70be62e4e8c1a9de592205cc0. PR #208 / head 3d34dccd09e95b8fe0cc7b58b4e8c6b3a5cf8a62 verified and merged: PG 37811482736 (296 cases), Web 37811482692 (14 tests/HTTP), all five workflows passed. Branch `feat/saas-batch-manifest`: ADR-SAAS-003 and pure proof validator with ten DB-forbidden tests; protected CI pending. No completed mutation replayed.
-- Local regression: 306 cases / 31 PostgreSQL-only skips; root 382 pass / 1 skip / 28 subtests. PostgreSQL row-lock races require CI, not SQLite certification.
-- Counters/reservations/periods and production CLI/R2/Google collection preserved. Billing/provider keys/activation remain empty/disabled.
-- Next: verify v3 proof exact-head CI/protected merge, then separately gated durable batch identity/ledger and terminal manifests per ADR-SAAS-003. No partial intake or pagination implementation claimed. Work units remain 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started. M5 85%, M6 75%, M7 86%, overall ~52% engineering indicator.
-- External provider/source rights, actual R2 signer, payment account, deployment/browser/customer/privacy acceptance and launch remain gated. Latest retained quota remains 6,855/12,000 on 2026-10-04; no fresh production observation. Distributed runtime identity is unverified.
-
-## Previous protected checkpoint
-
-
 ## Snapshot
 
 - Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 UTC / PKT.
-- Protected feature main read `3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7` / PR #204; feature base precedes documentation merge. Reconcile exact live main, open Issues then PRs before replay.
-- Next.js/TypeScript frontend, Django/DRF/PostgreSQL authority; production CLI/R2/Google stays isolated.
-- Open Issues: none at session start. Dependency PR #174 remains open (setup-node major update); separately review immutable action/runner compatibility before merging. No existing feature mutation replayed.
+- Exact protected feature main `176f8309a1d68c2feb650898d240bd2ed5aa89fc` after PR #209, before documentation-only checkpoint merge. Reconcile live main, open Issues then open PRs before mutations. No open Issues at final feature checkpoint.
+- Product 0.66.1 / ANPOS 1.4.0; Next frontend and isolated Django/DRF/PostgreSQL authority. Existing production CLI/R2/Google namespaces and phone-only US/Canada/taxonomy/quota invariants preserved.
 
 ## Verified
 
-- PR #204 merged at 3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7; head 02516bda90cd6e1aea00983f75193da14e75d1ae passed all five CI workflows/required checks/Actions CodeQL, PostgreSQL 37798742414 (all 269 tests, migrations/reversal/settings and earlier concurrency) and Web 37798742458 (14 transport tests, lint/format/build/type and actual Next/Django HTTP flows). Ten DB-forbidden billing-evidence tests verify the pure validator; no entitlement/payment write or activation.
-- Pure internal normalized billing evidence uses trusted local coordinates and empty default keys with bounded freshness/validity. It has no persistence, endpoint or entitlement/payment writes. Actual provider truth, durable uniqueness/order and ongoing capability expiry are not established by a signature.
-
-- PR #202 merged at f4e7e5ee2aacb53c3e609acc7d039471455e0241; head 4d09b60b3fc04b23312f25e13b3f1ff703a59cd6 passed all five CI workflows, including required checks/Actions CodeQL, PostgreSQL 37797128235 (all 259 tests, concurrency, migrations/reversal/settings) and Web 37797128305 (14 transport tests, lint/format/build/type and actual HTTP scoped signed receipt navigation, no-charge/erasure/redaction/referrer headers and earlier native auth/filter/CSV flows).
-- Readonly 25-row receipt history has current owner/admin job scope and member-own scope, viewer denial, signed 24-hour actor/job/scope-bound continuation, no charge/write/CSV and retained redacted metadata after payload erasure. Next/API no-referrer headers pass actual HTTP; live ingress/access-log query redaction remains a deployment gate. Migration 0016 indexes are reversible and passed PostgreSQL migration CI.
-
-- PR #200 merged at 812a4bc20e661e3088e453c866f50c031dca3d6f; head 2c326478c98c6fbdb482c7c73270d6fa19092ae0 passed all required checks/Actions CodeQL, PostgreSQL 37793585524 (all 253 tests, concurrency, migrations/settings) and Web 37793585562 (13 transport tests, build/type and actual HTTP compound/empty/clear filters, filtered-row denial, subset-only CSV/replay/conflict, auth and two-row erasure/tombstones).
-- Country/category/source native filters use saved metadata indices and current-rights AND matching; All/Clear and shown/filtered/withheld counts verified. Signed preview excludes even otherwise-authorized filtered-out rows. Six added backend cases and actual two-category HTTP subset CSV/erasure evidence pass. No migration, new payload copy or live activation.
-
-- PR #198 merged at 7dd9f10b4c28b1bacea1488aee5874685f600e3a; head 141cbac20f05b9edc3f63a4374fbc3612766140c passed all required checks/Actions CodeQL, PostgreSQL 37784930553 (all 247 tests, concurrency, migrations/settings) and Web 37784930581 (12 transport tests, build/type and HTTP country-filter/selected-row CSV/empty denial/replay/conflict/erasure/auth flows).
-- Country filters use only US/CA/All metadata in URLs; shown/filtered/withheld counts are distinct. Native CSRF row/field selection stays inside signed filtered scope; subset CSV/replay/changed-selection conflict, empty/duplicate/foreign/oversized input, old-form rejection and unselected erasure are tested. No migration or live consumer activation.
-
-- PR #194 merged at 6f9ad2b7808471c67523e31f1b42d37a710d9cd8; head 5dde3934edb0fdc2424b2fe4bb0d5e41e2eb9a46 passed required checks/Actions CodeQL, PostgreSQL 37779435828 (223 tests/export races/migrations/settings) and Next/HTTP 37779435876 (10 transport tests/build/type and CSRF CSV/replay/viewer denial).
-- PR #195 merged at 92657c5c8bbdb27115e95f5642f841e8a1c975c3; head dc84dce770bf14580e9d2691880510fc6615ba14 passed required checks/Actions CodeQL, PostgreSQL 37780165591 (235 tests/expiry races/migrations/settings) and Next/HTTP 37780165669 (10 transport tests/build/type and payload erasure/tombstone flow).
-- PR #196 merged at 584ba0ad71557609e88b4d5b48816f41f2dfd563; head 10f5ee5bc42f033f5d162a0ab5ef3232d330e963 passed required checks/Actions CodeQL, PostgreSQL 37781243971 (all 241 tests/concurrency/migrations/settings) and Next/HTTP 37781243921 (11 transport tests/build/type and native preview/confirmed CSV/replay/conflict/erasure flows).
-- Source-aware 1–25-record CSV preparation requires explicit field grants/current rights, CSRF and member role. Atomic caps include pending reservations; one unit per prepared file. Redacted keyed digest ledger retains no CSV; identical actor/key/specification replays once and changed selection/content conflicts.
-- Explicit current-admin source-expiry erasure clears active fields/lineage/source ref/category/purpose/retention label, keeping dated actor tombstones, fingerprints and usage/counts. Duplicate/rollback/role/expiry races and retained later-job duplicate rejection tested. No scheduled cleanup activated.
-- Native Next preview shows count, field omissions, attribution, earliest deadline and one-unit notice. Signed confirmation scopes actor/tenant/job/rows/permitted fields and short expiry. Direct Django CSRF POST returns CSV; viewer action omitted and failure review mints no new authority.
-- Earlier candidate/accepted-store/receipt/job/account/native forms remain verified. All 269 PostgreSQL tests pass; local 243 pass/26 PG-only skips; Next 14 transport/lint/format/build/type and real HTTP pass. Root 376 pass/1 skip/28 subtests; Ruff/ANPOS pass. CodeQL scans Actions only.
-- M5 85%, M6 75%, M7 86%, overall ~52% engineering indicators. Work units unchanged: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
+- PR #207 merged `8d555bf041b05690838b74b46406541abb68bd81`, head `d9be9ac1ef0303b70be62e4e8c1a9de592205cc0`. All five workflows passed, including PostgreSQL 37810735757 (290 tests, five billing races, migrations/settings) and Web 37810735885 (14 transport/build/type/actual HTTP). Disabled internal billing ledger, exact replay/contiguous revisions, grant deadlines and preservation of usage/periods/reservations. Past-effect settlement and safe cancellation retained. Migration 0017 refuses destructive evidence loss.
+- PR #208 merged `7e93dc814e3bbf64ec95052a3a8f9df79c1c5450`, head `3d34dccd09e95b8fe0cc7b58b4e8c6b3a5cf8a62`. All five workflows passed, PostgreSQL 37811482736 (296 tests/migrations/settings), Web 37811482692 (14 tests/actual HTTP). Readonly redacted local billing diagnostics and active-user/admin gates, six new tests and preservation-first recovery runbook. No repairs/provisioning.
+- PR #209 merged `176f8309a1d68c2feb650898d240bd2ed5aa89fc`, head `7c5adceb3fb150a89aaed3c8f556aea2552602f4`. All five workflows passed, PostgreSQL 37812348239 (306 tests/migrations/settings), Web 37812348326 (14 tests/build/type/actual HTTP). Pure bounded v3 manifest parser, ten DB-forbidden cases, separate empty-default authorities. No ORM/network/intake or replay side effects. ADR-SAAS-003 defines additive durable batch/final accounting/pagination direction; v2 single-source/25-row terminal acceptance/export retained.
+- Root local regression: 382 passed, 1 skipped, 28 subtests. Ruff/format/ANPOS/README/audit/migration checks passed. Local SaaS 306 cases / 31 explicit PostgreSQL-only skips; protected PostgreSQL verifies those races separately.
+- Earlier scope/filter/guarded CSV/expiry/receipt evidence remains in git history and linked review documents through PR #204. Counts unchanged: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21. M5 85%, M6 75%, M7 86%, overall ~52% engineering indicators; partial slices do not certify full work units.
 
 ## Not Verified
 
-- Real isolated R2 signer/client/qualification bridge, live intake/source/provider/payment/scheduler and Next production deployment remain disabled. Synthetic proofs/rights are fixtures only.
-- Broader batch pagination, billing events, recovery/signup, browser/responsive/WCAG/customer, encryption/backup/audit-retention and TLS/proxy acceptance remain open. HTTP is not browser certification.
-- Retained production quota is 6,855/12,000 on 2026-10-04; no fresh quota observation. Distributed runtime identity unverified; no work after turn end claimed.
+- Durable v3 batch/terminal ledger, partial intake/accounting, multi-source/multi-batch pagination/native UI not yet implemented. v3 signature/schema success does not prove signer qualification, committed R2 objects, payment truth or rights.
+- Live source/qualification/isolated R2 signer/client, billing/provider/webhook/consumer/scheduler and Next deployment remain disabled. Keys empty; synthetic proofs/rights are fixtures only.
+- Real payment sandbox/account mapping, signup/recovery, browser/responsive/WCAG/customer, qualified privacy/source rights, log redaction/retention/encryption/backups/TLS/proxy and launch remain open.
+- Latest retained production quota remains 6,855 / 12,000 on 2026-10-04. No new production quota observation. Distributed runtime/Supervisor identity unverified; no work after invocation ends claimed.
 
 ## Known Risk
 
-- Trusted future signer must prove canonical phone qualification/exact committed isolated R2 fingerprints, keys and crash reconciliation. Signature/schema tests do not prove actual signer behavior or commercial rights.
-- Active payload erasure is irreversible. Tombstone fingerprints/actor/job/country metadata remain pseudonymous; WAL/replicas/backups/client/downstream CSV erasure and qualified retention review are not certified. DATA-006/007/008 record remaining gates.
-- CSV charge is preparation, not successful delivery. Current rights/expiry can deny replay; SECRET_KEY rotation fails digest replay closed. No retained CSV exists for recovery beyond current rows.
-- Unknown provider effects retain reserved capacity. ESLint 9/plugin compatibility EOL remains a production gate. Default policies/verifier registries stay unavailable.
+- Unknown effects retain reservations. No inferred cancellation/refund; downgrade/expiry cannot rewrite past accounting. Trusted future provisioning/revocation must use matching workspace/user locks and independently authenticated runtime context. Local command arguments are context selectors, not remote authentication.
+- Payload erasure cannot certify WAL/replica/backup/download/downstream deletion; fingerprints and actor/job/event references are pseudonymous. Retention/backup/legal review remains before-production evidence.
+- Bindings/events/deadlines block destructive migration reversal. Provider truth, key lifecycle/independence, precise batch finality and crash reconciliation require separate proof. No old revision/body may be replayed as a repair.
+- CSV charge is preparation, not delivered download; no retained CSV exists. Actual signer keys/cost/rights and ESLint compatibility/browser/release evidence remain external or later development gates.
 
 ## Next Action
 
-1. Implement disabled durable billing bindings/redacted event ledger and atomic exact replay/contiguous revisions; enforce entitlement validity across every capability before enabling writes or billing. Preserve all reservations/periods; no live payment/provider activation.
-2. Billing-event reconciliation is independent safe work; audit/fingerprint/backup retention policy and real signer/source/legal/customer evidence remain separate before-production gates.
-3. Continue the ready frontier within invocation budget; checkpoints are recovery aids, not permission gates.
+1. Implement separately gated durable v3 batch identity/ledger and terminal manifests per ADR-SAAS-003, with additive evidence-preserving migrations and PostgreSQL cap/replay/terminal races. Preserve v2 intake/accounting and no live signer/provider activation.
+2. Then add stable-watermark signed 25-row page services and native selected-page CSV, preserving current rights/expiry/no-referrer/once-only preparation semantics.
+3. Keep README/machine/checkpoint evidence synchronized after protected merges; checkpoints are recovery aids, not permission gates. Continue safe frontier within the next invocation's host budget. Do not replay merged mutations.
