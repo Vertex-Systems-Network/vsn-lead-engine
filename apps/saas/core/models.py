@@ -601,7 +601,9 @@ class AcceptedResult(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
     job = models.ForeignKey(Job, on_delete=models.PROTECT)
-    acceptance = models.ForeignKey(ResultAcceptance, on_delete=models.PROTECT)
+    acceptance = models.ForeignKey(ResultAcceptance, null=True, on_delete=models.PROTECT)
+    batch_acceptance = models.ForeignKey(BatchAcceptance, null=True, on_delete=models.PROTECT)
+    batch_position = models.PositiveSmallIntegerField(null=True)
     record_ref = models.CharField(max_length=96, null=True)
     country = models.CharField(max_length=2)
     category = models.CharField(max_length=120)
@@ -618,6 +620,27 @@ class AcceptedResult(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["acceptance", "record_ref"], name="saas_accepted_record"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(
+                    acceptance__isnull=False,
+                    batch_acceptance__isnull=True,
+                    batch_position__isnull=True,
+                )
+                | models.Q(
+                    acceptance__isnull=True,
+                    batch_acceptance__isnull=False,
+                    batch_position__isnull=False,
+                    batch_position__gte=1,
+                    batch_position__lte=25,
+                ),
+                name="saas_result_protocol_link",
+            ),
+            models.UniqueConstraint(
+                fields=["batch_acceptance", "record_ref"], name="saas_batch_result_ref"
+            ),
+            models.UniqueConstraint(
+                fields=["batch_acceptance", "batch_position"], name="saas_batch_result_position"
             ),
             models.CheckConstraint(
                 condition=models.Q(country__in=["US", "CA"]), name="saas_accepted_country"

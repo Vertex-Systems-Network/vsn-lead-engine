@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Add isolated v3 accepted-payload schema with evidence-preserving rollback, then gated atomic acceptance and exact terminal/unknown-effect accounting; preserve original reservations. Internal write-ahead entry and signed 25-row pagination follow. Ordinary v3 dispatch remains quarantined.",
+    "Review additive v3 payload schema, then implement separately gated atomic accepted-batch reconciliation with current dual proofs, tenant fingerprints and aggregate original caps. Final-source/unknown-effect reconciliation must precede whole-job settlement and internal write-ahead entry; signed 25-row pagination follows. Keep ordinary v3 dispatch quarantined.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_366_postgres_and_14_web_http_verified",
+  "qa_readiness": "saas_366_verified_additive_batch_payload_schema_review",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "15814cf0bf0c52f58c4b1d1e31cc208bc3445199",
+  "last_reconciled_repository_ref": "17adbaaf659e91bfb3a61403838c773f318d894f",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [
