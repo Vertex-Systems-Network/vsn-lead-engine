@@ -154,3 +154,5 @@ class BillingEvidenceTests(SimpleTestCase):
             with self.assertRaises(ValidationError):
                 verified_billing_event(body, "0" * 64, self.binding)
         self.denied(body=b"[" * 2000 + b"0" + b"]" * 2000)
+        for encoding in ["utf-16", "utf-32"]:
+            self.denied(body=json.dumps(self.data).encode(encoding))

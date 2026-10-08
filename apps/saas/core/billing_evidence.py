@@ -82,7 +82,7 @@ def verified_billing_event(body, signature, binding):
             or not re.fullmatch(r"[0-9a-f]{64}", signature)
         ):
             raise ValueError()
-        data = json.loads(body, object_pairs_hook=unique_object)
+        data = json.loads(body.decode("utf-8"), object_pairs_hook=unique_object)
         if not isinstance(data, dict) or set(data) != FIELDS:
             raise ValueError()
         if type(data["version"]) is not int or data["version"] != 1:
