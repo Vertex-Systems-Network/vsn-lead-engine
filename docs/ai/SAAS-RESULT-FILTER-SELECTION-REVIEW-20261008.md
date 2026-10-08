@@ -21,3 +21,7 @@ Actual HTTP smoke follows native country filter and filtered link → Next previ
 ## Remaining boundary
 
 Category/source/full-text filters, broader multi-batch pagination, real isolated R2 signer/source-rights intake, customer billing/scheduler, production deployment and legal/backup/audit retention acceptance remain open. Synthetic fixture grants prove application contracts only. Production US/CA phone-only qualification, exact production R2 cross-day dedupe, Google delivery and daily target are unchanged.
+
+## Verified protected merge
+
+PR #198 merged at 7dd9f10b4c28b1bacea1488aee5874685f600e3a; head 141cbac20f05b9edc3f63a4374fbc3612766140c passed all required checks/Actions CodeQL, PostgreSQL 37784930553 (all 247 tests, concurrency, migrations/settings) and Web 37784930581 (12 transport tests, build/type and HTTP country-filter/selected-row CSV/empty denial/replay/conflict/erasure/auth flows).
