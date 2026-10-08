@@ -1975,9 +1975,11 @@
       "branch_refs": [
         "feat/native-export-row-selection"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #198"
+      ],
       "test_evidence": [
-        "Candidate local backend/transport/Next HTTP verification; exact-head PostgreSQL/Web CI pending."
+        "PR #198 merged at 7dd9f10b4c28b1bacea1488aee5874685f600e3a; head 141cbac20f05b9edc3f63a4374fbc3612766140c passed all required checks/Actions CodeQL, PostgreSQL 37784930553 (all 247 tests, concurrency, migrations/settings) and Web 37784930581 (12 transport tests, build/type and HTTP country-filter/selected-row CSV/empty denial/replay/conflict/erasure/auth flows)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1996,7 +1998,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:7dd9f10b4c28b1bacea1488aee5874685f600e3a"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }
