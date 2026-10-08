@@ -318,3 +318,17 @@ class SourceList(APIView):
         from .source_preview import source_api_snapshot
 
         return Response(source_api_snapshot(request.user, workspace_id))
+
+
+@method_decorator(never_cache, name="dispatch")
+class ResultList(APIView):
+    def get(self, request, workspace_id, job_id):
+        from rest_framework.exceptions import ValidationError
+
+        from .result_query import results_snapshot
+
+        # Current v2 intake is one complete batch <=25 per job; no unbounded reads.
+        membership_for(request.user, workspace_id)
+        if request.query_params:
+            raise ValidationError("Result query parameters are unavailable for this bounded batch.")
+        return Response(results_snapshot(request.user, workspace_id, job_id))

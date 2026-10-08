@@ -286,3 +286,80 @@ export function signInContext(v: unknown): v is SignInContext {
     /^[A-Za-z0-9]{64}$/.test(v.csrf_token)
   );
 }
+
+export const resultFieldNames = [
+  "business_name",
+  "phone",
+  "city",
+  "website",
+  "status",
+  "address",
+] as const;
+export type SavedResult = {
+  id: string;
+  country: string;
+  category: string;
+  fields: Partial<Record<(typeof resultFieldNames)[number], string>> & {
+    business_name: string;
+    phone: string;
+  };
+  source_code: string;
+  policy_version: number;
+  observed_at: string;
+  delete_at: string;
+  retention_version: string;
+  provenance_fields: string[];
+};
+export type SavedResults = {
+  workspace_id: string;
+  job_id: string;
+  results: SavedResult[];
+  withheld_count: number;
+};
+export function savedResults(v: unknown): v is SavedResults {
+  return (
+    object(v) &&
+    uuid(v.workspace_id) &&
+    uuid(v.job_id) &&
+    count(v.withheld_count) &&
+    v.withheld_count <= 25 &&
+    Array.isArray(v.results) &&
+    v.results.length <= 25 &&
+    v.results.length + v.withheld_count <= 25 &&
+    v.results.every(
+      (r) =>
+        object(r) &&
+        uuid(r.id) &&
+        typeof r.country === "string" &&
+        ["US", "CA"].includes(r.country) &&
+        typeof r.category === "string" &&
+        r.category.length <= 120 &&
+        object(r.fields) &&
+        typeof r.fields.business_name === "string" &&
+        typeof r.fields.phone === "string" &&
+        Object.entries(r.fields).every(
+          ([k, val]) =>
+            resultFieldNames.includes(k as (typeof resultFieldNames)[number]) &&
+            typeof val === "string" &&
+            val.trim().length > 0 &&
+            val.length <= 2000,
+        ) &&
+        typeof r.source_code === "string" &&
+        r.source_code.length <= 64 &&
+        count(r.policy_version) &&
+        r.policy_version > 0 &&
+        typeof r.retention_version === "string" &&
+        r.retention_version.length <= 64 &&
+        typeof r.observed_at === "string" &&
+        Number.isFinite(Date.parse(r.observed_at)) &&
+        typeof r.delete_at === "string" &&
+        Number.isFinite(Date.parse(r.delete_at)) &&
+        Array.isArray(r.provenance_fields) &&
+        r.provenance_fields.length <= 6 &&
+        r.provenance_fields.every(
+          (f: unknown) =>
+            typeof f === "string" && Object.hasOwn(r.fields as object, f),
+        ),
+    )
+  );
+}

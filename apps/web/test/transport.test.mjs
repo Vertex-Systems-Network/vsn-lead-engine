@@ -252,3 +252,37 @@ test("anonymous login context forwards only bounded CSRF on one exact path", asy
     "signin",
   );
 });
+
+test("result snapshots require session and permit only exact bounded read paths", async () => {
+  const path =
+    "/api/v1/workspaces/11111111-1111-1111-1111-111111111111/jobs/22222222-2222-2222-2222-222222222222/results/";
+  assert.equal(
+    (await readBackend("http://localhost:8000", path)).kind,
+    "signin",
+  );
+  const result = await readBackend(
+    "http://localhost:8000",
+    path,
+    session,
+    async (_, options) => {
+      assert.equal(options.headers.Cookie, `sessionid=${session}`);
+      assert.equal(options.cache, "no-store");
+      return new Response("{}", {
+        headers: { "content-type": "application/json" },
+      });
+    },
+    "C".repeat(32),
+  );
+  assert.equal(result.kind, "ok");
+  for (const bad of [
+    path + "?country=US",
+    path + "?after=x",
+    path + "../accept/",
+    path.replace("results", "accept"),
+  ]) {
+    await assert.rejects(
+      readBackend("http://localhost:8000", bad, session),
+      /Unsupported/,
+    );
+  }
+});
