@@ -67,3 +67,7 @@ The paired-proof PR #222 merged after all five exact-head workflows passed on th
 ## Source-final evidence — development review
 
 PR #224 merged after 389 PostgreSQL tests, 14 Web tests and all five workflows passed. The next default-off service under review records one redacted signed source-final set only after all server-owned allocated batch identities have accepted evidence, bounded payload counts and exact trusted hashes. Unknown effects cannot create new finality; an exact existing final may replay under current rights. Empty source sets, whole-job settlement, quota release, dispatch and pagination remain unavailable. CI for source-final evidence is pending.
+
+## Whole-job aggregate guard — development review
+
+PR #225 merged after 394 PostgreSQL tests, 14 Web tests and all five workflows passed. A pure bounded guard under review compares the exact original source set, started operation status, nonempty accepted batch totals, committed calls and original reservation caps before proposing one job and actual leads/calls. No database write, usage settlement, no-effect proof or dispatch is enabled. CI for this guard is pending.

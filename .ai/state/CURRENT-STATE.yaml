@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "43b8816de7f9b7bb0977651d42ff775eeabfa844",
-  "observed_main_semantics": "Verified default-off batch intake #224 before source-final review.",
+  "observed_main_sha": "794bb3b42d3525fc2436aed578f6380b4590246a",
+  "observed_main_semantics": "Verified source-final evidence #225 before aggregate accounting review.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -92,7 +92,8 @@
     "saas_batch_payload_schema": "PR #220 / head 57c54ce5: all five workflows passed; PG 37826291597 (375 tests/migrations/settings), Web 37826291595 (14 tests/HTTP). Protected shared payload schema only.",
     "saas_batch_payload_proof": "PR #222 merged after all five workflows passed; eight pure DB-forbidden cases.",
     "saas_batch_intake": "PR #224 merged at 43b8816de7f9b7bb0977651d42ff775eeabfa844; head b55789af passed all five workflows, including 389 PostgreSQL tests and 14 Web tests/HTTP. Default-off atomic v3 batch acceptance, shared fingerprints and original aggregate caps; no source finality or settlement.",
-    "saas_source_final": "Development review: default-off exact allocated/accepted set; no usage settlement; CI pending."
+    "saas_source_final": "PR #225 merged at 794bb3b42d3525fc2436aed578f6380b4590246a; head d9eb4cfb passed all five workflows, including 394 PostgreSQL tests and 14 Web tests/HTTP. Default-off exact source-final metadata over complete accepted batches; no whole-job settlement.",
+    "saas_whole_job_accounting": "Development review: pure aggregate guard only; no settlement; CI pending."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -139,7 +140,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify disabled source-final evidence against every allocated acceptance, then implement separately gated whole-job accounting with unknown-effect reconciliation. Keep reservation held and v3 dispatch quarantined; write-ahead entry and signed 25-row pagination follow.",
+  "exact_next_safe_action": "Verify pure whole-job aggregate accounting against exact original source set, operation status, committed batch totals and original reservation limits; then implement separately gated transactional settlement. Keep unknown/no-effect paths and v3 dispatch quarantined.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
