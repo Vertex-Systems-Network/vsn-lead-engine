@@ -47,6 +47,19 @@ jobs:
       - name: Validate current AI-native state and workflow safety
         run: python scripts/validate_ai_native_repo.py
 
+      - name: Verify autonomous resume and README progress contract
+        shell: bash
+        env:
+          BASE_SHA: \${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_autonomy_contract.py'
+          if [ -n "\${BASE_SHA}" ]; then
+            python scripts/verify_readme_progress.py --base "\${BASE_SHA}"
+          else
+            python scripts/verify_readme_progress.py
+          fi
+
       - name: Validate commercial distribution and licensing blueprint when present
         shell: bash
         run: |
