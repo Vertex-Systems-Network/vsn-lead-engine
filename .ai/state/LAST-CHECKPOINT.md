@@ -30,9 +30,11 @@
 - Unknown external outcomes retain capacity until valid proof; provider rights/evidence/replay contracts remain necessary. Evidence migrations refuse destructive rollback.
 - ESLint 9 is unsupported while plugin peers exclude 10; compatible maintained tooling remains a production gate. Manual windows and disabled schedule configs are not paid activation or a customer execution scheduler.
 
-## Candidate in progress
+## Candidate event implementation in progress
 
-Candidate result preflight implemented: separate empty-by-default signed evidence registry, current tenant/role/entitlement/source fingerprint checks, bounded US/CA phone/field lineage/retention validation and redacted immutable summary. No ingestion, dedupe, replay ledger, result/accounting writes or exports. Local/CI evidence pending on this branch. See docs/ai/SAAS-RESULT-EVIDENCE-REVIEW-20261008.md.
+PR #188 merged at 1baf1d80fa6aafca5420cf21a640ce7e7a9e7146; head a942efbacd299ee2460eb560da00d899b7f58f3f passed required checks/Actions CodeQL, PostgreSQL 37770063209 (172 tests/migration/settings) and Next/HTTP 37770063198 (nine transport tests/build/type and earlier native workflows). See docs/ai/SAAS-RESULT-EVIDENCE-REVIEW-20261008.md.
+
+Redacted candidate event ledger implemented: identical bytes replay once, changed bytes/event conflict and source-event reuse cannot cross workspace/operation boundaries. No payload, accepted leads, accounting, export or provider activation. Ten new tests include three PostgreSQL races; exact-head CI pending.
 
 ## Next Action
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "b5c4f1a8f1d74a7489e2124300ef1277d0218d06",
+  "reconciliation_base_ref": "1baf1d80fa6aafca5420cf21a640ce7e7a9e7146",
   "modules": [
     {
       "id": "MOD-HISTORICAL-ROADMAP",
@@ -617,7 +617,8 @@
       ],
       "status": "not_started",
       "completion_evidence": [
-        "Candidate result preflight implemented: separate empty-by-default signed evidence registry, current tenant/role/entitlement/source fingerprint checks, bounded US/CA phone/field lineage/retention validation and redacted immutable summary. No ingestion, dedupe, replay ledger, result/accounting writes or exports. Local/CI evidence pending on this branch."
+        "PR #188 merged at 1baf1d80fa6aafca5420cf21a640ce7e7a9e7146; head a942efbacd299ee2460eb560da00d899b7f58f3f passed required checks/Actions CodeQL, PostgreSQL 37770063209 (172 tests/migration/settings) and Next/HTTP 37770063198 (nine transport tests/build/type and earlier native workflows).",
+        "Redacted candidate event ledger implemented: identical bytes replay once, changed bytes/event conflict and source-event reuse cannot cross workspace/operation boundaries. No payload, accepted leads, accounting, export or provider activation. Ten new tests include three PostgreSQL races; exact-head CI pending."
       ],
       "update_notes": [],
       "removal_or_deprecation_notes": []
