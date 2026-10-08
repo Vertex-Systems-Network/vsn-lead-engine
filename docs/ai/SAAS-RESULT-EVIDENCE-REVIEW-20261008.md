@@ -20,3 +20,7 @@ PR #189 now provides durable redacted candidate event collision/replay records. 
 
 
 Follow-on redacted event ledger implementation is described in `SAAS-CANDIDATE-EVENT-REVIEW-20261008.md`; PR #189 exact-head PostgreSQL/required/Web CI passed.
+
+## Subsequent verified implementation
+
+PRs #191–#192 supersede the historical unimplemented storage/read claims in this review: internal dual-attested accepted storage/nonzero v2 accounting and bounded current-rights Next results reads are verified. Candidate review/event rows alone still grant no acceptance or dedupe authority. Live signer/R2 integration, export and physical retention cleanup remain open. See the accepted-results and Next-results reviews.

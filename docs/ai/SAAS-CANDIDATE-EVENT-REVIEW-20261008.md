@@ -19,3 +19,7 @@ Ten new tests cover unchanged accounting, identical replay, changed payload/even
 No accepted-result store or nonzero accounting is implemented. Provenance signatures and syntax cannot prove source rights, phone reachability, territory accuracy or exact cross-day uniqueness. Accepted ingestion needs a reviewed versioned receipt/accounting contract, trusted dedupe evidence and atomic lead budgets. Results reads/export follow with source field/export rights, atomic export caps, safe CSV, revocation/deletion/tombstones and audits.
 
 The earliest deadline describes candidate freshness/retention eligibility; no payload was retained and no physical cleanup runs. Redacted audit metadata retention/deletion/backup policy remains a separate production acceptance gate. Event references are provider audit identifiers and must not contain personal data; operators must enforce this when onboarding an adapter. No public/customer/browser/deployment/legal or live collection certification follows from these tests.
+
+## Subsequent verified implementation
+
+PRs #191–#192 supersede the historical unimplemented storage/read claims in this review: internal dual-attested accepted storage/nonzero v2 accounting and bounded current-rights Next results reads are verified. Candidate review/event rows alone still grant no acceptance or dedupe authority. Live signer/R2 integration, export and physical retention cleanup remain open. See the accepted-results and Next-results reviews.
