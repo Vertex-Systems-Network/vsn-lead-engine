@@ -42,6 +42,8 @@
 
 ## Next Action
 
+Current branch candidate: `feat/internal-billing-evidence` implements pure normalized HMAC snapshot verification with empty default registry and no DB/payment/entitlement writes. Local 269 cases: 243 passed/26 PostgreSQL-only skips; ten DB-forbidden adversarial tests pass. Exact-head CI/merge remains pending; verified production/milestone facts above are unchanged. See `docs/ai/SAAS-BILLING-EVIDENCE-REVIEW-20261008.md` for the next disabled binding/ledger/revision/expiry contract.
+
 1. Implement provider-neutral signed billing-event validation/reconciliation under WU-SAAS-FOUNDATION, with verifier registries disabled by default, preserving reservations/windows and no live payment activation. Real signer/live consumers and production gates remain unavailable.
 2. Billing-event reconciliation is independent safe work; audit/fingerprint/backup retention policy and real signer/source/legal/customer evidence remain separate before-production gates.
 3. Continue the ready frontier within invocation budget; checkpoints are recovery aids, not permission gates.

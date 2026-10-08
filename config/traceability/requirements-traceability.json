@@ -2095,6 +2095,44 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "SAAS-BILLING-EVIDENCE-001",
+      "source": "Internal signed normalized billing evidence with trusted scope and bounded validity",
+      "source_provenance_ref": "docs/ai/SAAS-BILLING-EVIDENCE-REVIEW-20261008.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-SAAS-IDENTITY"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-FOUNDATION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "feat/internal-billing-evidence"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Internal normalized billing evidence validator implemented; 269 local Django cases (243 passed/26 PostgreSQL-only skips), ten DB-forbidden adversarial evidence tests; exact-head CI pending. No entitlement write/payment activation."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-BILLING-EVIDENCE-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/billing_evidence.py",
+        "apps/saas/core/test_billing_evidence.py",
+        "apps/saas/lead_saas/settings.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

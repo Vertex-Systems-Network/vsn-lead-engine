@@ -10,15 +10,15 @@
     "status": "stable",
     "lifecycle_stage": "production_operations",
     "current_phase": "PHASE-SAAS-WEB-MVP",
-    "active_task": "WU-SAAS-LEAD-WEB",
+    "active_task": "WU-SAAS-FOUNDATION",
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "f4e7e5ee2aacb53c3e609acc7d039471455e0241",
-  "observed_main_semantics": "Protected feature main read after PR #202; this feature base precedes checkpoint documentation merge.",
+  "observed_main_sha": "01d52083f70e57974aec4388c67827237584df88",
+  "observed_main_semantics": "Protected PR #203 documentation main read; billing evidence is an unverified current branch candidate.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "main",
+  "active_branch": "feat/internal-billing-evidence",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -137,7 +137,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Implement provider-neutral signed billing-event validation/reconciliation under WU-SAAS-FOUNDATION, with verifier registries disabled by default, preserving reservations/windows and no live payment activation. Real signer/live consumers and production gates remain unavailable.",
+  "exact_next_safe_action": "Implement disabled durable billing bindings/redacted event ledger and atomic exact replay/contiguous revisions; enforce entitlement validity across every capability before enabling writes or billing. Preserve all reservations/periods; no live payment/provider activation.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
