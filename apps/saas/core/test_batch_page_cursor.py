@@ -78,7 +78,10 @@ class BatchPageCursorTests(SimpleTestCase):
             ("x" * 2049, {}),
             ("", {}),
         ):
-            with self.subTest(altered=altered[:20], extra=extra), self.assertRaises(ValidationError):
+            with (
+                self.subTest(altered=altered[:20], extra=extra),
+                self.assertRaises(ValidationError),
+            ):
                 self.read(altered, **extra)
 
     def test_wrong_shape_bounds_order_and_filter_denied_at_issue(self):

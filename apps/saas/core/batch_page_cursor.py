@@ -153,7 +153,9 @@ def decode_page_cursor(
         _invalid()
     try:
         body_part, signature_part = cursor.split(".")
-        body = base64.b64decode(body_part + "=" * (-len(body_part) % 4), altchars=b"-_", validate=True)
+        body = base64.b64decode(
+            body_part + "=" * (-len(body_part) % 4), altchars=b"-_", validate=True
+        )
         signature = base64.b64decode(
             signature_part + "=" * (-len(signature_part) % 4), altchars=b"-_", validate=True
         )
