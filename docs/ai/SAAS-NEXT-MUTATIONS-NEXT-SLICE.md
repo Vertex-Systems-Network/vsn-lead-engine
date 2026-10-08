@@ -6,7 +6,7 @@ PRs #194–#196 now verify guarded CSV preparation/accounting, explicit bounded 
 
 ## Next bounded implementation
 
-1. Country filters and explicit native row/field selection are verified and merged through PR #198; 247 PostgreSQL tests and 12-test Next/HTTP CI pass. Richer category/source filters require their own bounded metadata contract. Keep displayed/filtered/withheld counts distinct and preserve the single-batch 25-row ceiling.
+1. Country filters and explicit native row/field selection are verified and merged through PR #198; 247 PostgreSQL tests and 12-test Next/HTTP CI pass. Saved category/source filters and exact combined export scope are a current candidate; see SAAS-RESULT-METADATA-FILTER-REVIEW-20261008.md and verify protected-head CI before marking delivered. Keep displayed/filtered/withheld counts distinct and preserve the single-batch 25-row ceiling.
 2. Current signed previews bind filtered row scope and require an explicit subset. Maintain common field grants, conservative deadlines, current role/rights checks and once-only prepared-file accounting. See SAAS-RESULT-FILTER-SELECTION-REVIEW-20261008.md; browser/customer acceptance remains open.
 3. Review audit/fingerprint retention and backup/WAL/replica/downstream erasure before production. Existing command erases active row payloads only; it does not certify every copy erased or permit reaccepting duplicates.
 4. Real isolated R2 signer onboarding must prove canonical qualification/fingerprint mapping, committed objects, independent keys and crash reconciliation. Preserve production CLI/R2/Google namespaces and zero-new-spend behavior; fixtures are not provider rights.

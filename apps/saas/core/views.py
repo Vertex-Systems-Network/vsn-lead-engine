@@ -344,9 +344,9 @@ class SourceList(APIView):
 @method_decorator(never_cache, name="dispatch")
 class ResultList(APIView):
     def get(self, request, workspace_id, job_id):
-        from .result_query import result_country, results_snapshot
+        from .result_query import result_filters, results_snapshot
 
         # Current v2 intake is one complete batch <=25 per job; no unbounded reads.
         membership_for(request.user, workspace_id)
-        country = result_country(request.query_params)
-        return Response(results_snapshot(request.user, workspace_id, job_id, country))
+        filters = result_filters(request.query_params)
+        return Response(results_snapshot(request.user, workspace_id, job_id, **filters))

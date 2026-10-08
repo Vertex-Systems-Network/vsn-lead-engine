@@ -350,3 +350,50 @@ test("country filters permit only exact result and CSRF export-preview reads", a
     );
   }
 });
+
+test("metadata filters use canonical bounded indices only on result and export-form paths", async () => {
+  const base = `/api/v1/workspaces/${"a".repeat(36)}/jobs/${"b".repeat(36)}/`;
+  for (const suffix of [
+    "results/?category=0",
+    "results/?source=11",
+    "results/?country=CA&category=1&source=0",
+    "export-form/?category=1&source=0",
+    "export-form/?country=US&source=0",
+  ]) {
+    const result = await readBackend(
+      "http://localhost:8000",
+      base + suffix,
+      session,
+      async (_, options) => {
+        assert.equal(
+          options.headers.Cookie,
+          `sessionid=${session}${suffix.startsWith("export") ? `; csrftoken=${"C".repeat(32)}` : ""}`,
+        );
+        assert.equal(options.cache, "no-store");
+        return new Response("{}", {
+          headers: { "content-type": "application/json" },
+        });
+      },
+      "C".repeat(32),
+    );
+    assert.equal(result.kind, "ok");
+  }
+  for (const suffix of [
+    "results/?category=12",
+    "results/?category=01",
+    "results/?category=software",
+    "results/?source=fixture",
+    "results/?source=-1",
+    "results/?source=0&category=1",
+    "results/?category=0&category=0",
+    "results/?category=0?source=0",
+    "results/?country=US&source=0&extra=1",
+    "cancel-form/?category=0",
+    "export-form/?source=12",
+  ]) {
+    await assert.rejects(
+      readBackend("http://localhost:8000", base + suffix, session),
+      /Unsupported/,
+    );
+  }
+});
