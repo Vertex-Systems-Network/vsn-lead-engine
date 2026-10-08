@@ -26,12 +26,7 @@ from .services import IdempotencyConflict
 from .test_batch_events import KEY, SETTINGS, fixture
 
 
-@override_settings(
-    **SETTINGS,
-    SAAS_BATCH_ACCEPTANCE_ENABLED=True,
-    SAAS_BATCH_VERIFIERS={"fixture": {"source": manifests.SOURCE}},
-)
-class BatchIntakeTests(TestCase):
+class IntakeFixture:
     def setUp(self):
         self.user, self.operation, self.batch, self.candidate = fixture()
         self.namespace = f"saas-results/v1/{self.operation.workspace_id}"
@@ -99,6 +94,14 @@ class BatchIntakeTests(TestCase):
             hmac.new(manifests.SOURCE, body, hashlib.sha256).hexdigest(),
             hmac.new(manifests.DEDUPE, body, hashlib.sha256).hexdigest(),
         )
+
+
+@override_settings(
+    **SETTINGS,
+    SAAS_BATCH_ACCEPTANCE_ENABLED=True,
+    SAAS_BATCH_VERIFIERS={"fixture": {"source": manifests.SOURCE}},
+)
+class BatchIntakeTests(IntakeFixture, TestCase):
 
     def test_default_gate_and_exact_replay_preserve_original_reservation(self):
         with override_settings(SAAS_BATCH_ACCEPTANCE_ENABLED=False):

@@ -141,3 +141,7 @@ SAAS_BATCH_CANDIDATE_EVENTS_ENABLED = False
 # Internal v3 payload intake stays unreachable until signer, R2 and terminal
 # accounting gates are independently verified. No HTTP route enables this flag.
 SAAS_BATCH_ACCEPTANCE_ENABLED = False
+
+# Source-final metadata remains internal and default-off. Whole-job accounting
+# and no-effect proof are separate capabilities, never implied by this flag.
+SAAS_BATCH_TERMINAL_EVENTS_ENABLED = False

@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PR #220 merged at 2c422919a607d116b687ca45994597b581773faa; head 57c54ce52681d63603f87151785f4f818cf68be0 passed all five workflows, PostgreSQL 37826291597 (375 tests/migrations/settings) and Web 37826291595 (14 transport/build/type/HTTP). Exclusive v3 payload links, bounded positions, shared fingerprints/erasure, protected populated rollback and legacy visibility withholding verified; no v3 intake/finality/dispatch.",
+  "last_verified_completion": "PR #224 merged at 43b8816de7f9b7bb0977651d42ff775eeabfa844; head b55789af passed all five workflows, including 389 PostgreSQL tests and 14 Web tests/HTTP. Default-off atomic v3 batch acceptance, shared fingerprints and original aggregate caps; no source finality or settlement.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Implement disabled atomic v3 accepted-batch intake using paired current proofs, durable candidate identity, exact replay/reference collision checks, shared tenant fingerprints and summed original lead/source-call/outbox-call caps. Preserve the full reservation and unknown effects until every allocated identity is reconciled and exact source-final/whole-job accounting passes; then internal write-ahead entry and signed 25-row pages.",
+    "Verify disabled source-final evidence against every allocated acceptance, then implement separately gated whole-job accounting with unknown-effect reconciliation. Keep reservation held and v3 dispatch quarantined; write-ahead entry and signed 25-row pagination follow.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_375_verified_paired_batch_payload_review",
+  "qa_readiness": "saas_389_postgres_and_14_web_http_verified",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "2ed8bc67a435c033a8968be12e67d146b2ab7f18",
+  "last_reconciled_repository_ref": "43b8816de7f9b7bb0977651d42ff775eeabfa844",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

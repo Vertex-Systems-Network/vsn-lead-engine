@@ -34,7 +34,9 @@ from .usage import COUNTERS
 
 
 @transaction.atomic
-def allocate_result_batch(user, workspace_id, operation_id, expected_ordinal):
+def allocate_result_batch(
+    user, workspace_id, operation_id, expected_ordinal, *, terminal_replay=False
+):
     """Allocate a UUID or replay the same ordinal under a full original-budget lock.
 
     The ordinal is a compare/replay coordinate; callers never supply the batch UUID.
@@ -84,7 +86,7 @@ def allocate_result_batch(user, workspace_id, operation_id, expected_ordinal):
         or operation.status not in {"started", "unknown"}
         or intent.expires_at is not None
         and intent.expires_at <= timezone.now()
-        or SourceBatchTerminal.objects.filter(operation=operation).exists()
+        or (SourceBatchTerminal.objects.filter(operation=operation).exists() and not terminal_replay)
         or DispatchReceipt.objects.filter(operation__outbox=intent).exists()
         or CandidateEvidence.objects.filter(operation__outbox=intent).exists()
         or ResultAcceptance.objects.filter(operation__outbox=intent).exists()
@@ -154,6 +156,8 @@ def allocate_result_batch(user, workspace_id, operation_id, expected_ordinal):
     previous = ResultBatch.objects.filter(operation=operation, ordinal=expected_ordinal).first()
     if previous is not None:
         return previous, False
+    if terminal_replay:
+        raise RevisionConflict()
     if operation.status != "started" or expected_ordinal != len(ordinals) + 1:
         raise RevisionConflict()
     # Each eventual accepted batch is nonempty and attests at least one call.

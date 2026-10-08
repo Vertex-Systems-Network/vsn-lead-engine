@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "2ed8bc67a435c033a8968be12e67d146b2ab7f18",
-  "observed_main_semantics": "Verified payload-schema #220 checkpoint reconciled by documentation #221 before paired-proof review.",
+  "observed_main_sha": "43b8816de7f9b7bb0977651d42ff775eeabfa844",
+  "observed_main_semantics": "Verified default-off batch intake #224 before source-final review.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -90,7 +90,9 @@
     "saas_batch_candidates": "PR #217 / head ca1cd8ec: all five workflows passed; PG 37824016673 (358 tests/migrations/settings), Web 37824016597 (14 tests/HTTP). Pure proof/shared eligibility only.",
     "saas_batch_events": "PR #218 / head f9d0173c: all five workflows passed; PG 37824615261 (366 tests/migrations/settings), Web 37824615227 (14 tests/HTTP). Disabled redacted candidate ledger; no payload/finality/dispatch.",
     "saas_batch_payload_schema": "PR #220 / head 57c54ce5: all five workflows passed; PG 37826291597 (375 tests/migrations/settings), Web 37826291595 (14 tests/HTTP). Protected shared payload schema only.",
-    "saas_batch_payload_proof": "Development review: pure paired proof mapping, exact refs, independent keys, conditional domain token, immutable redacted-repr rows; eight DB-forbidden cases, CI pending."
+    "saas_batch_payload_proof": "PR #222 merged after all five workflows passed; eight pure DB-forbidden cases.",
+    "saas_batch_intake": "PR #224 merged at 43b8816de7f9b7bb0977651d42ff775eeabfa844; head b55789af passed all five workflows, including 389 PostgreSQL tests and 14 Web tests/HTTP. Default-off atomic v3 batch acceptance, shared fingerprints and original aggregate caps; no source finality or settlement.",
+    "saas_source_final": "Development review: default-off exact allocated/accepted set; no usage settlement; CI pending."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -137,7 +139,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Implement disabled atomic v3 accepted-batch intake using paired current proofs, durable candidate identity, exact replay/reference collision checks, shared tenant fingerprints and summed original lead/source-call/outbox-call caps. Preserve the full reservation and unknown effects until every allocated identity is reconciled and exact source-final/whole-job accounting passes; then internal write-ahead entry and signed 25-row pages.",
+  "exact_next_safe_action": "Verify disabled source-final evidence against every allocated acceptance, then implement separately gated whole-job accounting with unknown-effect reconciliation. Keep reservation held and v3 dispatch quarantined; write-ahead entry and signed 25-row pagination follow.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
