@@ -1651,6 +1651,43 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "SAAS-RESULT-EVIDENCE-001",
+      "source": "Bounded trusted candidate result contract",
+      "source_provenance_ref": "docs/ai/SAAS-API-DATA-CONTRACTS-20261008.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "saas/result-evidence-preflight"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Ten candidate-evidence tests; exact-head CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-RESULT-EVIDENCE-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/result_evidence.py",
+        "apps/saas/core/test_result_evidence.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

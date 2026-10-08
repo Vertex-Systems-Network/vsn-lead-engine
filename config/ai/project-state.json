@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Continue bounded accepted-result and source-aware export contracts under trusted source evidence, phone qualification and exact R2 dedupe authority; billing-event reconciliation is independent. Keep provider/payment/scheduler consumers disabled.",
+    "Continue durable candidate event replay/conflict and reviewed versioned accepted-result accounting; then bounded tenant result reads and source-aware export. Keep live providers/payment/scheduler consumers disabled.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "saas_130_postgres_cases_and_next_http_auth_verified_full_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "c5c26d15f5cbb8e9865014c125f13489895755a4",
+  "last_reconciled_repository_ref": "b5c4f1a8f1d74a7489e2124300ef1277d0218d06",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "c5c26d15f5cbb8e9865014c125f13489895755a4",
-  "observed_main_semantics": "Protected main read after verified PR #186; recorded feature base precedes this documentation merge.",
+  "observed_main_sha": "b5c4f1a8f1d74a7489e2124300ef1277d0218d06",
+  "observed_main_semantics": "Reconciled protected main before result-evidence candidate; open issues and PRs empty.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "main",
+  "active_branch": "saas/result-evidence-preflight",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -80,7 +80,8 @@
     "saas_next_source_configuration": "PR #181 merged at 4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01; head 66152035d4f4da7f75d8c656fe3eae0224590076 passed required checks/Actions CodeQL, PostgreSQL 37703955016 (141 tests/migration/settings), and Next/HTTP 37703954934 (bounded native source/XSS/viewer/tenant and earlier form/auth flows).",
     "saas_job_state_filter": "PR #182 merged at 9bc1065b403299b74b60dca52ce6d1cc46f4d810; head 593799c04edc7b03d888663362d655106da92eea passed required checks/Actions CodeQL, PostgreSQL 37704612846 (145 tests/migration/settings), and Next/HTTP 37704612908 (eight transport tests, native forms/source configuration and filtered/empty/Next/First-page flows).",
     "saas_next_validation_signout": "PR #184 merged at bec879cb7b7ed925e64a623d2ce197c7c590eafa; head 034cd99a40dbd3c2254e1a3a832e01f05f56501c passed required checks/Actions CodeQL, PostgreSQL 37755784470 (154 tests/migration/settings) and Next/HTTP 37755784437 (eight transport tests, escaped feedback/correction/replay/conflict/missing-context recovery and native sign-out).",
-    "saas_native_login_cancel": "PR #186 merged at c5c26d15f5cbb8e9865014c125f13489895755a4; head be357389f869b5b2cc667eff5280718d0e687789 passed required checks/Actions CodeQL, PostgreSQL 37766322082 (162 tests/migration/settings) and Next/HTTP 37766321955 (nine transport tests, native login bootstrap/failure/limit/rotation and cancellation-error review, plus earlier workflows)."
+    "saas_native_login_cancel": "PR #186 merged at c5c26d15f5cbb8e9865014c125f13489895755a4; head be357389f869b5b2cc667eff5280718d0e687789 passed required checks/Actions CodeQL, PostgreSQL 37766322082 (162 tests/migration/settings) and Next/HTTP 37766321955 (nine transport tests, native login bootstrap/failure/limit/rotation and cancellation-error review, plus earlier workflows).",
+    "saas_result_evidence": "Candidate result preflight implemented: separate empty-by-default signed evidence registry, current tenant/role/entitlement/source fingerprint checks, bounded US/CA phone/field lineage/retention validation and redacted immutable summary. No ingestion, dedupe, replay ledger, result/accounting writes or exports. Local/CI evidence pending on this branch."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -127,7 +128,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Continue bounded accepted-result and source-aware export contracts under trusted source evidence, phone qualification and exact R2 dedupe authority; billing-event reconciliation is independent. Keep provider/payment/scheduler consumers disabled.",
+  "exact_next_safe_action": "Continue durable candidate event replay/conflict and reviewed versioned accepted-result accounting; then bounded tenant result reads and source-aware export. Keep live providers/payment/scheduler consumers disabled.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

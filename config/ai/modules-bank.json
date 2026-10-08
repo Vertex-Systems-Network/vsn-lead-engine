@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "c5c26d15f5cbb8e9865014c125f13489895755a4",
+  "reconciliation_base_ref": "b5c4f1a8f1d74a7489e2124300ef1277d0218d06",
   "modules": [
     {
       "id": "MOD-HISTORICAL-ROADMAP",
@@ -616,7 +616,9 @@
         "Privacy/deletion tests"
       ],
       "status": "not_started",
-      "completion_evidence": [],
+      "completion_evidence": [
+        "Candidate result preflight implemented: separate empty-by-default signed evidence registry, current tenant/role/entitlement/source fingerprint checks, bounded US/CA phone/field lineage/retention validation and redacted immutable summary. No ingestion, dedupe, replay ledger, result/accounting writes or exports. Local/CI evidence pending on this branch."
+      ],
       "update_notes": [],
       "removal_or_deprecation_notes": []
     },
