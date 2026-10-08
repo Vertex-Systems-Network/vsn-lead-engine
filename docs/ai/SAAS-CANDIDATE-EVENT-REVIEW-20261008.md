@@ -12,7 +12,7 @@ Same operation and bytes replay the original row without updating its time/deadl
 
 Additive migration 0012 creates only the isolated SaaS metadata table, count bounds 1–25, unique source/event and protected one-to-one operation. Empty-database reversal/reapplication remains supported; a populated ledger refuses destructive reversal pending an explicit evidence preservation/reconciliation plan. No production R2/workbook schema or records are touched.
 
-Ten new tests cover unchanged accounting, identical replay, changed payload/event conflicts, signed cross-workspace collision, current rights/role/expiry rechecks, unconfigured verification, injected-write rollback, database constraints, protected parent/reverse guard and three PostgreSQL races (duplicate, conflicting, cross-workspace). Exact-head required/PostgreSQL/migration/settings/Web checks are required before merge. Repository README/checkpoint records final CI evidence.
+Ten new tests cover unchanged accounting, identical replay, changed payload/event conflicts, signed cross-workspace collision, current rights/role/expiry rechecks, unconfigured verification, injected-write rollback, database constraints, protected parent/reverse guard and three PostgreSQL races (duplicate, conflicting, cross-workspace). PR #189 merged at 0a81b3e24f45edfa72b5101c8241891030a88f1c; head fb58dd787290a81813f3c85a412f897782b5ffd7 passed required checks/Actions CodeQL, PostgreSQL 37770588647 (all 182 tests, including three candidate-event races, migrations/settings) and Next/HTTP 37770588715 (nine transport tests/build/type and native workflows). Local SaaS: 163 passed/19 PostgreSQL-only skips; root 376 passed/1 skipped/28 subtests, Ruff/ANPOS and drift pass.
 
 ## Remaining gates
 

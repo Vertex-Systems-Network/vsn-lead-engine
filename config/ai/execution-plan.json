@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "1baf1d80fa6aafca5420cf21a640ce7e7a9e7146",
+  "reconciliation_base_ref": "0a81b3e24f45edfa72b5101c8241891030a88f1c",
   "phases": [
     {
       "id": "PHASE-HISTORICAL-BASELINE",
@@ -656,7 +656,7 @@
         "PR #184 merged at bec879cb7b7ed925e64a623d2ce197c7c590eafa; head 034cd99a40dbd3c2254e1a3a832e01f05f56501c passed required checks/Actions CodeQL, PostgreSQL 37755784470 (154 tests/migration/settings) and Next/HTTP 37755784437 (eight transport tests, escaped feedback/correction/replay/conflict/missing-context recovery and native sign-out).",
         "PR #186 merged at c5c26d15f5cbb8e9865014c125f13489895755a4; head be357389f869b5b2cc667eff5280718d0e687789 passed required checks/Actions CodeQL, PostgreSQL 37766322082 (162 tests/migration/settings) and Next/HTTP 37766321955 (nine transport tests, native login bootstrap/failure/limit/rotation and cancellation-error review, plus earlier workflows).",
         "PR #188 merged at 1baf1d80fa6aafca5420cf21a640ce7e7a9e7146; head a942efbacd299ee2460eb560da00d899b7f58f3f passed required checks/Actions CodeQL, PostgreSQL 37770063209 (172 tests/migration/settings) and Next/HTTP 37770063198 (nine transport tests/build/type and earlier native workflows).",
-        "Redacted candidate event ledger implemented: identical bytes replay once, changed bytes/event conflict and source-event reuse cannot cross workspace/operation boundaries. No payload, accepted leads, accounting, export or provider activation. Ten new tests include three PostgreSQL races; exact-head CI pending."
+        "PR #189 merged at 0a81b3e24f45edfa72b5101c8241891030a88f1c; head fb58dd787290a81813f3c85a412f897782b5ffd7 passed required checks/Actions CodeQL, PostgreSQL 37770588647 (all 182 tests, including three candidate-event races, migrations/settings) and Next/HTTP 37770588715 (nine transport tests/build/type and native workflows)."
       ],
       "update_notes": [
         "Frontend selection partially supersedes templates UI decision only: docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md."

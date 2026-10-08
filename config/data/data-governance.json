@@ -145,6 +145,27 @@
       "deletion_method": "Logout session flush, bounded eviction/pruning and existing expired-session cleanup.",
       "backup_policy": "No new backup mechanism; production session-store backup/retention review remains open.",
       "non_production_policy": "Only disposable synthetic sessions and search fixtures."
+    },
+    {
+      "id": "DATA-006",
+      "name": "SaaS redacted candidate event evidence",
+      "classification": "confidential",
+      "tags": [
+        "security_sensitive"
+      ],
+      "owners": [
+        "VSN repository owner/operator"
+      ],
+      "storage_locations": [
+        "Isolated SaaS PostgreSQL CandidateEvidence table"
+      ],
+      "encryption_required": true,
+      "log_policy": "Do not log candidate payloads, signatures, verifier keys, cookies or source record references. Routine output uses compact counts/status only.",
+      "ai_access": "Synthetic fixtures only during development.",
+      "retention": "Candidate eligibility expires at the recorded source-derived deadline; this does not erase audit metadata. Operator-approved audit metadata retention and physical cleanup must be defined/verified before production activation. No production payload intake is enabled.",
+      "deletion_method": "No automated cleanup activated. Evidence/parent links and migration reverse guard require an explicit preservation/reconciliation plan for destructive changes.",
+      "backup_policy": "No new backup mechanism or production store enabled; audit metadata encryption, expiry and restore acceptance remain open.",
+      "non_production_policy": "Disposable synthetic evidence only; no raw production copy. Event references must be opaque provider audit identifiers without personal data."
     }
   ]
 }
