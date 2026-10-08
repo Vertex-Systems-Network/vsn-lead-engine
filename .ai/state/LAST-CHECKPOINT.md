@@ -36,6 +36,8 @@
 
 ## Next Action
 
-1. Implement quarantined v3 server-owned batch allocation and candidate/accepted-payload intake with aggregate original-reservation caps, durable replay and exact source-final/unknown-effect reconciliation. Keep v3 dispatch disabled until the full guarded transactional path is reviewed.
+1. Implement separately gated v3 candidate/accepted-payload intake and exact terminal/unknown-effect accounting; then an internal write-ahead entry path. Allocation primitive remains default disabled and ordinary v3 dispatch quarantined until the complete guarded flow passes review.
 2. Then add stable-watermark signed 25-row page services and native selected-page CSV, preserving current rights/expiry/no-referrer/once-only preparation semantics.
 3. Keep README/machine/checkpoint evidence synchronized after protected merges; checkpoints are recovery aids, not permission gates. Continue safe frontier within the next invocation's host budget. Do not replay merged mutations.
+
+Allocation review: default disabled primitive requires a future started v3 context. Local twelve cases / three PG skips; protected CI pending; no runtime v3 start, payload or settlement.

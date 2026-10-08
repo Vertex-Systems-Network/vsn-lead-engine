@@ -128,3 +128,6 @@ SAAS_BATCH_TERMINAL_VERIFIERS = {}
 # Enrollment only; batch dispatch/intake remain unavailable even when locally enabled.
 SAAS_BATCH_ENROLLMENT_ENABLED = False
 SAAS_BATCH_ENROLLMENT_SOURCES = frozenset()
+
+# Quarantined allocation primitive; ordinary dispatch still refuses v3 jobs.
+SAAS_BATCH_ALLOCATION_ENABLED = False
