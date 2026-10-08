@@ -1624,9 +1624,11 @@
       "branch_refs": [
         "codex/next-account-cancellation-recovery"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #186"
+      ],
       "test_evidence": [
-        "Native Next sign-in with explicit CSRF bootstrap/generic failures/unchanged attempt caps and cancellation-error snapshot/review implemented. Local 146 pass/16 PostgreSQL skips (162 cases), nine transport tests, Next build/type/lint/format and HTTP flows pass; exact-head CI pending. No provider/payment activation or browser/deployment certification."
+        "PR #186 merged at c5c26d15f5cbb8e9865014c125f13489895755a4; head be357389f869b5b2cc667eff5280718d0e687789 passed required checks/Actions CodeQL, PostgreSQL 37766322082 (162 tests/migration/settings) and Next/HTTP 37766321955 (nine transport tests, native login bootstrap/failure/limit/rotation and cancellation-error review, plus earlier workflows)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1644,7 +1646,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:c5c26d15f5cbb8e9865014c125f13489895755a4"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }

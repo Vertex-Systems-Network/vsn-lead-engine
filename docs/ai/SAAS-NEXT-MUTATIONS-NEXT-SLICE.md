@@ -1,24 +1,20 @@
-# Native Next mutations: delivered boundary and next slice
+# Native Next workflows: delivered boundary and ready results frontier
 
-PR #180 delivered native draft/cancellation controls and bounded Django contexts. PR #181 delivered read-only source configuration; PR #182 delivered saved-job state filtering/pagination. PR #184 now delivers native draft validation/correction/conflict, missing-feedback recovery and native sign-out confirmation. Django retains session/tenant/role, CSRF, signed idempotency, cancellation revision and login abuse-control authority.
+PRs #180–#184 delivered native draft/cancel controls, source configuration, state-filter pagination, draft correction/conflict/missing-feedback recovery and sign-out. PR #186 now delivers native sign-in with explicit browser CSRF bootstrap and generic attempt-limit/credential notices, plus cancellation-error current-state review. Django remains authentication, tenant/role/CSRF, abuse-control and transactional mutation authority.
 
-## Delivered controls
+## Verified account and mutation controls
 
-- Native HTML forms post to fixed Django actions. Successful drafts/cancellations return 303 to configured Next job paths; sign-out confirms the existing Django POST logout. No Next mutation proxy or request-selected backend/redirect origin.
-- Rejected bounded drafts with valid authority use five-minute session/actor/workspace-bound feedback with the original draft identity. At most three entries; reads do not consume/refresh context. Invalid authority/oversized input retains Django fallback. Physical session retention differs from the read deadline; see the validation/sign-out engineering review.
-- Exact authenticated form contexts return bounded public data, masked CSRF and existing signed tokens. Validated CSRF-cookie forwarding applies only to their exact paths; ordinary reads remain session-only, fixed-origin/path, bounded, private and uncached.
-- PostgreSQL, migration/settings, Next lint/format/type/build/transport and real HTTP auth/CSRF/role/tenant/replay/correction/conflict/sign-out checks pass. Full browser/deployment acceptance is separate.
+- Browser cookie bootstrap returns only to configured Next sign-in. The exact anonymous context forwards CSRF only and returns a masked token; authenticated paths retain validated session requirements. Credentials post directly to the protected Django login handler. Native success ignores supplied next destinations; generic notices contain no account/password data and grant no authority.
+- Login account/IP budgets and trusted connection-address policy are unchanged. Native limited responses use 303 plus Retry-After, without credential checks; standalone handlers retain existing behavior. Session/CSRF rotation and logout invalidation are tested.
+- Cancellation notice mode reads the authorized current snapshot, shows status/revision and links to explicit review. It issues no confirmation and performs no retry/cancellation. Stale or expired authority cannot become fresh through error rendering.
+- Exact-head PostgreSQL, migrations/settings, Next build/type/lint/format/transport and real HTTP bootstrap, credential/Origin/limit, mutation/replay, source/filter and cancellation-recovery workflows pass. Browser/deployment acceptance remains separate.
 
-## Next: native cancellation errors
+## Next bounded implementation: accepted results and source-aware export
 
-1. Present bounded generic cancellation errors alongside the current server job state. A stale revision must require reviewing current details and a fresh explicit confirmation; a feedback read must never auto-cancel, auto-retry or refresh mutation authority.
-2. Bind any error handoff to session/actor/workspace/job with expiry and bounded storage. Preserve pending-only rules; running/completed/unknown operations cannot become cancellable through UI recovery. Invalid/expired confirmation may retain Django fallback until an independently reviewed native recovery exists.
-3. Verify stale confirmation, changed role, foreign job, expired feedback and started/terminal state, plus release-once/idempotent replay and real PostgreSQL races. Browser focus/keyboard/responsive validation remains necessary.
+1. Reconcile the existing API/data and UX contracts with `src/vsn_lead_engine/saas/contracts.py`, `source_policy.py`, current job/source/usage/receipt services and model ownership before adding result storage. Preserve production CLI/Google delivery/exact R2 dedupe authority; use isolated tenant-scoped SaaS storage/keys and synthetic test namespaces, never the production R2 namespace or workbook data.
+2. Define trusted ingestion provenance, event identity, tenant/job/source bindings, stable replay/conflict behavior, phone qualification, US/CA scope, field lineage, retention version and permitted purpose. Browser payloads and a requested result limit cannot establish accepted leads. Current terminal receipts/accounting carry zero accepted leads: a reviewed versioned evidence/accounting change is required before accepting nonzero results; do not reinterpret existing receipts.
+3. Keep new ingestion/export routes unavailable until their contracts and authority checks exist. Enforce source display/storage/export/field rights, live policy version/kill switch, current actor membership/role and atomic lead/export budgets. Reuse source-aware policy logic; unknown metadata fails closed. Synthetic rights fixtures remain tests only.
+4. Add bounded tenant-scoped read views/pagination before enabling export. Export specification/idempotency, allowed fields, no formula injection, no sensitive URLs/logs, revocation/retention and audit evidence must be reviewed together. Full lead payloads are data, not operational logs or control-plane memory.
+5. Verify forged/unsigned evidence, conflicting replay, foreign tenant/source/job, missing phone, unsupported territory/fields, rights changes, stale membership and concurrent caps with disposable PostgreSQL. No live adapter, source, scheduler, payment or release activation follows from contract tests.
 
-## Next: native anonymous login
-
-1. Define explicit anonymous CSRF bootstrap and cookie propagation before rendering a native form. Server-component reads cannot silently seed browser cookies; use a narrow reviewed bootstrap path rather than bypassing CSRF or using the authenticated draft context.
-2. Post passwords only to the existing fixed Django login handler. Preserve account/IP attempt budgets, trusted connection-address policy, generic credential/rate-limit failures, session rotation and the fixed dashboard return. Never store or render passwords in feedback, query strings or logs.
-3. Keep user/account identifiers out of error URLs and review any bounded anonymous feedback mechanism separately. Test missing/mismatched/rotated CSRF, wrong Origin, failed login, attempt exhaustion, success/rotation and old-session denial with real HTTP and PostgreSQL budgets.
-
-Production shared-origin TLS/proxy/cookies, session encryption/retention/cleanup and browser/customer acceptance remain open. Signed billing events and phone-qualified accepted results/export are independent later slices. These frontend steps do not require provider, payment or scheduler activation.
+Signed billing-event reconciliation remains independent safe work. Recovery/signup, local browser visual/keyboard/WCAG/customer assessment, shared-origin TLS/proxy/cookies and retention/encryption/cleanup acceptance remain open. Engineering implementation progress is not deployment or collection certification.

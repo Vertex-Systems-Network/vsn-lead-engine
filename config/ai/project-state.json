@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-WEB-EXPERIENCE",
   "current_work_unit": "WU-SAAS-LEAD-WEB",
-  "last_verified_completion": "PR #184 merged at bec879cb7b7ed925e64a623d2ce197c7c590eafa; head 034cd99a40dbd3c2254e1a3a832e01f05f56501c passed required checks/Actions CodeQL, PostgreSQL 37755784470 (154 tests/migration/settings) and Next/HTTP 37755784437 (eight transport tests, escaped feedback/correction/replay/conflict/missing-context recovery and native sign-out).",
+  "last_verified_completion": "PR #186 merged at c5c26d15f5cbb8e9865014c125f13489895755a4; head be357389f869b5b2cc667eff5280718d0e687789 passed required checks/Actions CodeQL, PostgreSQL 37766322082 (162 tests/migration/settings) and Next/HTTP 37766321955 (nine transport tests, native login bootstrap/failure/limit/rotation and cancellation-error review, plus earlier workflows).",
   "next_valid_work_unit": "WU-SAAS-LEAD-WEB",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify native sign-in/cancellation-error CI and merge; continue accepted-result and source-aware export contracts with trusted evidence, exact R2 authority and no provider/payment activation.",
+    "Continue bounded accepted-result and source-aware export contracts under trusted source evidence, phone qualification and exact R2 dedupe authority; billing-event reconciliation is independent. Keep provider/payment/scheduler consumers disabled.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "saas_130_postgres_cases_and_next_http_auth_verified_full_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "9abfead754aefdd51683448ab6a38735714aa219",
+  "last_reconciled_repository_ref": "c5c26d15f5cbb8e9865014c125f13489895755a4",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [
