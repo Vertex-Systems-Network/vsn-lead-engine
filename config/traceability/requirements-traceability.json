@@ -1668,9 +1668,11 @@
       "branch_refs": [
         "saas/result-evidence-preflight"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #188"
+      ],
       "test_evidence": [
-        "Ten candidate-evidence tests; exact-head CI pending."
+        "PR #188 merged at 1baf1d80fa6aafca5420cf21a640ce7e7a9e7146; head a942efbacd299ee2460eb560da00d899b7f58f3f passed required checks/Actions CodeQL, PostgreSQL 37770063209 (172 tests/migration/settings) and Next/HTTP 37770063198 (nine transport tests/build/type and earlier native workflows)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1682,6 +1684,47 @@
       "artifact_refs": [
         "apps/saas/core/result_evidence.py",
         "apps/saas/core/test_result_evidence.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:1baf1d80fa6aafca5420cf21a640ce7e7a9e7146"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "SAAS-CANDIDATE-EVENT-001",
+      "source": "Durable redacted candidate event replay/conflict boundary",
+      "source_provenance_ref": "docs/ai/SAAS-API-DATA-CONTRACTS-20261008.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "saas/candidate-event-ledger"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Ten ledger tests including three PostgreSQL races; exact-head CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-CANDIDATE-EVENT-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [
+        "apps/saas/core/migrations/0012_candidate_evidence.py"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/candidate_events.py",
+        "apps/saas/core/test_candidate_events.py"
       ],
       "sbom_refs": [],
       "attestation_refs": [],

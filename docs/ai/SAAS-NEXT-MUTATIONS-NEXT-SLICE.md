@@ -11,7 +11,7 @@ PRs #180–#184 delivered native draft/cancel controls, source configuration, st
 
 ## Candidate result contract boundary
 
-The internal candidate preflight now implements the initial signed provenance/phone/scope/field-lineage/retention validation contract; exact-head verification is pending. It returns redacted comparison metadata only. No event ledger, result store, R2 dedupe authority, nonzero accounting, export or route is enabled. See `SAAS-RESULT-EVIDENCE-REVIEW-20261008.md`.
+The internal candidate preflight now implements the initial signed provenance/phone/scope/field-lineage/retention validation contract; PR #188 exact-head PostgreSQL/required/Web checks passed. It returns redacted comparison metadata only. A follow-on redacted event ledger is implemented with CI pending. No accepted result store, R2 dedupe authority, nonzero accounting, export or route is enabled. See `SAAS-RESULT-EVIDENCE-REVIEW-20261008.md`.
 
 ## Next bounded implementation: accepted results and source-aware export
 

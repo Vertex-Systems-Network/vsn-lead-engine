@@ -12,8 +12,11 @@ The frozen return contains only event reference, exact body digest, candidate co
 
 ## Review and verification
 
-Ten new tests cover redacted immutable/repeated review, unchanged accounting, unconfigured/separate verifier keys, forged/bound identities, exact schema, duplicate/deep/oversized payloads, scope/phone/lineage/rights/retention failures, live policy drift/kill switch, viewer/revoked/foreign/inactive access, reservation caps and zero-result terminal receipt compatibility. Local full suite and exact-head PostgreSQL/required/Web CI must pass before merge; repository checkpoint records final evidence after verification. No schema migration is introduced.
+Ten new tests cover redacted immutable/repeated review, unchanged accounting, unconfigured/separate verifier keys, forged/bound identities, exact schema, duplicate/deep/oversized payloads, scope/phone/lineage/rights/retention failures, live policy drift/kill switch, viewer/revoked/foreign/inactive access, reservation caps and zero-result terminal receipt compatibility. PR #188 merged at 1baf1d80fa6aafca5420cf21a640ce7e7a9e7146; head a942efbacd299ee2460eb560da00d899b7f58f3f passed required checks/Actions CodeQL, PostgreSQL 37770063209 (172 tests/migration/settings) and Next/HTTP 37770063198 (nine transport tests/build/type and earlier native workflows). Local SaaS 172 cases: 156 passed, 16 PostgreSQL-only skips; root/Ruff/ANPOS pass. No schema migration is introduced.
 
 ## Next acceptance gates
 
 Add durable event collision/replay records and a reviewed versioned nonzero result/accounting contract before storing accepted results. Preserve production exact R2 authority and isolated SaaS namespaces; candidate input cannot assert uniqueness. Then implement bounded tenant reads and source-aware export authorization/field rights, atomic export caps, safe CSV output, retention/deletion/tombstones and privacy-safe audits together. Current preflight has no export permission or export endpoint. Source/provider review, encryption/physical deletion/backup acceptance, deployment and customer/browser validation remain external or subsequent implementation work.
+
+
+Follow-on redacted event ledger implementation is described in `SAAS-CANDIDATE-EVENT-REVIEW-20261008.md`; its exact-head CI remains pending.
