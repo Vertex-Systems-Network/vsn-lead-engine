@@ -402,3 +402,75 @@ class CandidateEvidence(models.Model):
                 name="saas_candidate_count",
             ),
         ]
+
+
+class ResultAcceptance(models.Model):
+    """Version-2 terminal evidence, isolated from zero-lead DispatchReceipt v1."""
+
+    operation = models.OneToOneField(DispatchOperation, on_delete=models.PROTECT)
+    candidate = models.OneToOneField(CandidateEvidence, on_delete=models.PROTECT)
+    receipt_ref = models.CharField(max_length=96)
+    source_code = models.CharField(max_length=64)
+    source_key_id = models.CharField(max_length=64)
+    dedupe_key_id = models.CharField(max_length=64)
+    body_hash = models.CharField(max_length=64)
+    namespace = models.CharField(max_length=96)
+    accepted_count = models.PositiveIntegerField()
+    provider_calls = models.PositiveIntegerField()
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source_code", "receipt_ref"], name="saas_acceptance_ref"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(accepted_count__gte=1, accepted_count__lte=25),
+                name="saas_accepted_count",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(provider_calls__gte=1), name="saas_acceptance_calls"
+            ),
+        ]
+
+
+class AcceptedResult(models.Model):
+    """Isolated tenant payload with source-derived eligibility/deletion deadline."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
+    job = models.ForeignKey(Job, on_delete=models.PROTECT)
+    acceptance = models.ForeignKey(ResultAcceptance, on_delete=models.PROTECT)
+    record_ref = models.CharField(max_length=96)
+    country = models.CharField(max_length=2)
+    category = models.CharField(max_length=120)
+    fields = models.JSONField()
+    field_lineage = models.JSONField()
+    observed_at = models.DateTimeField()
+    delete_at = models.DateTimeField()
+    purpose = models.CharField(max_length=64)
+    retention_version = models.CharField(max_length=64)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["acceptance", "record_ref"], name="saas_accepted_record"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(country__in=["US", "CA"]), name="saas_accepted_country"
+            ),
+        ]
+        indexes = [models.Index(fields=["workspace", "job", "id"], name="saas_result_job")]
+
+
+class AcceptedFingerprint(models.Model):
+    """Tenant dedupe backstop; signed isolated R2 evidence remains mandatory."""
+
+    workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
+    result = models.ForeignKey(AcceptedResult, on_delete=models.PROTECT)
+    token = models.CharField(max_length=26)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["workspace", "token"], name="saas_accepted_token")
+        ]

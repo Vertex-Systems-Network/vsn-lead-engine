@@ -19,6 +19,7 @@ from .models import (
     Job,
     JobAttempt,
     JobOutbox,
+    ResultAcceptance,
     UsageReservation,
     Workspace,
 )
@@ -113,7 +114,16 @@ def verified_receipt(body, signature, operation):
         ) or issued_at > timezone.now() + timedelta(minutes=5):
             raise ValueError()
         return data, issued_at, hashlib.sha256(body).hexdigest()
-    except (ValueError, TypeError, KeyError, OverflowError, UnicodeError, AttributeError, OSError):
+    except (
+        ValueError,
+        TypeError,
+        KeyError,
+        OverflowError,
+        UnicodeError,
+        AttributeError,
+        OSError,
+        RecursionError,
+    ):
         raise ValidationError("Receipt evidence is unavailable or invalid.") from None
 
 
@@ -138,6 +148,8 @@ def reconcile_receipt(user, workspace_id, operation_id, body, signature):
         pk=operation.id, attempt__outbox=intent
     )
     data, issued_at, digest = verified_receipt(body, signature, operation)
+    if ResultAcceptance.objects.filter(operation=operation).exists():
+        raise RevisionConflict()
     previous = DispatchReceipt.objects.filter(operation=operation).first()
     if previous:
         if previous.body_hash != digest:

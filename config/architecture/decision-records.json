@@ -341,6 +341,42 @@
       "decided_at": "2026-10-08",
       "supersedes": [],
       "superseded_by": null
+    },
+    {
+      "id": "ADR-0010",
+      "title": "Isolated dual-attested accepted-result store/accounting",
+      "status": "accepted",
+      "context": "Candidate evidence cannot mint nonzero accepted leads or reinterpret zero-lead v1 receipts.",
+      "alternatives": [
+        "Trust requested/candidate counts (rejected)",
+        "Change v1 receipt semantics (rejected)",
+        "Copy production registry or fork canonical fingerprints (rejected)",
+        "Separate empty-by-default source and isolated R2 authorities (selected)"
+      ],
+      "evidence_refs": [
+        "docs/ai/ADR-SAAS-005-RESULT-ACCEPTANCE-20261008.md",
+        "docs/ai/SAAS-ACCEPTED-RESULTS-REVIEW-20261008.md"
+      ],
+      "decision": "Separate v2 signed receipt, independent isolated R2/qualification signature and tenant store/backstop with atomic single-source whole-batch settlement; no live activation.",
+      "consequences": [
+        "Single-source 1\u201325 records; multi-source/batch unavailable.",
+        "No alternative R2 algorithm or production namespace writes.",
+        "Customer reads/export and real signer integration remain separate."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "Current role/rights/caps rechecked; no secrets/raw proofs in audit.",
+        "DATA-007 source retention/encryption/cleanup/backup gates before production.",
+        "No new paid dependency or deployed intake."
+      ],
+      "reversibility": "Empty migration reversible; populated evidence requires explicit preservation plan.",
+      "affected_modules_or_contracts": [
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "decided_by": "Standing owner technical delegation",
+      "decided_at": "2026-10-08",
+      "supersedes": [],
+      "superseded_by": null
     }
   ],
   "decision_template": {

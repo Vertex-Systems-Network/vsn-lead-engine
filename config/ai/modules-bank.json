@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reconciliation_base_ref": "0a81b3e24f45edfa72b5101c8241891030a88f1c",
+  "reconciliation_base_ref": "aa29e7c9a1f11c8cbf90ab04fdc58157df7efa00",
   "modules": [
     {
       "id": "MOD-HISTORICAL-ROADMAP",
@@ -561,7 +561,8 @@
         "PR #162 operator-driven pre-dispatch expiry/recovery verified on PostgreSQL and merged; no cleanup schedule or provider execution activated.",
         "PR #169 merged at 4ed6a6a2b2bc29771afc2547c98e076e3686829c; head 898fd81de52ba4f6f4d44218d8b94220a8375c95 passed validate 37698446859, repository-integrity 37698446824, analyze-actions/CodeQL 37698446944, dependency verification 37698446887, SaaS PostgreSQL 37698446801 (93 tests, including start/start and start/cancel races; migration rollback/reapply and secure settings) and Web Quality 37698446997 (lint/format, six transport tests, build/type and disposable Next/Django HTTP checks).",
         "PR #175 merged at d29cffd520c5eca4152f76633035aab540f5f18b; head 1a1e321ecdf7e93d6597653c20e1d7070eb5ffca passed required checks/actions CodeQL, PostgreSQL 37700238737 (104 tests and receipt races/migration/security gates), and Next/HTTP 37700238777.",
-        "PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870."
+        "PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870.",
+        "Internal dual-attested v2 accepted-result store/accounting implemented: signed candidate ledger + separate source and isolated R2/qualification signatures, current role/rights/caps, atomic rows/tokens/usage/job finalization and v1 compatibility. Empty signing registries/no intake route; local 202 cases (180 passed/22 PostgreSQL skips), exact-head CI pending."
       ],
       "update_notes": [
         "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled."
@@ -618,7 +619,8 @@
       "status": "not_started",
       "completion_evidence": [
         "PR #188 merged at 1baf1d80fa6aafca5420cf21a640ce7e7a9e7146; head a942efbacd299ee2460eb560da00d899b7f58f3f passed required checks/Actions CodeQL, PostgreSQL 37770063209 (172 tests/migration/settings) and Next/HTTP 37770063198 (nine transport tests/build/type and earlier native workflows).",
-        "PR #189 merged at 0a81b3e24f45edfa72b5101c8241891030a88f1c; head fb58dd787290a81813f3c85a412f897782b5ffd7 passed required checks/Actions CodeQL, PostgreSQL 37770588647 (all 182 tests, including three candidate-event races, migrations/settings) and Next/HTTP 37770588715 (nine transport tests/build/type and native workflows)."
+        "PR #189 merged at 0a81b3e24f45edfa72b5101c8241891030a88f1c; head fb58dd787290a81813f3c85a412f897782b5ffd7 passed required checks/Actions CodeQL, PostgreSQL 37770588647 (all 182 tests, including three candidate-event races, migrations/settings) and Next/HTTP 37770588715 (nine transport tests/build/type and native workflows).",
+        "Internal dual-attested v2 accepted-result store/accounting implemented: signed candidate ledger + separate source and isolated R2/qualification signatures, current role/rights/caps, atomic rows/tokens/usage/job finalization and v1 compatibility. Empty signing registries/no intake route; local 202 cases (180 passed/22 PostgreSQL skips), exact-head CI pending."
       ],
       "update_notes": [],
       "removal_or_deprecation_notes": []

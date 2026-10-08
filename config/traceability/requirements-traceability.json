@@ -1735,6 +1735,47 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "SAAS-ACCEPTED-RESULTS-001",
+      "source": "Dual-attested accepted-result and nonzero accounting boundary",
+      "source_provenance_ref": "docs/ai/ADR-SAAS-005-RESULT-ACCEPTANCE-20261008.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB",
+        "WU-SAAS-COLLECTION"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "saas/accepted-results"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Local 202 SaaS cases, 180 passed/22 PostgreSQL-only skips; exact-head CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-ACCEPTED-RESULTS-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [
+        "apps/saas/core/migrations/0013_accepted_results.py"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/accepted_results.py",
+        "apps/saas/core/test_accepted_results.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {
