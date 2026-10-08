@@ -40,9 +40,7 @@ class BatchIntakeTests(TestCase):
         self.dedupe_settings.enable()
         self.addCleanup(self.dedupe_settings.disable)
         self.candidate_body = json.dumps(self.candidate, sort_keys=True).encode()
-        self.candidate_signature = hmac.new(
-            KEY, self.candidate_body, hashlib.sha256
-        ).hexdigest()
+        self.candidate_signature = hmac.new(KEY, self.candidate_body, hashlib.sha256).hexdigest()
         record_batch_candidates(
             self.user,
             self.operation.workspace_id,
@@ -55,8 +53,14 @@ class BatchIntakeTests(TestCase):
         data = {
             key: self.candidate[key]
             for key in (
-                "workspace_id", "job_id", "operation_id", "batch_id", "provider_key",
-                "source_code", "request_hash", "policy_fingerprint",
+                "workspace_id",
+                "job_id",
+                "operation_id",
+                "batch_id",
+                "provider_key",
+                "source_code",
+                "request_hash",
+                "policy_fingerprint",
             )
         }
         data.update(
@@ -73,10 +77,12 @@ class BatchIntakeTests(TestCase):
             registry_state="committed",
             candidate_body_hash=hashlib.sha256(self.candidate_body).hexdigest(),
             candidate_event_ref=self.candidate["event_ref"],
-            records=[{
-                "record_ref": "record-1",
-                "tokens": ["n:" + "1" * 24, "l:" + "2" * 24, "s:" + "3" * 24],
-            }],
+            records=[
+                {
+                    "record_ref": "record-1",
+                    "tokens": ["n:" + "1" * 24, "l:" + "2" * 24, "s:" + "3" * 24],
+                }
+            ],
         )
         return data
 
@@ -164,12 +170,13 @@ class BatchIntakeTests(TestCase):
             key: "record-2" for key in self.candidate["records"][0]["fields"]
         }
         self.candidate_body = json.dumps(self.candidate, sort_keys=True).encode()
-        self.candidate_signature = hmac.new(
-            KEY, self.candidate_body, hashlib.sha256
-        ).hexdigest()
+        self.candidate_signature = hmac.new(KEY, self.candidate_body, hashlib.sha256).hexdigest()
         record_batch_candidates(
-            self.user, self.operation.workspace_id, batch.pk,
-            self.candidate_body, self.candidate_signature,
+            self.user,
+            self.operation.workspace_id,
+            batch.pk,
+            self.candidate_body,
+            self.candidate_signature,
         )
 
     def test_original_call_budget_and_shared_fingerprint_uniqueness(self):

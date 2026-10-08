@@ -86,9 +86,7 @@ def accept_result_batch(
         policy,
         job.search,
     )
-    candidate = (
-        BatchCandidateEvidence.objects.select_for_update().filter(batch=locked).first()
-    )
+    candidate = BatchCandidateEvidence.objects.select_for_update().filter(batch=locked).first()
     if candidate is None or (
         candidate.source_code,
         candidate.event_ref,
@@ -107,17 +105,23 @@ def accept_result_batch(
     previous = BatchAcceptance.objects.select_for_update().filter(candidate=candidate).first()
     if previous is not None:
         if (
-            previous.body_hash,
-            previous.receipt_ref,
-            previous.accepted_count,
-            previous.provider_calls,
-            previous.namespace,
-        ) != (
-            proof.body_hash,
-            proof.receipt_ref,
-            len(records),
-            proof.provider_calls,
-            namespace,
+            (
+                previous.body_hash,
+                previous.receipt_ref,
+                previous.accepted_count,
+                previous.provider_calls,
+                previous.namespace,
+                previous.source_code,
+            )
+            != (
+                proof.body_hash,
+                proof.receipt_ref,
+                len(records),
+                proof.provider_calls,
+                namespace,
+                operation.source_code,
+            )
+            or AcceptedResult.objects.filter(batch_acceptance=previous).count() != len(records)
         ):
             raise IdempotencyConflict()
         return previous, False
@@ -125,12 +129,15 @@ def accept_result_batch(
         raise ValidationError("Unknown or expired batch effects require reconciliation.")
     if job.result_count != 0:
         raise RevisionConflict()
-    totals = BatchAcceptance.objects.filter(
-        candidate__batch__operation__outbox=intent
-    ).aggregate(leads=Sum("accepted_count"), calls=Sum("provider_calls"))
-    source_calls = BatchAcceptance.objects.filter(
-        candidate__batch__operation=operation
-    ).aggregate(calls=Sum("provider_calls"))["calls"] or 0
+    totals = BatchAcceptance.objects.filter(candidate__batch__operation__outbox=intent).aggregate(
+        leads=Sum("accepted_count"), calls=Sum("provider_calls")
+    )
+    source_calls = (
+        BatchAcceptance.objects.filter(candidate__batch__operation=operation).aggregate(
+            calls=Sum("provider_calls")
+        )["calls"]
+        or 0
+    )
     if (
         (totals["leads"] or 0) + len(records) > reservation.leads
         or (totals["calls"] or 0) + proof.provider_calls > reservation.provider_calls
