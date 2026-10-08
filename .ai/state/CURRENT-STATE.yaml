@@ -90,7 +90,7 @@
     "saas_billing_ledger": "PR #207 / head d9be9ac1: all five checks passed; PostgreSQL 37810735757 (290 tests/migrations), Web 37810735885 (14 tests/HTTP). See ledger review.",
     "saas_billing_diagnostics": "PR #208 / head 3d34dccd: all five CI workflows, PG 37811482736 (296 tests/migrations), Web 37811482692 (14 tests/HTTP) passed. No repair/activation.",
     "saas_batch_manifest": "PR #209 / head 7c5adceb: all five CI workflows, PG 37812348239 (306 tests/migrations), Web 37812348326 (14 tests/HTTP). No intake/activation.",
-    "saas_batch_schema": "PR #211 merged at 866efda12bf3250fc55ca3af66036987c11ea47e; head bc07f8d24eab993d125a3f17b8dbf8e2d63e4b65 passed all five CI workflows, PostgreSQL 37816152759 (319 tests/migrations/settings) and Web 37816152845 (14 transport/build/type/HTTP). Four inert v3 metadata tables, protected links/count/uniqueness and populated rollback guard; no enrollment/intake/settlement.",
+    "saas_batch_schema": "PR #211 / head bc07f8d2: all five workflows passed, PG 37816152759 (319 tests/migrations/settings), Web 37816152845 (14 tests/HTTP). Inert metadata only; detailed evidence in checkpoint/schema contract.",
     "saas_terminal_manifest": "Development review: ten DB-forbidden pure source-final proof cases pass; no intake/finality/accounting authority. Protected CI pending."
   },
   "governance": {
