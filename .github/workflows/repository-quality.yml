@@ -50,12 +50,12 @@ jobs:
       - name: Verify autonomous resume and README progress contract
         shell: bash
         env:
-          BASE_SHA: \${{ github.event.pull_request.base.sha }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -euo pipefail
           python -m unittest discover -s tests -p 'test_autonomy_contract.py'
-          if [ -n "\${BASE_SHA}" ]; then
-            python scripts/verify_readme_progress.py --base "\${BASE_SHA}"
+          if [ -n "${BASE_SHA}" ]; then
+            python scripts/verify_readme_progress.py --base "${BASE_SHA}"
           else
             python scripts/verify_readme_progress.py
           fi
