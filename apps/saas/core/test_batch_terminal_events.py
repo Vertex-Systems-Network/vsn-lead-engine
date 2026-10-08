@@ -17,19 +17,12 @@ from .test_batch_intake import IntakeFixture, manifests
 from .test_terminal_manifest import KEY as TERMINAL_KEY
 
 
-@override_settings(
-    **SETTINGS,
-    SAAS_BATCH_ACCEPTANCE_ENABLED=True,
-    SAAS_BATCH_TERMINAL_EVENTS_ENABLED=True,
-    SAAS_BATCH_VERIFIERS={"fixture": {"source": manifests.SOURCE}},
-    SAAS_BATCH_TERMINAL_VERIFIERS={"fixture": {"terminal": TERMINAL_KEY}},
-)
-class TerminalEventTests(IntakeFixture, TestCase):
+class TerminalFixture(IntakeFixture):
     def setUp(self):
         super().setUp()
         self.acceptance, _ = self.intake()
 
-    def terminal(self, changes=None):
+    def terminal_proof(self, changes=None):
         operation = self.operation
         data = {
             "workspace_id": str(operation.workspace_id),
@@ -56,13 +49,27 @@ class TerminalEventTests(IntakeFixture, TestCase):
         }
         data.update(changes or {})
         body = json.dumps(data).encode()
+        return body, hmac.new(TERMINAL_KEY, body, hashlib.sha256).hexdigest()
+
+    def terminal(self, changes=None):
+        body, signature = self.terminal_proof(changes)
         return record_source_batch_terminal(
             self.user,
-            operation.workspace_id,
-            operation.pk,
+            self.operation.workspace_id,
+            self.operation.pk,
             body,
-            hmac.new(TERMINAL_KEY, body, hashlib.sha256).hexdigest(),
+            signature,
         )
+
+
+@override_settings(
+    **SETTINGS,
+    SAAS_BATCH_ACCEPTANCE_ENABLED=True,
+    SAAS_BATCH_TERMINAL_EVENTS_ENABLED=True,
+    SAAS_BATCH_VERIFIERS={"fixture": {"source": manifests.SOURCE}},
+    SAAS_BATCH_TERMINAL_VERIFIERS={"fixture": {"terminal": TERMINAL_KEY}},
+)
+class TerminalEventTests(TerminalFixture, TestCase):
 
     def test_default_gate_exact_replay_and_no_settlement(self):
         with override_settings(SAAS_BATCH_TERMINAL_EVENTS_ENABLED=False):

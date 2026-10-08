@@ -2431,6 +2431,10 @@ An internal, default-off service checks paired signed candidate/accepted proofs 
 
 A separate default-off internal service checks a signed source-final batch set against every allocated and accepted identity. Missing/unknown batch effects cannot create finality; exact existing proof may replay. PR #225 passed 394 PostgreSQL tests, 14 Web tests and all five workflows. This writes redacted source metadata only. Whole-job usage settlement, no-effect attestation, dispatch and pagination remain separate gated work.
 
-### Whole-job aggregate guard — development review
+### Whole-job aggregate guard — verified, quarantined
 
-A pure, bounded preflight rejects incomplete or duplicate source sets, unresolved operation states, empty/partial batch totals, understated calls and original lead/call overages. It returns proposed amounts only; database truth, signed proofs and transactional settlement remain separately gated. CI for this guard is pending.
+A pure, bounded preflight rejects incomplete or duplicate source sets, unresolved operation states, empty/partial batch totals, understated calls and original lead/call overages. PR #226 passed 402 PostgreSQL tests, 14 Web tests and all five workflows. It returns proposed amounts only; database truth, signed proofs and transactional settlement remain separately gated.
+
+### Atomic whole-job settlement — development review
+
+A separate default-off internal service under review requires current signed source-final proofs for every original source before committing one positive-result job and its actual usage in a transaction. Unknown/no-effect sources, settled-state replay, ordinary v3 dispatch and live signer/provider activation remain unavailable. CI for this slice is pending.

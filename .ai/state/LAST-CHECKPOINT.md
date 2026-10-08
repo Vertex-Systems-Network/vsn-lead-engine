@@ -71,3 +71,7 @@ PR #224 merged after 389 PostgreSQL tests, 14 Web tests and all five workflows p
 ## Whole-job aggregate guard — development review
 
 PR #225 merged after 394 PostgreSQL tests, 14 Web tests and all five workflows passed. A pure bounded guard under review compares the exact original source set, started operation status, nonempty accepted batch totals, committed calls and original reservation caps before proposing one job and actual leads/calls. No database write, usage settlement, no-effect proof or dispatch is enabled. CI for this guard is pending.
+
+## Atomic positive-result settlement — development review
+
+PR #226 merged after 402 PostgreSQL tests, 14 Web tests and all five workflows passed. A separately default-off transactional service under review re-verifies signed source-final proofs for every original source under workspace/actor/job/reservation locks, checks current entitlement/period and aggregate original caps, then settles actual positive-result usage and job/attempt/operation states together. Unknown/no-effect paths, settled-state replay, ordinary dispatch and live signer/provider trust remain disabled. CI for this slice is pending.
