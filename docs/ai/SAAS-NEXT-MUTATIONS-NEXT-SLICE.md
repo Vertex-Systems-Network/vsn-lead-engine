@@ -44,3 +44,15 @@ set is empty or matches stored accepted rows. PostgreSQL allocation/replay/cap a
 terminal/partial/expiry/crash races precede any usage release. Native 25-row pages
 and selected-page CSV remain downstream; actual signer/payment/provider rights,
 browser/customer/privacy/deployment and launch evidence remain separate gates.
+
+
+## Current frontier after PR #214
+
+Default-v2 server classification, disabled admin enrollment and v3 quarantine are
+verified (338 PostgreSQL tests / 14 Web tests). Do not repeat enrollment. Next build
+a separate internal v3 write-ahead/lease and server-owned identity allocation path;
+ordinary v2 pre-dispatch must continue to refuse v3. Allocation must retain original
+budgets, prevent client-chosen IDs and cross-operation replay, and preserve unknown
+identities through crash/finality reconciliation. Only unlock the internal v3 path
+after guarded candidate/payload acceptance and exact final accounting can cover it.
+No consumer or network activation follows from fixture tests or server selection.

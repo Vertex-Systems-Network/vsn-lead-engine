@@ -71,3 +71,22 @@ persistence and final whole-job settlement remain transactional service work.
 ## Verified terminal-proof checkpoint
 
 PR #212 merged at 20e2362ec6000a72e679a8716d428795f1a9d077; head b0f19291687c8b532b81a2f2bdd85e8c29758e9a passed all five workflows, PostgreSQL 37816828169 (329 tests/migrations/settings) and Web 37816828126 (14 transport/build/type/HTTP). Ten DB-forbidden bounded source-final proof cases; no enrollment/intake/finality/settlement authority.
+
+
+## Quarantined enrollment checkpoint
+
+Migration 0019 defaults existing/new outboxes to v2 without reclassifying old
+evidence. Disabled trusted-local admin enrollment selects v3 only on a pending
+queued job before any attempt. Replay rechecks current actor/source/grant/cap and
+period/deadline gates without changing job revision or accounting. The explicit
+source allowlist is empty by default. Ordinary pre-dispatch always refuses v3;
+v1/v2 proof services refuse its selector before processing evidence. Pending safe
+cancellation is preserved. Populated v3 classification blocks destructive reversal.
+
+This is a deliberate quarantine until a separately reviewed internal v3
+write-ahead/identity/candidate/acceptance/finality path can preserve every original
+reservation. No public selector, source caller, scheduler, signer or network
+consumer is added. The enrollment preflight override is internal validation only;
+it is not a dispatch authorization or client-controlled parameter.
+
+PR #214 merged at 412c29286500d8db88491e13074baa77a7648eb5; head f68067283ab1ab16d437e8bd4093a182ab4cda01 passed all five workflows, PostgreSQL 37821424861 (338 tests/migrations/settings) and Web 37821424914 (14 transport/build/type/HTTP). Disabled quarantined admin v3 enrollment, default-v2 classification, legacy proof exclusion and preserved cancellation; no allocation/intake/dispatch.

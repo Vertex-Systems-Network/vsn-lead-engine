@@ -570,11 +570,13 @@
         "ADR-SAAS-003 additive bounded v3 batch direction; pure manifest validator with ten DB-forbidden tests on review branch. No durable intake or live consumer; exact-head CI pending.",
         "PR #209 merged at 176f8309a1d68c2feb650898d240bd2ed5aa89fc; head 7c5adceb3fb150a89aaed3c8f556aea2552602f4 passed all five CI workflows, PostgreSQL 37812348239 (306 tests/migrations/settings) and Web 37812348326 (14 transport/build/type/HTTP). Ten DB-forbidden v3 proof cases; no intake/ledger/activation. PRs #207/#208 billing ledger/expiry/diagnostics remain verified.",
         "PR #211 merged at 866efda12bf3250fc55ca3af66036987c11ea47e; head bc07f8d24eab993d125a3f17b8dbf8e2d63e4b65 passed all five CI workflows, PostgreSQL 37816152759 (319 tests/migrations/settings) and Web 37816152845 (14 transport/build/type/HTTP). Four inert v3 metadata tables, protected links/count/uniqueness and populated rollback guard; no enrollment/intake/settlement.",
-        "PR #212 merged at 20e2362ec6000a72e679a8716d428795f1a9d077; head b0f19291687c8b532b81a2f2bdd85e8c29758e9a passed all five workflows, PostgreSQL 37816828169 (329 tests/migrations/settings) and Web 37816828126 (14 transport/build/type/HTTP). Ten DB-forbidden bounded source-final proof cases; no enrollment/intake/finality/settlement authority."
+        "PR #212 merged at 20e2362ec6000a72e679a8716d428795f1a9d077; head b0f19291687c8b532b81a2f2bdd85e8c29758e9a passed all five workflows, PostgreSQL 37816828169 (329 tests/migrations/settings) and Web 37816828126 (14 transport/build/type/HTTP). Ten DB-forbidden bounded source-final proof cases; no enrollment/intake/finality/settlement authority.",
+        "PR #214 merged at 412c29286500d8db88491e13074baa77a7648eb5; head f68067283ab1ab16d437e8bd4093a182ab4cda01 passed all five workflows, PostgreSQL 37821424861 (338 tests/migrations/settings) and Web 37821424914 (14 transport/build/type/HTTP). Disabled quarantined admin v3 enrollment, default-v2 classification, legacy proof exclusion and preserved cancellation; no allocation/intake/dispatch."
       ],
       "update_notes": [
         "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled.",
-        "Next: separately gated trusted-local v3 enrollment/allocation and atomic batch/terminal services; pure terminal proof verified through PR #212, no live activation."
+        "Next: separately gated trusted-local v3 enrollment/allocation and atomic batch/terminal services; pure terminal proof verified through PR #212, no live activation.",
+        "V3 enrollment verified through #214; remain quarantined. Next server-owned batch allocation/intake/replay/finality before dispatch."
       ],
       "removal_or_deprecation_notes": []
     },

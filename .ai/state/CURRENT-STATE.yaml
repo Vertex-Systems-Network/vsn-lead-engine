@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "56220af9775cf9f30cff49721fcd467b390b3cae",
-  "observed_main_semantics": "Exact main #213 before quarantined enrollment review.",
+  "observed_main_sha": "412c29286500d8db88491e13074baa77a7648eb5",
+  "observed_main_semantics": "Exact protected enrollment feature main #214 before documentation-only checkpoint merge.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -68,7 +68,7 @@
     "saas_terminal_receipts": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_periods": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_daily_occurrences": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
-    "latest_saas_verified_head": "b0f19291687c8b532b81a2f2bdd85e8c29758e9a",
+    "latest_saas_verified_head": "f68067283ab1ab16d437e8bd4093a182ab4cda01",
     "saas_native_next_forms": "PR #180: required checks, PostgreSQL 37703540378 (138 tests/migrations/settings) and Next/HTTP 37703540308 (native draft/cancel/CSRF/auth) passed; full evidence in history.",
     "saas_next_validation_signout": "PR #184: required checks/Actions CodeQL, PostgreSQL 37755784470 and Next/HTTP 37755784437 passed; exact head and full evidence retained in git history.",
     "saas_native_login_cancel": "PR #186: required checks/Actions CodeQL, PostgreSQL 37766322082 and Next/HTTP 37766321955 passed; exact head and full evidence retained in git history.",
@@ -88,7 +88,7 @@
     "saas_batch_manifest": "PR #209 / head 7c5adceb: all five CI workflows, PG 37812348239 (306 tests/migrations), Web 37812348326 (14 tests/HTTP). No intake/activation.",
     "saas_batch_schema": "PR #211 / head bc07f8d2: all five workflows passed, PG 37816152759 (319 tests/migrations/settings), Web 37816152845 (14 tests/HTTP). Inert metadata only; detailed evidence in checkpoint/schema contract.",
     "saas_terminal_manifest": "PR #212 / head b0f19291: all five workflows passed; PG 37816828169 (329 tests/migrations/settings), Web 37816828126 (14 tests/HTTP). Pure accepted-set proof only; no enrollment/intake/settlement.",
-    "saas_batch_enrollment": "Development review: default-v2 server selector and quarantined disabled admin enrollment; nine tests including two PG-only races. CI pending; no dispatch/intake."
+    "saas_batch_enrollment": "PR #214 / head f6806728: all five workflows passed; PG 37821424861 (338 tests/migrations/settings), Web 37821424914 (14 tests/HTTP). Disabled enrollment, explicit v3 quarantine/v2 exclusion; no allocation/intake."
   },
   "governance": {
     "main_ruleset_id": 24086362,
