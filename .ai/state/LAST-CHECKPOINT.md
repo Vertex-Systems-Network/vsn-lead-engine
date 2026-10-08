@@ -75,3 +75,7 @@ PR #225 merged after 394 PostgreSQL tests, 14 Web tests and all five workflows p
 ## Atomic positive-result settlement — development review
 
 PR #226 merged after 402 PostgreSQL tests, 14 Web tests and all five workflows passed. A separately default-off transactional service under review re-verifies signed source-final proofs for every original source under workspace/actor/job/reservation locks, checks current entitlement/period and aggregate original caps, then settles actual positive-result usage and job/attempt/operation states together. Unknown/no-effect paths, settled-state replay, ordinary dispatch and live signer/provider trust remain disabled. CI for this slice is pending.
+
+## Verified atomic positive-result settlement checkpoint
+
+PR #227 merged at 930cc4d37f71303905954ca9a3e619c71ad4a66a; exact head c6cfbd2 passed all five workflows, 406 PostgreSQL tests and 14 Web tests/HTTP. Disabled internal positive-result settlement validates every original source final under current rights and locks, then updates usage/job/attempt/outbox/operation in one transaction; injected late failure rolls back. Current key registries are empty, ordinary v3 start/dispatch is quarantined. Unknown/no-effect resolution, settled-state replay, source-qualified real R2 signer/rights, internal write-ahead entry and signed 25-row pagination remain open.

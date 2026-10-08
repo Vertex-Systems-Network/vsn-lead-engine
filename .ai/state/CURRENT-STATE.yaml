@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "92e7535149b0cd8c26150c65d1471c9b7fd0d7c4",
-  "observed_main_semantics": "Verified pure whole-job accounting guard #226 before transactional settlement review.",
+  "observed_main_sha": "930cc4d37f71303905954ca9a3e619c71ad4a66a",
+  "observed_main_semantics": "Verified default-off atomic positive-result settlement #227.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -93,7 +93,8 @@
     "saas_batch_payload_proof": "PR #222 merged after all five workflows passed; eight pure DB-forbidden cases.",
     "saas_batch_intake": "PR #224 merged at 43b8816de7f9b7bb0977651d42ff775eeabfa844; head b55789af passed all five workflows, including 389 PostgreSQL tests and 14 Web tests/HTTP. Default-off atomic v3 batch acceptance, shared fingerprints and original aggregate caps; no source finality or settlement.",
     "saas_source_final": "PR #225: five CI workflows, 394 PostgreSQL and 14 Web tests passed; default-off source final.",
-    "saas_whole_job_accounting": "PR #226: five workflows, 402 PostgreSQL and 14 Web tests passed; pure guard only."
+    "saas_whole_job_accounting": "PR #226: pure guard; 402 PostgreSQL and 14 Web tests passed.",
+    "saas_positive_settlement": "PR #227: five workflows; 406 PostgreSQL and 14 Web tests passed; default off."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -140,7 +141,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify default-off atomic positive-result settlement under exact current source-final proofs and original reservation caps. Keep unknown/no-effect, settled replay and ordinary v3 dispatch quarantined; add write-ahead and signed 25-row pagination after recovery contracts.",
+  "exact_next_safe_action": "Add signed settled-state replay under current proofs and explicit unknown/no-effect reconciliation without refund inference; then internal write-ahead and signed 25-row page/export services. Keep ordinary v3 dispatch and external signer/provider gates closed.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
