@@ -97,14 +97,15 @@ def settle_batch_job(user, workspace_id, job_id, terminal_proofs):
             or not SourceBatchTerminal.objects.filter(operation=op).exists()
         ):
             raise ValidationError("Current exact source-final proof is required.")
-        final, created = record_source_batch_terminal(
-            user, workspace_id, op.pk, proof[0], proof[1]
-        )
+        final, created = record_source_batch_terminal(user, workspace_id, op.pk, proof[0], proof[1])
         if created:
             raise RevisionConflict()
-        committed = BatchAcceptance.objects.filter(
-            candidate__batch__operation=op
-        ).aggregate(calls=Sum("provider_calls"))["calls"] or 0
+        committed = (
+            BatchAcceptance.objects.filter(candidate__batch__operation=op).aggregate(
+                calls=Sum("provider_calls")
+            )["calls"]
+            or 0
+        )
         sources.append(
             SourceAccounting(
                 op.pk,

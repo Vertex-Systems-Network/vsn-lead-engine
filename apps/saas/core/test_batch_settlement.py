@@ -61,9 +61,7 @@ class BatchSettlementTests(TerminalFixture, TestCase):
         with self.assertRaises(IdempotencyConflict):
             self.settle({"receipt_ref": "changed"})
         with self.assertRaises(RevisionConflict):
-            settle_batch_job(
-                self.user, self.operation.workspace_id, self.operation.job_id, {}
-            )
+            settle_batch_job(self.user, self.operation.workspace_id, self.operation.job_id, {})
         self.assertEqual(
             UsageReservation.objects.get(pk=self.operation.outbox.reservation_id).status,
             "reserved",

@@ -70,7 +70,6 @@ class TerminalFixture(IntakeFixture):
     SAAS_BATCH_TERMINAL_VERIFIERS={"fixture": {"terminal": TERMINAL_KEY}},
 )
 class TerminalEventTests(TerminalFixture, TestCase):
-
     def test_default_gate_exact_replay_and_no_settlement(self):
         with override_settings(SAAS_BATCH_TERMINAL_EVENTS_ENABLED=False):
             with self.assertRaises(PermissionDenied):
