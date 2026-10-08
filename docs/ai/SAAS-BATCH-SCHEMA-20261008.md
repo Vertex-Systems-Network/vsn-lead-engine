@@ -50,3 +50,8 @@ reservation/payload preservation and reverse guard coverage. Three explicit
 PostgreSQL-only races verify duplicate ordinal, source/event reference and terminal
 exclusion. They are uniqueness races, not settlement/cap/replay certification.
 All existing service races and forward/reverse/reapply CI remain required.
+
+
+## Verified schema checkpoint
+
+PR #211 merged at 866efda12bf3250fc55ca3af66036987c11ea47e; head bc07f8d24eab993d125a3f17b8dbf8e2d63e4b65 passed all five workflows, PostgreSQL 37816152759 (319 tests/migrations/settings) and Web 37816152845 (14 transport/build/type/HTTP). The later pure terminal-proof checkpoint is PR #212; neither checkpoint enables enrollment/intake or final accounting.
