@@ -1,6 +1,6 @@
 # ADR-SAAS-003: additive bounded batch intake and result pagination
 
-Status: accepted internal development direction under standing technical autonomy; durable intake/pagination implementation not yet delivered; pure proof validation on review branch. Date: 2026-10-08. No provider, signer, payment, scheduler or production activation is authorized by this ADR.
+Status: accepted internal development direction under standing technical autonomy; durable intake/pagination implementation not yet delivered; pure proof validation verified through PR #209. Date: 2026-10-08. No provider, signer, payment, scheduler or production activation is authorized by this ADR.
 
 ## Evidence and problem
 
@@ -36,3 +36,7 @@ An additive protocol costs new models and explicit reconciliation, but preserves
 ## Pure manifest slice
 
 `core.batch_manifest` has no ORM/network or state writes. Trusted immutable coordinates include batch/operation/provider/candidate/request/policy identity and reserved bounds; signatures use separate source/isolated-registry registries with empty defaults. Exact bytes, strict v3 kind, duplicate-key denial, bounded 1–25 unique record/fingerprint triples, short issuance and provider-call caps are checked. Returned immutable redacted evidence has no record payload/tokens/signature/secret. Ten adversarial `SimpleTestCase` cases forbid database access. No accepted record, durable batch, ordering/idempotency, terminal settlement or source qualification truth is created by verification.
+
+## Verified pure proof checkpoint
+
+PR #209 merged at 176f8309a1d68c2feb650898d240bd2ed5aa89fc; head 7c5adceb3fb150a89aaed3c8f556aea2552602f4 passed all five CI workflows, PostgreSQL 37812348239 (306 tests/migrations/settings) and Web 37812348326 (14 transport/build/type/HTTP). Ten DB-forbidden v3 proof cases; no intake/ledger/activation. PRs #207/#208 billing ledger/expiry/diagnostics remain verified.

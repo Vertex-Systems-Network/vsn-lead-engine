@@ -567,7 +567,8 @@
         "PR #175 merged at d29cffd520c5eca4152f76633035aab540f5f18b; head 1a1e321ecdf7e93d6597653c20e1d7070eb5ffca passed required checks/actions CodeQL, PostgreSQL 37700238737 (104 tests and receipt races/migration/security gates), and Next/HTTP 37700238777.",
         "PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870.",
         "PR #191 merged at 1d11e078a9a784f964c4743fc7b523b0f05307ed; head d7cabfae2fa53cf5daba19f0432bdb11b022b03b passed required checks/Actions CodeQL, PostgreSQL 37774522114 (all 202 tests, three acceptance races, migrations/settings) and Next/HTTP 37774522030 (nine transport tests/build/type and native flows).",
-        "ADR-SAAS-003 additive bounded v3 batch direction; pure manifest validator with ten DB-forbidden tests on review branch. No durable intake or live consumer; exact-head CI pending."
+        "ADR-SAAS-003 additive bounded v3 batch direction; pure manifest validator with ten DB-forbidden tests on review branch. No durable intake or live consumer; exact-head CI pending.",
+        "PR #209 merged at 176f8309a1d68c2feb650898d240bd2ed5aa89fc; head 7c5adceb3fb150a89aaed3c8f556aea2552602f4 passed all five CI workflows, PostgreSQL 37812348239 (306 tests/migrations/settings) and Web 37812348326 (14 transport/build/type/HTTP). Ten DB-forbidden v3 proof cases; no intake/ledger/activation. PRs #207/#208 billing ledger/expiry/diagnostics remain verified."
       ],
       "update_notes": [
         "Continue M6 confirmed-receipt reconciliation/terminal settlement and durable schedule contracts, then M7 Next-native login return/logout and draft/cancel with Django CSRF. M5 billing period/events remain open; no provider consumer enabled."
