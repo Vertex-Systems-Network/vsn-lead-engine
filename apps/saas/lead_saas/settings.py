@@ -145,3 +145,7 @@ SAAS_BATCH_ACCEPTANCE_ENABLED = False
 # Source-final metadata remains internal and default-off. Whole-job accounting
 # and no-effect proof are separate capabilities, never implied by this flag.
 SAAS_BATCH_TERMINAL_EVENTS_ENABLED = False
+
+# Entire-job positive-result accounting is internal and separately disabled.
+# Unknown/no-effect recovery and settled-state replay are not activated.
+SAAS_BATCH_SETTLEMENT_ENABLED = False

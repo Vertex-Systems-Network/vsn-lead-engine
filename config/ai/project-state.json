@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PR #225 merged at 794bb3b42d3525fc2436aed578f6380b4590246a; head d9eb4cfb passed all five workflows, including 394 PostgreSQL tests and 14 Web tests/HTTP. Default-off exact source-final metadata over complete accepted batches; no whole-job settlement.",
+  "last_verified_completion": "PR #226 merged at 92e7535149b0cd8c26150c65d1471c9b7fd0d7c4; head c27f9a1 passed all five workflows, including 402 PostgreSQL tests and 14 Web tests/HTTP. Pure exact whole-job aggregate guard only; no settlement.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify pure whole-job aggregate accounting against exact original source set, operation status, committed batch totals and original reservation limits; then implement separately gated transactional settlement. Keep unknown/no-effect paths and v3 dispatch quarantined.",
+    "Verify default-off atomic positive-result settlement under exact current source-final proofs and original reservation caps. Keep unknown/no-effect, settled replay and ordinary v3 dispatch quarantined; add write-ahead and signed 25-row pagination after recovery contracts.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_394_postgres_and_14_web_http_verified",
+  "qa_readiness": "saas_402_postgres_and_14_web_http_verified",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "794bb3b42d3525fc2436aed578f6380b4590246a",
+  "last_reconciled_repository_ref": "92e7535149b0cd8c26150c65d1471c9b7fd0d7c4",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [
