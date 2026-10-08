@@ -137,3 +137,7 @@ SAAS_BATCH_CANDIDATE_VERIFIERS = {}
 
 # Internal redacted evidence only; consumer and accepted payload intake remain off.
 SAAS_BATCH_CANDIDATE_EVENTS_ENABLED = False
+
+# Internal v3 payload intake stays unreachable until signer, R2 and terminal
+# accounting gates are independently verified. No HTTP route enables this flag.
+SAAS_BATCH_ACCEPTANCE_ENABLED = False
