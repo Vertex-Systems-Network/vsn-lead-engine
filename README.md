@@ -30,15 +30,15 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected feature main: `469c4ec8` (PR #216); v3 enrollment/allocation primitives are verified but disabled/quarantined. Durable candidate/payload intake/accounting remains open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected feature main: `15814cf0` (PR #218); v3 enrollment/allocation/candidate ledger primitives are verified but disabled/quarantined. Durable candidate/payload intake/accounting remains open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
-- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: candidate-event review, then accepted-payload intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
+- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: additive accepted-payload schema/intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
 - Continuation: **full ready frontier per invocation**; milestone/PR completion is a checkpoint, not an instruction to stop. Recoverable errors are AI-owned; human approval is reserved for genuine external authorization/consent/paid or irreversible commitments. CI runs `scripts/verify_readme_progress.py` to reject README/machine-state divergence and feature PRs that omit a README update.
 
 <!-- ANPOS-CONTINUITY:END -->
 
-Snapshot: **2026-10-08 PKT**, reconciled through protected feature `main` commit `469c4ec8` / merged PR #216. Scoped filters/CSV/receipt history and isolated normalized billing-evidence validation are verified through required checks, 350 PostgreSQL tests and 14-test Next/HTTP CI. Internal ledger reconciliation and validity guards are verified but default disabled; live payments/signers/consumers stay disabled. Production P01–P70 runtime remains separate. Bars are engineering estimates, not customer/provider/legal/deployment/launch certification.
+Snapshot: **2026-10-08 PKT**, reconciled through protected feature `main` commit `15814cf0` / merged PR #218. Scoped filters/CSV/receipt history and isolated normalized billing-evidence validation are verified through required checks, 366 PostgreSQL tests and 14-test Next/HTTP CI. Internal ledger reconciliation and validity guards are verified but default disabled; live payments/signers/consumers stay disabled. Production P01–P70 runtime remains separate. Bars are engineering estimates, not customer/provider/legal/deployment/launch certification.
 
 | Milestone | Start date | Status | Progress |
 |---|---:|---|---|
@@ -2395,7 +2395,7 @@ This produces redacted immutable review metadata only: no durable candidate even
 R2 uniqueness/phone reachability proof, payload intake or accounting. PR #217 passed all five workflows, PostgreSQL 37824016673 (358 tests/migrations/settings) and Web 37824016597 (14 tests/HTTP).
 
 
-### Durable v3 candidate event ledger — development review
+### Durable v3 candidate event ledger — verified, disabled
 
 A disabled internal service binds verified candidate proof to an allocated server
 batch identity. Allocation replay holds the workspace/current-admin/source/period/
@@ -2404,5 +2404,9 @@ all retries. Equal bytes return the existing redacted event, while changed bytes
 cross-batch source/event reuse conflict. Unknown operations can replay recorded
 evidence but cannot add a new event. Failed proof or event writes preserve identity
 and full reservation with no accepted payload or accounting changes. Eight new
-checks include two PostgreSQL duplicate/conflicting-event races; CI pending. No
+checks include two PostgreSQL duplicate/conflicting-event races; all five exact-head workflows passed. No
 caller, v3 start, live signer/provider or payload consumer is enabled.
+
+PR #218 merged at 15814cf0bf0c52f58c4b1d1e31cc208bc3445199; head f9d0173c03fac4a757a605dfed3e30f38c98cb3e passed all five workflows, PostgreSQL 37824615261 (366 tests/migrations/settings) and Web 37824615227 (14 transport/build/type/HTTP). Disabled durable redacted candidate ledger, exact replay/reference conflicts and unknown-effect preservation; no accepted payload/finality/dispatch.
+
+Next safe frontier: Add isolated v3 accepted-payload schema with evidence-preserving rollback, then gated atomic acceptance and exact terminal/unknown-effect accounting; preserve original reservations. Internal write-ahead entry and signed 25-row pagination follow. Ordinary v3 dispatch remains quarantined. Whole work-unit counts and engineering estimates remain unchanged; real provider/rights/privacy/customer/deployment/launch gates remain open.

@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "81423210ec1500a5e2006d8985d7f8da4f19265f",
-  "observed_main_semantics": "Exact protected candidate-proof main #217 before event-ledger review.",
+  "observed_main_sha": "15814cf0bf0c52f58c4b1d1e31cc208bc3445199",
+  "observed_main_semantics": "Exact protected event-ledger feature main #218 before documentation reconciliation.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -65,19 +65,19 @@
     "saas_pending_cancellation": "PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks, CodeQL and PostgreSQL 37695788773",
     "saas_source_preview": "PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks, CodeQL and PostgreSQL 37696123260",
     "saas_daily_occurrences": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
-    "latest_saas_verified_head": "ca1cd8ec52706de4cba9ad37745cfff5ee1795c1",
+    "latest_saas_verified_head": "f9d0173c03fac4a757a605dfed3e30f38c98cb3e",
     "saas_native_next_forms": "PR #180: required checks, PostgreSQL 37703540378 (138 tests/migrations/settings) and Next/HTTP 37703540308 (native draft/cancel/CSRF/auth) passed; full evidence in history.",
     "saas_next_validation_signout": "PR #184: required checks/Actions CodeQL, PostgreSQL 37755784470 and Next/HTTP 37755784437 passed; exact head and full evidence retained in git history.",
     "saas_native_login_cancel": "PR #186: required checks/Actions CodeQL, PostgreSQL 37766322082 and Next/HTTP 37766321955 passed; exact head and full evidence retained in git history.",
     "saas_result_evidence": "PR #188: required checks/Actions CodeQL, PostgreSQL 37770063209 and Next/HTTP 37770063198 passed; exact head and full evidence retained in git history.",
-    "saas_candidate_events": "PR #189 merged at 0a81b3e24f45edfa72b5101c8241891030a88f1c; head fb58dd787290a81813f3c85a412f897782b5ffd7 passed required checks/Actions CodeQL, PostgreSQL 37770588647 (all 182 tests, including three candidate-event races, migrations/settings) and Next/HTTP 37770588715 (nine transport tests/build/type and native workflows).",
+    "saas_candidate_events": "Earlier verified implementation, exact-head CI and limitations retained in git history and linked README reviews.",
     "saas_accepted_results": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #201.",
     "saas_next_results": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #201.",
     "saas_guarded_export": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #201.",
-    "saas_result_retention": "PR #195 merged at 92657c5c8bbdb27115e95f5642f841e8a1c975c3; head dc84dce770bf14580e9d2691880510fc6615ba14 passed required checks/Actions CodeQL, PostgreSQL 37780165591 (235 tests/expiry races/migrations/settings) and Next/HTTP 37780165669 (10 transport tests/build/type and payload erasure/tombstone flow).",
-    "saas_next_export": "PR #196 merged at 584ba0ad71557609e88b4d5b48816f41f2dfd563; head 10f5ee5bc42f033f5d162a0ab5ef3232d330e963 passed required checks/Actions CodeQL, PostgreSQL 37781243971 (all 241 tests/concurrency/migrations/settings) and Next/HTTP 37781243921 (11 transport tests/build/type and native preview/confirmed CSV/replay/conflict/erasure flows).",
+    "saas_result_retention": "Earlier verified implementation, exact-head CI and limitations retained in git history and linked README reviews.",
+    "saas_next_export": "Earlier verified implementation, exact-head CI and limitations retained in git history and linked README reviews.",
     "saas_result_selection": "PR #198 merged at 7dd9f10b4c28b1bacea1488aee5874685f600e3a; head 141cbac20f05b9edc3f63a4374fbc3612766140c passed all required checks/Actions CodeQL, PostgreSQL 37784930553 (all 247 tests, concurrency, migrations/settings) and Web 37784930581 (12 transport tests, build/type and HTTP country-filter/selected-row CSV/empty denial/replay/conflict/erasure/auth flows).",
-    "saas_result_metadata_filters": "PR #200 merged at 812a4bc20e661e3088e453c866f50c031dca3d6f; head 2c326478c98c6fbdb482c7c73270d6fa19092ae0 passed all required checks/Actions CodeQL, PostgreSQL 37793585524 (all 253 tests, concurrency, migrations/settings) and Web 37793585562 (13 transport tests, build/type and actual HTTP compound/empty/clear filters, filtered-row denial, subset-only CSV/replay/conflict, auth and two-row erasure/tombstones).",
+    "saas_result_metadata_filters": "Earlier verified implementation, exact-head CI and limitations retained in git history and linked README reviews.",
     "saas_export_receipt_history": "PR #202 merged at f4e7e5ee2aacb53c3e609acc7d039471455e0241; head 4d09b60b3fc04b23312f25e13b3f1ff703a59cd6 passed all five CI workflows, including required checks/Actions CodeQL, PostgreSQL 37797128235 (all 259 tests, concurrency, migrations/reversal/settings) and Web 37797128305 (14 transport tests, lint/format/build/type and actual HTTP scoped signed receipt navigation, no-charge/erasure/redaction/referrer headers and earlier native auth/filter/CSV flows).",
     "saas_billing_evidence": "PR #204: required/PostgreSQL/Web checks passed; pure normalized parser only. Exact-head evidence in prior checkpoint and review document.",
     "saas_billing_ledger": "PR #207 / head d9be9ac1: all five checks passed; PostgreSQL 37810735757 (290 tests/migrations), Web 37810735885 (14 tests/HTTP). See ledger review.",
@@ -88,7 +88,7 @@
     "saas_batch_enrollment": "PR #214 / head f6806728: all five workflows passed; PG 37821424861 (338 tests/migrations/settings), Web 37821424914 (14 tests/HTTP). Disabled enrollment, explicit v3 quarantine/v2 exclusion; no allocation/intake.",
     "saas_batch_allocation": "PR #216 / head 508878f5: all five workflows passed, PG 37823442614 (350 tests/migrations/settings), Web 37823442485 (14 tests/HTTP). Disabled allocation; no reachable v3 start/intake.",
     "saas_batch_candidates": "PR #217 / head ca1cd8ec: all five workflows passed; PG 37824016673 (358 tests/migrations/settings), Web 37824016597 (14 tests/HTTP). Pure proof/shared eligibility only.",
-    "saas_batch_events": "Development review: disabled redacted event reconciliation, exact replay/ref conflicts and unknown preservation. Eight checks / two PG skips; CI pending."
+    "saas_batch_events": "PR #218 / head f9d0173c: all five workflows passed; PG 37824615261 (366 tests/migrations/settings), Web 37824615227 (14 tests/HTTP). Disabled redacted candidate ledger; no payload/finality/dispatch."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -135,7 +135,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Implement separately gated v3 candidate/accepted-payload intake and exact terminal/unknown-effect accounting; then an internal write-ahead entry path. Allocation primitive remains default disabled and ordinary v3 dispatch quarantined until the complete guarded flow passes review.",
+  "exact_next_safe_action": "Add isolated v3 accepted-payload schema with evidence-preserving rollback, then gated atomic acceptance and exact terminal/unknown-effect accounting; preserve original reservations. Internal write-ahead entry and signed 25-row pagination follow. Ordinary v3 dispatch remains quarantined.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
