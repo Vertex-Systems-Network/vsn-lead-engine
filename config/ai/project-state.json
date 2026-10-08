@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PR #217 merged at 81423210ec1500a5e2006d8985d7f8da4f19265f; head ca1cd8ec52706de4cba9ad37745cfff5ee1795c1 passed all five workflows, PostgreSQL 37824016673 (358 tests/migrations/settings) and Web 37824016597 (14 transport/build/type/HTTP). Pure batch-bound candidate proof and shared eligibility, eight DB-forbidden cases; no durable candidate/acceptance.",
+  "last_verified_completion": "PR #218 merged at 15814cf0bf0c52f58c4b1d1e31cc208bc3445199; head f9d0173c03fac4a757a605dfed3e30f38c98cb3e passed all five workflows, PostgreSQL 37824615261 (366 tests/migrations/settings) and Web 37824615227 (14 transport/build/type/HTTP). Disabled durable redacted candidate ledger, exact replay/reference conflicts and unknown-effect preservation; no accepted payload/finality/dispatch.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Implement separately gated v3 candidate/accepted-payload intake and exact terminal/unknown-effect accounting; then an internal write-ahead entry path. Allocation primitive remains default disabled and ordinary v3 dispatch quarantined until the complete guarded flow passes review.",
+    "Add isolated v3 accepted-payload schema with evidence-preserving rollback, then gated atomic acceptance and exact terminal/unknown-effect accounting; preserve original reservations. Internal write-ahead entry and signed 25-row pagination follow. Ordinary v3 dispatch remains quarantined.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_358_postgres_and_14_web_http_verified_batch_event_review",
+  "qa_readiness": "saas_366_postgres_and_14_web_http_verified",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "81423210ec1500a5e2006d8985d7f8da4f19265f",
+  "last_reconciled_repository_ref": "15814cf0bf0c52f58c4b1d1e31cc208bc3445199",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

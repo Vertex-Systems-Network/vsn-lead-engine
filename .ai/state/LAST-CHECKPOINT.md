@@ -3,7 +3,7 @@
 ## Snapshot
 
 - Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 UTC / PKT.
-- Exact protected enrollment feature main `412c29286500d8db88491e13074baa77a7648eb5` after PR #214, before documentation-only checkpoint merge. Live open Issues/PRs reconciled before development; none open at feature checkpoint.
+- Exact protected event-ledger feature main `15814cf0bf0c52f58c4b1d1e31cc208bc3445199` after PR #218, before documentation-only checkpoint merge. Live open Issues/PRs reconciled before development; none open at feature checkpoint.
 - Product 0.66.1 / ANPOS 1.4.0; Next frontend and isolated Django/DRF/PostgreSQL authority. Existing production CLI/R2/Google namespaces and phone-only US/Canada/taxonomy/quota invariants preserved.
 
 ## Verified
@@ -24,6 +24,8 @@
 
 - PR #217 merged at 81423210ec1500a5e2006d8985d7f8da4f19265f; head ca1cd8ec52706de4cba9ad37745cfff5ee1795c1 passed all five workflows, PostgreSQL 37824016673 (358 tests/migrations/settings) and Web 37824016597 (14 transport/build/type/HTTP). Pure batch-bound candidate proof and shared eligibility, eight DB-forbidden cases; no durable candidate/acceptance.
 
+- PR #218 merged at 15814cf0bf0c52f58c4b1d1e31cc208bc3445199; head f9d0173c03fac4a757a605dfed3e30f38c98cb3e passed all five workflows, PostgreSQL 37824615261 (366 tests/migrations/settings) and Web 37824615227 (14 transport/build/type/HTTP). Disabled durable redacted candidate ledger, exact replay/reference conflicts and unknown-effect preservation; no accepted payload/finality/dispatch.
+
 ## Not Verified
 
 - V3 durable metadata schema and pure terminal proof are verified; transactional batch intake/finality/accounting and multi-source/multi-batch pagination/native UI remain unimplemented. v3 signature/schema success does not prove signer qualification, committed R2 objects, payment truth or rights.
@@ -40,9 +42,6 @@
 
 ## Next Action
 
-1. Implement separately gated v3 candidate/accepted-payload intake and exact terminal/unknown-effect accounting; then an internal write-ahead entry path. Allocation primitive remains default disabled and ordinary v3 dispatch quarantined until the complete guarded flow passes review.
+1. Add isolated v3 accepted-payload schema with evidence-preserving rollback, then gated atomic acceptance and exact terminal/unknown-effect accounting; preserve original reservations. Internal write-ahead entry and signed 25-row pagination follow. Ordinary v3 dispatch remains quarantined.
 2. Then add stable-watermark signed 25-row page services and native selected-page CSV, preserving current rights/expiry/no-referrer/once-only preparation semantics.
 3. Keep README/machine/checkpoint evidence synchronized after protected merges; checkpoints are recovery aids, not permission gates. Continue safe frontier within the next invocation's host budget. Do not replay merged mutations.
-
-
-Event-ledger review on candidate-proof main 81423210ec1500a5e2006d8985d7f8da4f19265f: disabled metadata only; exact-head CI pending.
