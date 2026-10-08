@@ -232,6 +232,12 @@ For every fresh development session, `continue`, resume, or timeout recovery:
 14. Before ending an invocation, checkpoint exact main/branch/PR/check evidence plus the next ready frontier so the next workspace turn resumes without rediscovery.
 15. End with repo name, completed milestones/work units, blocked work with evidence, next ready frontier, module progress, and overall operational status.
 
+### Workspace invocation vs. distributed Supervisor
+
+A live authenticated single-session developer may implement, test, open PRs and merge authorized low-risk work through normal protected GitHub checks without pretending to be a distributed ANPOS Worker or fabricating a Supervisor identity. A true multi-agent dispatch, shared coordination write or privileged release still needs its selected authenticated agent, live lease/fencing and explicit scoped authority; otherwise retain degraded mode and keep executing independent single-session code work. Do not ask the owner to select Development AI again simply because the persistent orchestrator is absent. An interactive session cannot autonomously restart after its host invocation terminates.
+
+The recovery rule in `.ai/state/RECOVERY-PROTOCOL.md`, the Cursor/Copilot/Claude/Gemini/Windsurf adapters and the PR integrity check must all agree with the continuous-ready-frontier loop above. A one-milestone-per-continue default is prohibited. For any material SaaS implementation or machine-progress change, update the human-readable README dashboard in the same PR; run `python scripts/verify_readme_progress.py --base <PR_BASE_SHA>` in CI so missing progress updates cannot silently pass.
+
 Security and correctness rules:
 
 - preserve phone-only accepted-lead semantics;
