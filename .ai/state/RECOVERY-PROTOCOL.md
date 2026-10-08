@@ -10,8 +10,10 @@ Use this on every fresh supervisor session, `continue`/resume, interruption, con
 6. Repository/runtime evidence outranks chat memory and this compact index.
 7. Never repeat a branch/file/PR/merge/production trigger/destructive action merely because a previous response was missing or timed out.
 8. If evidence conflicts, record the conflict and stop only the affected mutation; continue safe independent work when possible.
-9. Default to one logical milestone per `continue` turn and avoid tight CI polling.
-10. Before handoff, update compact state/checkpoint when the durable milestone or exact next action materially changes.
+9. Continue across the full ready, authorized dependency frontier within the current host invocation. A milestone completion is a checkpoint, not a stop condition: immediately reconcile newly unblocked work, fix recoverable errors within budgets and proceed without technical owner confirmation. Never infer 24/7 execution from a repository document; when the host ends, retain a resumable checkpoint instead.
+10. If one work unit is blocked by CI, a missing tool, verified external consent or a circuit breaker, record exact evidence, isolate it and continue independent authorized work. Do not attempt forbidden bypasses, unbounded retries or repeated CI polling.
+11. Update README milestone bars/status and machine/checkpoint state in the same feature PR or reconciliation PR. Verify current protected `main` README after each merge; a status change is incomplete until its durable mirror is reconciled.
+12. Before handoff, update compact state/checkpoint with exact Git/CI evidence, current safety gates and the next ready frontier when the durable milestone or exact next action materially changes.
 
 Compact limits:
 
