@@ -30,7 +30,7 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected feature main: `2c422919` (PR #220); v3 enrollment/allocation/candidate ledger primitives are verified but disabled/quarantined. Candidate metadata is durable; accepted-payload intake/accounting remains open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected main: `a293e6a5` (PR #228); v3 batch acceptance, source finality and positive-result whole-job accounting are verified but disabled/quarantined. Unknown/no-effect reconciliation, replay, pagination and external activation remain open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
 - Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: additive accepted-payload schema/intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
@@ -2438,3 +2438,13 @@ A pure, bounded preflight rejects incomplete or duplicate source sets, unresolve
 ### Atomic whole-job settlement — verified, quarantined
 
 A separate default-off internal service requires current signed source-final proofs for every original source before committing one positive-result job and its actual usage in a transaction. PR #227 passed 406 PostgreSQL tests, 14 Web tests and all five workflows. Unknown/no-effect sources, settled-state replay, ordinary v3 dispatch and live signer/provider activation remain unavailable.
+
+### Signed v3 result-page cursor — isolated contract under review
+
+A separate empty-key default prevents v3 page continuation issuance. The pure
+15-minute HMAC contract binds workspace, job, actor, immutable request hash,
+country/category/source filters, an upper watermark and last ordered row; both
+positions are limited to 1,000 batches and 25 rows per batch. It returns no
+results and has no database access. Current membership, entitlement, source
+rights, completed-job finality and immutable ordering must be rechecked by a
+future page service. There is no v3 result endpoint or export path yet.
