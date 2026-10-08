@@ -107,7 +107,9 @@ test("form paths require a bounded CSRF cookie and ordinary reads never forward 
     "a".repeat(12);
   const csrf = "B".repeat(32);
   for (const path of [
+    "/api/v1/account/sign-out-form/",
     `/api/v1/workspaces/${id}/draft-form/`,
+    `/api/v1/workspaces/${id}/draft-feedback/${id}/`,
     `/api/v1/workspaces/${id}/jobs/${id}/cancel-form/`,
   ]) {
     for (const bad of [undefined, "bad", csrf + ";evil=1"])

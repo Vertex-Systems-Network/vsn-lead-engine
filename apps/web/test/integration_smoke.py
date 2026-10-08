@@ -232,6 +232,14 @@ def main():
                     parser.feed(body)
                     return body, parser
 
+                missing_feedback, _ = native_form(
+                    f"/dashboard/workspaces/{workspace.id}/search/new?feedback=00000000-0000-0000-0000-000000000000"
+                )
+                assert "saved form may have expired" in missing_feedback
+                assert (
+                    "Open a new draft form" in missing_feedback
+                    and "return to your workspace" in missing_feedback
+                )
                 source_path = f"/dashboard/workspaces/{workspace.id}/sources"
                 empty_catalog, _ = native_form(source_path)
                 assert "No source policies are configured" in empty_catalog
@@ -250,6 +258,23 @@ def main():
                 }
                 assert account(draft_action, payload, "http://localhost:3999")[0] == 403
                 before = Job.objects.count()
+                invalid = {
+                    **payload,
+                    "categories": "<script>feedback</script>",
+                    "result_limit": "0",
+                }
+                code, _, feedback_return = account(draft_action, invalid, origin)
+                assert code == 303 and "feedback=" in feedback_return["Location"]
+                assert "script" not in feedback_return["Location"]
+                feedback_page, retry = native_form(feedback_return["Location"].removeprefix(origin))
+                assert (
+                    "Check your search" in feedback_page and 'href="#result_limit"' in feedback_page
+                )
+                assert "&lt;script&gt;feedback&lt;/script&gt;" in feedback_page
+                assert "<script>feedback</script>" not in feedback_page
+                assert retry.hidden["draft_token"] == native.hidden["draft_token"]
+                assert Job.objects.count() == before
+                payload.update(retry.hidden)
                 code, _, returned = account(draft_action, payload, origin)
                 assert code == 303
                 created = Job.objects.get(search__categories=["Native bakery"])
@@ -260,7 +285,15 @@ def main():
                 assert not UsageReservation.objects.exists() and not JobOutbox.objects.exists()
                 assert account(draft_action, payload, origin)[0] == 303
                 assert Job.objects.count() == before + 1
-                assert account(draft_action, {**payload, "result_limit": "6"}, origin)[0] == 409
+                conflict_code, _, conflict_return = account(
+                    draft_action, {**payload, "result_limit": "6"}, origin
+                )
+                assert conflict_code == 303
+                conflict_page, _ = native_form(conflict_return["Location"].removeprefix(origin))
+                assert (
+                    "Draft submission conflict" in conflict_page
+                    and "different search" in conflict_page
+                )
                 Membership.objects.filter(user=user, workspace=workspace).update(role="viewer")
                 denied_form, parser = native_form(draft_path)
                 assert "draft_token" not in parser.hidden
@@ -340,15 +373,14 @@ def main():
                 _, closed_form = native_form(detail_path + "/cancel")
                 assert "confirmation" not in closed_form.hidden
                 active_session = next(cookie.value for cookie in jar if cookie.name == "sessionid")
-                code, form, _ = account("/accounts/sign-out/")
-                assert code == 200 and "End your session" in form
-                csrf = Csrf()
-                csrf.feed(form)
+                form, csrf = native_form("/account/sign-out")
+                assert "End your session" in form and "Keep working" in form
+                assert csrf.action == backend + "/accounts/logout/"
                 assert csrf.token
                 assert account("/accounts/logout/")[0] == 405
                 assert account("/accounts/logout/", {})[0] == 403
                 code, _, returned = account(
-                    "/accounts/logout/", {"csrfmiddlewaretoken": csrf.token}
+                    "/accounts/logout/", {"csrfmiddlewaretoken": csrf.token}, origin
                 )
                 assert code == 302 and returned["Location"] == origin + "/dashboard"
                 with opener.open(origin + "/dashboard", timeout=10) as response:
@@ -364,7 +396,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native draft/replay/role/tenant/cancel and bounded source configuration/status-filter pagination flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

@@ -190,6 +190,7 @@ def job_detail_page(request, workspace_id, job_id):
     )
 
 
+@never_cache
 @login_required
 @require_http_methods(["GET", "POST"])
 def draft_search_page(request, workspace_id):
@@ -228,6 +229,15 @@ def draft_search_page(request, workspace_id):
                 )
             else:
                 return HttpResponseRedirect(job_return(workspace_id, job.id), status=303)
+    if request.method == "POST" and settings.WEB_DASHBOARD_URL:
+        from .draft_feedback import save_feedback
+
+        handle = save_feedback(request, workspace_id, form, response_status)
+        if handle:
+            return HttpResponseRedirect(
+                f"{settings.WEB_DASHBOARD_URL}/workspaces/{workspace_id}/search/new?feedback={handle}",
+                status=303,
+            )
     return render(
         request,
         "core/draft_search.html",

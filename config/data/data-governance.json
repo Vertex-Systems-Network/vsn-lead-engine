@@ -124,6 +124,27 @@
       "deletion_method": "Controlled object/workbook cleanup when approved.",
       "backup_policy": "Provider durability plus reproducible telemetry schema in repository.",
       "non_production_policy": "Synthetic/test telemetry should use isolated stores or mocks."
+    },
+    {
+      "id": "DATA-005",
+      "name": "SaaS draft validation handoffs",
+      "classification": "confidential",
+      "tags": [
+        "customer_content"
+      ],
+      "owners": [
+        "VSN repository owner/operator"
+      ],
+      "storage_locations": [
+        "Existing server-side Django session store"
+      ],
+      "encryption_required": true,
+      "log_policy": "Never log submitted values, draft nonces, CSRF/session cookies or error payloads.",
+      "ai_access": "Synthetic fixtures only during development.",
+      "retention": "Read deadline five minutes, maximum three entries per session; expired entries pruned on subsequent writes. Physical rows follow Django session expiry and operator clearsessions cleanup; production retention/cleanup acceptance remains open.",
+      "deletion_method": "Logout session flush, bounded eviction/pruning and existing expired-session cleanup.",
+      "backup_policy": "No new backup mechanism; production session-store backup/retention review remains open.",
+      "non_production_policy": "Only disposable synthetic sessions and search fixtures."
     }
   ]
 }

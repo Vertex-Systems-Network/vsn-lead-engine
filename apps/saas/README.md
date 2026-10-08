@@ -148,3 +148,5 @@ The read-only workspace `sources/` API reuses the bounded shared catalog preview
 ### Saved job state filtering
 
 The job-list API accepts one supported `status` and optional UUID `after`, returning up to 25 tenant-scoped rows. Unknown/repeated query parameters fail; absent status remains the unfiltered cursor contract. Native Next filter changes reset continuation and pagination retains the selected state. This filters saved job state, not requested business statuses or accepted-lead classification. See [review](../../docs/ai/SAAS-JOB-STATE-FILTER-REVIEW-20261008.md).
+
+Native draft validation uses a bounded five-minute session handoff with the original signed retry identity, preserved inputs and field/error summary. Invalid authority or oversized inputs retain the Django fallback. Native `/account/sign-out` confirms CSRF-protected Django POST logout. Native login and cancellation-error screens remain open. See `docs/ai/SAAS-NEXT-VALIDATION-SIGNOUT-REVIEW-20261008.md` for session retention and acceptance limits.
