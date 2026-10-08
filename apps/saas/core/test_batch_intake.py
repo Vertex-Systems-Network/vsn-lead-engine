@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from django.db import IntegrityError
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from . import test_batch_manifest as manifests
@@ -135,7 +136,9 @@ class BatchIntakeTests(TestCase):
 
     def test_unknown_effect_replays_only_recorded_acceptance(self):
         first, _ = self.intake()
-        DispatchOperation.objects.filter(pk=self.operation.pk).update(status="unknown")
+        DispatchOperation.objects.filter(pk=self.operation.pk).update(
+            status="unknown", unknown_at=timezone.now()
+        )
         same, created = self.intake()
         self.assertFalse(created)
         self.assertEqual(same.pk, first.pk)
