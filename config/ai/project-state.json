@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PR #204 merged at 3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7; head 02516bda90cd6e1aea00983f75193da14e75d1ae passed all five CI workflows/required checks/Actions CodeQL, PostgreSQL 37798742414 (all 269 tests, migrations/reversal/settings and earlier concurrency) and Web 37798742458 (14 transport tests, lint/format/build/type and actual Next/Django HTTP flows). Ten DB-forbidden billing-evidence tests verify the pure validator; no entitlement/payment write or activation.",
+  "last_verified_completion": "PR #207 merged at 8d555bf041b05690838b74b46406541abb68bd81; head d9be9ac1ef0303b70be62e4e8c1a9de592205cc0 passed all five workflows: PostgreSQL 37810735757 (290 tests, five added billing races, forward/reverse/reapply and production settings), Web 37810735885 (14 transport/build/type/HTTP), required checks/Actions CodeQL. Disabled ledger/expiry only; no live payment/provider activation.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Verify disabled billing ledger/expiry slice through exact-head PostgreSQL and protected checks; then implement broader bounded result pagination and billing recovery/operator diagnostics without live activation.",
+    "Complete read-only billing diagnostics CI/protected merge, then design versioned bounded multi-source/multi-batch result pagination; retain disabled live signers/providers and preserve accounting.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "billing_ledger_expiry_local_verified_postgres_protected_merge_pending",
+  "qa_readiness": "billing_290_postgres_verified_readonly_diagnostics_local_pending_protected_ci",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "a116cfb9d761299b72d01596a3196e6350e4a848",
+  "last_reconciled_repository_ref": "8d555bf041b05690838b74b46406541abb68bd81",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

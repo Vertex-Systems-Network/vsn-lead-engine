@@ -440,7 +440,8 @@
       "completion_evidence": [
         "PR #157 internal fail-closed entitlements and atomic usage reserve/settle/release verified on real PostgreSQL. No payment/billing period/event provider activated.",
         "PR #176 merged at 52653cfbd7d3ccffee0cf1685afcc99be9877183; head d3707b30d5284fb94cd39e80c9b4474a6aa749be passed required checks/Actions CodeQL, PostgreSQL 37701109983 (114 tests including period races/migration/security gates), and Next/HTTP 37701109984.",
-        "Disabled internal billing ledger/expiry slice implemented on feat/saas-billing-ledger-expiry from main a116cfb9d761299b72d01596a3196e6350e4a848; local suite 290 tests successful (31 explicit PostgreSQL-only skips). Exact-head PostgreSQL/required/Web CI and protected merge pending. No real billing/provider activation."
+        "Disabled internal billing ledger/expiry slice implemented on feat/saas-billing-ledger-expiry from main a116cfb9d761299b72d01596a3196e6350e4a848; local suite 290 tests successful (31 explicit PostgreSQL-only skips). Exact-head PostgreSQL/required/Web CI and protected merge pending. No real billing/provider activation.",
+        "PR #207 merged at 8d555bf041b05690838b74b46406541abb68bd81; head d9be9ac1ef0303b70be62e4e8c1a9de592205cc0 passed all five workflows: PostgreSQL 37810735757 (290 tests, five added billing races, forward/reverse/reapply and production settings), Web 37810735885 (14 transport/build/type/HTTP), required checks/Actions CodeQL. Disabled ledger/expiry only; no live payment/provider activation."
       ],
       "update_notes": [
         "Payment provider/tiers and storefront routes unresolved."

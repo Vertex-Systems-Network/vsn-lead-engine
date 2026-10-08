@@ -11,3 +11,7 @@ Billing changes never reset counters, roll periods, release/refund reservations,
 Migration 0017 is additive. Empty rollback/reapply is supported; persisted bindings/events or grant deadlines block destructive reversal pending a preservation plan. Local regressions cover rollback injection, tenant/role/key/age/ordering/replay/conflict/downgrade, deadline guards and past-effect settlement. Five PostgreSQL races cover duplicate events, conflicting revisions, issuer-event reuse across tenants, revocation/reservation and revocation/dispatch. Final exact-head CI is required before merge.
 
 Provider-specific raw signature validation, account mapping, actual payment sandbox, authenticated ingress/replay queue, durable recovery/runbook, ledger retention/log redaction, production migrations/backup/encryption, provider/customer/privacy/legal/deployment acceptance and launch remain separate gates. Nothing here seeds a production entitlement or establishes payment truth.
+
+## Verified protected merge
+
+PR #207 merged at 8d555bf041b05690838b74b46406541abb68bd81; head d9be9ac1ef0303b70be62e4e8c1a9de592205cc0 passed all five workflows: PostgreSQL 37810735757 (290 tests, five added billing races, forward/reverse/reapply and production settings), Web 37810735885 (14 transport/build/type/HTTP), required checks/Actions CodeQL. Disabled ledger/expiry only; no live payment/provider activation.
