@@ -22,7 +22,7 @@ from .form_context import form_csrf
 from .models import Entitlement, SourcePolicy, UsageCounter, UsageReservation
 from .periods import active_window
 from .result_exports import FIELD_ORDER, export_rights, prepare_export, specification
-from .result_query import result_country, results_snapshot
+from .result_query import result_filters, results_snapshot
 from .services import membership_for
 from .usage import lock_workspace
 
@@ -30,7 +30,7 @@ SALT = "saas.export-confirmation.v2"
 
 
 @transaction.atomic
-def export_context(user, workspace_id, job_id, country=""):
+def export_context(user, workspace_id, job_id, country="", category="", source=""):
     lock_workspace(user, workspace_id)
     entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
     if entitlement is None or not entitlement.active or entitlement.export_limit < 1:
@@ -47,7 +47,7 @@ def export_context(user, workspace_id, job_id, country=""):
     )
     if counter.exports + pending >= entitlement.export_limit:
         raise PermissionDenied("Export budget is unavailable.")
-    snapshot = results_snapshot(user, workspace_id, job_id, country)
+    snapshot = results_snapshot(user, workspace_id, job_id, country, category, source)
     rows = snapshot["results"]
     if not rows:
         raise PermissionDenied("No current results are available for export.")
@@ -93,6 +93,10 @@ def export_context(user, workspace_id, job_id, country=""):
         "withheld_count": snapshot["withheld_count"],
         "filtered_count": snapshot["filtered_count"],
         "country": country,
+        "category_filter": snapshot["category_filter"],
+        "source_filter": snapshot["source_filter"],
+        "category_options": snapshot["category_options"],
+        "source_options": snapshot["source_options"],
         "expires_at": expires_at.isoformat(),
         "sources": sources,
         "omitted_fields": [f for f in FIELD_ORDER if f not in allowed],
@@ -104,9 +108,9 @@ class ExportFormContext(APIView):
     def get(self, request, workspace_id, job_id):
         membership_for(request.user, workspace_id)
         csrf = form_csrf(request)
-        country = result_country(request.query_params)
+        filters = result_filters(request.query_params)
         return Response(
-            {**export_context(request.user, workspace_id, job_id, country), "csrf_token": csrf}
+            {**export_context(request.user, workspace_id, job_id, **filters), "csrf_token": csrf}
         )
 
 

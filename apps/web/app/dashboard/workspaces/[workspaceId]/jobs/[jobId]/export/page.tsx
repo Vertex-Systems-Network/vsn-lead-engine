@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { resultCountry } from "../../../../../../../lib/result-filter";
+import {
+  resultFilters,
+  resultFilterQuery,
+} from "../../../../../../../lib/result-filter";
 import { notFound } from "next/navigation";
 import { backend, backendLink } from "../../../../../../../lib/backend";
 import { exportContext, uuid } from "../../../../../../../lib/contracts";
@@ -14,9 +17,9 @@ export default async function ExportResults({
 }) {
   const { workspaceId, jobId } = await params;
   if (!uuid(workspaceId) || !uuid(jobId)) notFound();
-  const country = resultCountry(await searchParams);
-  if (country === null) notFound();
-  const query = country ? `?country=${country}` : "";
+  const filters = resultFilters(await searchParams);
+  if (filters === null) notFound();
+  const query = resultFilterQuery(filters);
   const back = `/dashboard/workspaces/${workspaceId}/jobs/${jobId}/results${query}`;
   const result = await backend(
     `/api/v1/workspaces/${workspaceId}/jobs/${jobId}/export-form/${query}`,
@@ -35,7 +38,9 @@ export default async function ExportResults({
   if (
     data.workspace_id !== workspaceId ||
     data.job_id !== jobId ||
-    data.country !== country
+    data.country !== filters.country ||
+    data.category_filter !== filters.category ||
+    data.source_filter !== filters.source
   )
     return <FormUnavailable kind="unavailable" />;
   return (
@@ -49,8 +54,19 @@ export default async function ExportResults({
         <p>
           Choose which currently available records to export from this initial
           batch. {data.filtered_count} available records are excluded by the
-          country filter. {data.withheld_count} recorded results are unavailable
-          and excluded.
+          filters. {data.withheld_count} recorded results are unavailable and
+          excluded.
+        </p>
+        <p>
+          Country: {data.country || "All"}; saved category:{" "}
+          {data.category_filter
+            ? data.category_options[Number(data.category_filter)]
+            : "All"}
+          ; saved source:{" "}
+          {data.source_filter
+            ? data.source_options[Number(data.source_filter)]
+            : "All"}
+          .
         </p>
         <p>
           Preparing this CSV uses one export unit. Repeating the same

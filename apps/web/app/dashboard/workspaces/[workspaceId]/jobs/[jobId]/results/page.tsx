@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { resultCountry } from "../../../../../../../lib/result-filter";
+import {
+  resultFilters,
+  resultFilterQuery,
+} from "../../../../../../../lib/result-filter";
 import { Fragment } from "react";
 import { notFound } from "next/navigation";
 import { backend } from "../../../../../../../lib/backend";
@@ -19,9 +22,9 @@ export default async function Results({
 }) {
   const { workspaceId, jobId } = await params;
   if (!uuid(workspaceId) || !uuid(jobId)) notFound();
-  const country = resultCountry(await searchParams);
-  if (country === null) notFound();
-  const query = country ? `?country=${country}` : "";
+  const filters = resultFilters(await searchParams);
+  if (filters === null) notFound();
+  const query = resultFilterQuery(filters);
   const result = await backend(
     `/api/v1/workspaces/${workspaceId}/jobs/${jobId}/results/${query}`,
     savedResults,
@@ -31,7 +34,9 @@ export default async function Results({
   if (
     data.workspace_id !== workspaceId ||
     data.job_id !== jobId ||
-    data.country !== country
+    data.country !== filters.country ||
+    data.category_filter !== filters.category ||
+    data.source_filter !== filters.source
   )
     return <State kind="unavailable" />;
   return (
@@ -45,18 +50,52 @@ export default async function Results({
       <h1>Available results</h1>
       <form method="get">
         <label htmlFor="result-country">Country</label>
-        <select id="result-country" name="country" defaultValue={country}>
+        <select
+          id="result-country"
+          name="country"
+          defaultValue={filters.country}
+        >
           <option value="">All countries</option>
           <option value="US">United States</option>
           <option value="CA">Canada</option>
         </select>
+        <label htmlFor="result-category">Saved category</label>
+        <select
+          id="result-category"
+          name="category"
+          defaultValue={filters.category}
+        >
+          <option value="">All saved categories</option>
+          {data.category_options.map((label, index) => (
+            <option key={label} value={String(index)}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <label htmlFor="result-source">Saved source</label>
+        <select id="result-source" name="source" defaultValue={filters.source}>
+          <option value="">All saved sources</option>
+          {data.source_options.map((label, index) => (
+            <option key={label} value={String(index)}>
+              {label}
+            </option>
+          ))}
+        </select>
         <button className="button" type="submit">
-          Apply filter
+          Apply filters
         </button>
       </form>
       <p role="status">
         {data.results.length} shown; {data.filtered_count} available records
-        excluded by country filter.
+        excluded by filters.
+      </p>
+      <p>
+        <Link
+          prefetch={false}
+          href={`/dashboard/workspaces/${workspaceId}/jobs/${jobId}/results`}
+        >
+          Clear filters
+        </Link>
       </p>
       {data.can_review_export ? (
         <p>
@@ -82,7 +121,7 @@ export default async function Results({
         <section className="card">
           <h2>No available results</h2>
           <p>
-            Try All countries to clear the filter. A saved search or requested
+            Choose All in each filter to clear them. A saved search or requested
             limit does not mean leads have been collected.
           </p>
         </section>

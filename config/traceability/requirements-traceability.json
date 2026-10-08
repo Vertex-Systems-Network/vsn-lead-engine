@@ -2003,6 +2003,48 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "SAAS-RESULT-METADATA-FILTER-001",
+      "source": "Saved metadata index filters and exact filtered export scope",
+      "source_provenance_ref": "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "feat/native-result-metadata-filters"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Local 253 cases: 227 passed/26 PostgreSQL-only skips; Next 13 transport tests/build/type and real HTTP compound filters/scoped subset CSV; exact-head CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-RESULT-METADATA-FILTER-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/result_query.py",
+        "apps/saas/core/export_forms.py",
+        "apps/saas/core/test_result_filters.py",
+        "apps/web/lib/result-filter.ts",
+        "apps/web/lib/contracts.ts",
+        "apps/web/test/integration_smoke.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

@@ -420,10 +420,10 @@ def main():
                 assert "confirmation" not in closed_form.hidden
                 # Full synthetic dual-attested storage -> API -> actual Next rendering.
                 # No real signer/source/registry is activated by these fixtures.
-                from core.test_result_exports import ExportFixture
+                from core.test_result_filters import MetadataAcceptanceFixture
                 from core.models import AcceptedResult
                 result_marker = "<img src=x onerror=synthetic-result>"
-                class HttpAcceptance(ExportFixture):
+                class HttpAcceptance(MetadataAcceptanceFixture):
                     def addCleanup(self, fn):
                         self.cleanup = fn
                     def candidate_signed(self, data=None):
@@ -442,9 +442,10 @@ def main():
                 assert "Available results" in rendered and "&lt;img src=x onerror=synthetic-result&gt;" in rendered
                 assert "synthetic-record-1" not in rendered and "registry-test" not in rendered
                 assert "no-store" in result_headers.get("Cache-Control", "")
-                export_url = backend + result_fixture.url
+                export_url = backend + result_fixture.url.replace("results/", "exports/")
+                export_selection = {"result_ids": [str(r.id) for r in AcceptedResult.objects.filter(job=result_fixture.job)], "fields": ["phone", "business_name"]}
                 export_csrf = next(cookie.value for cookie in jar if cookie.name == "csrftoken")
-                export_request = Request(export_url, data=json.dumps(result_fixture.selection).encode(), headers={"Content-Type": "application/json", "Idempotency-Key": "http-synthetic-export", "X-CSRFToken": export_csrf, "Origin": origin}, method="POST")
+                export_request = Request(export_url, data=json.dumps(export_selection).encode(), headers={"Content-Type": "application/json", "Idempotency-Key": "http-synthetic-export", "X-CSRFToken": export_csrf, "Origin": origin}, method="POST")
                 with opener.open(export_request, timeout=10) as response:
                     exported = response.read()
                     export_receipt = response.headers["X-Export-Receipt"]
@@ -455,21 +456,32 @@ def main():
                     assert response.read() == exported and response.headers["X-Export-Receipt"] == export_receipt
                 Entitlement.objects.filter(workspace=result_fixture.workspace).update(export_limit=2)
                 filtered_results, _ = read(result_path + "?country=CA")
-                assert "1 available records excluded by country filter" in filtered_results.replace("<!-- -->", "")
-                assert "synthetic-result" not in filtered_results and "Review CSV export" not in filtered_results
-                matching_results, _ = read(result_path + "?country=US")
-                assert "synthetic-result" in matching_results and "/export?country=US" in matching_results
-                preview, export_form = native_form(result_path.replace("/results", "/export") + "?country=US")
+                assert "1 available records excluded by filters" in filtered_results.replace("<!-- -->", "")
+                assert "synthetic-result" not in filtered_results and "Second synthetic" in filtered_results
+                empty_filtered, _ = read(result_path + "?country=US&category=1&source=0")
+                assert "2 available records excluded by filters" in empty_filtered.replace("<!-- -->", "")
+                assert "Review CSV export" not in empty_filtered and "Clear filters" in empty_filtered
+                assert "synthetic-result" not in empty_filtered and "Second synthetic" not in empty_filtered
+                cleared, _ = read(result_path + "?country=&category=&source=")
+                assert "synthetic-result" in cleared and "Second synthetic" in cleared
+                matching_results, _ = read(result_path + "?country=US&category=0&source=0")
+                assert "synthetic-result" in matching_results and "/export?country=US&amp;category=0&amp;source=0" in matching_results
+                preview, export_form = native_form(result_path.replace("/results", "/export") + "?country=US&category=0&source=0")
                 assert "Confirm and download CSV" in preview and "one export unit" in preview
                 assert "Unavailable fields" in preview and "Synthetic test source" in preview
                 assert export_form.action == backend + f"/workspaces/{result_fixture.workspace.id}/jobs/{result_fixture.job.id}/export/"
-                native_selection = {**export_form.hidden, "fields": ["phone"], "result_ids": [str(AcceptedResult.objects.get(job=result_fixture.job).id)]}
+                assert 'name="category"' in matching_results and 'name="source"' in matching_results
+                assert "saved category:" in preview and "saved source:" in preview
+                native_selection = {**export_form.hidden, "fields": ["phone"], "result_ids": [str(AcceptedResult.objects.get(job=result_fixture.job, category="software").id)]}
                 assert "Choose records to include" in preview and "&lt;img src=x onerror=synthetic-result&gt;" in preview
                 code, _, _ = account(f"/workspaces/{result_fixture.workspace.id}/jobs/{result_fixture.job.id}/export/", {**native_selection, "result_ids": []}, origin)
                 assert code == 400
+                other_row = str(AcceptedResult.objects.get(job=result_fixture.job, category="z-second").id)
+                code, _, _ = account(f"/workspaces/{result_fixture.workspace.id}/jobs/{result_fixture.job.id}/export/", {**native_selection, "result_ids": [other_row]}, origin)
+                assert code == 400
                 export_submit_path = f"/workspaces/{result_fixture.workspace.id}/jobs/{result_fixture.job.id}/export/"
                 code, native_csv, native_headers = account(export_submit_path, native_selection, origin)
-                assert code == 200 and "'+1" in native_csv and "no-store" in native_headers["Cache-Control"]
+                assert code == 200 and "'+1" in native_csv and "50123" in native_csv and "50124" not in native_csv and "no-store" in native_headers["Cache-Control"]
                 code, repeated_csv, repeated_headers = account(export_submit_path, native_selection, origin)
                 assert code == 200 and repeated_csv == native_csv and repeated_headers["X-Export-Receipt"] == native_headers["X-Export-Receipt"]
                 code, conflict, _ = account(export_submit_path, {**native_selection, "fields": ["business_name"]}, origin)
@@ -501,9 +513,9 @@ def main():
                 assert "No available results" in expired_results and "synthetic-result" not in expired_results
                 from core.result_retention import expire_result_payloads
                 from core.models import AcceptedFingerprint
-                assert expire_result_payloads(user, result_fixture.workspace.id) == {"erased_count": 1, "more_due": False}
-                assert AcceptedResult.objects.get(job=result_fixture.job).fields == {}
-                assert AcceptedFingerprint.objects.filter(workspace=result_fixture.workspace).count() == 3
+                assert expire_result_payloads(user, result_fixture.workspace.id) == {"erased_count": 2, "more_due": False}
+                assert all(r.fields == {} for r in AcceptedResult.objects.filter(job=result_fixture.job))
+                assert AcceptedFingerprint.objects.filter(workspace=result_fixture.workspace).count() == 6
                 erased_results, _ = read(result_path)
                 assert "No available results" in erased_results and "synthetic-result" not in erased_results
                 active_session = next(cookie.value for cookie in jar if cookie.name == "sessionid")
@@ -530,7 +542,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, country result filters and native selected-row export preview/confirmation/empty-denial/conflict and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, country/category/source result filters and native selected-row export preview/confirmation/empty/outside-filter denial/subset-only/conflict and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

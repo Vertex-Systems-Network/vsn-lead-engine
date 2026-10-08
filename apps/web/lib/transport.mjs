@@ -16,8 +16,19 @@ export function trustedOrigin(value) {
 }
 const filteredJobsPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/\?status=(?:draft|queued|running|partial|completed|failed|paused|cancelled)(?:&after=[0-9a-f-]{36})?$/;
-const resultsPath =
-  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/[0-9a-f-]{36}\/results\/(?:\?country=(?:US|CA))?$/;
+const resultFilterQuery =
+  /^(?:country=(?:US|CA)(?:&category=(?:[0-9]|1[01]))?(?:&source=(?:[0-9]|1[01]))?|category=(?:[0-9]|1[01])(?:&source=(?:[0-9]|1[01]))?|source=(?:[0-9]|1[01]))$/;
+function filteredResultPath(path, suffix) {
+  const [base, query, extra] = path.split("?");
+  return (
+    extra === undefined &&
+    /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/[0-9a-f-]{36}\/(?:results|export-form)\/$/.test(
+      base,
+    ) &&
+    base.endsWith(`/${suffix}/`) &&
+    (query === undefined || resultFilterQuery.test(query))
+  );
+}
 const formPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/(?:cancel-form|export-form)\/)$/;
 export async function readBackend(
@@ -31,14 +42,12 @@ export async function readBackend(
   const form =
     publicForm ||
     formPath.test(path) ||
-    /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/[0-9a-f-]{36}\/export-form\/\?country=(?:US|CA)$/.test(
-      path,
-    ) ||
+    filteredResultPath(path, "export-form") ||
     path === "/api/v1/account/sign-out-form/";
   if (
     !form &&
     !filteredJobsPath.test(path) &&
-    !resultsPath.test(path) &&
+    !filteredResultPath(path, "results") &&
     !/^\/api\/v1\/workspaces\/(?:[0-9a-f-]{36}\/(?:usage\/|sources\/|jobs\/(?:[0-9a-f-]{36}\/)?))?(?:\?(?:page=[1-9][0-9]{0,5}|after=[0-9a-f-]{36}))?$/.test(
       path,
     )

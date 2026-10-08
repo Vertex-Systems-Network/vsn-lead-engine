@@ -111,3 +111,7 @@ A screen is ready for implementation review when:
 ## Bounded implemented result-filter/selection refinement
 
 The first result filter is country: All, US or Canada, using one native GET select with a persistent label. Counts distinguish shown, otherwise available but filtered, and currently unavailable rows. Filtered CSV review retains country and shows row checkboxes with authorized names/countries plus common field checkboxes, each in a labelled fieldset. At least one record and field are required server-side. The direct CSRF confirmation contains IDs only in the POST body and must remain within the signed filtered preview scope; stale/invalid selection returns safe review without an automatic replacement request. This is a single complete accepted batch of at most 25, without multi-batch pagination. Browser and accessibility certification remain pending.
+
+## Saved metadata filter refinement
+
+The result GET form adds labelled Saved category and Saved source selects alongside country, with All choices and a Clear filters link. Values are bounded indices into saved job metadata; display labels remain escaped and never enter URLs. Counts classify current shown/filtered/unavailable rows. Compound filters apply together, and export review displays the saved filter labels while retaining exact filtered row scope. Source options describe saved selection, not current collection rights; current intake is still single-source and at most 25 records.

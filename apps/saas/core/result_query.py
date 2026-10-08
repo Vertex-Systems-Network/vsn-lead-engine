@@ -14,23 +14,53 @@ from .result_evidence import ALLOWED_FIELDS, RIGHTS, token
 from .services import membership_for
 
 
-def result_country(query):
-    if set(query) - {"country"} or len(query.getlist("country")) > 1:
-        raise ValidationError("Only one US or CA country filter is available.")
-    country = query.get("country", "")
-    if country not in {"", "US", "CA"}:
-        raise ValidationError("Only US or CA country filters are available.")
-    return country
+def result_filters(query):
+    keys = {"country", "category", "source"}
+    if set(query) - keys or any(len(query.getlist(key)) > 1 for key in keys):
+        raise ValidationError("Only one value per result filter is available.")
+    filters = {key: query.get(key, "") for key in keys}
+    validate_filters(**filters)
+    return filters
+
+
+def validate_filters(country="", category="", source=""):
+    if country not in {"", "US", "CA"} or any(
+        type(value) is not str or value not in {"", *(str(i) for i in range(12))}
+        for value in (category, source)
+    ):
+        raise ValidationError("Invalid bounded result filter.")
+
+
+def filter_options(search, key, maximum):
+    values = search.get(key) if isinstance(search, dict) else None
+    if (
+        not isinstance(values, list)
+        or len(values) > 12
+        or any(
+            type(v) is not str
+            or not v.strip()
+            or len(v) > maximum
+            or any(ord(c) < 32 or ord(c) == 127 for c in v)
+            for v in values
+        )
+        or len(set(values)) != len(values)
+    ):
+        raise ValidationError("Saved result filter metadata is unavailable.")
+    return values
 
 
 @transaction.atomic
-def results_snapshot(user, workspace_id, job_id, country=""):
+def results_snapshot(user, workspace_id, job_id, country="", category="", source=""):
     locked_workspace(user, workspace_id)
-    if country not in {"", "US", "CA"}:
-        raise ValidationError("Invalid country filter.")
+    validate_filters(country, category, source)
     job = Job.objects.filter(pk=job_id, workspace_id=workspace_id).first()
     if job is None:
         raise Http404("Workspace resource not found.")
+    categories = filter_options(job.search, "categories", 120)
+    sources = filter_options(job.search, "source_codes", 64)
+    for choice, options in [(category, categories), (source, sources)]:
+        if choice and int(choice) >= len(options):
+            raise ValidationError("Result filter is outside saved search scope.")
     output = {
         "workspace_id": str(workspace_id),
         "job_id": str(job_id),
@@ -38,6 +68,10 @@ def results_snapshot(user, workspace_id, job_id, country=""):
         "withheld_count": min(job.result_count, 25),
         "filtered_count": 0,
         "country": country,
+        "category_filter": category,
+        "source_filter": source,
+        "category_options": categories,
+        "source_options": sources,
         "can_review_export": False,
     }
     acceptance = (
@@ -140,10 +174,15 @@ def results_snapshot(user, workspace_id, job_id, country=""):
             continue
         output["results"].append(entry)
     output["withheld_count"] = acceptance.accepted_count - len(output["results"])
-    if country:
-        visible = output["results"]
-        output["results"] = [r for r in visible if r["country"] == country]
-        output["filtered_count"] = len(visible) - len(output["results"])
+    visible = output["results"]
+    output["results"] = [
+        r
+        for r in visible
+        if (not country or r["country"] == country)
+        and (not category or r["category"] == categories[int(category)])
+        and (not source or r["source_code"] == sources[int(source)])
+    ]
+    output["filtered_count"] = len(visible) - len(output["results"])
     output["can_review_export"] = bool(output["results"]) and membership_for(
         user, workspace_id
     ).role in {"owner", "admin", "member"}

@@ -310,13 +310,49 @@ export type SavedResult = {
   retention_version: string;
   provenance_fields: string[];
 };
-export type SavedResults = {
+type ResultFilterMetadata = {
+  country: "" | "US" | "CA";
+  category_filter: string;
+  source_filter: string;
+  category_options: string[];
+  source_options: string[];
+};
+function resultFilterMetadata(
+  v: unknown,
+): v is ResultFilterMetadata & Record<string, unknown> {
+  if (!object(v) || !["", "US", "CA"].includes(v.country as string))
+    return false;
+  for (const [key, optionsKey, maximum] of [
+    ["category_filter", "category_options", 120],
+    ["source_filter", "source_options", 64],
+  ] as const) {
+    const selected = v[key],
+      options = v[optionsKey];
+    if (
+      typeof selected !== "string" ||
+      (selected !== "" && !/^(?:[0-9]|1[01])$/.test(selected)) ||
+      !Array.isArray(options) ||
+      options.length > 12 ||
+      new Set(options).size !== options.length ||
+      !options.every(
+        (label) =>
+          typeof label === "string" &&
+          label.trim().length > 0 &&
+          label.length <= maximum &&
+          !/[\x00-\x1f\x7f]/.test(label),
+      ) ||
+      (selected !== "" && Number(selected) >= options.length)
+    )
+      return false;
+  }
+  return true;
+}
+export type SavedResults = ResultFilterMetadata & {
   workspace_id: string;
   job_id: string;
   results: SavedResult[];
   withheld_count: number;
   filtered_count: number;
-  country: "" | "US" | "CA";
   can_review_export: boolean;
 };
 export function savedResults(v: unknown): v is SavedResults {
@@ -326,7 +362,7 @@ export function savedResults(v: unknown): v is SavedResults {
     uuid(v.job_id) &&
     typeof v.can_review_export === "boolean" &&
     count(v.filtered_count) &&
-    ["", "US", "CA"].includes(v.country as string) &&
+    resultFilterMetadata(v) &&
     count(v.withheld_count) &&
     v.withheld_count <= 25 &&
     Array.isArray(v.results) &&
@@ -339,6 +375,10 @@ export function savedResults(v: unknown): v is SavedResults {
         typeof r.country === "string" &&
         ["US", "CA"].includes(r.country) &&
         (!v.country || r.country === v.country) &&
+        (!v.category_filter ||
+          r.category === v.category_options[Number(v.category_filter)]) &&
+        (!v.source_filter ||
+          r.source_code === v.source_options[Number(v.source_filter)]) &&
         typeof r.category === "string" &&
         r.category.length <= 120 &&
         object(r.fields) &&
@@ -371,7 +411,7 @@ export function savedResults(v: unknown): v is SavedResults {
   );
 }
 
-export type ExportContext = {
+export type ExportContext = ResultFilterMetadata & {
   records: { id: string; business_name: string; country: "US" | "CA" }[];
   kind: "export";
   workspace_id: string;
@@ -383,7 +423,6 @@ export type ExportContext = {
   record_count: number;
   withheld_count: number;
   filtered_count: number;
-  country: "" | "US" | "CA";
   expires_at: string;
   sources: { code: string; attribution: string }[];
 };
@@ -428,7 +467,7 @@ export function exportContext(v: unknown): v is ExportContext {
         (!v.country || r.country === v.country),
     ) &&
     count(v.filtered_count) &&
-    ["", "US", "CA"].includes(v.country as string) &&
+    resultFilterMetadata(v) &&
     count(v.withheld_count) &&
     v.withheld_count + v.record_count + v.filtered_count <= 25 &&
     typeof v.expires_at === "string" &&
