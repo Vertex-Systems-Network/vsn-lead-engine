@@ -34,6 +34,9 @@
 
 ## Next Action
 
-1. Implement disabled trusted-local v3 job enrollment/server-owned batch allocation, candidate/acceptance intake and exact terminal-manifest verification with aggregate reservation caps and PostgreSQL replay/finality races per ADR-SAAS-003. Preserve v2 behavior and no live signer/provider activation.
+1. Implement quarantined v3 server-owned batch allocation and candidate/accepted-payload intake with aggregate original-reservation caps, durable replay and exact source-final/unknown-effect reconciliation. Keep v3 dispatch disabled until the full guarded transactional path is reviewed.
 2. Then add stable-watermark signed 25-row page services and native selected-page CSV, preserving current rights/expiry/no-referrer/once-only preparation semantics.
 3. Keep README/machine/checkpoint evidence synchronized after protected merges; checkpoints are recovery aids, not permission gates. Continue safe frontier within the next invocation's host budget. Do not replay merged mutations.
+
+
+Enrollment review based on documentation main 56220af9775cf9f30cff49721fcd467b390b3cae: default-v2 selector, disabled admin enrollment, explicit v3 dispatch quarantine and legacy evidence exclusion. Exact-head CI pending.

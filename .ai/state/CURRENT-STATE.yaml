@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "20e2362ec6000a72e679a8716d428795f1a9d077",
-  "observed_main_semantics": "Exact protected feature main after #212; precedes documentation-only checkpoint merge.",
+  "observed_main_sha": "56220af9775cf9f30cff49721fcd467b390b3cae",
+  "observed_main_semantics": "Exact main #213 before quarantined enrollment review.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -65,15 +65,11 @@
     "saas_pending_cancellation": "PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks, CodeQL and PostgreSQL 37695788773",
     "saas_source_preview": "PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks, CodeQL and PostgreSQL 37696123260",
     "checkpoint_168": "PR #168 head 7d4bfc9e69138f7424405a9c88691ecea2fb8a03 passed required checks, CodeQL/actions and SaaS PostgreSQL 37696425439 (84 tests).",
-    "saas_dispatch_next": "Earlier verified feature evidence retained in git history through PR #197.",
     "saas_terminal_receipts": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_periods": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_daily_occurrences": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
-    "saas_session_navigation": "Earlier verified feature evidence retained in git history through PR #197.",
     "latest_saas_verified_head": "b0f19291687c8b532b81a2f2bdd85e8c29758e9a",
     "saas_native_next_forms": "PR #180: required checks, PostgreSQL 37703540378 (138 tests/migrations/settings) and Next/HTTP 37703540308 (native draft/cancel/CSRF/auth) passed; full evidence in history.",
-    "saas_next_source_configuration": "Earlier exact-head implementation/CI evidence retained in git history through PR #203.",
-    "saas_job_state_filter": "Earlier exact-head implementation/CI evidence retained in git history through PR #203.",
     "saas_next_validation_signout": "PR #184: required checks/Actions CodeQL, PostgreSQL 37755784470 and Next/HTTP 37755784437 passed; exact head and full evidence retained in git history.",
     "saas_native_login_cancel": "PR #186: required checks/Actions CodeQL, PostgreSQL 37766322082 and Next/HTTP 37766321955 passed; exact head and full evidence retained in git history.",
     "saas_result_evidence": "PR #188: required checks/Actions CodeQL, PostgreSQL 37770063209 and Next/HTTP 37770063198 passed; exact head and full evidence retained in git history.",
@@ -91,7 +87,8 @@
     "saas_billing_diagnostics": "PR #208 / head 3d34dccd: all five CI workflows, PG 37811482736 (296 tests/migrations), Web 37811482692 (14 tests/HTTP) passed. No repair/activation.",
     "saas_batch_manifest": "PR #209 / head 7c5adceb: all five CI workflows, PG 37812348239 (306 tests/migrations), Web 37812348326 (14 tests/HTTP). No intake/activation.",
     "saas_batch_schema": "PR #211 / head bc07f8d2: all five workflows passed, PG 37816152759 (319 tests/migrations/settings), Web 37816152845 (14 tests/HTTP). Inert metadata only; detailed evidence in checkpoint/schema contract.",
-    "saas_terminal_manifest": "PR #212 / head b0f19291: all five workflows passed; PG 37816828169 (329 tests/migrations/settings), Web 37816828126 (14 tests/HTTP). Pure accepted-set proof only; no enrollment/intake/settlement."
+    "saas_terminal_manifest": "PR #212 / head b0f19291: all five workflows passed; PG 37816828169 (329 tests/migrations/settings), Web 37816828126 (14 tests/HTTP). Pure accepted-set proof only; no enrollment/intake/settlement.",
+    "saas_batch_enrollment": "Development review: default-v2 server selector and quarantined disabled admin enrollment; nine tests including two PG-only races. CI pending; no dispatch/intake."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -138,7 +135,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Implement disabled trusted-local v3 job enrollment/server-owned batch allocation, candidate/acceptance intake and exact terminal-manifest verification with aggregate reservation caps and PostgreSQL replay/finality races per ADR-SAAS-003. Preserve v2 behavior and no live signer/provider activation.",
+  "exact_next_safe_action": "Implement quarantined v3 server-owned batch allocation and candidate/accepted-payload intake with aggregate original-reservation caps, durable replay and exact source-final/unknown-effect reconciliation. Keep v3 dispatch disabled until the full guarded transactional path is reviewed.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

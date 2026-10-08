@@ -124,3 +124,7 @@ SAAS_BATCH_VERIFIERS = {}
 SAAS_BATCH_DEDUPE_VERIFIERS = {}
 # Separate source-final authority; empty by default and no intake service enabled.
 SAAS_BATCH_TERMINAL_VERIFIERS = {}
+
+# Enrollment only; batch dispatch/intake remain unavailable even when locally enabled.
+SAAS_BATCH_ENROLLMENT_ENABLED = False
+SAAS_BATCH_ENROLLMENT_SOURCES = frozenset()

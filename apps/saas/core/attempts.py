@@ -19,8 +19,10 @@ LEASE = timedelta(seconds=60)
 MAX_ATTEMPTS = 3
 
 
-def preflight(outbox):
+def preflight(outbox, *, allow_batch_enrollment=False):
     """Caller holds the workspace lock; repeat before every future external action."""
+    if outbox.result_protocol != 2 and not allow_batch_enrollment:
+        raise PermissionDenied("Batch dispatch is not available.")
     job = outbox.job
     lock_workspace(outbox.submitted_by, job.workspace_id)
     if (

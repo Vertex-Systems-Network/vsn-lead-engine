@@ -325,6 +325,7 @@ class JobOutbox(models.Model):
     submitted_revision = models.PositiveIntegerField()
     expires_at = models.DateTimeField(null=True, db_index=True)
     source_snapshot = models.JSONField()
+    result_protocol = models.PositiveSmallIntegerField(default=2, editable=False)
     status = models.CharField(max_length=9, default="pending")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -334,7 +335,10 @@ class JobOutbox(models.Model):
             models.CheckConstraint(
                 condition=models.Q(status__in=["pending", "cancelled", "started", "done"]),
                 name="saas_outbox_status",
-            )
+            ),
+            models.CheckConstraint(
+                condition=models.Q(result_protocol__in=[2, 3]), name="saas_outbox_protocol"
+            ),
         ]
 
 

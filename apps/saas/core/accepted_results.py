@@ -208,6 +208,8 @@ def accept_results(
     if operation is None:
         raise Http404("Workspace resource not found.")
     job, intent = operation.job, operation.outbox
+    if intent.result_protocol != 2:
+        raise RevisionConflict()
     reservation = UsageReservation.objects.select_for_update().get(pk=intent.reservation_id)
     entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
     if entitlement is None or not entitlement.is_current:
