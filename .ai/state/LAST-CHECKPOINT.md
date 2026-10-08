@@ -59,3 +59,7 @@ Pure paired v3 candidate/acceptance payload mapping under review: exact signed r
 Next ready frontier: Implement disabled atomic v3 accepted-batch intake using paired current proofs, durable candidate identity, exact replay/reference collision checks, shared tenant fingerprints and summed original lead/source-call/outbox-call caps. Preserve the full reservation and unknown effects until every allocated identity is reconciled and exact source-final/whole-job accounting passes; then internal write-ahead entry and signed 25-row pages.
 
 Paired-proof local verification: 383 SaaS cases / 42 explicit PostgreSQL-only skips; eight new DB-forbidden proof mapping cases passed. Ruff/format pass; pending exact-head CI remains the merge gate.
+
+## Disabled atomic batch intake — development review
+
+The paired-proof PR #222 merged after all five exact-head workflows passed on the branch updated with CI path scoping. The next isolated service under review writes a v3 acceptance, 1–25 payload rows and shared tenant fingerprints in one transaction after rechecking current actor/source/entitlement, the recorded exact candidate event and original lead/call caps across all batches. Exact replay returns the existing acceptance; changed bytes, source/key revocation, duplicate fingerprints, expiry and ambiguous effects fail closed. No HTTP route, ordinary dispatch, terminal settlement or usage release is enabled. `SAAS_BATCH_ACCEPTANCE_ENABLED` defaults false; external signer/R2 truth remains unverified. CI for this intake slice is pending.

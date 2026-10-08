@@ -2422,3 +2422,7 @@ Next safe frontier: Implement paired candidate/acceptance proof-to-payload mappi
 ### Paired v3 proof-to-payload mapping — development review
 
 Pure paired v3 candidate/acceptance payload mapping under review: exact signed record sets, candidate digest/ref binding, independent isolated dedupe key, issuance order, current phone/territory/taxonomy/rights checks and website-dependent domain fingerprints. Immutable in-memory rows suppress sensitive repr; no durable intake, job mutation or usage settlement. Eight DB-forbidden adversarial cases; exact-head CI pending. The pure manifest now permits a bounded fourth `d` fingerprint, matching the delivered domain/name/location/source token contract; the paired verifier requires it exactly when a website exists. A signature or synthetic fingerprint does not certify committed R2 objects or provider rights. Raw bodies, signatures and payloads are not persisted by this helper.
+
+### Disabled v3 batch intake — development review
+
+An internal, default-off service now checks paired signed candidate/accepted proofs against the durable candidate event and original reservation limits. It stores acceptance metadata, bounded payload and shared tenant fingerprint tokens in one transaction, with exact replay and rollback on conflicts. It does not settle usage, complete a job, enable v3 dispatch, expose an HTTP route or certify live signer/R2 authority. This slice remains under CI review; terminal accounting and pagination follow separately.

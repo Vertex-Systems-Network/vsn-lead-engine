@@ -19,6 +19,7 @@ class CheckedBatchRecord:
     country: str
     category: str
     fields: tuple
+    field_lineage: tuple
     observed_at: datetime
     delete_at: datetime
     purpose: str
@@ -95,6 +96,7 @@ def verified_batch_payload(
                     row["country"],
                     row["category"],
                     tuple(sorted(row["fields"].items())),
+                    tuple(sorted(row["field_lineage"].items())),
                     observed,
                     observed
                     + timedelta(seconds=policy.controls["result_contract"]["max_age_seconds"]),
