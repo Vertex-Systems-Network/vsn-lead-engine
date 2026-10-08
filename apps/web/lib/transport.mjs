@@ -19,7 +19,7 @@ const filteredJobsPath =
 const resultsPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/[0-9a-f-]{36}\/results\/$/;
 const formPath =
-  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/cancel-form\/)$/;
+  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/(?:cancel-form|export-form)\/)$/;
 export async function readBackend(
   origin,
   path,

@@ -11,3 +11,7 @@ Migration 0015 is additive and reverses while no erasure exists. After any paylo
 Tests cover due/future/idempotent/bounded cleanup, multiple references, role/revocation/tenant isolation, disabled policies/inactive entitlements, rollback, retained duplicate rejection, database tombstone consistency, command output and rollback guard. PostgreSQL tests cover duplicate expiry and simultaneous due-result export/cleanup. Actual Django/Next HTTP verification erases a synthetic expired result, observes empty payload, preserved fingerprints and withheld Next display. Exact-head CI is the merge gate.
 
 This removes active row payloads only. PostgreSQL historical pages/WAL/replicas, backups, caches outside this isolated application, audit-key retention, permanent pseudonymous fingerprints, client-downloaded CSVs and downstream copies are not certified erased. Qualified retention/privacy/backup review remains required before production. No live source/signer/R2 registry, scheduler, paid service or production deployment is activated. Next export preview/confirmation is the next user-facing slice.
+
+## Verified merge evidence
+
+PR #195 merged at 92657c5c8bbdb27115e95f5642f841e8a1c975c3; head dc84dce770bf14580e9d2691880510fc6615ba14 passed required checks/Actions CodeQL, PostgreSQL 37780165591 (235 tests/expiry races/migrations/settings) and Next/HTTP 37780165669 (10 transport tests/build/type and payload erasure/tombstone flow).

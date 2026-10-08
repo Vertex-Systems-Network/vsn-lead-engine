@@ -410,6 +410,38 @@
       "decided_at": "2026-10-08",
       "supersedes": [],
       "superseded_by": null
+    },
+    {
+      "id": "ADR-0012",
+      "title": "Source-expiry active payload erasure preserving dedupe tombstones",
+      "status": "accepted",
+      "context": "Expiry hiding alone leaves active payloads; physical erasure must not permit repeated accepted duplicates or refund history.",
+      "alternatives": [
+        "Hide only (insufficient)",
+        "Delete result/fingerprint rows (rejected)",
+        "Clear payload fields and retain minimal protected tombstones (selected)"
+      ],
+      "evidence_refs": [
+        "docs/ai/SAAS-RESULT-RETENTION-REVIEW-20261008.md"
+      ],
+      "decision": "Explicit bounded current-admin source-deadline erasure under workspace locks; preserve minimal tombstone/fingerprint/usage authority. No schedule or production deletion activated.",
+      "consequences": [
+        "Payload erasure is irreversible; populated erasure migration cannot roll back.",
+        "Backup/WAL/replica/audit/fingerprint retention review remains external before production."
+      ],
+      "security_privacy_data_operational_cost_impact": [
+        "Clears active payload/lineage/source reference only.",
+        "Dedupe tokens and actor/tenant/job metadata remain pseudonymous records requiring retention review.",
+        "No new paid storage/scheduler/live source."
+      ],
+      "reversibility": "Additive fields/index/checks reversible before erasure; after erasure reviewed roll-forward preservation required.",
+      "affected_modules_or_contracts": [
+        "MOD-LEAD-DATA-WORKFLOW"
+      ],
+      "decided_by": "Standing owner technical delegation",
+      "decided_at": "2026-10-08",
+      "supersedes": [],
+      "superseded_by": null
     }
   ],
   "decision_template": {

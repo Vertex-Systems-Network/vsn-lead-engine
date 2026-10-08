@@ -2278,6 +2278,10 @@ Next: source-aware guarded export and retention-safe payload cleanup/tombstones.
 
 PR #194 merged at 6f9ad2b7808471c67523e31f1b42d37a710d9cd8; head 5dde3934edb0fdc2424b2fe4bb0d5e41e2eb9a46 passed required checks/Actions CodeQL, PostgreSQL 37779435828 (223 tests/export races/migrations/settings) and Next/HTTP 37779435876 (10 transport tests/build/type and CSRF CSV/replay/viewer denial). One export unit is one prepared CSV of at most 25 explicitly selected records; it does not certify delivery. Next preview/confirmation, physical payload cleanup and production rights remain open. [Review](docs/ai/SAAS-GUARDED-EXPORT-REVIEW-20261008.md).
 
-### Source-deadline payload erasure (implementation awaiting CI)
+### Source-deadline payload erasure (verified bounded command)
 
-Bounded current-admin source-deadline erasure/tombstones implemented: clear payload/lineage/source reference, retain fingerprints/usage, fail-closed reads/export and irreversible-erasure rollback guard. Local/full CI evidence pending. Cleanup is explicitly operator-invoked for one authorized workspace, at most 100 rows; no automated scheduler or backup-erasure certification is added. [Review](docs/ai/SAAS-RESULT-RETENTION-REVIEW-20261008.md).
+PR #195 merged at 92657c5c8bbdb27115e95f5642f841e8a1c975c3; head dc84dce770bf14580e9d2691880510fc6615ba14 passed required checks/Actions CodeQL, PostgreSQL 37780165591 (235 tests/expiry races/migrations/settings) and Next/HTTP 37780165669 (10 transport tests/build/type and payload erasure/tombstone flow). Cleanup is explicitly operator-invoked for one authorized workspace, at most 100 rows; no automated scheduler or backup-erasure certification is added. [Review](docs/ai/SAAS-RESULT-RETENTION-REVIEW-20261008.md).
+
+### Native Next export preview (implementation awaiting CI)
+
+Native Next export preview/confirmation implemented: bounded field omissions/attribution/count/deadline/one-unit notice, actor/job/selection/expiry-bound confirmation, direct CSRF POST CSV/replay and safe failure review. Full local/CI evidence pending. One initial batch at most 25; no row selection/pagination extension or browser certification. [Review](docs/ai/SAAS-NEXT-EXPORT-REVIEW-20261008.md).

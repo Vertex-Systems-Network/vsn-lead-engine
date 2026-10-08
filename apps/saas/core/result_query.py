@@ -11,6 +11,7 @@ from .job_history import locked_workspace
 from .jobs import eligible_sources
 from .models import AcceptedResult, Job, ResultAcceptance, SourcePolicy
 from .result_evidence import ALLOWED_FIELDS, RIGHTS, token
+from .services import membership_for
 
 
 @transaction.atomic
@@ -24,6 +25,7 @@ def results_snapshot(user, workspace_id, job_id):
         "job_id": str(job_id),
         "results": [],
         "withheld_count": min(job.result_count, 25),
+        "can_review_export": False,
     }
     acceptance = (
         ResultAcceptance.objects.select_related("operation")
@@ -125,4 +127,7 @@ def results_snapshot(user, workspace_id, job_id):
             continue
         output["results"].append(entry)
     output["withheld_count"] = acceptance.accepted_count - len(output["results"])
+    output["can_review_export"] = bool(output["results"]) and membership_for(
+        user, workspace_id
+    ).role in {"owner", "admin", "member"}
     return output

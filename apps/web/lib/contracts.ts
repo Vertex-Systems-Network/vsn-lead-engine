@@ -315,12 +315,14 @@ export type SavedResults = {
   job_id: string;
   results: SavedResult[];
   withheld_count: number;
+  can_review_export: boolean;
 };
 export function savedResults(v: unknown): v is SavedResults {
   return (
     object(v) &&
     uuid(v.workspace_id) &&
     uuid(v.job_id) &&
+    typeof v.can_review_export === "boolean" &&
     count(v.withheld_count) &&
     v.withheld_count <= 25 &&
     Array.isArray(v.results) &&
@@ -360,6 +362,63 @@ export function savedResults(v: unknown): v is SavedResults {
           (f: unknown) =>
             typeof f === "string" && Object.hasOwn(r.fields as object, f),
         ),
+    )
+  );
+}
+
+export type ExportContext = {
+  kind: "export";
+  workspace_id: string;
+  job_id: string;
+  csrf_token: string;
+  confirmation: string;
+  fields: string[];
+  omitted_fields: string[];
+  record_count: number;
+  withheld_count: number;
+  expires_at: string;
+  sources: { code: string; attribution: string }[];
+};
+export function exportContext(v: unknown): v is ExportContext {
+  const fields = (value: unknown): value is string[] =>
+    Array.isArray(value) &&
+    value.length <= 6 &&
+    new Set(value).size === value.length &&
+    value.every(
+      (f) =>
+        typeof f === "string" &&
+        resultFieldNames.includes(f as (typeof resultFieldNames)[number]),
+    );
+  return (
+    object(v) &&
+    v.kind === "export" &&
+    uuid(v.workspace_id) &&
+    uuid(v.job_id) &&
+    typeof v.csrf_token === "string" &&
+    /^[A-Za-z0-9]{64}$/.test(v.csrf_token) &&
+    typeof v.confirmation === "string" &&
+    v.confirmation.length > 0 &&
+    v.confirmation.length <= 4096 &&
+    fields(v.fields) &&
+    v.fields.length > 0 &&
+    fields(v.omitted_fields) &&
+    count(v.record_count) &&
+    v.record_count > 0 &&
+    v.record_count <= 25 &&
+    count(v.withheld_count) &&
+    v.withheld_count + v.record_count <= 25 &&
+    typeof v.expires_at === "string" &&
+    Number.isFinite(Date.parse(v.expires_at)) &&
+    Array.isArray(v.sources) &&
+    v.sources.length > 0 &&
+    v.sources.length <= 12 &&
+    v.sources.every(
+      (s) =>
+        object(s) &&
+        typeof s.code === "string" &&
+        s.code.length <= 64 &&
+        typeof s.attribution === "string" &&
+        s.attribution.length <= 240,
     )
   );
 }

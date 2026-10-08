@@ -1,5 +1,6 @@
 from core import views
 from core.account_forms import sign_in_form, start_sign_in
+from core.export_forms import ExportFormContext, confirmed_export
 from core.form_context import (
     CancelFormContext,
     DraftFeedbackContext,
@@ -11,6 +12,11 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 
 urlpatterns = [
+    path(
+        "api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/export-form/",
+        ExportFormContext.as_view(),
+    ),
+    path("workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/export/", confirmed_export),
     path(
         "api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/exports/",
         views.ResultExportDownload.as_view(),

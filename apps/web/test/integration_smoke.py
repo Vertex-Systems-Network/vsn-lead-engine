@@ -453,6 +453,21 @@ def main():
                 assert result_marker.encode() in exported and b"'+1" in exported
                 with opener.open(export_request, timeout=10) as response:
                     assert response.read() == exported and response.headers["X-Export-Receipt"] == export_receipt
+                Entitlement.objects.filter(workspace=result_fixture.workspace).update(export_limit=2)
+                preview, export_form = native_form(result_path.replace("/results", "/export"))
+                assert "Confirm and download CSV" in preview and "one export unit" in preview
+                assert "Unavailable fields" in preview and "Synthetic test source" in preview
+                assert export_form.action == backend + f"/workspaces/{result_fixture.workspace.id}/jobs/{result_fixture.job.id}/export/"
+                native_selection = {**export_form.hidden, "fields": ["phone"]}
+                export_submit_path = f"/workspaces/{result_fixture.workspace.id}/jobs/{result_fixture.job.id}/export/"
+                code, native_csv, native_headers = account(export_submit_path, native_selection, origin)
+                assert code == 200 and "'+1" in native_csv and "no-store" in native_headers["Cache-Control"]
+                code, repeated_csv, repeated_headers = account(export_submit_path, native_selection, origin)
+                assert code == 200 and repeated_csv == native_csv and repeated_headers["X-Export-Receipt"] == native_headers["X-Export-Receipt"]
+                code, conflict, _ = account(export_submit_path, {**native_selection, "fields": ["business_name"]}, origin)
+                assert code == 409 and "Export needs review" in conflict
+                from core.models import UsageCounter
+                assert UsageCounter.objects.get(workspace=result_fixture.workspace).exports == 2
                 empty_results, _ = read(f"/dashboard/workspaces/{workspace.id}/jobs/{saved[0].id}/results")
                 assert "No available results" in empty_results
                 Membership.objects.filter(user=user, workspace=result_fixture.workspace).update(role="viewer")
@@ -463,6 +478,7 @@ def main():
                     assert exc.code == 403
                 viewer_results, _ = read(result_path)
                 assert "&lt;img src=x onerror=synthetic-result&gt;" in viewer_results
+                assert "Review CSV export" not in viewer_results
                 Membership.objects.filter(user=user, workspace=result_fixture.workspace).delete()
                 revoked_results, _ = read(result_path)
                 assert "synthetic-result" not in revoked_results
@@ -506,7 +522,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, native export preview/confirmation/conflict and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)
