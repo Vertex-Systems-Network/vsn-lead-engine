@@ -397,3 +397,35 @@ test("metadata filters use canonical bounded indices only on result and export-f
     );
   }
 });
+
+test("receipt history is readonly and forwards session only on exact bounded paths", async () => {
+  const path = `/api/v1/workspaces/${"a".repeat(36)}/jobs/${"b".repeat(36)}/export-receipts/`;
+  for (const suffix of ["", "?after=synthetic%3Acursor-signature"]) {
+    const result = await readBackend(
+      "http://localhost:8000",
+      path + suffix,
+      session,
+      async (_, options) => {
+        assert.equal(options.headers.Cookie, `sessionid=${session}`);
+        assert.equal(options.cache, "no-store");
+        return new Response("{}", {
+          headers: { "content-type": "application/json" },
+        });
+      },
+      "C".repeat(32),
+    );
+    assert.equal(result.kind, "ok");
+  }
+  for (const suffix of [
+    "?page=1",
+    "?after=x&after=y",
+    "?after=" + "x".repeat(1201),
+    "?after=x&all=1",
+    "../exports/",
+  ]) {
+    await assert.rejects(
+      readBackend("http://localhost:8000", path + suffix, session),
+      /Unsupported/,
+    );
+  }
+});

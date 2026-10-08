@@ -2049,6 +2049,48 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "SAAS-EXPORT-RECEIPT-HISTORY-001",
+      "source": "Readonly scoped preparation history and signed pagination",
+      "source_provenance_ref": "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "feat/readonly-export-receipt-history"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Local 259 cases: 233 passed/26 PostgreSQL-only skips; 14 Web transport tests/build/type/HTTP redacted history and no-charge/erasure/cursor navigation; exact-head CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-EXPORT-RECEIPT-HISTORY-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [
+        "apps/saas/core/migrations/0016_export_history_indexes.py"
+      ],
+      "artifact_refs": [
+        "apps/saas/core/export_history.py",
+        "apps/saas/core/test_export_history.py",
+        "apps/web/app/dashboard/workspaces/[workspaceId]/jobs/[jobId]/export-receipts/page.tsx",
+        "apps/web/test/integration_smoke.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

@@ -73,6 +73,8 @@ def results_snapshot(user, workspace_id, job_id, country="", category="", source
         "category_options": categories,
         "source_options": sources,
         "can_review_export": False,
+        "can_review_receipts": membership_for(user, workspace_id).role
+        in {"owner", "admin", "member"},
     }
     acceptance = (
         ResultAcceptance.objects.select_related("operation")

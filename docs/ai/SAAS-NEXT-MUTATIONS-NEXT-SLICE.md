@@ -17,3 +17,5 @@ Recovery/signup, browser/keyboard/WCAG/customer, shared-origin TLS/proxy/cookies
 ## Next ready receipt-recovery slice
 
 Expose bounded readonly tenant/job export-receipt metadata from the existing redacted ledger, with explicit current role/creator scope. Show preparation accounting/expiry and explain that no retained CSV copy or confirmed download exists. GET must not prepare/replay CSV, refund, reserve or charge usage. Avoid contact fields, digests, signing/source references and mutable provider activation. Signed billing-event reconciliation remains a separate M5 frontier.
+
+Receipt history is implemented as a candidate with current creator/role scope and signed bounded navigation; verify protected-head CI before marking delivered. See SAAS-EXPORT-RECEIPT-HISTORY-REVIEW-20261008.md. Next independent plan frontier is provider-neutral signed billing-event validation/reconciliation design with verifier defaults disabled, preserving existing reservations/windows and no live payment activation.
