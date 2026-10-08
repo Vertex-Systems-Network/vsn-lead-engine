@@ -9,7 +9,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .job_history import locked_workspace
 from .jobs import eligible_sources
-from .models import AcceptedResult, Job, ResultAcceptance, SourcePolicy
+from .models import AcceptedResult, Entitlement, Job, ResultAcceptance, SourcePolicy
 from .result_evidence import ALLOWED_FIELDS, RIGHTS, token
 from .services import membership_for
 
@@ -76,6 +76,9 @@ def results_snapshot(user, workspace_id, job_id, country="", category="", source
         "can_review_receipts": membership_for(user, workspace_id).role
         in {"owner", "admin", "member"},
     }
+    entitlement = Entitlement.objects.filter(workspace_id=workspace_id).first()
+    if entitlement is None or not entitlement.is_current:
+        return output
     acceptance = (
         ResultAcceptance.objects.select_related("operation")
         .filter(operation__job=job, operation__workspace_id=workspace_id)

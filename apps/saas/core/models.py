@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -165,15 +166,68 @@ class LoginBucket(models.Model):
     attempts = models.PositiveIntegerField(default=0)
 
 
+class BillingAccount(models.Model):
+    """Trusted local binding; disabled by default, no customer/payment identifiers."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.OneToOneField(Workspace, on_delete=models.PROTECT)
+    issuer_code = models.CharField(max_length=64)
+    enabled = models.BooleanField(default=False)
+    revision = models.PositiveIntegerField(default=0)
+    issued_at = models.DateTimeField(null=True)
+
+
+class BillingEvent(models.Model):
+    """Redacted reconciliation ledger. No signed payload, signature or payment data."""
+
+    account = models.ForeignKey(BillingAccount, on_delete=models.PROTECT)
+    workspace = models.ForeignKey(Workspace, on_delete=models.PROTECT)
+    issuer_code = models.CharField(max_length=64)
+    event_ref = models.CharField(max_length=96)
+    revision = models.PositiveIntegerField()
+    body_hash = models.CharField(max_length=64)
+    key_id = models.CharField(max_length=64)
+    issued_at = models.DateTimeField()
+    valid_until = models.DateTimeField()
+    active = models.BooleanField()
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["issuer_code", "event_ref"], name="saas_billing_event"),
+            models.UniqueConstraint(fields=["account", "revision"], name="saas_billing_revision"),
+            models.CheckConstraint(
+                condition=models.Q(revision__gte=1), name="saas_billing_positive"
+            ),
+        ]
+
+
 class Entitlement(models.Model):
     """Internal, fail-closed capabilities; no billing provider is activated."""
 
     workspace = models.OneToOneField(Workspace, primary_key=True, on_delete=models.CASCADE)
     active = models.BooleanField(default=False)
+    valid_until = models.DateTimeField(null=True)
+    billing_account = models.ForeignKey(BillingAccount, null=True, on_delete=models.PROTECT)
     lead_limit = models.PositiveIntegerField(default=0)
     job_limit = models.PositiveIntegerField(default=0)
     provider_call_limit = models.PositiveIntegerField(default=0)
     export_limit = models.PositiveIntegerField(default=0)
+
+    @property
+    def is_current(self):
+        if not self.active or (self.valid_until is not None and self.valid_until <= timezone.now()):
+            return False
+        if self.billing_account_id is not None:
+            return (
+                self.valid_until is not None
+                and BillingAccount.objects.filter(
+                    pk=self.billing_account_id, workspace_id=self.workspace_id, enabled=True
+                ).exists()
+            )
+        # Existing explicitly provisioned internal development grants remain compatible.
+        return True
 
 
 class UsagePeriod(models.Model):

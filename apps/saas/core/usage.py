@@ -47,7 +47,7 @@ def reserve_usage(user, workspace_id, key, requested):
         raise ValidationError("A valid reservation key is required.")
     lock_workspace(user, workspace_id)
     entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
-    if entitlement is None or not entitlement.active:
+    if entitlement is None or not entitlement.is_current:
         raise PermissionDenied("Workspace entitlement is inactive.")
     request_hash = hashlib.sha256(json.dumps(requested, sort_keys=True).encode()).hexdigest()
     previous = UsageReservation.objects.filter(workspace_id=workspace_id, key=key).first()

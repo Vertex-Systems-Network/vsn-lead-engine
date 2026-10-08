@@ -12,7 +12,7 @@ from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .jobs import RevisionConflict, revision
-from .models import DailySchedule, ScheduleOccurrence
+from .models import DailySchedule, Entitlement, ScheduleOccurrence
 from .serializers import SearchSerializer
 from .services import IdempotencyConflict, create_draft, membership_for
 from .usage import lock_workspace
@@ -106,6 +106,9 @@ def materialize_daily(user, workspace_id, schedule_id, local_date, expected_revi
     )
     if schedule is None:
         raise Http404("Workspace resource not found.")
+    entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
+    if entitlement is None or not entitlement.is_current:
+        raise PermissionDenied("Workspace entitlement is inactive.")
     creator = membership_for(schedule.created_by_id, workspace_id, lock=True)
     if creator.role not in {"owner", "admin", "member"}:
         raise PermissionDenied("Schedule creator no longer has job-write permission.")

@@ -116,3 +116,6 @@ SAAS_ACCEPTANCE_VERIFIERS = {}
 SAAS_DEDUPE_VERIFIERS = {}
 # Separate normalized billing-event adapter authority; no webhook/payment enabled.
 SAAS_BILLING_VERIFIERS = {}
+
+# Internal reconciliation stays disabled until external provider/operational review.
+SAAS_BILLING_RECONCILIATION_ENABLED = False

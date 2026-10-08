@@ -52,7 +52,8 @@ def advance_period(user, workspace_id, starts_at, ends_at, key):
         return previous
     if not starts_at <= timezone.now() < ends_at:
         raise ValidationError("The new accounting window must contain the current time.")
-    if not Entitlement.objects.filter(workspace_id=workspace_id, active=True).exists():
+    entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
+    if entitlement is None or not entitlement.is_current:
         raise PermissionDenied("Internal entitlement is inactive.")
     counter, _ = UsageCounter.objects.get_or_create(workspace_id=workspace_id)
     # Includes unknown/started and non-job reservations; never infer safe release.

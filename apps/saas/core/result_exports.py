@@ -118,7 +118,7 @@ def prepare_export(user, workspace_id, job_id, key, data):
     ):
         raise IdempotencyConflict()
     entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
-    if entitlement is None or not entitlement.active or entitlement.export_limit < 1:
+    if entitlement is None or not entitlement.is_current or entitlement.export_limit < 1:
         raise PermissionDenied("Export entitlement is unavailable.")
     snapshot = results_snapshot(user, workspace_id, job_id)
     available = {r["id"]: r for r in snapshot["results"]}
@@ -146,7 +146,7 @@ def prepare_export(user, workspace_id, job_id, key, data):
                 workspace_id=workspace_id,
                 plan_code="internal",
                 source_codes=frozenset(policies),
-                active=entitlement.active,
+                active=entitlement.is_current,
                 export_enabled=entitlement.export_limit > 0,
             ),
             policies,
