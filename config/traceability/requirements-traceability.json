@@ -1578,9 +1578,11 @@
       "branch_refs": [
         "codex/next-draft-validation"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #184"
+      ],
       "test_evidence": [
-        "Native Next draft feedback/correction/conflict and sign-out implemented; bounded five-minute session handoff retains signed identity and CSRF/tenant authority. Local 138 pass/16 PostgreSQL skips (154 cases), eight transport tests, Next lint/format/build/type and real correction/conflict/sign-out HTTP flows pass; final-head CI pending. Browser/login/cancellation-error/deployment acceptance remains open."
+        "PR #184 merged at bec879cb7b7ed925e64a623d2ce197c7c590eafa; head 034cd99a40dbd3c2254e1a3a832e01f05f56501c passed required checks/Actions CodeQL, PostgreSQL 37755784470 (154 tests/migration/settings) and Next/HTTP 37755784437 (eight transport tests, escaped feedback/correction/replay/conflict/missing-context recovery and native sign-out)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1597,7 +1599,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:bec879cb7b7ed925e64a623d2ce197c7c590eafa"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }
