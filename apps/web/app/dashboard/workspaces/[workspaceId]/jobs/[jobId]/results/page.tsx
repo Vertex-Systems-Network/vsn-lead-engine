@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { resultCountry } from "../../../../../../../lib/result-filter";
 import { Fragment } from "react";
 import { notFound } from "next/navigation";
 import { backend } from "../../../../../../../lib/backend";
@@ -11,18 +12,27 @@ import { State } from "../../../../../../components/state";
 
 export default async function Results({
   params,
+  searchParams,
 }: {
   params: Promise<{ workspaceId: string; jobId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { workspaceId, jobId } = await params;
   if (!uuid(workspaceId) || !uuid(jobId)) notFound();
+  const country = resultCountry(await searchParams);
+  if (country === null) notFound();
+  const query = country ? `?country=${country}` : "";
   const result = await backend(
-    `/api/v1/workspaces/${workspaceId}/jobs/${jobId}/results/`,
+    `/api/v1/workspaces/${workspaceId}/jobs/${jobId}/results/${query}`,
     savedResults,
   );
   if (result.kind !== "ok") return <State kind={result.kind} />;
   const data = result.data;
-  if (data.workspace_id !== workspaceId || data.job_id !== jobId)
+  if (
+    data.workspace_id !== workspaceId ||
+    data.job_id !== jobId ||
+    data.country !== country
+  )
     return <State kind="unavailable" />;
   return (
     <>
@@ -33,11 +43,26 @@ export default async function Results({
         ← Saved search
       </Link>
       <h1>Available results</h1>
+      <form method="get">
+        <label htmlFor="result-country">Country</label>
+        <select id="result-country" name="country" defaultValue={country}>
+          <option value="">All countries</option>
+          <option value="US">United States</option>
+          <option value="CA">Canada</option>
+        </select>
+        <button className="button" type="submit">
+          Apply filter
+        </button>
+      </form>
+      <p role="status">
+        {data.results.length} shown; {data.filtered_count} available records
+        excluded by country filter.
+      </p>
       {data.can_review_export ? (
         <p>
           <Link
             prefetch={false}
-            href={`/dashboard/workspaces/${workspaceId}/jobs/${jobId}/export`}
+            href={`/dashboard/workspaces/${workspaceId}/jobs/${jobId}/export${query}`}
           >
             Review CSV export
           </Link>
@@ -57,8 +82,8 @@ export default async function Results({
         <section className="card">
           <h2>No available results</h2>
           <p>
-            A saved search or requested limit does not mean leads have been
-            collected.
+            Try All countries to clear the filter. A saved search or requested
+            limit does not mean leads have been collected.
           </p>
         </section>
       ) : null}

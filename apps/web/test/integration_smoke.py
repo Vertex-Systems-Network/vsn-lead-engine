@@ -454,11 +454,19 @@ def main():
                 with opener.open(export_request, timeout=10) as response:
                     assert response.read() == exported and response.headers["X-Export-Receipt"] == export_receipt
                 Entitlement.objects.filter(workspace=result_fixture.workspace).update(export_limit=2)
-                preview, export_form = native_form(result_path.replace("/results", "/export"))
+                filtered_results, _ = read(result_path + "?country=CA")
+                assert "1 available records excluded by country filter" in filtered_results.replace("<!-- -->", "")
+                assert "synthetic-result" not in filtered_results and "Review CSV export" not in filtered_results
+                matching_results, _ = read(result_path + "?country=US")
+                assert "synthetic-result" in matching_results and "/export?country=US" in matching_results
+                preview, export_form = native_form(result_path.replace("/results", "/export") + "?country=US")
                 assert "Confirm and download CSV" in preview and "one export unit" in preview
                 assert "Unavailable fields" in preview and "Synthetic test source" in preview
                 assert export_form.action == backend + f"/workspaces/{result_fixture.workspace.id}/jobs/{result_fixture.job.id}/export/"
-                native_selection = {**export_form.hidden, "fields": ["phone"]}
+                native_selection = {**export_form.hidden, "fields": ["phone"], "result_ids": [str(AcceptedResult.objects.get(job=result_fixture.job).id)]}
+                assert "Choose records to include" in preview and "&lt;img src=x onerror=synthetic-result&gt;" in preview
+                code, _, _ = account(f"/workspaces/{result_fixture.workspace.id}/jobs/{result_fixture.job.id}/export/", {**native_selection, "result_ids": []}, origin)
+                assert code == 400
                 export_submit_path = f"/workspaces/{result_fixture.workspace.id}/jobs/{result_fixture.job.id}/export/"
                 code, native_csv, native_headers = account(export_submit_path, native_selection, origin)
                 assert code == 200 and "'+1" in native_csv and "no-store" in native_headers["Cache-Control"]
@@ -522,7 +530,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, native export preview/confirmation/conflict and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, country result filters and native selected-row export preview/confirmation/empty-denial/conflict and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

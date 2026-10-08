@@ -1957,6 +1957,48 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "SAAS-RESULT-SELECTION-001",
+      "source": "Bounded country filters and signed native row-selection export",
+      "source_provenance_ref": "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "feat/native-export-row-selection"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Candidate local backend/transport/Next HTTP verification; exact-head PostgreSQL/Web CI pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-RESULT-FILTER-SELECTION-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/result_query.py",
+        "apps/saas/core/export_forms.py",
+        "apps/saas/core/test_export_forms.py",
+        "apps/saas/core/test_result_query.py",
+        "apps/web/lib/result-filter.ts",
+        "apps/web/test/integration_smoke.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

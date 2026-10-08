@@ -22,15 +22,15 @@ from .form_context import form_csrf
 from .models import Entitlement, SourcePolicy, UsageCounter, UsageReservation
 from .periods import active_window
 from .result_exports import FIELD_ORDER, export_rights, prepare_export, specification
-from .result_query import results_snapshot
+from .result_query import result_country, results_snapshot
 from .services import membership_for
 from .usage import lock_workspace
 
-SALT = "saas.export-confirmation.v1"
+SALT = "saas.export-confirmation.v2"
 
 
 @transaction.atomic
-def export_context(user, workspace_id, job_id):
+def export_context(user, workspace_id, job_id, country=""):
     lock_workspace(user, workspace_id)
     entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
     if entitlement is None or not entitlement.active or entitlement.export_limit < 1:
@@ -47,7 +47,7 @@ def export_context(user, workspace_id, job_id):
     )
     if counter.exports + pending >= entitlement.export_limit:
         raise PermissionDenied("Export budget is unavailable.")
-    snapshot = results_snapshot(user, workspace_id, job_id)
+    snapshot = results_snapshot(user, workspace_id, job_id, country)
     rows = snapshot["results"]
     if not rows:
         raise PermissionDenied("No current results are available for export.")
@@ -86,7 +86,13 @@ def export_context(user, workspace_id, job_id):
         "confirmation": token,
         "fields": fields,
         "record_count": len(rows),
+        "records": [
+            {"id": r["id"], "business_name": r["fields"]["business_name"], "country": r["country"]}
+            for r in rows
+        ],
         "withheld_count": snapshot["withheld_count"],
+        "filtered_count": snapshot["filtered_count"],
+        "country": country,
         "expires_at": expires_at.isoformat(),
         "sources": sources,
         "omitted_fields": [f for f in FIELD_ORDER if f not in allowed],
@@ -98,12 +104,13 @@ class ExportFormContext(APIView):
     def get(self, request, workspace_id, job_id):
         membership_for(request.user, workspace_id)
         csrf = form_csrf(request)
-        if request.query_params:
-            raise ValidationError("Export preview query parameters are unavailable.")
-        return Response({**export_context(request.user, workspace_id, job_id), "csrf_token": csrf})
+        country = result_country(request.query_params)
+        return Response(
+            {**export_context(request.user, workspace_id, job_id, country), "csrf_token": csrf}
+        )
 
 
-def confirmed_selection(user, workspace_id, job_id, token, fields):
+def confirmed_selection(user, workspace_id, job_id, token, fields, result_ids):
     try:
         if type(token) is not str or len(token) > 4096:
             raise ValueError
@@ -128,15 +135,15 @@ def confirmed_selection(user, workspace_id, job_id, token, fields):
         if not timezone.is_aware(deadline) or deadline <= timezone.now():
             raise ValueError
         ids, permitted = specification({"result_ids": data["ids"], "fields": data["fields"]})
-        _, selected = specification({"result_ids": ids, "fields": fields})
-        if not set(selected) <= set(permitted):
+        selected_ids, selected = specification({"result_ids": result_ids, "fields": fields})
+        if not set(selected_ids) <= set(ids) or not set(selected) <= set(permitted):
             raise ValueError
         key = str(UUID(data["key"]))
     except (signing.BadSignature, ValueError, TypeError, KeyError, AttributeError, APIException):
         raise ValidationError(
             "Export confirmation is invalid or expired. Review a new preview."
         ) from None
-    return key, {"result_ids": ids, "fields": selected}
+    return key, {"result_ids": selected_ids, "fields": selected}
 
 
 @login_required
@@ -146,7 +153,7 @@ def confirmed_export(request, workspace_id, job_id):
     membership_for(request.user, workspace_id)
     if (
         request.GET
-        or set(request.POST) - {"csrfmiddlewaretoken", "confirmation", "fields"}
+        or set(request.POST) - {"csrfmiddlewaretoken", "confirmation", "fields", "result_ids"}
         or len(request.POST.getlist("confirmation")) != 1
         or len(request.POST.getlist("csrfmiddlewaretoken")) != 1
     ):
@@ -158,6 +165,7 @@ def confirmed_export(request, workspace_id, job_id):
             job_id,
             request.POST["confirmation"],
             request.POST.getlist("fields"),
+            request.POST.getlist("result_ids"),
         )
         result = prepare_export(request.user, workspace_id, job_id, key, data)
     except APIException as exc:

@@ -81,8 +81,28 @@ class ResultQueryTests(fixtures.AcceptanceFixture, TestCase):
             self.assertEqual(data["withheld_count"], 1)
 
     def test_query_and_mutation_methods_are_unavailable(self):
-        for query in ["after=x", "country=US", "page=10000", "source=other"]:
+        for query in [
+            "after=x",
+            "country=GB",
+            "country=US&country=CA",
+            "country=US&extra=x",
+            "page=10000",
+            "source=other",
+        ]:
             self.assertEqual(self.client.get(self.url + "?" + query).status_code, 400)
         for method in ["post", "put", "patch", "delete"]:
             self.assertEqual(getattr(self.client, method)(self.url, {}).status_code, 405)
         self.assertEqual(AcceptedResult.objects.count(), 1)
+
+    def test_country_filter_distinguishes_available_excluded_and_withheld(self):
+        filtered = self.client.get(self.url + "?country=CA").json()
+        self.assertEqual(
+            (filtered["results"], filtered["filtered_count"], filtered["withheld_count"]),
+            ([], 1, 0),
+        )
+        self.assertFalse(filtered["can_review_export"])
+        self.assertEqual(len(self.client.get(self.url + "?country=US").json()["results"]), 1)
+        self.assertEqual(len(self.client.get(self.url + "?country=").json()["results"]), 1)
+        AcceptedResult.objects.update(delete_at=timezone.now() - timedelta(seconds=1))
+        expired = self.client.get(self.url + "?country=CA").json()
+        self.assertEqual((expired["filtered_count"], expired["withheld_count"]), (0, 1))

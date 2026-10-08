@@ -315,6 +315,8 @@ export type SavedResults = {
   job_id: string;
   results: SavedResult[];
   withheld_count: number;
+  filtered_count: number;
+  country: "" | "US" | "CA";
   can_review_export: boolean;
 };
 export function savedResults(v: unknown): v is SavedResults {
@@ -323,17 +325,20 @@ export function savedResults(v: unknown): v is SavedResults {
     uuid(v.workspace_id) &&
     uuid(v.job_id) &&
     typeof v.can_review_export === "boolean" &&
+    count(v.filtered_count) &&
+    ["", "US", "CA"].includes(v.country as string) &&
     count(v.withheld_count) &&
     v.withheld_count <= 25 &&
     Array.isArray(v.results) &&
     v.results.length <= 25 &&
-    v.results.length + v.withheld_count <= 25 &&
+    v.results.length + v.withheld_count + v.filtered_count <= 25 &&
     v.results.every(
       (r) =>
         object(r) &&
         uuid(r.id) &&
         typeof r.country === "string" &&
         ["US", "CA"].includes(r.country) &&
+        (!v.country || r.country === v.country) &&
         typeof r.category === "string" &&
         r.category.length <= 120 &&
         object(r.fields) &&
@@ -367,6 +372,7 @@ export function savedResults(v: unknown): v is SavedResults {
 }
 
 export type ExportContext = {
+  records: { id: string; business_name: string; country: "US" | "CA" }[];
   kind: "export";
   workspace_id: string;
   job_id: string;
@@ -376,6 +382,8 @@ export type ExportContext = {
   omitted_fields: string[];
   record_count: number;
   withheld_count: number;
+  filtered_count: number;
+  country: "" | "US" | "CA";
   expires_at: string;
   sources: { code: string; attribution: string }[];
 };
@@ -405,8 +413,24 @@ export function exportContext(v: unknown): v is ExportContext {
     count(v.record_count) &&
     v.record_count > 0 &&
     v.record_count <= 25 &&
+    Array.isArray(v.records) &&
+    v.records.length === v.record_count &&
+    new Set(v.records.map((r: unknown) => (object(r) ? r.id : null))).size ===
+      v.records.length &&
+    v.records.every(
+      (r: unknown) =>
+        object(r) &&
+        uuid(r.id) &&
+        typeof r.business_name === "string" &&
+        r.business_name.length > 0 &&
+        r.business_name.length <= 2000 &&
+        (r.country === "US" || r.country === "CA") &&
+        (!v.country || r.country === v.country),
+    ) &&
+    count(v.filtered_count) &&
+    ["", "US", "CA"].includes(v.country as string) &&
     count(v.withheld_count) &&
-    v.withheld_count + v.record_count <= 25 &&
+    v.withheld_count + v.record_count + v.filtered_count <= 25 &&
     typeof v.expires_at === "string" &&
     Number.isFinite(Date.parse(v.expires_at)) &&
     Array.isArray(v.sources) &&

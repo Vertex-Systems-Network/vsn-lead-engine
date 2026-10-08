@@ -275,7 +275,8 @@ test("result snapshots require session and permit only exact bounded read paths"
   );
   assert.equal(result.kind, "ok");
   for (const bad of [
-    path + "?country=US",
+    path + "?country=GB",
+    path + "?country=US&country=CA",
     path + "?after=x",
     path + "../accept/",
     path.replace("results", "accept"),
@@ -314,4 +315,38 @@ test("export preview forwards validated form cookies only on exact path", async 
   await assert.rejects(
     readBackend("http://localhost:8000", path + "?all=1", session),
   );
+});
+
+test("country filters permit only exact result and CSRF export-preview reads", async () => {
+  const base = `/api/v1/workspaces/${"a".repeat(36)}/jobs/${"b".repeat(36)}/`;
+  for (const suffix of ["results/?country=US", "export-form/?country=CA"]) {
+    const result = await readBackend(
+      "http://localhost:8000",
+      base + suffix,
+      session,
+      async (_, options) => {
+        assert.equal(
+          options.headers.Cookie,
+          `sessionid=${session}${suffix.startsWith("export") ? `; csrftoken=${"C".repeat(32)}` : ""}`,
+        );
+        assert.equal(options.cache, "no-store");
+        return new Response("{}", {
+          headers: { "content-type": "application/json" },
+        });
+      },
+      "C".repeat(32),
+    );
+    assert.equal(result.kind, "ok");
+  }
+  for (const suffix of [
+    "export-form/?country=GB",
+    "cancel-form/?country=US",
+    "results/?country=US&extra=x",
+    "export-form/?country=CA&country=CA",
+  ]) {
+    await assert.rejects(
+      readBackend("http://localhost:8000", base + suffix, session),
+      /Unsupported/,
+    );
+  }
 });

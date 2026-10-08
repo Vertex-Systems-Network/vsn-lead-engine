@@ -6,8 +6,8 @@ PRs #194–#196 now verify guarded CSV preparation/accounting, explicit bounded 
 
 ## Next bounded implementation
 
-1. Add bounded current-batch result filters/selection and native presentation; specify visible/withheld/filtered counts without treating requested limits as achieved output. Preserve tenant/rights/expiry checks and maximum 25 records. Avoid personal contact values or full payloads in URLs/logs.
-2. Bind export previews to explicit filtered selection without widening field/source/row authority. Recheck current roles/grants/deadlines and preserve once-only prepared-file accounting.
+1. Country filters and explicit native row/field selection are implemented as a candidate; verify protected-head CI and merge evidence before marking delivered. Richer category/source filters require their own bounded metadata contract. Keep displayed/filtered/withheld counts distinct and preserve the single-batch 25-row ceiling.
+2. Current signed previews bind filtered row scope and require an explicit subset. Maintain common field grants, conservative deadlines, current role/rights checks and once-only prepared-file accounting. See SAAS-RESULT-FILTER-SELECTION-REVIEW-20261008.md; browser/customer acceptance remains open.
 3. Review audit/fingerprint retention and backup/WAL/replica/downstream erasure before production. Existing command erases active row payloads only; it does not certify every copy erased or permit reaccepting duplicates.
 4. Real isolated R2 signer onboarding must prove canonical qualification/fingerprint mapping, committed objects, independent keys and crash reconciliation. Preserve production CLI/R2/Google namespaces and zero-new-spend behavior; fixtures are not provider rights.
 5. Multi-source/multi-batch intake and larger pagination require versioned contracts/concurrency tests. Signed billing-event reconciliation is independent safe work.
