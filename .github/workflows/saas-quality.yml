@@ -3,6 +3,7 @@ name: SaaS Quality
 on:
   pull_request:
     branches: [main]
+    paths: ["apps/saas/**", ".github/workflows/saas-quality.yml"]
   push:
     branches: [main]
     paths: ["apps/saas/**", ".github/workflows/saas-quality.yml"]

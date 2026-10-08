@@ -40,13 +40,35 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check whether root product validation applies
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "${BASE_SHA}^{commit}"
+          changed="$(git diff --name-only "$BASE_SHA" HEAD)"
+          if [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -Ev '^(apps/saas/|apps/web/)' >/dev/null; then
+            echo 'root=false' >> "$GITHUB_OUTPUT"
+            echo 'Only app paths changed; root product suite is not affected.'
+          else
+            echo 'root=true' >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        if: steps.scope.outputs.root == 'true'
         with:
           python-version: "3.12"
           cache: pip
-      - run: python scripts/install_locked.py --dev
-      - run: python -m vsn_lead_engine.cli validate
-      - run: pytest -q --ignore=tests/test_control_plane.py --ignore=tests/test_product_assurance.py --ignore=tests/test_governance_assurance.py --ignore=tests/test_blueprint_closure.py
+      - if: steps.scope.outputs.root == 'true'
+        run: python scripts/install_locked.py --dev
+      - if: steps.scope.outputs.root == 'true'
+        run: python -m vsn_lead_engine.cli validate
+      - if: steps.scope.outputs.root == 'true'
+        run: pytest -q --ignore=tests/test_control_plane.py --ignore=tests/test_product_assurance.py --ignore=tests/test_governance_assurance.py --ignore=tests/test_blueprint_closure.py
 
   run:
     if: ${{ github.event_name != 'pull_request' }}
