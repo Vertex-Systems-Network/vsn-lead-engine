@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Implement paired candidate/acceptance proof-to-payload mapping with exact record-set and conditional domain-token checks, then gated atomic accepted-batch reconciliation and original aggregate caps. Reconcile every allocated identity and unknown effect before terminal whole-job settlement; internal write-ahead entry and signed 25-row pages follow. Keep v3 dispatch quarantined.",
+    "Implement disabled atomic v3 accepted-batch intake using paired current proofs, durable candidate identity, exact replay/reference collision checks, shared tenant fingerprints and summed original lead/source-call/outbox-call caps. Preserve the full reservation and unknown effects until every allocated identity is reconciled and exact source-final/whole-job accounting passes; then internal write-ahead entry and signed 25-row pages.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_375_postgres_and_14_web_http_verified",
+  "qa_readiness": "saas_375_verified_paired_batch_payload_review",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "2c422919a607d116b687ca45994597b581773faa",
+  "last_reconciled_repository_ref": "2ed8bc67a435c033a8968be12e67d146b2ab7f18",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

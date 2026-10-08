@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "2c422919a607d116b687ca45994597b581773faa",
-  "observed_main_semantics": "Exact protected payload-schema feature main #220 before documentation reconciliation.",
+  "observed_main_sha": "2ed8bc67a435c033a8968be12e67d146b2ab7f18",
+  "observed_main_semantics": "Verified payload-schema #220 checkpoint reconciled by documentation #221 before paired-proof review.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -89,7 +89,8 @@
     "saas_batch_allocation": "PR #216 / head 508878f5: all five workflows passed, PG 37823442614 (350 tests/migrations/settings), Web 37823442485 (14 tests/HTTP). Disabled allocation; no reachable v3 start/intake.",
     "saas_batch_candidates": "PR #217 / head ca1cd8ec: all five workflows passed; PG 37824016673 (358 tests/migrations/settings), Web 37824016597 (14 tests/HTTP). Pure proof/shared eligibility only.",
     "saas_batch_events": "PR #218 / head f9d0173c: all five workflows passed; PG 37824615261 (366 tests/migrations/settings), Web 37824615227 (14 tests/HTTP). Disabled redacted candidate ledger; no payload/finality/dispatch.",
-    "saas_batch_payload_schema": "PR #220 / head 57c54ce5: all five workflows passed; PG 37826291597 (375 tests/migrations/settings), Web 37826291595 (14 tests/HTTP). Protected shared payload schema only."
+    "saas_batch_payload_schema": "PR #220 / head 57c54ce5: all five workflows passed; PG 37826291597 (375 tests/migrations/settings), Web 37826291595 (14 tests/HTTP). Protected shared payload schema only.",
+    "saas_batch_payload_proof": "Development review: pure paired proof mapping, exact refs, independent keys, conditional domain token, immutable redacted-repr rows; eight DB-forbidden cases, CI pending."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -136,7 +137,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Implement paired candidate/acceptance proof-to-payload mapping with exact record-set and conditional domain-token checks, then gated atomic accepted-batch reconciliation and original aggregate caps. Reconcile every allocated identity and unknown effect before terminal whole-job settlement; internal write-ahead entry and signed 25-row pages follow. Keep v3 dispatch quarantined.",
+  "exact_next_safe_action": "Implement disabled atomic v3 accepted-batch intake using paired current proofs, durable candidate identity, exact replay/reference collision checks, shared tenant fingerprints and summed original lead/source-call/outbox-call caps. Preserve the full reservation and unknown effects until every allocated identity is reconciled and exact source-final/whole-job accounting passes; then internal write-ahead entry and signed 25-row pages.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

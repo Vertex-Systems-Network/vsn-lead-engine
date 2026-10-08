@@ -106,3 +106,9 @@ V3 rows do not enter legacy acceptance-scoped reads, and the v2 snapshot explici
 ## Verified payload schema checkpoint
 
 PR #220 merged at 2c422919a607d116b687ca45994597b581773faa; head 57c54ce52681d63603f87151785f4f818cf68be0 passed all five workflows, PostgreSQL 37826291597 (375 tests/migrations/settings) and Web 37826291595 (14 transport/build/type/HTTP). Exclusive v3 payload links, bounded positions, shared fingerprints/erasure, protected populated rollback and legacy visibility withholding verified; no v3 intake/finality/dispatch.
+
+## Paired payload contract
+
+Candidate and acceptance proof validators remain pure and redacted. A separate pure assembler binds the accepted exact record set to the signed candidate digest/event and derives immutable bounded rows for future transactional intake. Accepted issuance cannot predate candidate issuance by more than five minutes; the isolated registry authority must differ from both source and candidate authorities. The manifest allows `n/l/s` with exactly one optional `d`; pairing requires `d` exactly when the source payload includes a website, preserving the delivered v2 token contract without generating replacement fingerprints. Current phone, US/Canada, taxonomy, freshness, field lineage, purpose and retention checks remain mandatory.
+
+Suppressed repr is a local diagnostic guard, not production access-log/redaction certification. Returned rows exist only in process memory, include no signatures/keys/raw envelopes and cannot settle usage. Durable intake must independently recheck locked candidate metadata, current rights, original aggregate caps, tenant fingerprint conflicts, once-only replay and finality. The same proof can verify twice without creating acceptance; only a separately reviewed atomic service can authorize a write.
