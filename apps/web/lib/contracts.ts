@@ -214,3 +214,65 @@ export const jobStates = [
 ] as const;
 export const jobState = (v: unknown): v is (typeof jobStates)[number] =>
   typeof v === "string" && jobStates.some((s) => s === v);
+
+export type DraftFeedback = Omit<DraftContext, "kind"> & {
+  kind: "draft-feedback";
+  status: 400 | 409;
+  values: {
+    countries: string[];
+    statuses: string[];
+    required_fields: string[];
+    categories: string;
+    source_codes: string;
+    result_limit: string;
+  };
+  errors: Record<string, string[]>;
+};
+export function draftFeedback(v: unknown): v is DraftFeedback {
+  const strings = (a: unknown) =>
+    Array.isArray(a) &&
+    a.length <= 12 &&
+    a.every((s) => typeof s === "string" && s.length <= 64);
+  return (
+    formBase(v) &&
+    v.kind === "draft-feedback" &&
+    signedToken(v.draft_token) &&
+    [400, 409].includes(v.status as number) &&
+    object(v.values) &&
+    strings(v.values.countries) &&
+    strings(v.values.statuses) &&
+    strings(v.values.required_fields) &&
+    typeof v.values.categories === "string" &&
+    v.values.categories.length <= 1600 &&
+    typeof v.values.source_codes === "string" &&
+    v.values.source_codes.length <= 900 &&
+    typeof v.values.result_limit === "string" &&
+    v.values.result_limit.length <= 40 &&
+    object(v.errors) &&
+    Object.entries(v.errors).every(
+      ([k, a]) =>
+        [
+          "countries",
+          "statuses",
+          "required_fields",
+          "categories",
+          "source_codes",
+          "result_limit",
+          "__all__",
+        ].includes(k) &&
+        Array.isArray(a) &&
+        a.length <= 5 &&
+        a.every((s) => typeof s === "string" && s.length <= 240),
+    )
+  );
+}
+
+export type SignOutContext = { kind: "sign-out"; csrf_token: string };
+export function signOutContext(v: unknown): v is SignOutContext {
+  return (
+    object(v) &&
+    v.kind === "sign-out" &&
+    typeof v.csrf_token === "string" &&
+    /^[A-Za-z0-9]{64}$/.test(v.csrf_token)
+  );
+}

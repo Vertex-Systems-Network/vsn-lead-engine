@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Continue native validation/error and account flows under Django session/CSRF authority; signed billing events and phone-qualified results/export contracts remain independent. No provider/payment/scheduler activation.",
+    "Verify native draft validation/sign-out, then continue native login/cancellation errors and independent billing/results contracts.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "saas_130_postgres_cases_and_next_http_auth_verified_full_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "9bc1065b403299b74b60dca52ce6d1cc46f4d810",
+  "last_reconciled_repository_ref": "5157f1cfd96abb01673b099ff3994034071c076e",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

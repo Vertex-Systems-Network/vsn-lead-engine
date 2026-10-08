@@ -1558,6 +1558,48 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-NEXT-VALIDATION-SIGNOUT",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-WEB-EXPERIENCE",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/next-draft-validation"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Native Next draft feedback/correction/conflict and sign-out implemented; bounded five-minute session handoff retains signed identity and CSRF/tenant authority. Local 138 pass/16 PostgreSQL skips (154 cases), eight transport tests, Next lint/format/build/type and real correction/conflict/sign-out HTTP flows pass; final-head CI pending. Browser/login/cancellation-error/deployment acceptance remains open."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-NEXT-VALIDATION-SIGNOUT-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/draft_feedback.py",
+        "apps/saas/core/test_draft_feedback.py",
+        "apps/saas/core/test_sign_out_context.py",
+        "apps/web/app/account/sign-out/page.tsx"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

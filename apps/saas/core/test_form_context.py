@@ -74,7 +74,7 @@ class FormContextTests(TestCase):
             self.client.post(
                 self.submit, {**data, "result_limit": "6"}, HTTP_ORIGIN="http://localhost:3000"
             ).status_code,
-            409,
+            303,
         )
         self.assertEqual(Job.objects.count(), 2)
         self.assertFalse(UsageReservation.objects.exists())
