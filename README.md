@@ -30,10 +30,10 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected main before this remediation: `ebec6e3a` (PR #205, documentation/evidence reconciliation); feature evidence remains PR #204 / `3336a81b`.
+- Verified plan snapshot: **2026-10-08**. Latest inspected main: `3d5d5039` (PR #210); verified feature evidence includes PRs #207–#209. V3 durable metadata schema is under review; service/accounting acceptance remains open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
-- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: disabled durable billing event/binding ledger and atomic exact-replay/contiguous revisions; do not activate payments, providers, production collections or a customer launch without verified gates.
+- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: v3 durable evidence schema followed by gated partial intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
 - Continuation: **full ready frontier per invocation**; milestone/PR completion is a checkpoint, not an instruction to stop. Recoverable errors are AI-owned; human approval is reserved for genuine external authorization/consent/paid or irreversible commitments. CI runs `scripts/verify_readme_progress.py` to reject README/machine-state divergence and feature PRs that omit a README update.
 
 <!-- ANPOS-CONTINUITY:END -->
@@ -2287,7 +2287,7 @@ All 269 SaaS tests pass on PostgreSQL, including export/expiry/earlier acceptanc
 
 Engineering indicators: M5 85%, M6 75%, M7 86%, overall approximately 52%. The increase reflects verified guarded export, payload expiry, native confirmation, country/category/source filtering, exact row selection and readonly receipt history; full lead-workflow acceptance remains open. Work units stay 9 complete, 5 in progress, 1 blocked, 2 deferred and 4 not started of 21. [CSV review](docs/ai/SAAS-GUARDED-EXPORT-REVIEW-20261008.md), [erasure review](docs/ai/SAAS-RESULT-RETENTION-REVIEW-20261008.md), [native export review](docs/ai/SAAS-NEXT-EXPORT-REVIEW-20261008.md) and [next slice](docs/ai/SAAS-NEXT-MUTATIONS-NEXT-SLICE.md) retain evidence/boundaries.
 
-Next: disabled durable billing binding/ledger reconciliation with exact replay/contiguous revisions and complete entitlement-expiry guards; pure signed evidence validation and readonly export-receipt history are verified. Real isolated R2 signer/qualification integration, key lifecycle/crash reconciliation, multi-source/multi-batch pagination, recovery/signup and TLS/proxy/deployment acceptance remain open. Erasing active payloads does not certify deletion from WAL/replicas/backups or downloaded/downstream copies. Pseudonymous fingerprint/audit retention and encryption require review before production. No provider/payment/scheduler consumer or production Next deployment is activated. Production US/CA phone qualification, exact R2 dedupe, Google delivery and 12,000/day target retain their contracts. Latest retained production snapshot is 6,855/12,000 on October 4; no new quota observation or execution after turn end is claimed.
+Next: separately gated v3 server-owned batching and exact terminal accounting; disabled billing ledger/deadlines and readonly diagnostics are verified through PRs #207/#208. Real isolated R2 signer/qualification integration, key lifecycle/crash reconciliation, multi-source/multi-batch pagination, recovery/signup and TLS/proxy/deployment acceptance remain open. Erasing active payloads does not certify deletion from WAL/replicas/backups or downloaded/downstream copies. Pseudonymous fingerprint/audit retention and encryption require review before production. No provider/payment/scheduler consumer or production Next deployment is activated. Production US/CA phone qualification, exact R2 dedupe, Google delivery and 12,000/day target retain their contracts. Latest retained production snapshot is 6,855/12,000 on October 4; no new quota observation or execution after turn end is claimed.
 
 ### Verified country filtering and selected-row export
 
@@ -2340,3 +2340,10 @@ Stored deadlines and current binding enablement now guard reserve/enqueue/replay
 
 
 Verified next frontier: separately gated durable v3 batch identity/ledger and terminal manifests under ADR-SAAS-003, followed by bounded page services/native UI. Existing v2 paths and production CLI/R2/Google stay isolated; real source/signer/billing/browser/customer/privacy/deployment/launch acceptance remains open. The final documentation checkpoint records feature main before its own merge and adds no runtime capability.
+
+
+### Durable v3 metadata schema — development review
+
+Migration 0018 adds separate server-owned batch identities, once-per-batch candidate/acceptance metadata and once-per-source-operation terminal metadata. Database constraints preserve positive operation ordinals, source-scoped reference uniqueness, 1–25 candidate/accepted counts and consistent terminal count bounds. Protected links and a populated-evidence reversal guard preserve the new history; empty forward/reverse/reapply remains supported. Thirteen new checks include three PostgreSQL-only identity/reference/terminal uniqueness races. Local SQLite verifies ten cases; PostgreSQL race and full CI evidence is pending review.
+
+These tables are inert scaffolding: no endpoint, command, worker, v3 enrollment, payload intake or accounting service writes them. Metadata fixtures prove no job completion, payload creation or reservation settlement. They do not establish exact replay, aggregate caps, current rights, signer qualification, exact batch-set finality or cross-version isolation. Those checks must be implemented together in gated transactional services before v3 is usable. See [schema contract](docs/ai/SAAS-BATCH-SCHEMA-20261008.md). Work-unit counts and M5/M6/M7/overall indicators remain unchanged.
