@@ -4,8 +4,11 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+import sys
 from pathlib import Path
 
+# pytest and unittest discovery may start with tests/ as sys.path[0].
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.verify_readme_progress import validate_repository
 
 
