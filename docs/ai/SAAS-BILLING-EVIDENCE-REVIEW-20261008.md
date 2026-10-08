@@ -27,3 +27,7 @@ Ten adversarial `SimpleTestCase` tests prohibit database access and cover immuta
 ## Verified protected merge
 
 PR #204 merged at 3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7; head 02516bda90cd6e1aea00983f75193da14e75d1ae passed all five CI workflows/required checks/Actions CodeQL, PostgreSQL 37798742414 (all 269 tests, migrations/reversal/settings and earlier concurrency) and Web 37798742458 (14 transport tests, lint/format/build/type and actual Next/Django HTTP flows). Ten DB-forbidden billing-evidence tests verify the pure validator; no entitlement/payment write or activation.
+
+## Subsequent delivered transactional boundary
+
+The originally future binding/ledger/deadline slice above was subsequently implemented and verified in PR #207, followed by readonly diagnostics/active-user gates in PR #208. See SAAS-BILLING-LEDGER-REVIEW-20261008.md and SAAS-BILLING-RECOVERY-RUNBOOK-20261008.md for exact protected evidence and remaining default-disabled/provider/operational gates. This parser review is historical evidence, not the current next-action selector; current frontier after PR #209 is ADR-SAAS-003 durable v3 batches/terminal accounting.
