@@ -2112,9 +2112,11 @@
       "branch_refs": [
         "feat/internal-billing-evidence"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #204"
+      ],
       "test_evidence": [
-        "Internal normalized billing evidence validator implemented; 269 local Django cases (243 passed/26 PostgreSQL-only skips), ten DB-forbidden adversarial evidence tests; exact-head CI pending. No entitlement write/payment activation."
+        "PR #204 merged at 3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7; head 02516bda90cd6e1aea00983f75193da14e75d1ae passed all five CI workflows/required checks/Actions CodeQL, PostgreSQL 37798742414 (all 269 tests, migrations/reversal/settings and earlier concurrency) and Web 37798742458 (14 transport tests, lint/format/build/type and actual Next/Django HTTP flows). Ten DB-forbidden billing-evidence tests verify the pure validator; no entitlement/payment write or activation."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -2130,7 +2132,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }
