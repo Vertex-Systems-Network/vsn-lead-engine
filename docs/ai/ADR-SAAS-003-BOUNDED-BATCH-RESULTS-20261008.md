@@ -40,3 +40,29 @@ An additive protocol costs new models and explicit reconciliation, but preserves
 ## Verified pure proof checkpoint
 
 PR #209 merged at 176f8309a1d68c2feb650898d240bd2ed5aa89fc; head 7c5adceb3fb150a89aaed3c8f556aea2552602f4 passed all five CI workflows, PostgreSQL 37812348239 (306 tests/migrations/settings) and Web 37812348326 (14 transport/build/type/HTTP). Ten DB-forbidden v3 proof cases; no intake/ledger/activation. PRs #207/#208 billing ledger/expiry/diagnostics remain verified.
+
+
+## Durable metadata and terminal-proof contract
+
+PR #211 adds inert batch/candidate/acceptance/source-terminal metadata with
+uniqueness/count constraints and protected reversal (see schema contract). No
+legacy classification or v3 intake is enabled by the schema. Existing v2 behavior
+remains the sole active service contract; explicit server-side enrollment and
+cross-version exclusion must precede any v3 writes.
+
+The next pure source-final proof uses a canonical UUID-sorted list of accepted
+batch identities, acceptance-body SHA-256 digests, accepted counts and accrued
+calls. It binds workspace/job/operation/provider/request/policy/source, exact-byte
+HMAC from a separate empty-default terminal registry, a 24-hour/five-minute issuance
+window and at most 1,000 batches / 256 KiB. Its exact-set digest is SHA-256 of
+ASCII JSON rows with sorted object keys and compact separators. Terminal calls
+may exceed summed accepted-batch calls (rejected discovery still costs calls), but
+must cover accrued calls and remain within the trusted reserved source budget.
+An empty accepted set may report calls; it never implies a refund/no-effect.
+
+The trusted caller must independently derive all accepted coordinates from locked
+durable evidence and reconcile every allocated identity/candidate/unknown source
+effect. Exact accepted-set equality is not proof that an allocated or provider
+batch was never omitted. A signature alone never closes an unknown effect or
+settles capacity. Exact-body replay/conflict, current rights/grants, crash-safe
+persistence and final whole-job settlement remain transactional service work.

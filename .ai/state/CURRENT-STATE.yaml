@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "3d5d50397e9413526bbfbd4339c5577497e3ab3e",
-  "observed_main_semantics": "Exact main before the v3 metadata-schema review; no pending work is claimed verified.",
+  "observed_main_sha": "866efda12bf3250fc55ca3af66036987c11ea47e",
+  "observed_main_semantics": "Exact protected schema main #211 before terminal-proof review.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -70,7 +70,7 @@
     "saas_periods": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_daily_occurrences": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_session_navigation": "Earlier verified feature evidence retained in git history through PR #197.",
-    "latest_saas_verified_head": "7c5adceb3fb150a89aaed3c8f556aea2552602f4",
+    "latest_saas_verified_head": "bc07f8d24eab993d125a3f17b8dbf8e2d63e4b65",
     "saas_native_next_forms": "PR #180: required checks, PostgreSQL 37703540378 (138 tests/migrations/settings) and Next/HTTP 37703540308 (native draft/cancel/CSRF/auth) passed; full evidence in history.",
     "saas_next_source_configuration": "Earlier exact-head implementation/CI evidence retained in git history through PR #203.",
     "saas_job_state_filter": "Earlier exact-head implementation/CI evidence retained in git history through PR #203.",
@@ -90,7 +90,8 @@
     "saas_billing_ledger": "PR #207 / head d9be9ac1: all five checks passed; PostgreSQL 37810735757 (290 tests/migrations), Web 37810735885 (14 tests/HTTP). See ledger review.",
     "saas_billing_diagnostics": "PR #208 / head 3d34dccd: all five CI workflows, PG 37811482736 (296 tests/migrations), Web 37811482692 (14 tests/HTTP) passed. No repair/activation.",
     "saas_batch_manifest": "PR #209 / head 7c5adceb: all five CI workflows, PG 37812348239 (306 tests/migrations), Web 37812348326 (14 tests/HTTP). No intake/activation.",
-    "saas_batch_schema": "Development review: inert additive metadata tables; local 13 checks / 3 PostgreSQL skips. Protected CI pending; no intake/settlement."
+    "saas_batch_schema": "PR #211 / head bc07f8d2: all five workflows passed, PG 37816152759 (319 tests/migrations/settings), Web 37816152845 (14 tests/HTTP). Inert metadata only; detailed evidence in checkpoint/schema contract.",
+    "saas_terminal_manifest": "Development review: ten DB-forbidden pure source-final proof cases pass; no intake/finality/accounting authority. Protected CI pending."
   },
   "governance": {
     "main_ruleset_id": 24086362,

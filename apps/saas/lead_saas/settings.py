@@ -122,3 +122,5 @@ SAAS_BILLING_RECONCILIATION_ENABLED = False
 # Future v3 batch proof authorities remain separate, empty and without a consumer.
 SAAS_BATCH_VERIFIERS = {}
 SAAS_BATCH_DEDUPE_VERIFIERS = {}
+# Separate source-final authority; empty by default and no intake service enabled.
+SAAS_BATCH_TERMINAL_VERIFIERS = {}
