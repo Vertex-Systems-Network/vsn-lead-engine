@@ -131,3 +131,6 @@ SAAS_BATCH_ENROLLMENT_SOURCES = frozenset()
 
 # Quarantined allocation primitive; ordinary dispatch still refuses v3 jobs.
 SAAS_BATCH_ALLOCATION_ENABLED = False
+
+# Pure candidate-batch proof authority; no intake consumer is enabled.
+SAAS_BATCH_CANDIDATE_VERIFIERS = {}

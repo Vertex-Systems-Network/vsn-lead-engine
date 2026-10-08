@@ -30,15 +30,15 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected feature main: `412c2928` (PR #214); v3 enrollment is verified but disabled/quarantined. Server-owned batch allocation/intake/accounting remains open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected feature main: `469c4ec8` (PR #216); v3 enrollment/allocation primitives are verified but disabled/quarantined. Durable candidate/payload intake/accounting remains open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
-- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: allocation review, then guarded candidate/payload intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
+- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: candidate proof review, then durable candidate/payload intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
 - Continuation: **full ready frontier per invocation**; milestone/PR completion is a checkpoint, not an instruction to stop. Recoverable errors are AI-owned; human approval is reserved for genuine external authorization/consent/paid or irreversible commitments. CI runs `scripts/verify_readme_progress.py` to reject README/machine-state divergence and feature PRs that omit a README update.
 
 <!-- ANPOS-CONTINUITY:END -->
 
-Snapshot: **2026-10-08 PKT**, reconciled through protected feature `main` commit `412c2928` / merged PR #214. Scoped filters/CSV/receipt history and isolated normalized billing-evidence validation are verified through required checks, 338 PostgreSQL tests and 14-test Next/HTTP CI. Internal ledger reconciliation and validity guards are verified but default disabled; live payments/signers/consumers stay disabled. Production P01–P70 runtime remains separate. Bars are engineering estimates, not customer/provider/legal/deployment/launch certification.
+Snapshot: **2026-10-08 PKT**, reconciled through protected feature `main` commit `469c4ec8` / merged PR #216. Scoped filters/CSV/receipt history and isolated normalized billing-evidence validation are verified through required checks, 350 PostgreSQL tests and 14-test Next/HTTP CI. Internal ledger reconciliation and validity guards are verified but default disabled; live payments/signers/consumers stay disabled. Production P01–P70 runtime remains separate. Bars are engineering estimates, not customer/provider/legal/deployment/launch certification.
 
 | Milestone | Start date | Status | Progress |
 |---|---:|---|---|
@@ -2369,7 +2369,7 @@ PostgreSQL enrollment/replay/first-lease races. PR #214 passed all five workflow
 enable batch allocation, intake, settlement, provider execution or a live signer.
 
 
-### Quarantined v3 identity allocation — development review
+### Quarantined v3 identity allocation — verified PR #216
 
 A disabled trusted-local allocation primitive assigns server UUIDs and contiguous
 source-operation ordinals under current admin/tenant/source/request/period/grant
@@ -2378,6 +2378,18 @@ identity slots. Exact ordinal retry returns the existing UUID; gaps/corruption,
 closed sources, legacy evidence and new identities for unknown effects fail closed.
 Full reservations remain intact; identities do not accept payloads or settle usage.
 Twelve tests include three PostgreSQL duplicate/downgrade/source-revocation races;
-local checks pass with three PostgreSQL skips, exact-head CI pending. Runtime cannot
+PR #216 passed all five workflows, PostgreSQL 37823442614 (350 tests/migrations/settings) and Web 37823442485 (14 tests/HTTP). Runtime cannot
 start v3 operations yet: future started contexts in tests are synthetic fixtures,
 and no caller/endpoint/consumer is added. Counts and engineering estimates unchanged.
+
+
+### Pure v3 candidate proof — development review
+
+The batch-bound v3 candidate validator uses a separate empty-default source-key
+registry and exact-byte scope/signature/issuance checks. Shared pure record rules
+preserve US/Canada phone syntax, saved taxonomy, source display/storage rights,
+field lineage, retention and 1–25 row bounds. The legacy v1 envelope/key registry
+and exported rule constants remain compatible. Eight database-forbidden cases
+cover scope/key/schema/qualification/expiry/limits and a 1,000-target/25-row ceiling.
+This produces redacted immutable review metadata only: no durable candidate event,
+R2 uniqueness/phone reachability proof, payload intake or accounting. CI pending.
