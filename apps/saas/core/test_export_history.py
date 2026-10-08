@@ -25,6 +25,7 @@ class ExportHistoryTests(ExportFixture, TestCase):
         response = self.client.get(self.history_url)
         self.assertEqual(response.status_code, 200)
         self.assertIn("no-store", response["Cache-Control"])
+        self.assertEqual(response["Referrer-Policy"], "no-referrer")
         data = response.json()
         self.assertEqual(data["scope"], "job")
         self.assertEqual(data["receipts"][0]["id"], str(prepared.receipt_id))

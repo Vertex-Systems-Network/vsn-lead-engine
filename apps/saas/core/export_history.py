@@ -97,6 +97,8 @@ class ExportReceiptList(APIView):
         membership_for(request.user, workspace_id)
         if set(request.query_params) - {"after"} or len(request.query_params.getlist("after")) > 1:
             raise ValidationError("Only one receipt continuation is available.")
-        return Response(
+        response = Response(
             receipt_snapshot(request.user, workspace_id, job_id, request.query_params.get("after"))
         )
+        response["Referrer-Policy"] = "no-referrer"
+        return response

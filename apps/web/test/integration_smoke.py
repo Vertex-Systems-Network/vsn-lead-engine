@@ -495,6 +495,7 @@ def main():
                 assert export_receipt in history_html and native_headers["X-Export-Receipt"] in history_html
                 assert "50123" not in history_html and "synthetic-result" not in history_html
                 assert "no-store" in history_headers["Cache-Control"]
+                assert history_headers["Referrer-Policy"] == "no-referrer"
                 # Two genuine settled preparations, smaller readonly page for transport navigation.
                 from unittest.mock import patch
                 with patch("core.export_history.PAGE_SIZE", 1):
