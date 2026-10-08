@@ -1,24 +1,17 @@
-# Native Next workflows: delivered boundary and ready results frontier
+# Native Next workflows: delivered boundary and next frontier
 
-PRs #180–#184 delivered native draft/cancel controls, source configuration, state-filter pagination, draft correction/conflict/missing-feedback recovery and sign-out. PR #186 now delivers native sign-in with explicit browser CSRF bootstrap and generic attempt-limit/credential notices, plus cancellation-error current-state review. Django remains authentication, tenant/role/CSRF, abuse-control and transactional mutation authority.
+PRs #180–#189 deliver native account/draft/cancel/source/filter/correction workflows and signed candidate/event validation. Django remains session, tenant/role/CSRF, abuse-control and transactional authority.
 
-## Verified account and mutation controls
+PR #191 delivers internal single-source complete 1–25-row accepted storage and nonzero v2 accounting with independent source/dedupe attestations, current rights/role/caps and replay/rollback protections. Existing v1 receipts remain zero leads. All signer registries default empty; no real R2 client, live intake or provider consumer exists.
 
-- Browser cookie bootstrap returns only to configured Next sign-in. The exact anonymous context forwards CSRF only and returns a masked token; authenticated paths retain validated session requirements. Credentials post directly to the protected Django login handler. Native success ignores supplied next destinations; generic notices contain no account/password data and grant no authority.
-- Login account/IP budgets and trusted connection-address policy are unchanged. Native limited responses use 303 plus Retry-After, without credential checks; standalone handlers retain existing behavior. Session/CSRF rotation and logout invalidation are tested.
-- Cancellation notice mode reads the authorized current snapshot, shows status/revision and links to explicit review. It issues no confirmation and performs no retry/cancellation. Stale or expired authority cannot become fresh through error rendering.
-- Exact-head PostgreSQL, migrations/settings, Next build/type/lint/format/transport and real HTTP bootstrap, credential/Origin/limit, mutation/replay, source/filter and cancellation-recovery workflows pass. Browser/deployment acceptance remains separate.
+PR #192 delivers authorized bounded results reads and native Next display. Current source/field/lineage/retention checks withhold unavailable records; private evidence is excluded and text escaped. Counts remain historical, and a read does not erase payloads. Exact-head 208-case PostgreSQL and Next/HTTP checks pass; browser/customer acceptance remains open.
 
-## Candidate result contract boundary
+## Next bounded implementation
 
-The internal candidate preflight now implements the initial signed provenance/phone/scope/field-lineage/retention validation contract; PR #188 exact-head PostgreSQL/required/Web checks passed. It returns redacted comparison metadata only. PR #189 verifies the redacted event ledger with duplicate/conflicting/cross-workspace PostgreSQL races; current role/rights/expiry are rechecked on replay. No accepted result store, R2 dedupe authority, nonzero accounting, export or route is enabled. See `SAAS-RESULT-EVIDENCE-REVIEW-20261008.md`.
+1. Implement source-aware export specification/idempotency with current membership, field/export rights, policy fingerprint/kill switch, retention and atomic export budgets. Reuse canonical policy logic; unknown metadata fails closed.
+2. Review safe CSV/formula handling, bounded selection, revocation, audit evidence and delivery semantics together. Keep payloads out of operational logs/control-plane memory.
+3. Implement retention-safe payload cleanup and fingerprint tombstones without losing cross-day dedupe/audit authority; review backup/encryption/deletion evidence before production. Expiry hiding is not deletion.
+4. Real isolated R2 signer integration must prove canonical qualification/fingerprint mapping, committed objects, key lifecycle and crash reconciliation. Preserve production CLI/R2/Google namespaces and zero-new-spend behavior. Synthetic fixtures are not collection rights.
+5. Multi-source/multi-batch intake, results filters/pagination and live adapters need versioned contracts and concurrency tests before activation.
 
-## Next bounded implementation: accepted results and source-aware export
-
-1. Reconcile the existing API/data and UX contracts with `src/vsn_lead_engine/saas/contracts.py`, `source_policy.py`, current job/source/usage/receipt services and model ownership before adding result storage. Preserve production CLI/Google delivery/exact R2 dedupe authority; use isolated tenant-scoped SaaS storage/keys and synthetic test namespaces, never the production R2 namespace or workbook data.
-2. Extend the verified candidate provenance/event/tenant/job/source/phone/lineage/retention contract into reviewed accepted ingestion with trusted dedupe evidence and versioned accounting. Candidate preflight and redacted event replay are already implemented; they cannot establish acceptance or exact cross-day uniqueness. Browser payloads and a requested result limit cannot establish accepted leads. Current terminal receipts/accounting carry zero accepted leads: a reviewed versioned evidence/accounting change is required before accepting nonzero results; do not reinterpret existing receipts.
-3. Keep new ingestion/export routes unavailable until their contracts and authority checks exist. Enforce source display/storage/export/field rights, live policy version/kill switch, current actor membership/role and atomic lead/export budgets. Reuse source-aware policy logic; unknown metadata fails closed. Synthetic rights fixtures remain tests only.
-4. Add bounded tenant-scoped read views/pagination before enabling export. Export specification/idempotency, allowed fields, no formula injection, no sensitive URLs/logs, revocation/retention and audit evidence must be reviewed together. Full lead payloads are data, not operational logs or control-plane memory.
-5. Verify forged/unsigned evidence, conflicting replay, foreign tenant/source/job, missing phone, unsupported territory/fields, rights changes, stale membership and concurrent caps with disposable PostgreSQL. No live adapter, source, scheduler, payment or release activation follows from contract tests.
-
-Signed billing-event reconciliation remains independent safe work. Recovery/signup, local browser visual/keyboard/WCAG/customer assessment, shared-origin TLS/proxy/cookies and retention/encryption/cleanup acceptance remain open. Engineering implementation progress is not deployment or collection certification.
+Billing-event reconciliation remains independent safe work. Recovery/signup, browser/keyboard/WCAG/customer, shared-origin TLS/proxy/cookies, provider rights and deployment/launch acceptance remain open.

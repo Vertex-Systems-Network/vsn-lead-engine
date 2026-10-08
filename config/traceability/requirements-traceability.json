@@ -1798,9 +1798,11 @@
       "branch_refs": [
         "saas/next-result-view"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #192"
+      ],
       "test_evidence": [
-        "Six backend read tests and exact-path transport/HTTP flows; final verification pending."
+        "PR #192 merged at 1f63f0283b68c7e005677d31157e77e26a84c366; head 5903e2d71c592ec03bdcb5c50939118a62b39fe3 passed required checks/Actions CodeQL, PostgreSQL 37776196602 (all 208 tests, concurrency, migrations/settings) and Next/HTTP 37776195589 (10 transport tests/build/type and stored-result, viewer/revocation/expiry/escaped-text flows)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1817,7 +1819,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:1f63f0283b68c7e005677d31157e77e26a84c366"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }
