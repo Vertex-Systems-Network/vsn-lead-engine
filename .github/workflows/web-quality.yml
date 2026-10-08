@@ -3,6 +3,7 @@ name: Web Quality
 on:
   pull_request:
     branches: [main]
+    paths: ["apps/web/**", "apps/saas/**", ".github/workflows/web-quality.yml"]
   push:
     branches: [main]
     paths: ["apps/web/**", "apps/saas/**", ".github/workflows/web-quality.yml"]

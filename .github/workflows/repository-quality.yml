@@ -27,13 +27,42 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      - name: Check whether repository control-plane validation applies
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BEFORE_SHA: ${{ github.event.before }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != 'pull_request' ] && [ "${{ github.event_name }}" != 'push' ]; then
+            echo 'control=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          base="$BASE_SHA"
+          if [ "${{ github.event_name }}" = 'push' ]; then base="$BEFORE_SHA"; fi
+          if ! git cat-file -e "${base}^{commit}" 2>/dev/null; then
+            echo 'control=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed="$(git diff --name-only "$base" HEAD)"
+          if [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -Ev '^(apps/saas/|apps/web/)' >/dev/null; then
+            echo 'control=false' >> "$GITHUB_OUTPUT"
+            echo 'Only app paths changed; control-plane validation is not affected.'
+          else
+            echo 'control=true' >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install pinned ANPOS validation dependencies
+        if: steps.scope.outputs.control == 'true'
         run: python -m pip install --disable-pip-version-check -r requirements-anpos.txt
 
       - name: Compile repository scripts and tests
+        if: steps.scope.outputs.control == 'true'
         run: python -m compileall -q scripts tests
 
       - name: Run ANPOS control-plane conformance unit tests
+        if: steps.scope.outputs.control == 'true'
         shell: bash
         run: |
           python -m unittest discover -s tests -p 'test_control_plane.py'
@@ -42,12 +71,15 @@ jobs:
           python -m unittest discover -s tests -p 'test_blueprint_closure.py'
 
       - name: Verify tamper-evident audit journal
+        if: steps.scope.outputs.control == 'true'
         run: python scripts/verify_audit_journal.py
 
       - name: Validate current AI-native state and workflow safety
+        if: steps.scope.outputs.control == 'true'
         run: python scripts/validate_ai_native_repo.py
 
       - name: Verify autonomous resume and README progress contract
+        if: steps.scope.outputs.control == 'true'
         shell: bash
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -61,6 +93,7 @@ jobs:
           fi
 
       - name: Validate commercial distribution and licensing blueprint when present
+        if: steps.scope.outputs.control == 'true'
         shell: bash
         run: |
           if [ -f scripts/validate_commercial_licensing.py ] && [ -f config/licensing/commercial-policy.json ]; then
@@ -70,7 +103,7 @@ jobs:
           fi
 
       - name: Run protected-base validators against proposed tree
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.scope.outputs.control == 'true'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         shell: bash
@@ -93,7 +126,7 @@ jobs:
           fi
 
       - name: Report control-plane changes for review evidence
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.scope.outputs.control == 'true'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         shell: bash
@@ -107,12 +140,14 @@ jobs:
             AUTO-AGENT.md SUPERVISOR.md ORCHESTRATOR.md MULTI-AGENT-ORCHESTRATION.md || true
 
       - name: Validate YAML syntax
+        if: steps.scope.outputs.control == 'true'
         shell: bash
         run: |
           ruby -e 'require "yaml"; ARGV.each { |f| YAML.load_file(f); puts "valid yaml: #{f}" }' \
             .github/dependabot.yml .github/workflows/*.yml
 
       - name: Reject trailing whitespace in machine/code files
+        if: steps.scope.outputs.control == 'true'
         shell: bash
         run: |
           if git grep -nE '[[:blank:]]+$' -- '*.py' '*.json' '*.yml' '*.yaml'; then
@@ -121,4 +156,5 @@ jobs:
           fi
 
       - name: Show repository integrity success
+        if: steps.scope.outputs.control == 'true'
         run: echo 'Repository integrity, conformance tests, JSON Schema, core/commercial validators, protected-base validation, workflow pinning, JSON, and YAML checks passed.'
