@@ -9,6 +9,10 @@ PRs #180–#184 delivered native draft/cancel controls, source configuration, st
 - Cancellation notice mode reads the authorized current snapshot, shows status/revision and links to explicit review. It issues no confirmation and performs no retry/cancellation. Stale or expired authority cannot become fresh through error rendering.
 - Exact-head PostgreSQL, migrations/settings, Next build/type/lint/format/transport and real HTTP bootstrap, credential/Origin/limit, mutation/replay, source/filter and cancellation-recovery workflows pass. Browser/deployment acceptance remains separate.
 
+## Candidate result contract boundary
+
+The internal candidate preflight now implements the initial signed provenance/phone/scope/field-lineage/retention validation contract; exact-head verification is pending. It returns redacted comparison metadata only. No event ledger, result store, R2 dedupe authority, nonzero accounting, export or route is enabled. See `SAAS-RESULT-EVIDENCE-REVIEW-20261008.md`.
+
 ## Next bounded implementation: accepted results and source-aware export
 
 1. Reconcile the existing API/data and UX contracts with `src/vsn_lead_engine/saas/contracts.py`, `source_policy.py`, current job/source/usage/receipt services and model ownership before adding result storage. Preserve production CLI/Google delivery/exact R2 dedupe authority; use isolated tenant-scoped SaaS storage/keys and synthetic test namespaces, never the production R2 namespace or workbook data.

@@ -30,6 +30,10 @@
 - Unknown external outcomes retain capacity until valid proof; provider rights/evidence/replay contracts remain necessary. Evidence migrations refuse destructive rollback.
 - ESLint 9 is unsupported while plugin peers exclude 10; compatible maintained tooling remains a production gate. Manual windows and disabled schedule configs are not paid activation or a customer execution scheduler.
 
+## Candidate in progress
+
+Candidate result preflight implemented: separate empty-by-default signed evidence registry, current tenant/role/entitlement/source fingerprint checks, bounded US/CA phone/field lineage/retention validation and redacted immutable summary. No ingestion, dedupe, replay ledger, result/accounting writes or exports. Local/CI evidence pending on this branch. See docs/ai/SAAS-RESULT-EVIDENCE-REVIEW-20261008.md.
+
 ## Next Action
 
 1. Continue bounded accepted-result and source-aware export contracts under trusted source evidence, phone qualification and exact R2 dedupe authority; billing-event reconciliation is independent. Keep provider/payment/scheduler consumers disabled.
