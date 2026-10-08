@@ -1932,9 +1932,11 @@
       "branch_refs": [
         "saas/next-export-preview"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #196"
+      ],
       "test_evidence": [
-        "Native Next export preview/confirmation implemented: bounded field omissions/attribution/count/deadline/one-unit notice, actor/job/selection/expiry-bound confirmation, direct CSRF POST CSV/replay and safe failure review. Full local/CI evidence pending."
+        "PR #196 merged at 584ba0ad71557609e88b4d5b48816f41f2dfd563; head 10f5ee5bc42f033f5d162a0ab5ef3232d330e963 passed required checks/Actions CodeQL, PostgreSQL 37781243971 (all 241 tests/concurrency/migrations/settings) and Next/HTTP 37781243921 (11 transport tests/build/type and native preview/confirmed CSV/replay/conflict/erasure flows)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1950,7 +1952,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:584ba0ad71557609e88b4d5b48816f41f2dfd563"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }

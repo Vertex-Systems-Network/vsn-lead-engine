@@ -11,3 +11,7 @@ Six backend read tests cover redacted DTO/no-store, viewer/revoked/foreign acces
 ## Verified merge evidence
 
 PR #192 merged at 1f63f0283b68c7e005677d31157e77e26a84c366; head 5903e2d71c592ec03bdcb5c50939118a62b39fe3 passed required checks/Actions CodeQL, PostgreSQL 37776196602 (all 208 tests, concurrency, migrations/settings) and Next/HTTP 37776195589 (10 transport tests/build/type and stored-result, viewer/revocation/expiry/escaped-text flows).
+
+## Subsequent verified frontier
+
+PRs #194–#196 deliver guarded CSV preparation, bounded active payload erasure/tombstones and native Next preview/confirmation. Historical remaining-work statements in this review are superseded for those slices. Result filters/selection, wider pagination, real signer/source and browser/customer/backup/production acceptance remain open.

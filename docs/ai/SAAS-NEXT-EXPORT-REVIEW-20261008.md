@@ -9,3 +9,7 @@ A signed ten-minute-or-shorter confirmation binds current actor/workspace/job, e
 Next validates bounded typed DTOs, uses server components, one fetch and stable keys, labels/fieldset/legend and plain escaped attribution. Confirmation is never put in a URL or analytics. Actual HTTP verification follows Next preview → direct Django CSRF POST → CSV/receipt/accounting → same-confirmation replay/conflict, alongside viewer action omission and retained erasure checks. Six backend tests and the eleventh transport test cover scope, expiry, roles/CSRF, unknown/repeated input, readonly preview, omissions, cap and replay. Browser/visual/keyboard/WCAG/customer assessment remains open; HTTP is not certification.
 
 Real R2 signer/source-rights intake, live consumers, payment/scheduler and production deployment remain unavailable. No additional CSV copy is persisted; downloaded copies and backups are not certified recalled/erased. Exact-head PostgreSQL/Web/required checks are recorded in README/checkpoint after merge.
+
+## Verified merge evidence
+
+PR #196 merged at 584ba0ad71557609e88b4d5b48816f41f2dfd563; head 10f5ee5bc42f033f5d162a0ab5ef3232d330e963 passed required checks/Actions CodeQL, PostgreSQL 37781243971 (all 241 tests/concurrency/migrations/settings) and Next/HTTP 37781243921 (11 transport tests/build/type and native preview/confirmed CSV/replay/conflict/erasure flows).

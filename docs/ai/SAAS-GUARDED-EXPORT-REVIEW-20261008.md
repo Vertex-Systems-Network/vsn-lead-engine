@@ -15,3 +15,7 @@ Next export preview/confirmation is not yet implemented, and no UI export button
 ## Verified merge evidence
 
 PR #194 merged at 6f9ad2b7808471c67523e31f1b42d37a710d9cd8; head 5dde3934edb0fdc2424b2fe4bb0d5e41e2eb9a46 passed required checks/Actions CodeQL, PostgreSQL 37779435828 (223 tests/export races/migrations/settings) and Next/HTTP 37779435876 (10 transport tests/build/type and CSRF CSV/replay/viewer denial).
+
+## Subsequent verified frontier
+
+PRs #194–#196 deliver guarded CSV preparation, bounded active payload erasure/tombstones and native Next preview/confirmation. Historical remaining-work statements in this review are superseded for those slices. Result filters/selection, wider pagination, real signer/source and browser/customer/backup/production acceptance remain open.

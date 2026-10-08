@@ -15,3 +15,7 @@ This removes active row payloads only. PostgreSQL historical pages/WAL/replicas,
 ## Verified merge evidence
 
 PR #195 merged at 92657c5c8bbdb27115e95f5642f841e8a1c975c3; head dc84dce770bf14580e9d2691880510fc6615ba14 passed required checks/Actions CodeQL, PostgreSQL 37780165591 (235 tests/expiry races/migrations/settings) and Next/HTTP 37780165669 (10 transport tests/build/type and payload erasure/tombstone flow).
+
+## Subsequent verified frontier
+
+PRs #194–#196 deliver guarded CSV preparation, bounded active payload erasure/tombstones and native Next preview/confirmation. Historical remaining-work statements in this review are superseded for those slices. Result filters/selection, wider pagination, real signer/source and browser/customer/backup/production acceptance remain open.
