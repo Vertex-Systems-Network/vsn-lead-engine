@@ -3,11 +3,14 @@
 ## Snapshot
 
 - Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 UTC / PKT.
-- Protected feature main read `f4e7e5ee2aacb53c3e609acc7d039471455e0241` / PR #202; feature base precedes documentation merge. Reconcile exact live main, open Issues then PRs before replay.
+- Protected feature main read `3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7` / PR #204; feature base precedes documentation merge. Reconcile exact live main, open Issues then PRs before replay.
 - Next.js/TypeScript frontend, Django/DRF/PostgreSQL authority; production CLI/R2/Google stays isolated.
 - Open Issues: none at session start. Dependency PR #174 remains open (setup-node major update); separately review immutable action/runner compatibility before merging. No existing feature mutation replayed.
 
 ## Verified
+
+- PR #204 merged at 3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7; head 02516bda90cd6e1aea00983f75193da14e75d1ae passed all five CI workflows/required checks/Actions CodeQL, PostgreSQL 37798742414 (all 269 tests, migrations/reversal/settings and earlier concurrency) and Web 37798742458 (14 transport tests, lint/format/build/type and actual Next/Django HTTP flows). Ten DB-forbidden billing-evidence tests verify the pure validator; no entitlement/payment write or activation.
+- Pure internal normalized billing evidence uses trusted local coordinates and empty default keys with bounded freshness/validity. It has no persistence, endpoint or entitlement/payment writes. Actual provider truth, durable uniqueness/order and ongoing capability expiry are not established by a signature.
 
 - PR #202 merged at f4e7e5ee2aacb53c3e609acc7d039471455e0241; head 4d09b60b3fc04b23312f25e13b3f1ff703a59cd6 passed all five CI workflows, including required checks/Actions CodeQL, PostgreSQL 37797128235 (all 259 tests, concurrency, migrations/reversal/settings) and Web 37797128305 (14 transport tests, lint/format/build/type and actual HTTP scoped signed receipt navigation, no-charge/erasure/redaction/referrer headers and earlier native auth/filter/CSV flows).
 - Readonly 25-row receipt history has current owner/admin job scope and member-own scope, viewer denial, signed 24-hour actor/job/scope-bound continuation, no charge/write/CSV and retained redacted metadata after payload erasure. Next/API no-referrer headers pass actual HTTP; live ingress/access-log query redaction remains a deployment gate. Migration 0016 indexes are reversible and passed PostgreSQL migration CI.
@@ -24,7 +27,7 @@
 - Source-aware 1–25-record CSV preparation requires explicit field grants/current rights, CSRF and member role. Atomic caps include pending reservations; one unit per prepared file. Redacted keyed digest ledger retains no CSV; identical actor/key/specification replays once and changed selection/content conflicts.
 - Explicit current-admin source-expiry erasure clears active fields/lineage/source ref/category/purpose/retention label, keeping dated actor tombstones, fingerprints and usage/counts. Duplicate/rollback/role/expiry races and retained later-job duplicate rejection tested. No scheduled cleanup activated.
 - Native Next preview shows count, field omissions, attribution, earliest deadline and one-unit notice. Signed confirmation scopes actor/tenant/job/rows/permitted fields and short expiry. Direct Django CSRF POST returns CSV; viewer action omitted and failure review mints no new authority.
-- Earlier candidate/accepted-store/receipt/job/account/native forms remain verified. All 259 PostgreSQL tests pass; local 233 pass/26 PG-only skips; Next 14 transport/lint/format/build/type and real HTTP pass. Root 376 pass/1 skip/28 subtests; Ruff/ANPOS pass. CodeQL scans Actions only.
+- Earlier candidate/accepted-store/receipt/job/account/native forms remain verified. All 269 PostgreSQL tests pass; local 243 pass/26 PG-only skips; Next 14 transport/lint/format/build/type and real HTTP pass. Root 376 pass/1 skip/28 subtests; Ruff/ANPOS pass. CodeQL scans Actions only.
 - M5 85%, M6 75%, M7 86%, overall ~52% engineering indicators. Work units unchanged: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
 
 ## Not Verified
@@ -42,8 +45,6 @@
 
 ## Next Action
 
-Current branch candidate: `feat/internal-billing-evidence` implements pure normalized HMAC snapshot verification with empty default registry and no DB/payment/entitlement writes. Local 269 cases: 243 passed/26 PostgreSQL-only skips; ten DB-forbidden adversarial tests pass. Exact-head CI/merge remains pending; verified production/milestone facts above are unchanged. See `docs/ai/SAAS-BILLING-EVIDENCE-REVIEW-20261008.md` for the next disabled binding/ledger/revision/expiry contract.
-
-1. Implement provider-neutral signed billing-event validation/reconciliation under WU-SAAS-FOUNDATION, with verifier registries disabled by default, preserving reservations/windows and no live payment activation. Real signer/live consumers and production gates remain unavailable.
+1. Implement disabled durable billing bindings/redacted event ledger and atomic exact replay/contiguous revisions; enforce entitlement validity across every capability before enabling writes or billing. Preserve all reservations/periods; no live payment/provider activation.
 2. Billing-event reconciliation is independent safe work; audit/fingerprint/backup retention policy and real signer/source/legal/customer evidence remain separate before-production gates.
 3. Continue the ready frontier within invocation budget; checkpoints are recovery aids, not permission gates.

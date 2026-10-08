@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "01d52083f70e57974aec4388c67827237584df88",
-  "observed_main_semantics": "Protected PR #203 documentation main read; billing evidence is an unverified current branch candidate.",
+  "observed_main_sha": "3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7",
+  "observed_main_semantics": "Protected feature main read after PR #204; this feature base precedes checkpoint documentation merge.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "feat/internal-billing-evidence",
+  "active_branch": "main",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -75,10 +75,10 @@
     "saas_periods": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_daily_occurrences": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_session_navigation": "Earlier verified feature evidence retained in git history through PR #197.",
-    "latest_saas_verified_head": "4d09b60b3fc04b23312f25e13b3f1ff703a59cd6",
+    "latest_saas_verified_head": "02516bda90cd6e1aea00983f75193da14e75d1ae",
     "saas_native_next_forms": "PR #180: required checks, PostgreSQL 37703540378 (138 tests/migrations/settings) and Next/HTTP 37703540308 (native draft/cancel/CSRF/auth) passed; full evidence in history.",
-    "saas_next_source_configuration": "PR #181 merged at 4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01; head 66152035d4f4da7f75d8c656fe3eae0224590076 passed required checks/Actions CodeQL, PostgreSQL 37703955016 (141 tests/migration/settings), and Next/HTTP 37703954934 (bounded native source/XSS/viewer/tenant and earlier form/auth flows).",
-    "saas_job_state_filter": "PR #182 merged at 9bc1065b403299b74b60dca52ce6d1cc46f4d810; head 593799c04edc7b03d888663362d655106da92eea passed required checks/Actions CodeQL, PostgreSQL 37704612846 (145 tests/migration/settings), and Next/HTTP 37704612908 (eight transport tests, native forms/source configuration and filtered/empty/Next/First-page flows).",
+    "saas_next_source_configuration": "Earlier exact-head implementation/CI evidence retained in git history through PR #203.",
+    "saas_job_state_filter": "Earlier exact-head implementation/CI evidence retained in git history through PR #203.",
     "saas_next_validation_signout": "PR #184: required checks/Actions CodeQL, PostgreSQL 37755784470 and Next/HTTP 37755784437 passed; exact head and full evidence retained in git history.",
     "saas_native_login_cancel": "PR #186: required checks/Actions CodeQL, PostgreSQL 37766322082 and Next/HTTP 37766321955 passed; exact head and full evidence retained in git history.",
     "saas_result_evidence": "PR #188: required checks/Actions CodeQL, PostgreSQL 37770063209 and Next/HTTP 37770063198 passed; exact head and full evidence retained in git history.",
@@ -90,7 +90,8 @@
     "saas_next_export": "PR #196 merged at 584ba0ad71557609e88b4d5b48816f41f2dfd563; head 10f5ee5bc42f033f5d162a0ab5ef3232d330e963 passed required checks/Actions CodeQL, PostgreSQL 37781243971 (all 241 tests/concurrency/migrations/settings) and Next/HTTP 37781243921 (11 transport tests/build/type and native preview/confirmed CSV/replay/conflict/erasure flows).",
     "saas_result_selection": "PR #198 merged at 7dd9f10b4c28b1bacea1488aee5874685f600e3a; head 141cbac20f05b9edc3f63a4374fbc3612766140c passed all required checks/Actions CodeQL, PostgreSQL 37784930553 (all 247 tests, concurrency, migrations/settings) and Web 37784930581 (12 transport tests, build/type and HTTP country-filter/selected-row CSV/empty denial/replay/conflict/erasure/auth flows).",
     "saas_result_metadata_filters": "PR #200 merged at 812a4bc20e661e3088e453c866f50c031dca3d6f; head 2c326478c98c6fbdb482c7c73270d6fa19092ae0 passed all required checks/Actions CodeQL, PostgreSQL 37793585524 (all 253 tests, concurrency, migrations/settings) and Web 37793585562 (13 transport tests, build/type and actual HTTP compound/empty/clear filters, filtered-row denial, subset-only CSV/replay/conflict, auth and two-row erasure/tombstones).",
-    "saas_export_receipt_history": "PR #202 merged at f4e7e5ee2aacb53c3e609acc7d039471455e0241; head 4d09b60b3fc04b23312f25e13b3f1ff703a59cd6 passed all five CI workflows, including required checks/Actions CodeQL, PostgreSQL 37797128235 (all 259 tests, concurrency, migrations/reversal/settings) and Web 37797128305 (14 transport tests, lint/format/build/type and actual HTTP scoped signed receipt navigation, no-charge/erasure/redaction/referrer headers and earlier native auth/filter/CSV flows)."
+    "saas_export_receipt_history": "PR #202 merged at f4e7e5ee2aacb53c3e609acc7d039471455e0241; head 4d09b60b3fc04b23312f25e13b3f1ff703a59cd6 passed all five CI workflows, including required checks/Actions CodeQL, PostgreSQL 37797128235 (all 259 tests, concurrency, migrations/reversal/settings) and Web 37797128305 (14 transport tests, lint/format/build/type and actual HTTP scoped signed receipt navigation, no-charge/erasure/redaction/referrer headers and earlier native auth/filter/CSV flows).",
+    "saas_billing_evidence": "PR #204 merged at 3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7; head 02516bda90cd6e1aea00983f75193da14e75d1ae passed all five CI workflows/required checks/Actions CodeQL, PostgreSQL 37798742414 (all 269 tests, migrations/reversal/settings and earlier concurrency) and Web 37798742458 (14 transport tests, lint/format/build/type and actual Next/Django HTTP flows). Ten DB-forbidden billing-evidence tests verify the pure validator; no entitlement/payment write or activation."
   },
   "governance": {
     "main_ruleset_id": 24086362,

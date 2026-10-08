@@ -22,4 +22,8 @@ The return value is immutable typed evidence with event/key references, exact bo
 
 ## Verification
 
-Ten adversarial `SimpleTestCase` tests prohibit database access and cover immutable validation, empty/revoked/malformed keys, byte tampering, signed foreign scopes, duplicate/extra/missing/oversized/recursive JSON, exact integer limits, inactive/expiry rules and issuance/version/revision bounds. Existing Django/usage/reservation/period/dispatch/export behavior is unchanged. Required exact-head PostgreSQL and Web CI must pass before this slice is marked verified. No new migration or frontend path is introduced; no milestone or work unit is completed by this parser.
+Ten adversarial `SimpleTestCase` tests prohibit database access and cover immutable validation, empty/revoked/malformed keys, byte tampering, signed foreign scopes, duplicate/extra/missing/oversized/recursive JSON, exact integer limits, inactive/expiry rules and issuance/version/revision bounds. Existing Django/usage/reservation/period/dispatch/export behavior is unchanged. Required exact-head PostgreSQL and Web CI passed before protected merge. No new migration or frontend path is introduced; no milestone or work unit is completed by this parser.
+
+## Verified protected merge
+
+PR #204 merged at 3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7; head 02516bda90cd6e1aea00983f75193da14e75d1ae passed all five CI workflows/required checks/Actions CodeQL, PostgreSQL 37798742414 (all 269 tests, migrations/reversal/settings and earlier concurrency) and Web 37798742458 (14 transport tests, lint/format/build/type and actual Next/Django HTTP flows). Ten DB-forbidden billing-evidence tests verify the pure validator; no entitlement/payment write or activation.
