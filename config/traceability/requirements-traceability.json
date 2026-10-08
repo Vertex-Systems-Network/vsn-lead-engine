@@ -1754,9 +1754,11 @@
       "branch_refs": [
         "saas/accepted-results"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #191"
+      ],
       "test_evidence": [
-        "Local 202 SaaS cases, 180 passed/22 PostgreSQL-only skips; exact-head CI pending."
+        "PR #191 merged at 1d11e078a9a784f964c4743fc7b523b0f05307ed; head d7cabfae2fa53cf5daba19f0432bdb11b022b03b passed required checks/Actions CodeQL, PostgreSQL 37774522114 (all 202 tests, three acceptance races, migrations/settings) and Next/HTTP 37774522030 (nine transport tests/build/type and native flows)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1770,6 +1772,48 @@
       "artifact_refs": [
         "apps/saas/core/accepted_results.py",
         "apps/saas/core/test_accepted_results.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:1d11e078a9a784f964c4743fc7b523b0f05307ed"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "SAAS-NEXT-RESULTS-001",
+      "source": "Current-rights bounded tenant result view",
+      "source_provenance_ref": "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "saas/next-result-view"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Six backend read tests and exact-path transport/HTTP flows; final verification pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-NEXT-RESULTS-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/result_query.py",
+        "apps/saas/core/test_result_query.py",
+        "apps/web/app/dashboard/workspaces/[workspaceId]/jobs/[jobId]/results/page.tsx",
+        "apps/web/test/integration_smoke.py"
       ],
       "sbom_refs": [],
       "attestation_refs": [],

@@ -417,6 +417,47 @@ def main():
                 assert f"/dashboard/workspaces/{workspace.id}?status=draft" in links.links
                 _, closed_form = native_form(detail_path + "/cancel")
                 assert "confirmation" not in closed_form.hidden
+                # Full synthetic dual-attested storage -> API -> actual Next rendering.
+                # No real signer/source/registry is activated by these fixtures.
+                from core.test_accepted_results import AcceptanceFixture
+                from core.models import AcceptedResult
+                result_marker = "<img src=x onerror=synthetic-result>"
+                class HttpAcceptance(AcceptanceFixture):
+                    def addCleanup(self, fn):
+                        self.cleanup = fn
+                    def candidate_signed(self, data=None):
+                        if data is None:
+                            self.data["records"][0]["fields"]["business_name"] = result_marker
+                        return super().candidate_signed(data)
+                result_fixture = HttpAcceptance()
+                try:
+                    result_fixture.setUp()
+                    result_fixture.accept()
+                finally:
+                    result_fixture.cleanup()
+                Membership.objects.create(user=user, workspace=result_fixture.workspace, role="owner")
+                result_path = f"/dashboard/workspaces/{result_fixture.workspace.id}/jobs/{result_fixture.job.id}/results"
+                rendered, result_headers = read(result_path)
+                assert "Available results" in rendered and "&lt;img src=x onerror=synthetic-result&gt;" in rendered
+                assert "synthetic-record-1" not in rendered and "registry-test" not in rendered
+                assert "no-store" in result_headers.get("Cache-Control", "")
+                empty_results, _ = read(f"/dashboard/workspaces/{workspace.id}/jobs/{saved[0].id}/results")
+                assert "No available results" in empty_results
+                Membership.objects.filter(user=user, workspace=result_fixture.workspace).update(role="viewer")
+                viewer_results, _ = read(result_path)
+                assert "&lt;img src=x onerror=synthetic-result&gt;" in viewer_results
+                Membership.objects.filter(user=user, workspace=result_fixture.workspace).delete()
+                revoked_results, _ = read(result_path)
+                assert "synthetic-result" not in revoked_results
+                Membership.objects.create(user=user, workspace=result_fixture.workspace, role="owner")
+                SourcePolicy.objects.filter(pk="fixture").update(enabled=False)
+                withheld_results, _ = read(result_path)
+                assert "recorded results are currently unavailable" in withheld_results
+                assert "synthetic-result" not in withheld_results
+                SourcePolicy.objects.filter(pk="fixture").update(enabled=True)
+                AcceptedResult.objects.filter(job=result_fixture.job).update(delete_at=timezone.now() - timedelta(seconds=1))
+                expired_results, _ = read(result_path)
+                assert "No available results" in expired_results and "synthetic-result" not in expired_results
                 active_session = next(cookie.value for cookie in jar if cookie.name == "sessionid")
                 form, csrf = native_form("/account/sign-out")
                 assert "End your session" in form and "Keep working" in form
@@ -441,7 +482,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

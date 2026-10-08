@@ -16,6 +16,8 @@ export function trustedOrigin(value) {
 }
 const filteredJobsPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/\?status=(?:draft|queued|running|partial|completed|failed|paused|cancelled)(?:&after=[0-9a-f-]{36})?$/;
+const resultsPath =
+  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/[0-9a-f-]{36}\/results\/$/;
 const formPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/cancel-form\/)$/;
 export async function readBackend(
@@ -33,6 +35,7 @@ export async function readBackend(
   if (
     !form &&
     !filteredJobsPath.test(path) &&
+    !resultsPath.test(path) &&
     !/^\/api\/v1\/workspaces\/(?:[0-9a-f-]{36}\/(?:usage\/|sources\/|jobs\/(?:[0-9a-f-]{36}\/)?))?(?:\?(?:page=[1-9][0-9]{0,5}|after=[0-9a-f-]{36}))?$/.test(
       path,
     )

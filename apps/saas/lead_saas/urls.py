@@ -11,6 +11,10 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 
 urlpatterns = [
+    path(
+        "api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/results/",
+        views.ResultList.as_view(),
+    ),
     path("health/", views.health),
     path("", views.overview),
     path("accounts/start-sign-in/", start_sign_in),

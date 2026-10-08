@@ -32,7 +32,9 @@
 
 ## Accepted-result candidate
 
-Internal dual-attested v2 accepted-result store/accounting implemented: signed candidate ledger + separate source and isolated R2/qualification signatures, current role/rights/caps, atomic rows/tokens/usage/job finalization and v1 compatibility. Empty signing registries/no intake route; local 202 cases (180 passed/22 PostgreSQL skips), exact-head CI pending. See ADR-SAAS-005 / SAAS-ACCEPTED-RESULTS-REVIEW-20261008.
+PR #191 merged at 1d11e078a9a784f964c4743fc7b523b0f05307ed; head d7cabfae2fa53cf5daba19f0432bdb11b022b03b passed required checks/Actions CodeQL, PostgreSQL 37774522114 (all 202 tests, three acceptance races, migrations/settings) and Next/HTTP 37774522030 (nine transport tests/build/type and native flows). See ADR-SAAS-005 / SAAS-ACCEPTED-RESULTS-REVIEW-20261008.
+
+Current-rights bounded tenant/job result API and native Next view implemented: source/fingerprint/field lineage/retention checks, escaped source/field/deadline display and empty/withheld states. Six read tests; local SaaS 208 cases (186 passed/22 PostgreSQL skips); final Web/HTTP and exact-head CI pending.
 
 ## Next Action
 

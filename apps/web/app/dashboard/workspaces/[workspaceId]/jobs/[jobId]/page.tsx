@@ -22,6 +22,12 @@ export default async function Detail({
     <>
       <Link href={`/dashboard/workspaces/${workspaceId}`}>← Workspace</Link>
       <h1>Saved search</h1>
+      <Link
+        prefetch={false}
+        href={`/dashboard/workspaces/${workspaceId}/jobs/${jobId}/results`}
+      >
+        View available results
+      </Link>
       <section className="card">
         <span className="badge">{j.status}</span>
         <h2>{j.search.categories.join(", ")}</h2>
