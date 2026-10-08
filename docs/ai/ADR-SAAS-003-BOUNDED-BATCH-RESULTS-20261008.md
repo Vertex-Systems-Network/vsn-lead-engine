@@ -1,6 +1,6 @@
 # ADR-SAAS-003: additive bounded batch intake and result pagination
 
-Status: accepted internal development direction under standing technical autonomy; durable intake/pagination implementation not yet delivered; pure proof validation verified through PR #209. Date: 2026-10-08. No provider, signer, payment, scheduler or production activation is authorized by this ADR.
+Status: accepted internal development direction under standing technical autonomy; inert durable metadata schema and pure batch/terminal proof verified through PRs #209/#211/#212; transactional intake/accounting and pagination not delivered. Date: 2026-10-08. No provider, signer, payment, scheduler or production activation is authorized by this ADR.
 
 ## Evidence and problem
 
@@ -66,3 +66,8 @@ effect. Exact accepted-set equality is not proof that an allocated or provider
 batch was never omitted. A signature alone never closes an unknown effect or
 settles capacity. Exact-body replay/conflict, current rights/grants, crash-safe
 persistence and final whole-job settlement remain transactional service work.
+
+
+## Verified terminal-proof checkpoint
+
+PR #212 merged at 20e2362ec6000a72e679a8716d428795f1a9d077; head b0f19291687c8b532b81a2f2bdd85e8c29758e9a passed all five workflows, PostgreSQL 37816828169 (329 tests/migrations/settings) and Web 37816828126 (14 transport/build/type/HTTP). Ten DB-forbidden bounded source-final proof cases; no enrollment/intake/finality/settlement authority.

@@ -27,3 +27,20 @@ PR #204 verifies the pure normalized billing-evidence validator with ten DB-forb
 The previously planned pure billing parser and transactional binding/ledger/deadline slice are delivered through PR #207, with readonly diagnostics/active-admin recovery boundaries through PR #208. Both remain internal and default disabled; no provider/payment activation is established. PR #209 adds a separate pure v3 batch-proof validator and ADR-SAAS-003. All five exact-head workflows passed; latest PostgreSQL 37812348239 verifies 306 cases/migrations/settings, Web 37812348326 verifies 14 transport/build/type/HTTP cases. Full browser/customer/provider/privacy/deployment acceptance remains open.
 
 Next implement separately gated durable v3 batch identity/ledger and trusted terminal manifests with additive preservation-safe migrations, then atomic partial-batch/final accounting and stable-watermark signed 25-row pagination. Preserve delivered v2 single-source/one-batch settlement and export contracts. A valid proof-shaped manifest has no durable replay/ordering/qualification authority. Unknown effects retain full reservations. Follow ADR-SAAS-003 and the latest compact checkpoint; do not replay the old billing frontier described above.
+
+
+## Current frontier after PRs #211/#212
+
+The additive inert schema (0018) and pure bounded source-final proof are verified
+on PostgreSQL/Web CI (319 and 329 cases respectively). Do not repeat the schema or
+proof slices. Next implement trusted-local disabled v3 enrollment and server-owned
+batch allocation, with a default-v2 server selector and explicit v1/v2 exclusion
+before any new v3 state can be used. Preserve legacy operation/accepted-result
+references and refusal to reverse populated evidence. Then add candidate/accepted
+payload intake, current grant/rights gates, aggregate original-reservation caps,
+exact-body replay and atomic final accounting. Unknown allocated identities or
+candidate/effect evidence cannot be closed merely because the terminal's accepted
+set is empty or matches stored accepted rows. PostgreSQL allocation/replay/cap and
+terminal/partial/expiry/crash races precede any usage release. Native 25-row pages
+and selected-page CSV remain downstream; actual signer/payment/provider rights,
+browser/customer/privacy/deployment and launch evidence remain separate gates.
