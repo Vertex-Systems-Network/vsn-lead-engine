@@ -2067,9 +2067,11 @@
       "branch_refs": [
         "feat/readonly-export-receipt-history"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #202"
+      ],
       "test_evidence": [
-        "Local 259 cases: 233 passed/26 PostgreSQL-only skips; 14 Web transport tests/build/type/HTTP redacted history and no-charge/erasure/cursor navigation; exact-head CI pending."
+        "PR #202 merged at f4e7e5ee2aacb53c3e609acc7d039471455e0241; head 4d09b60b3fc04b23312f25e13b3f1ff703a59cd6 passed all five CI workflows, including required checks/Actions CodeQL, PostgreSQL 37797128235 (all 259 tests, concurrency, migrations/reversal/settings) and Web 37797128305 (14 transport tests, lint/format/build/type and actual HTTP scoped signed receipt navigation, no-charge/erasure/redaction/referrer headers and earlier native auth/filter/CSV flows)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -2088,7 +2090,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:f4e7e5ee2aacb53c3e609acc7d039471455e0241"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }
