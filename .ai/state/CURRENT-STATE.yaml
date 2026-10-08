@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "a116cfb9d761299b72d01596a3196e6350e4a848",
-  "observed_main_semantics": "Live protected main at fresh session resume, after PR #206; new billing ledger/expiry slice pending protected merge.",
+  "observed_main_sha": "8d555bf041b05690838b74b46406541abb68bd81",
+  "observed_main_semantics": "Protected main after PR #207, before diagnostics/progress checkpoint merge.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "feat/saas-billing-ledger-expiry",
+  "active_branch": "feat/saas-billing-diagnostics",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -92,7 +92,8 @@
     "saas_result_metadata_filters": "PR #200 merged at 812a4bc20e661e3088e453c866f50c031dca3d6f; head 2c326478c98c6fbdb482c7c73270d6fa19092ae0 passed all required checks/Actions CodeQL, PostgreSQL 37793585524 (all 253 tests, concurrency, migrations/settings) and Web 37793585562 (13 transport tests, build/type and actual HTTP compound/empty/clear filters, filtered-row denial, subset-only CSV/replay/conflict, auth and two-row erasure/tombstones).",
     "saas_export_receipt_history": "PR #202 merged at f4e7e5ee2aacb53c3e609acc7d039471455e0241; head 4d09b60b3fc04b23312f25e13b3f1ff703a59cd6 passed all five CI workflows, including required checks/Actions CodeQL, PostgreSQL 37797128235 (all 259 tests, concurrency, migrations/reversal/settings) and Web 37797128305 (14 transport tests, lint/format/build/type and actual HTTP scoped signed receipt navigation, no-charge/erasure/redaction/referrer headers and earlier native auth/filter/CSV flows).",
     "saas_billing_evidence": "PR #204: required/PostgreSQL/Web checks passed; pure normalized parser only. Exact-head evidence in prior checkpoint and review document.",
-    "saas_billing_ledger": "Review branch: disabled billing ledger/expiry implemented, local 290 tests (31 PG-only skips); protected CI/merge pending. See billing-ledger review."
+    "saas_billing_ledger": "PR #207 / head d9be9ac1: all five checks passed; PostgreSQL 37810735757 (290 tests/migrations), Web 37810735885 (14 tests/HTTP). See ledger review.",
+    "saas_billing_diagnostics": "Six local tests pass; protected PostgreSQL/Web CI pending. No repair/activation."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -139,7 +140,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify disabled billing ledger/expiry slice through exact-head PostgreSQL and protected checks; then implement broader bounded result pagination and billing recovery/operator diagnostics without live activation.",
+  "exact_next_safe_action": "Complete read-only billing diagnostics CI/protected merge, then design versioned bounded multi-source/multi-batch result pagination; retain disabled live signers/providers and preserve accounting.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

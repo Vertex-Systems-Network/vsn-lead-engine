@@ -5,7 +5,7 @@ from django.db import IntegrityError, transaction
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .billing_evidence import BillingBinding, verified_billing_event
-from .models import BillingAccount, BillingEvent, Entitlement, Workspace
+from .models import BillingAccount, BillingEvent, Entitlement, User, Workspace
 from .services import IdempotencyConflict, membership_for
 from .usage import COUNTERS
 
@@ -16,6 +16,8 @@ def reconcile_billing(user, workspace_id, body, signature):
         raise PermissionDenied("Billing reconciliation is unavailable.")
     membership_for(user, workspace_id)
     Workspace.objects.select_for_update().get(pk=workspace_id)
+    if not User.objects.select_for_update().filter(pk=user.pk, is_active=True).exists():
+        raise PermissionDenied("Current actor is unavailable.")
     membership = membership_for(user, workspace_id, lock=True)
     if membership.role not in {"owner", "admin"}:
         raise PermissionDenied("Billing reconciliation requires a current administrator.")
