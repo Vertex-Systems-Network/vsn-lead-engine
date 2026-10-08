@@ -33,7 +33,7 @@ and dedupe.
 - Verified plan snapshot: **2026-10-08**. Latest inspected feature main: `412c2928` (PR #214); v3 enrollment is verified but disabled/quarantined. Server-owned batch allocation/intake/accounting remains open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
-- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: quarantined server-owned batch allocation, partial intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
+- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: allocation review, then guarded candidate/payload intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
 - Continuation: **full ready frontier per invocation**; milestone/PR completion is a checkpoint, not an instruction to stop. Recoverable errors are AI-owned; human approval is reserved for genuine external authorization/consent/paid or irreversible commitments. CI runs `scripts/verify_readme_progress.py` to reject README/machine-state divergence and feature PRs that omit a README update.
 
 <!-- ANPOS-CONTINUITY:END -->
@@ -2367,3 +2367,17 @@ Migration 0019 preserves legacy v2 classification and refuses reversal with any
 v3 enrollment, including cancelled history. Nine new tests include two explicit
 PostgreSQL enrollment/replay/first-lease races. PR #214 passed all five workflows, PostgreSQL 37821424861 (all 338 tests/migrations/settings) and Web 37821424914 (14 transport/build/type/HTTP). This does not
 enable batch allocation, intake, settlement, provider execution or a live signer.
+
+
+### Quarantined v3 identity allocation — development review
+
+A disabled trusted-local allocation primitive assigns server UUIDs and contiguous
+source-operation ordinals under current admin/tenant/source/request/period/grant
+locks. Original source call budgets and aggregate reserved lead/call ceilings bound
+identity slots. Exact ordinal retry returns the existing UUID; gaps/corruption,
+closed sources, legacy evidence and new identities for unknown effects fail closed.
+Full reservations remain intact; identities do not accept payloads or settle usage.
+Twelve tests include three PostgreSQL duplicate/downgrade/source-revocation races;
+local checks pass with three PostgreSQL skips, exact-head CI pending. Runtime cannot
+start v3 operations yet: future started contexts in tests are synthetic fixtures,
+and no caller/endpoint/consumer is added. Counts and engineering estimates unchanged.

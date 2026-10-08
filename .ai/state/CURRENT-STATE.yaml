@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "412c29286500d8db88491e13074baa77a7648eb5",
-  "observed_main_semantics": "Exact protected enrollment feature main #214 before documentation-only checkpoint merge.",
+  "observed_main_sha": "3449cce03108a4b52def854162578d905a9ea5e3",
+  "observed_main_semantics": "Exact main #215 before quarantined allocation review.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -64,7 +64,6 @@
     "saas_draft_form": "PR #165 head 7bb1124545a230a3349e383d4fe30d5dcff6ecc2 passed required checks, CodeQL and SaaS PostgreSQL 37695370079",
     "saas_pending_cancellation": "PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks, CodeQL and PostgreSQL 37695788773",
     "saas_source_preview": "PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks, CodeQL and PostgreSQL 37696123260",
-    "checkpoint_168": "PR #168 head 7d4bfc9e69138f7424405a9c88691ecea2fb8a03 passed required checks, CodeQL/actions and SaaS PostgreSQL 37696425439 (84 tests).",
     "saas_terminal_receipts": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_periods": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_daily_occurrences": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
@@ -88,7 +87,8 @@
     "saas_batch_manifest": "PR #209 / head 7c5adceb: all five CI workflows, PG 37812348239 (306 tests/migrations), Web 37812348326 (14 tests/HTTP). No intake/activation.",
     "saas_batch_schema": "PR #211 / head bc07f8d2: all five workflows passed, PG 37816152759 (319 tests/migrations/settings), Web 37816152845 (14 tests/HTTP). Inert metadata only; detailed evidence in checkpoint/schema contract.",
     "saas_terminal_manifest": "PR #212 / head b0f19291: all five workflows passed; PG 37816828169 (329 tests/migrations/settings), Web 37816828126 (14 tests/HTTP). Pure accepted-set proof only; no enrollment/intake/settlement.",
-    "saas_batch_enrollment": "PR #214 / head f6806728: all five workflows passed; PG 37821424861 (338 tests/migrations/settings), Web 37821424914 (14 tests/HTTP). Disabled enrollment, explicit v3 quarantine/v2 exclusion; no allocation/intake."
+    "saas_batch_enrollment": "PR #214 / head f6806728: all five workflows passed; PG 37821424861 (338 tests/migrations/settings), Web 37821424914 (14 tests/HTTP). Disabled enrollment, explicit v3 quarantine/v2 exclusion; no allocation/intake.",
+    "saas_batch_allocation": "Development review: disabled server-owned UUID/ordinal allocation, original-budget gates and unknown-effect preservation; twelve cases / three PG skips. CI pending; no reachable v3 start/intake."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -135,7 +135,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Implement quarantined v3 server-owned batch allocation and candidate/accepted-payload intake with aggregate original-reservation caps, durable replay and exact source-final/unknown-effect reconciliation. Keep v3 dispatch disabled until the full guarded transactional path is reviewed.",
+  "exact_next_safe_action": "Implement separately gated v3 candidate/accepted-payload intake and exact terminal/unknown-effect accounting; then an internal write-ahead entry path. Allocation primitive remains default disabled and ordinary v3 dispatch quarantined until the complete guarded flow passes review.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
