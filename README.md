@@ -27,6 +27,17 @@ and dedupe.
 
 ## SaaS milestone roadmap
 
+<!-- ANPOS-CONTINUITY:BEGIN -->
+### AI-Native continuity — verified development snapshot
+
+- Verified plan snapshot: **2026-10-08**. Latest inspected main before this remediation: `ebec6e3a` (PR #205, documentation/evidence reconciliation); feature evidence remains PR #204 / `3336a81b`.
+- Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
+- Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
+- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: disabled durable billing event/binding ledger and atomic exact-replay/contiguous revisions; do not activate payments, providers, production collections or a customer launch without verified gates.
+- Continuation: **full ready frontier per invocation**; milestone/PR completion is a checkpoint, not an instruction to stop. Recoverable errors are AI-owned; human approval is reserved for genuine external authorization/consent/paid or irreversible commitments. CI runs `scripts/verify_readme_progress.py` to reject README/machine-state divergence and feature PRs that omit a README update.
+
+<!-- ANPOS-CONTINUITY:END -->
+
 Snapshot: **2026-10-08 PKT**, reconciled through protected feature `main` commit `3336a81b` / merged PR #204. Scoped filters/CSV/receipt history and isolated normalized billing-evidence validation are verified through required checks, 269 PostgreSQL tests and 14-test Next/HTTP CI. Billing validation has no database/entitlement/payment writes; live signers/consumers stay disabled. Production P01–P70 runtime remains separate. Bars are engineering estimates, not customer/provider/legal/deployment/launch certification.
 
 | Milestone | Start date | Status | Progress |
