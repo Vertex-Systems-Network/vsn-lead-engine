@@ -2427,6 +2427,10 @@ Pure paired v3 candidate/acceptance payload mapping verifies exact signed record
 
 An internal, default-off service checks paired signed candidate/accepted proofs against the durable candidate event and original reservation limits. It stores acceptance metadata, bounded payload and shared tenant fingerprint tokens in one transaction, with exact replay and rollback on conflicts. PR #224 passed 389 PostgreSQL tests, 14 Web tests and all five workflows. It does not settle usage, complete a job, enable v3 dispatch, expose an HTTP route or certify live signer/R2 authority. Terminal accounting and pagination follow separately.
 
-### Source-final evidence — development review
+### Source-final evidence — verified, quarantined
 
-A separate default-off internal service now checks a signed source-final batch set against every allocated and accepted identity. Missing/unknown batch effects cannot create finality; exact existing proof may replay. This writes redacted source metadata only. Whole-job usage settlement, no-effect attestation, dispatch and pagination remain separate gated work. CI for this slice is pending.
+A separate default-off internal service checks a signed source-final batch set against every allocated and accepted identity. Missing/unknown batch effects cannot create finality; exact existing proof may replay. PR #225 passed 394 PostgreSQL tests, 14 Web tests and all five workflows. This writes redacted source metadata only. Whole-job usage settlement, no-effect attestation, dispatch and pagination remain separate gated work.
+
+### Whole-job aggregate guard — development review
+
+A pure, bounded preflight rejects incomplete or duplicate source sets, unresolved operation states, empty/partial batch totals, understated calls and original lead/call overages. It returns proposed amounts only; database truth, signed proofs and transactional settlement remain separately gated. CI for this guard is pending.
