@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7",
-  "observed_main_semantics": "Protected feature main read after PR #204; this feature base precedes checkpoint documentation merge.",
+  "observed_main_sha": "a116cfb9d761299b72d01596a3196e6350e4a848",
+  "observed_main_semantics": "Live protected main at fresh session resume, after PR #206; new billing ledger/expiry slice pending protected merge.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "main",
+  "active_branch": "feat/saas-billing-ledger-expiry",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -91,7 +91,8 @@
     "saas_result_selection": "PR #198 merged at 7dd9f10b4c28b1bacea1488aee5874685f600e3a; head 141cbac20f05b9edc3f63a4374fbc3612766140c passed all required checks/Actions CodeQL, PostgreSQL 37784930553 (all 247 tests, concurrency, migrations/settings) and Web 37784930581 (12 transport tests, build/type and HTTP country-filter/selected-row CSV/empty denial/replay/conflict/erasure/auth flows).",
     "saas_result_metadata_filters": "PR #200 merged at 812a4bc20e661e3088e453c866f50c031dca3d6f; head 2c326478c98c6fbdb482c7c73270d6fa19092ae0 passed all required checks/Actions CodeQL, PostgreSQL 37793585524 (all 253 tests, concurrency, migrations/settings) and Web 37793585562 (13 transport tests, build/type and actual HTTP compound/empty/clear filters, filtered-row denial, subset-only CSV/replay/conflict, auth and two-row erasure/tombstones).",
     "saas_export_receipt_history": "PR #202 merged at f4e7e5ee2aacb53c3e609acc7d039471455e0241; head 4d09b60b3fc04b23312f25e13b3f1ff703a59cd6 passed all five CI workflows, including required checks/Actions CodeQL, PostgreSQL 37797128235 (all 259 tests, concurrency, migrations/reversal/settings) and Web 37797128305 (14 transport tests, lint/format/build/type and actual HTTP scoped signed receipt navigation, no-charge/erasure/redaction/referrer headers and earlier native auth/filter/CSV flows).",
-    "saas_billing_evidence": "PR #204 merged at 3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7; head 02516bda90cd6e1aea00983f75193da14e75d1ae passed all five CI workflows/required checks/Actions CodeQL, PostgreSQL 37798742414 (all 269 tests, migrations/reversal/settings and earlier concurrency) and Web 37798742458 (14 transport tests, lint/format/build/type and actual Next/Django HTTP flows). Ten DB-forbidden billing-evidence tests verify the pure validator; no entitlement/payment write or activation."
+    "saas_billing_evidence": "PR #204 merged at 3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7; head 02516bda90cd6e1aea00983f75193da14e75d1ae passed all five CI workflows/required checks/Actions CodeQL, PostgreSQL 37798742414 (all 269 tests, migrations/reversal/settings and earlier concurrency) and Web 37798742458 (14 transport tests, lint/format/build/type and actual Next/Django HTTP flows). Ten DB-forbidden billing-evidence tests verify the pure validator; no entitlement/payment write or activation.",
+    "saas_billing_ledger": "Disabled internal billing ledger/expiry slice implemented on feat/saas-billing-ledger-expiry from main a116cfb9d761299b72d01596a3196e6350e4a848; local suite 290 tests successful (31 explicit PostgreSQL-only skips). Exact-head PostgreSQL/required/Web CI and protected merge pending. No real billing/provider activation."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -138,7 +139,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Implement disabled durable billing bindings/redacted event ledger and atomic exact replay/contiguous revisions; enforce entitlement validity across every capability before enabling writes or billing. Preserve all reservations/periods; no live payment/provider activation.",
+  "exact_next_safe_action": "Verify disabled billing ledger/expiry slice through exact-head PostgreSQL and protected checks; then implement broader bounded result pagination and billing recovery/operator diagnostics without live activation.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

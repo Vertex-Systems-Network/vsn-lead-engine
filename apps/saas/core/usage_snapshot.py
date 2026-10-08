@@ -20,7 +20,7 @@ def usage_snapshot(user, workspace_id):
     ).aggregate(**{name: Sum(name) for name in COUNTERS})
     return {
         "workspace_id": str(workspace_id),
-        "entitlement_active": bool(entitlement and entitlement.active),
+        "entitlement_active": bool(entitlement and entitlement.is_current),
         "period": {
             "id": str(counter.period_id),
             "starts_at": counter.period.starts_at,

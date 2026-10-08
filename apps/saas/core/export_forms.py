@@ -33,7 +33,7 @@ SALT = "saas.export-confirmation.v2"
 def export_context(user, workspace_id, job_id, country="", category="", source=""):
     lock_workspace(user, workspace_id)
     entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
-    if entitlement is None or not entitlement.active or entitlement.export_limit < 1:
+    if entitlement is None or not entitlement.is_current or entitlement.export_limit < 1:
         raise PermissionDenied("Export entitlement is unavailable.")
     counter = UsageCounter.objects.filter(workspace_id=workspace_id).first()
     if counter is None:

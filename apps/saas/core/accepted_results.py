@@ -210,7 +210,7 @@ def accept_results(
     job, intent = operation.job, operation.outbox
     reservation = UsageReservation.objects.select_for_update().get(pk=intent.reservation_id)
     entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
-    if entitlement is None or not entitlement.active:
+    if entitlement is None or not entitlement.is_current:
         raise PermissionDenied("Workspace entitlement is inactive.")
     if (
         intent.job_id != job.id

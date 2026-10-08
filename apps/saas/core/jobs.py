@@ -9,7 +9,7 @@ from django.http import Http404
 from django.utils import timezone
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
-from .models import Job, JobAttempt, JobOutbox, SourcePolicy, UsageReservation
+from .models import Entitlement, Job, JobAttempt, JobOutbox, SourcePolicy, UsageReservation
 from .serializers import SearchSerializer
 from .usage import _release_locked, lock_workspace, reserve_usage
 
@@ -101,6 +101,9 @@ def enqueue_job(user, workspace_id, job_id, expected_revision):
     """Persist job+budget+intent together; source activation stays internal."""
     expected_revision = revision(expected_revision)
     job = locked_job(user, workspace_id, job_id)
+    entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
+    if entitlement is None or not entitlement.is_current:
+        raise PermissionDenied("Workspace entitlement is inactive.")
     existing = JobOutbox.objects.filter(job=job).first()
     if existing:
         if (

@@ -1,5 +1,17 @@
 # Last Checkpoint
 
+## Current invocation
+
+- Repository: Vertex-Systems-Network/vsn-lead-engine. Live protected main `a116cfb9d761299b72d01596a3196e6350e4a848` after PR #206. Open Issues then open PRs reconciled: none. Older checkpoint references to open #174 are stale.
+- Branch `feat/saas-billing-ledger-expiry`: disabled internal billing ledger and entitlement validity implemented; exact-head PostgreSQL/protected/Web CI and merge pending. No completed mutation replayed.
+- Local regression: 290 cases successful / 31 PostgreSQL-only skips. PostgreSQL row-lock races require CI, not SQLite certification.
+- Counters/reservations/periods and production CLI/R2/Google collection preserved. Billing/provider keys/activation remain empty/disabled.
+- Next: verify exact-head CI and protected merge, synchronize verified main evidence, then continue bounded result pagination/recovery diagnostics within invocation budget. Work units remain 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started. M5 85%, M6 75%, M7 86%, overall ~52% engineering indicator.
+- External provider/source rights, actual R2 signer, payment account, deployment/browser/customer/privacy acceptance and launch remain gated. Latest retained quota remains 6,855/12,000 on 2026-10-04; no fresh production observation. Distributed runtime identity is unverified.
+
+## Previous protected checkpoint
+
+
 ## Snapshot
 
 - Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 UTC / PKT.

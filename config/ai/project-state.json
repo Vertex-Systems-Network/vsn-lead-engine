@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Implement disabled durable billing bindings/redacted event ledger and atomic exact replay/contiguous revisions; enforce entitlement validity across every capability before enabling writes or billing. Preserve all reservations/periods; no live payment/provider activation.",
+    "Verify disabled billing ledger/expiry slice through exact-head PostgreSQL and protected checks; then implement broader bounded result pagination and billing recovery/operator diagnostics without live activation.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_269_postgres_cases_and_14_next_transport_http_verified_browser_customer_release_acceptance_open",
+  "qa_readiness": "billing_ledger_expiry_local_verified_postgres_protected_merge_pending",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "3336a81bdaf5fc2aaa6761c514f0a80d18b02fa7",
+  "last_reconciled_repository_ref": "a116cfb9d761299b72d01596a3196e6350e4a848",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

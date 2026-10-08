@@ -14,6 +14,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from .jobs import RevisionConflict
 from .models import (
     DailySchedule,
+    Entitlement,
     Job,
     JobOutbox,
     Membership,
@@ -32,6 +33,7 @@ DAY = date(2026, 11, 1)
 def fixture():
     user = User.objects.create_user(username="schedule")
     workspace = create_workspace(user, {"name": "Schedule", "timezone": "UTC"})
+    Entitlement.objects.create(workspace=workspace, active=True)
     schedule, _ = create_daily_schedule(
         user, workspace.id, SEARCH, "America/New_York", time(1, 30), "daily"
     )

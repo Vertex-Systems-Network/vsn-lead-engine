@@ -36,7 +36,7 @@ def preflight(outbox):
     entitlement = (
         Entitlement.objects.select_for_update().filter(workspace_id=job.workspace_id).first()
     )
-    if entitlement is None or not entitlement.active:
+    if entitlement is None or not entitlement.is_current:
         raise PermissionDenied("Workspace entitlement is inactive.")
     serializer = SearchSerializer(data=job.search)
     serializer.is_valid(raise_exception=True)

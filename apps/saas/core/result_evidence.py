@@ -236,7 +236,7 @@ def review_candidates(user, workspace_id, operation_id, body, signature):
     job, intent = operation.job, operation.outbox
     reservation = UsageReservation.objects.select_for_update().get(pk=intent.reservation_id)
     entitlement = Entitlement.objects.select_for_update().filter(workspace_id=workspace_id).first()
-    if entitlement is None or not entitlement.active or entitlement.lead_limit < 1:
+    if entitlement is None or not entitlement.is_current or entitlement.lead_limit < 1:
         raise PermissionDenied("Workspace entitlement is inactive.")
     if (
         job.status != "running"
