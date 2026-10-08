@@ -1,17 +1,15 @@
 # Native Next workflows: delivered boundary and next frontier
 
-PRs #180–#189 deliver native account/draft/cancel/source/filter/correction workflows and signed candidate/event validation. Django remains session, tenant/role/CSRF, abuse-control and transactional authority.
+PRs #180–#192 deliver native account/job/source/filter/correction workflows, candidate/event validation, dual-attested internal accepted storage/accounting and bounded current-rights results reads. Django remains session, tenant/role/CSRF and transactional authority; Next.js is the frontend. One complete single-source batch is limited to 25. Signer registries stay empty; no real R2 signer/consumer/source is activated.
 
-PR #191 delivers internal single-source complete 1–25-row accepted storage and nonzero v2 accounting with independent source/dedupe attestations, current rights/role/caps and replay/rollback protections. Existing v1 receipts remain zero leads. All signer registries default empty; no real R2 client, live intake or provider consumer exists.
-
-PR #192 delivers authorized bounded results reads and native Next display. Current source/field/lineage/retention checks withhold unavailable records; private evidence is excluded and text escaped. Counts remain historical, and a read does not erase payloads. Exact-head 208-case PostgreSQL and Next/HTTP checks pass; browser/customer acceptance remains open.
+PRs #194–#196 now verify guarded CSV preparation/accounting, explicit bounded source-expiry payload erasure with preserved dedupe tombstones, and native Next export preview/confirmation. Current rights/field grants, membership/CSRF, caps, replay/conflict and expiry remain authoritative. Same confirmation does not recharge; preview creates no CSV/counter. Viewer export action omitted. All 241 PostgreSQL cases and 11-test Next/HTTP CI pass; browser/customer acceptance remains open.
 
 ## Next bounded implementation
 
-1. Implement source-aware export specification/idempotency with current membership, field/export rights, policy fingerprint/kill switch, retention and atomic export budgets. Reuse canonical policy logic; unknown metadata fails closed.
-2. Review safe CSV/formula handling, bounded selection, revocation, audit evidence and delivery semantics together. Keep payloads out of operational logs/control-plane memory.
-3. Implement retention-safe payload cleanup and fingerprint tombstones without losing cross-day dedupe/audit authority; review backup/encryption/deletion evidence before production. Expiry hiding is not deletion.
-4. Real isolated R2 signer integration must prove canonical qualification/fingerprint mapping, committed objects, key lifecycle and crash reconciliation. Preserve production CLI/R2/Google namespaces and zero-new-spend behavior. Synthetic fixtures are not collection rights.
-5. Multi-source/multi-batch intake, results filters/pagination and live adapters need versioned contracts and concurrency tests before activation.
+1. Add bounded current-batch result filters/selection and native presentation; specify visible/withheld/filtered counts without treating requested limits as achieved output. Preserve tenant/rights/expiry checks and maximum 25 records. Avoid personal contact values or full payloads in URLs/logs.
+2. Bind export previews to explicit filtered selection without widening field/source/row authority. Recheck current roles/grants/deadlines and preserve once-only prepared-file accounting.
+3. Review audit/fingerprint retention and backup/WAL/replica/downstream erasure before production. Existing command erases active row payloads only; it does not certify every copy erased or permit reaccepting duplicates.
+4. Real isolated R2 signer onboarding must prove canonical qualification/fingerprint mapping, committed objects, independent keys and crash reconciliation. Preserve production CLI/R2/Google namespaces and zero-new-spend behavior; fixtures are not provider rights.
+5. Multi-source/multi-batch intake and larger pagination require versioned contracts/concurrency tests. Signed billing-event reconciliation is independent safe work.
 
-Billing-event reconciliation remains independent safe work. Recovery/signup, browser/keyboard/WCAG/customer, shared-origin TLS/proxy/cookies, provider rights and deployment/launch acceptance remain open.
+Recovery/signup, browser/keyboard/WCAG/customer, shared-origin TLS/proxy/cookies, provider rights and deployment/launch acceptance remain open.
