@@ -14,11 +14,11 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "14b519c10e3edf67e6b3461af84ef3f568d2889d",
-  "observed_main_semantics": "Protected feature main read after PR #192; this feature base precedes checkpoint documentation merge.",
+  "observed_main_sha": "6f9ad2b7808471c67523e31f1b42d37a710d9cd8",
+  "observed_main_semantics": "Protected main README read after PR #194; pending export evidence reconciled in retention slice.",
   "active_issue": null,
   "active_pr": null,
-  "active_branch": "saas/guarded-export",
+  "active_branch": "saas/result-retention",
   "current_milestone": "PRODUCTION-MONITORING",
   "milestone_status": "IN_PROGRESS",
   "last_completed_milestone": "ANPOS 1.4.0 adoption, assurance hardening and active main governance verified through PR #131.",
@@ -75,8 +75,8 @@
     "saas_periods": "PR #176 merged at 52653cfbd7d3ccffee0cf1685afcc99be9877183; head d3707b30d5284fb94cd39e80c9b4474a6aa749be passed required checks/Actions CodeQL, PostgreSQL 37701109983 (114 tests including period races/migration/security gates), and Next/HTTP 37701109984.",
     "saas_daily_occurrences": "PR #177 merged at b73d0de7ec1e5659c1573d4fc814973be765adbd; head 177b826286449ef6983af40cd1631d5658bec568 passed required checks/Actions CodeQL, PostgreSQL 37701609841 (124 tests including duplicate/revocation schedule races and migration/security gates), and Next/HTTP 37701609870.",
     "saas_session_navigation": "PR #178: required checks, PostgreSQL 37702109091 (130 tests/migrations/settings), Web 37702108894 (CSRF auth/logout/session denial) passed; full evidence retained in git history.",
-    "latest_saas_verified_head": "5903e2d71c592ec03bdcb5c50939118a62b39fe3",
-    "saas_native_next_forms": "PR #180 merged at 6c6460c095778b27235272bd6f5ea608900614e1; head 3c24b14fd0e263cc4fa24fd15ed2279752738961 passed all required checks/Actions CodeQL, PostgreSQL 37703540378 (138 tests/migration/settings) and Next/HTTP 37703540308 (native draft/replay/role/tenant/queued cancellation/CSRF/auth flows).",
+    "latest_saas_verified_head": "5dde3934edb0fdc2424b2fe4bb0d5e41e2eb9a46",
+    "saas_native_next_forms": "PR #180: required checks, PostgreSQL 37703540378 (138 tests/migrations/settings) and Next/HTTP 37703540308 (native draft/cancel/CSRF/auth) passed; full evidence in history.",
     "saas_next_source_configuration": "PR #181 merged at 4d2c6ab86b01c6335de81d2d437ed8d2fe3d7b01; head 66152035d4f4da7f75d8c656fe3eae0224590076 passed required checks/Actions CodeQL, PostgreSQL 37703955016 (141 tests/migration/settings), and Next/HTTP 37703954934 (bounded native source/XSS/viewer/tenant and earlier form/auth flows).",
     "saas_job_state_filter": "PR #182 merged at 9bc1065b403299b74b60dca52ce6d1cc46f4d810; head 593799c04edc7b03d888663362d655106da92eea passed required checks/Actions CodeQL, PostgreSQL 37704612846 (145 tests/migration/settings), and Next/HTTP 37704612908 (eight transport tests, native forms/source configuration and filtered/empty/Next/First-page flows).",
     "saas_next_validation_signout": "PR #184 merged at bec879cb7b7ed925e64a623d2ce197c7c590eafa; head 034cd99a40dbd3c2254e1a3a832e01f05f56501c passed required checks/Actions CodeQL, PostgreSQL 37755784470 (154 tests/migration/settings) and Next/HTTP 37755784437 (eight transport tests, escaped feedback/correction/replay/conflict/missing-context recovery and native sign-out).",
@@ -85,7 +85,8 @@
     "saas_candidate_events": "PR #189 merged at 0a81b3e24f45edfa72b5101c8241891030a88f1c; head fb58dd787290a81813f3c85a412f897782b5ffd7 passed required checks/Actions CodeQL, PostgreSQL 37770588647 (all 182 tests, including three candidate-event races, migrations/settings) and Next/HTTP 37770588715 (nine transport tests/build/type and native workflows).",
     "saas_accepted_results": "PR #191 merged at 1d11e078a9a784f964c4743fc7b523b0f05307ed; head d7cabfae2fa53cf5daba19f0432bdb11b022b03b passed required checks/Actions CodeQL, PostgreSQL 37774522114 (all 202 tests, three acceptance races, migrations/settings) and Next/HTTP 37774522030 (nine transport tests/build/type and native flows).",
     "saas_next_results": "PR #192 merged at 1f63f0283b68c7e005677d31157e77e26a84c366; head 5903e2d71c592ec03bdcb5c50939118a62b39fe3 passed required checks/Actions CodeQL, PostgreSQL 37776196602 (all 208 tests, concurrency, migrations/settings) and Next/HTTP 37776195589 (10 transport tests/build/type and stored-result, viewer/revocation/expiry/escaped-text flows).",
-    "saas_guarded_export": "Source-aware bounded CSV export/API implemented: explicit grants/selection, canonical field authorization, CSRF/current roles/rights/expiry, one prepared-file usage unit, keyed content replay and no persisted payload copy. Local verification and exact-head CI pending."
+    "saas_guarded_export": "PR #194 merged at 6f9ad2b7808471c67523e31f1b42d37a710d9cd8; head 5dde3934edb0fdc2424b2fe4bb0d5e41e2eb9a46 passed required checks/Actions CodeQL, PostgreSQL 37779435828 (223 tests/export races/migrations/settings) and Next/HTTP 37779435876 (10 transport tests/build/type and CSRF CSV/replay/viewer denial).",
+    "saas_result_retention": "Bounded current-admin source-deadline erasure/tombstones implemented: clear payload/lineage/source reference, retain fingerprints/usage, fail-closed reads/export and irreversible-erasure rollback guard. Local/full CI evidence pending."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -132,7 +133,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Verify guarded export, then bounded payload expiry/tombstones and native Next export preview; real R2 signer and live consumers stay unavailable.",
+  "exact_next_safe_action": "Verify bounded result expiry/tombstones, then native Next export preview/confirmation; real R2 signer/live consumers remain unavailable.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

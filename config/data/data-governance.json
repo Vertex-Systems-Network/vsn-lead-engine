@@ -184,8 +184,8 @@
       "encryption_required": true,
       "log_policy": "Never log fields, source record references, raw proofs/signatures, cookies or verifier keys; compact metadata only.",
       "ai_access": "Disposable synthetic fixtures only during development.",
-      "retention": "Per-record source-derived delete_at and retention version; no live intake authorities configured. Physical payload erasure/tombstones, redacted audit metadata expiry and backup expiry must be implemented/verified before production activation.",
-      "deletion_method": "No cleanup activated in this slice. Protected evidence/fingerprints must survive authorized payload tombstoning; migration rollback requires an explicit preservation plan.",
+      "retention": "Source-derived delete_at gates reads/export; expired active payload erasure command implemented. Dedupe tokens/UUID/tenant/job/acceptance/country/deadline/erasure actor retained as pseudonymous tombstones; audit/fingerprint retention and backup erasure require qualified review before production.",
+      "deletion_method": "Explicit bounded current-admin source-deadline command erases fields/lineage/source reference/category/purpose/retention label and leaves dated actor-attributed tombstones, fingerprints and historical usage. No scheduler activated; backup/audit retention remains open.",
       "backup_policy": "No production deployment/backup exists; encryption, backup expiry/restore and downstream deletion acceptance remain open.",
       "non_production_policy": "Synthetic disposable databases only; never copy production R2/workbook payloads."
     },

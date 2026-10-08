@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-WEB-EXPERIENCE",
   "current_work_unit": "WU-SAAS-LEAD-WEB",
-  "last_verified_completion": "PR #192 merged at 1f63f0283b68c7e005677d31157e77e26a84c366; head 5903e2d71c592ec03bdcb5c50939118a62b39fe3 passed required checks/Actions CodeQL, PostgreSQL 37776196602 (all 208 tests, concurrency, migrations/settings) and Next/HTTP 37776195589 (10 transport tests/build/type and stored-result, viewer/revocation/expiry/escaped-text flows).",
+  "last_verified_completion": "PR #194 merged at 6f9ad2b7808471c67523e31f1b42d37a710d9cd8; head 5dde3934edb0fdc2424b2fe4bb0d5e41e2eb9a46 passed required checks/Actions CodeQL, PostgreSQL 37779435828 (223 tests/export races/migrations/settings) and Next/HTTP 37779435876 (10 transport tests/build/type and CSRF CSV/replay/viewer denial).",
   "next_valid_work_unit": "WU-SAAS-LEAD-WEB",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Implement source-aware guarded export and retention-safe tombstone cleanup; keep real signer/intake unavailable.",
+    "Verify bounded payload erasure/tombstones, then native Next export preview/confirmation; keep real signer/intake unavailable.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_208_postgres_cases_and_next_http_verified_browser_customer_release_acceptance_open",
+  "qa_readiness": "saas_223_postgres_cases_and_next_http_verified_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "1f63f0283b68c7e005677d31157e77e26a84c366",
+  "last_reconciled_repository_ref": "6f9ad2b7808471c67523e31f1b42d37a710d9cd8",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

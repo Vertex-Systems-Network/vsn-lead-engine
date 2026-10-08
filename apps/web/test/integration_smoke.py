@@ -475,6 +475,13 @@ def main():
                 AcceptedResult.objects.filter(job=result_fixture.job).update(delete_at=timezone.now() - timedelta(seconds=1))
                 expired_results, _ = read(result_path)
                 assert "No available results" in expired_results and "synthetic-result" not in expired_results
+                from core.result_retention import expire_result_payloads
+                from core.models import AcceptedFingerprint
+                assert expire_result_payloads(user, result_fixture.workspace.id) == {"erased_count": 1, "more_due": False}
+                assert AcceptedResult.objects.get(job=result_fixture.job).fields == {}
+                assert AcceptedFingerprint.objects.filter(workspace=result_fixture.workspace).count() == 3
+                erased_results, _ = read(result_path)
+                assert "No available results" in erased_results and "synthetic-result" not in erased_results
                 active_session = next(cookie.value for cookie in jar if cookie.name == "sessionid")
                 form, csrf = native_form("/account/sign-out")
                 assert "End your session" in form and "Keep working" in form
@@ -499,7 +506,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

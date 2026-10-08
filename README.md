@@ -2274,6 +2274,10 @@ Engineering indicators: M5 85%, M6 75%, M7 75%, overall approximately 47%. These
 
 Next: source-aware guarded export and retention-safe payload cleanup/tombstones. Real isolated R2 signer integration, signing-key lifecycle/crash reconciliation, multi-source/multi-batch pagination, billing events, recovery/signup, encryption/backups, shared-origin TLS/proxy and deployment acceptance remain open. Hiding expired payloads does not physically erase them. No live provider/payment/scheduler consumer or production Next deployment is activated. Production US/CA phone qualification, exact R2 dedupe, Google delivery and the 12,000/day target retain their contracts. Latest retained production evidence remains 6,855/12,000 on October 4; no new quota observation or work after turn end is claimed.
 
-### Guarded CSV export (implementation awaiting CI)
+### Guarded CSV export (verified bounded API)
 
-Source-aware bounded CSV export/API implemented: explicit grants/selection, canonical field authorization, CSRF/current roles/rights/expiry, one prepared-file usage unit, keyed content replay and no persisted payload copy. Local verification and exact-head CI pending. One export unit is one prepared CSV of at most 25 explicitly selected records; it does not certify delivery. Next preview/confirmation, physical payload cleanup and production rights remain open. [Review](docs/ai/SAAS-GUARDED-EXPORT-REVIEW-20261008.md).
+PR #194 merged at 6f9ad2b7808471c67523e31f1b42d37a710d9cd8; head 5dde3934edb0fdc2424b2fe4bb0d5e41e2eb9a46 passed required checks/Actions CodeQL, PostgreSQL 37779435828 (223 tests/export races/migrations/settings) and Next/HTTP 37779435876 (10 transport tests/build/type and CSRF CSV/replay/viewer denial). One export unit is one prepared CSV of at most 25 explicitly selected records; it does not certify delivery. Next preview/confirmation, physical payload cleanup and production rights remain open. [Review](docs/ai/SAAS-GUARDED-EXPORT-REVIEW-20261008.md).
+
+### Source-deadline payload erasure (implementation awaiting CI)
+
+Bounded current-admin source-deadline erasure/tombstones implemented: clear payload/lineage/source reference, retain fingerprints/usage, fail-closed reads/export and irreversible-erasure rollback guard. Local/full CI evidence pending. Cleanup is explicitly operator-invoked for one authorized workspace, at most 100 rows; no automated scheduler or backup-erasure certification is added. [Review](docs/ai/SAAS-RESULT-RETENTION-REVIEW-20261008.md).

@@ -11,3 +11,7 @@ CSV is built in memory, quoted structurally, UTF-8 and capped at 128 KiB. Formul
 Additive migration 0014 reverses on an empty ledger and rejects populated accounting loss. Tests cover canonical replay/cap/competing pending reservations, roles/creator binding, expiry/source/entitlement/explicit grant, bounds, changed payload, transaction rollback, CSV structure/formulas, CSRF/download headers and rollback guard. Two PostgreSQL races verify duplicate preparation and competing cap exhaustion. Actual disposable Django/Next HTTP smoke verifies accepted-result display plus POST CSV/replay/viewer denial. Exact-head CI evidence is recorded in README/checkpoint after merge.
 
 Next export preview/confirmation is not yet implemented, and no UI export button is enabled. Physical payload cleanup/tombstones, audit/backup expiry/encryption, broader pagination, browser/customer/privacy/provider-rights and production activation remain separate gates. Synthetic fixtures prove contracts only; no live signer, source, paid service or deployment is activated.
+
+## Verified merge evidence
+
+PR #194 merged at 6f9ad2b7808471c67523e31f1b42d37a710d9cd8; head 5dde3934edb0fdc2424b2fe4bb0d5e41e2eb9a46 passed required checks/Actions CodeQL, PostgreSQL 37779435828 (223 tests/export races/migrations/settings) and Next/HTTP 37779435876 (10 transport tests/build/type and CSRF CSV/replay/viewer denial).
