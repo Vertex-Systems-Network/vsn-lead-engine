@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PR #218 merged at 15814cf0bf0c52f58c4b1d1e31cc208bc3445199; head f9d0173c03fac4a757a605dfed3e30f38c98cb3e passed all five workflows, PostgreSQL 37824615261 (366 tests/migrations/settings) and Web 37824615227 (14 transport/build/type/HTTP). Disabled durable redacted candidate ledger, exact replay/reference conflicts and unknown-effect preservation; no accepted payload/finality/dispatch.",
+  "last_verified_completion": "PR #220 merged at 2c422919a607d116b687ca45994597b581773faa; head 57c54ce52681d63603f87151785f4f818cf68be0 passed all five workflows, PostgreSQL 37826291597 (375 tests/migrations/settings) and Web 37826291595 (14 transport/build/type/HTTP). Exclusive v3 payload links, bounded positions, shared fingerprints/erasure, protected populated rollback and legacy visibility withholding verified; no v3 intake/finality/dispatch.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Review additive v3 payload schema, then implement separately gated atomic accepted-batch reconciliation with current dual proofs, tenant fingerprints and aggregate original caps. Final-source/unknown-effect reconciliation must precede whole-job settlement and internal write-ahead entry; signed 25-row pagination follows. Keep ordinary v3 dispatch quarantined.",
+    "Implement paired candidate/acceptance proof-to-payload mapping with exact record-set and conditional domain-token checks, then gated atomic accepted-batch reconciliation and original aggregate caps. Reconcile every allocated identity and unknown effect before terminal whole-job settlement; internal write-ahead entry and signed 25-row pages follow. Keep v3 dispatch quarantined.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_366_verified_additive_batch_payload_schema_review",
+  "qa_readiness": "saas_375_postgres_and_14_web_http_verified",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "17adbaaf659e91bfb3a61403838c773f318d894f",
+  "last_reconciled_repository_ref": "2c422919a607d116b687ca45994597b581773faa",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [
