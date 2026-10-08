@@ -30,6 +30,10 @@
 - Current authority is rechecked on candidate replay; closed/expired/revoked/drifted operations fail closed even when evidence was previously recorded. Evidence migrations protect history rather than silently deleting it.
 - Existing draft feedback read expiry is not physical session erasure; cleanup/encryption acceptance remains open. Unknown provider effects retain capacity until valid terminal evidence. ESLint 9/plugin compatibility EOL remains a production gate.
 
+## Accepted-result candidate
+
+Internal dual-attested v2 accepted-result store/accounting implemented: signed candidate ledger + separate source and isolated R2/qualification signatures, current role/rights/caps, atomic rows/tokens/usage/job finalization and v1 compatibility. Empty signing registries/no intake route; local 202 cases (180 passed/22 PostgreSQL skips), exact-head CI pending. See ADR-SAAS-005 / SAAS-ACCEPTED-RESULTS-REVIEW-20261008.
+
 ## Next Action
 
 1. Continue reviewed versioned nonzero accepted-result/accounting and trusted dedupe contracts; then bounded tenant result reads and source-aware export. Keep production R2 namespaces/workbooks isolated and live consumers disabled.

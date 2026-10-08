@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Continue reviewed versioned nonzero accepted-result/accounting and trusted dedupe contracts; then bounded tenant result reads and source-aware export. Billing-event reconciliation remains independent. Keep live consumers disabled.",
+    "Verify internal accepted-result/accounting, then retention-safe bounded tenant result reads/Next view and guarded export. Empty authorities/live consumers remain disabled.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "saas_182_postgres_cases_and_next_http_verified_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "0a81b3e24f45edfa72b5101c8241891030a88f1c",
+  "last_reconciled_repository_ref": "aa29e7c9a1f11c8cbf90ab04fdc58157df7efa00",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

@@ -52,7 +52,7 @@ RIGHTS = {
     "display_allowed",
     "storage_allowed",
 }
-ALLOWED_FIELDS = {"business_name", "phone", "city", "website", "status"}
+ALLOWED_FIELDS = {"business_name", "phone", "city", "website", "status", "address"}
 
 
 @dataclass(frozen=True, slots=True)
@@ -177,7 +177,10 @@ def checked_candidates(body, signature, operation, policy, search, now):
                 or not set(fields) <= ALLOWED_FIELDS
             ):
                 raise ValueError()
-            if not set(search["required_fields"]) <= set(fields):
+            required = {
+                "business_name" if field == "name" else field for field in search["required_fields"]
+            }
+            if not required <= set(fields):
                 raise ValueError()
             if not set(fields) <= set(rights["display_fields"]) & set(rights["storage_fields"]):
                 raise ValueError()

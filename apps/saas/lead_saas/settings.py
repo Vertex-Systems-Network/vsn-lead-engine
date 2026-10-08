@@ -107,3 +107,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SAAS_RECEIPT_VERIFIERS = {}
 # Separate, internal-only candidate evidence. No provider or ingestion is enabled.
 SAAS_RESULT_VERIFIERS = {}
+# Independent source receipt and isolated R2/qualification attestation authorities.
+# No provider, registry signer or payload intake is activated by these empty maps.
+SAAS_ACCEPTANCE_VERIFIERS = {}
+SAAS_DEDUPE_VERIFIERS = {}
