@@ -63,3 +63,7 @@ Paired-proof local verification: 383 SaaS cases / 42 explicit PostgreSQL-only sk
 ## Disabled atomic batch intake — development review
 
 The paired-proof PR #222 merged after all five exact-head workflows passed on the branch updated with CI path scoping. The next isolated service under review writes a v3 acceptance, 1–25 payload rows and shared tenant fingerprints in one transaction after rechecking current actor/source/entitlement, the recorded exact candidate event and original lead/call caps across all batches. Exact replay returns the existing acceptance; changed bytes, source/key revocation, duplicate fingerprints, expiry and ambiguous effects fail closed. No HTTP route, ordinary dispatch, terminal settlement or usage release is enabled. `SAAS_BATCH_ACCEPTANCE_ENABLED` defaults false; external signer/R2 truth remains unverified. CI for this intake slice is pending.
+
+## Source-final evidence — development review
+
+PR #224 merged after 389 PostgreSQL tests, 14 Web tests and all five workflows passed. The next default-off service under review records one redacted signed source-final set only after all server-owned allocated batch identities have accepted evidence, bounded payload counts and exact trusted hashes. Unknown effects cannot create new finality; an exact existing final may replay under current rights. Empty source sets, whole-job settlement, quota release, dispatch and pagination remain unavailable. CI for source-final evidence is pending.
