@@ -14,8 +14,8 @@ PRs #194–#196 now verify guarded CSV preparation/accounting, explicit bounded 
 
 Recovery/signup, browser/keyboard/WCAG/customer, shared-origin TLS/proxy/cookies, provider rights and deployment/launch acceptance remain open.
 
-## Next ready receipt-recovery slice
+## Delivered receipt history and next foundation frontier
 
-Expose bounded readonly tenant/job export-receipt metadata from the existing redacted ledger, with explicit current role/creator scope. Show preparation accounting/expiry and explain that no retained CSV copy or confirmed download exists. GET must not prepare/replay CSV, refund, reserve or charge usage. Avoid contact fields, digests, signing/source references and mutable provider activation. Signed billing-event reconciliation remains a separate M5 frontier.
+PR #202 verifies readonly redacted settled receipts, 25-row signed pages, current owner/admin job or member-own scope and retained no-charge metadata after payload erasure. No CSV delivery proof or stored download exists. All 259 PostgreSQL cases and 14-test Next/HTTP CI pass; see SAAS-EXPORT-RECEIPT-HISTORY-REVIEW-20261008.md. Production logging/privacy and browser/customer acceptance remain open.
 
-Receipt history is implemented as a candidate with current creator/role scope and signed bounded navigation; verify protected-head CI before marking delivered. See SAAS-EXPORT-RECEIPT-HISTORY-REVIEW-20261008.md. Next independent plan frontier is provider-neutral signed billing-event validation/reconciliation design with verifier defaults disabled, preserving existing reservations/windows and no live payment activation.
+Implement provider-neutral signed billing-event validation/reconciliation under WU-SAAS-FOUNDATION, with verifier registries disabled by default, preserving reservations/windows and no live payment activation. Real signer/live consumers and production gates remain unavailable.

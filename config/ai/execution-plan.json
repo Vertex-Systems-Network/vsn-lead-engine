@@ -667,7 +667,8 @@
         "PR #198 merged at 7dd9f10b4c28b1bacea1488aee5874685f600e3a; head 141cbac20f05b9edc3f63a4374fbc3612766140c passed all required checks/Actions CodeQL, PostgreSQL 37784930553 (all 247 tests, concurrency, migrations/settings) and Web 37784930581 (12 transport tests, build/type and HTTP country-filter/selected-row CSV/empty denial/replay/conflict/erasure/auth flows).",
         "docs/ai/SAAS-RESULT-METADATA-FILTER-REVIEW-20261008.md",
         "PR #200 merged at 812a4bc20e661e3088e453c866f50c031dca3d6f; head 2c326478c98c6fbdb482c7c73270d6fa19092ae0 passed all required checks/Actions CodeQL, PostgreSQL 37793585524 (all 253 tests, concurrency, migrations/settings) and Web 37793585562 (13 transport tests, build/type and actual HTTP compound/empty/clear filters, filtered-row denial, subset-only CSV/replay/conflict, auth and two-row erasure/tombstones).",
-        "docs/ai/SAAS-EXPORT-RECEIPT-HISTORY-REVIEW-20261008.md"
+        "docs/ai/SAAS-EXPORT-RECEIPT-HISTORY-REVIEW-20261008.md",
+        "PR #202 merged at f4e7e5ee2aacb53c3e609acc7d039471455e0241; head 4d09b60b3fc04b23312f25e13b3f1ff703a59cd6 passed all five CI workflows, including required checks/Actions CodeQL, PostgreSQL 37797128235 (all 259 tests, concurrency, migrations/reversal/settings) and Web 37797128305 (14 transport tests, lint/format/build/type and actual HTTP scoped signed receipt navigation, no-charge/erasure/redaction/referrer headers and earlier native auth/filter/CSV flows)."
       ],
       "update_notes": [
         "Frontend selection partially supersedes templates UI decision only: docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md."
