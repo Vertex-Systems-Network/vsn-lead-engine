@@ -119,3 +119,6 @@ SAAS_BILLING_VERIFIERS = {}
 
 # Internal reconciliation stays disabled until external provider/operational review.
 SAAS_BILLING_RECONCILIATION_ENABLED = False
+# Future v3 batch proof authorities remain separate, empty and without a consumer.
+SAAS_BATCH_VERIFIERS = {}
+SAAS_BATCH_DEDUPE_VERIFIERS = {}

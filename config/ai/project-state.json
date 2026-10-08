@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PR #207 merged at 8d555bf041b05690838b74b46406541abb68bd81; head d9be9ac1ef0303b70be62e4e8c1a9de592205cc0 passed all five workflows: PostgreSQL 37810735757 (290 tests, five added billing races, forward/reverse/reapply and production settings), Web 37810735885 (14 transport/build/type/HTTP), required checks/Actions CodeQL. Disabled ledger/expiry only; no live payment/provider activation.",
+  "last_verified_completion": "PR #208 merged at 7e93dc814e3bbf64ec95052a3a8f9df79c1c5450; head 3d34dccd09e95b8fe0cc7b58b4e8c6b3a5cf8a62 passed all five workflows, PostgreSQL 37811482736 (all 296 tests/migrations/settings) and Web 37811482692 (14 transport/build/type/HTTP). Redacted readonly diagnostics/current active-user checks verified; no repair/activation.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Complete read-only billing diagnostics CI/protected merge, then design versioned bounded multi-source/multi-batch result pagination; retain disabled live signers/providers and preserve accounting.",
+    "Verify pure v3 batch-manifest slice CI/protected merge, then add separately gated durable batch identity/ledger and terminal manifests under ADR-SAAS-003. Preserve v2 single-batch contracts and reservations; no live signer/provider activation.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "billing_290_postgres_verified_readonly_diagnostics_local_pending_protected_ci",
+  "qa_readiness": "billing_296_postgres_verified_v3_manifest_local_pending_protected_ci",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "8d555bf041b05690838b74b46406541abb68bd81",
+  "last_reconciled_repository_ref": "7e93dc814e3bbf64ec95052a3a8f9df79c1c5450",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

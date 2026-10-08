@@ -2,11 +2,11 @@
 
 ## Current invocation
 
-- Repository: Vertex-Systems-Network/vsn-lead-engine. Live protected main `8d555bf041b05690838b74b46406541abb68bd81` after PR #207. Open Issues then open PRs reconciled: none. Older checkpoint references to open #174 are stale.
-- PR #207 ledger/expiry merged after all five workflows passed; PostgreSQL 37810735757 (all 290 tests/migrations), Web 37810735885 (14 transport/build/type/HTTP). Head d9be9ac1ef0303b70be62e4e8c1a9de592205cc0. Branch `feat/saas-billing-diagnostics`: six local readonly/redaction/authority tests pass, protected CI pending. No completed mutation replayed.
-- Local regression: 290 cases successful / 31 PostgreSQL-only skips. PostgreSQL row-lock races require CI, not SQLite certification.
+- Repository: Vertex-Systems-Network/vsn-lead-engine. Live protected main `7e93dc814e3bbf64ec95052a3a8f9df79c1c5450` after PR #208. Open Issues then open PRs reconciled: none. Older checkpoint references to open #174 are stale.
+- PR #207 ledger/expiry merged after all five workflows passed; PostgreSQL 37810735757 (all 290 tests/migrations), Web 37810735885 (14 transport/build/type/HTTP). Head d9be9ac1ef0303b70be62e4e8c1a9de592205cc0. PR #208 / head 3d34dccd09e95b8fe0cc7b58b4e8c6b3a5cf8a62 verified and merged: PG 37811482736 (296 cases), Web 37811482692 (14 tests/HTTP), all five workflows passed. Branch `feat/saas-batch-manifest`: ADR-SAAS-003 and pure proof validator with ten DB-forbidden tests; protected CI pending. No completed mutation replayed.
+- Local regression: 306 cases / 31 PostgreSQL-only skips; root 382 pass / 1 skip / 28 subtests. PostgreSQL row-lock races require CI, not SQLite certification.
 - Counters/reservations/periods and production CLI/R2/Google collection preserved. Billing/provider keys/activation remain empty/disabled.
-- Next: verify diagnostics exact-head CI/protected merge, then design versioned bounded multi-source/multi-batch result pagination within invocation budget. Work units remain 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started. M5 85%, M6 75%, M7 86%, overall ~52% engineering indicator.
+- Next: verify v3 proof exact-head CI/protected merge, then separately gated durable batch identity/ledger and terminal manifests per ADR-SAAS-003. No partial intake or pagination implementation claimed. Work units remain 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started. M5 85%, M6 75%, M7 86%, overall ~52% engineering indicator.
 - External provider/source rights, actual R2 signer, payment account, deployment/browser/customer/privacy acceptance and launch remain gated. Latest retained quota remains 6,855/12,000 on 2026-10-04; no fresh production observation. Distributed runtime identity is unverified.
 
 ## Previous protected checkpoint

@@ -11,3 +11,7 @@ On any mismatch, leave live activation disabled and preserve ledger/counters/per
 For a contiguous event gap, obtain the missing trusted event or use a separately reviewed reconciliation protocol. Never increment local revisions to bypass ordering. For an exact replay, present the same bytes while current key/binding/freshness still permits verification; denied old/revoked evidence cannot restore an earlier entitlement. Unknown provider effects keep reserved capacity. Confirmed past effect settlement and existing safe cancellation/expiry paths retain their respective authority.
 
 Default-disabled switches, empty signing registries and fixture keys are not production provisioning instructions. Before enabling actual billing, verify provider payment sandbox/signature/account mapping, authenticated ingress/recovery, commercial/legal rights, log redaction, pseudonymous event/fingerprint/actor retention, encryption/backups, migration preservation and qualified privacy review. No automatic ledger deletion, backup/WAL purge, payment refund or external account change is authorized by this runbook.
+
+## Verified internal diagnostics
+
+PR #208 merged at 7e93dc814e3bbf64ec95052a3a8f9df79c1c5450; head 3d34dccd09e95b8fe0cc7b58b4e8c6b3a5cf8a62 passed all five workflows, PostgreSQL 37811482736 (all 296 tests/migrations/settings) and Web 37811482692 (14 transport/build/type/HTTP). Redacted readonly diagnostics/current active-user checks verified; no repair/activation.
