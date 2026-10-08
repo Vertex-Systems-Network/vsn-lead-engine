@@ -1,0 +1,38 @@
+# ADR-SAAS-003: additive bounded batch intake and result pagination
+
+Status: accepted internal development direction under standing technical autonomy; durable intake/pagination implementation not yet delivered; pure proof validation on review branch. Date: 2026-10-08. No provider, signer, payment, scheduler or production activation is authorized by this ADR.
+
+## Evidence and problem
+
+The delivered v2 path is deliberately one operation/source/batch, 1–25 accepted records, one candidate event and one terminal acceptance per operation. `accept_results` rejects multiple operations, requires a zero-result running job, settles the whole reservation and completes the job. `results_snapshot` reads the first acceptance and refuses more than 25 stored rows. These explicit guards preserve the current tested contract. Increasing a slice limit or reusing v2 for partial batches would bypass quota/accounting/visibility guarantees.
+
+## Decision
+
+Implement an additive v3 batch protocol and separate trusted internal intake service. Preserve the current v1 zero-lead terminal receipts, v2 candidate/accepted-result services, URLs and HTTP/export semantics. Do not allow mixed v2/v3 acceptance within a job. A trusted local job protocol selector defaults to the delivered v2 path; new v3 jobs need separately reviewed source/signer capability and never become active merely from client request JSON.
+
+A pure, disabled normalized manifest validator is the next independently reviewable slice. It must accept only trusted local operation/job/workspace/source/batch coordinates and source/qualification/dedupe authorities, bounded exact-byte envelopes with duplicate-key rejection, short issuance/deadline bounds and an explicit v3 kind. The validator itself must have no ORM, network, key provisioning, billing, job transition or accepted-result writes. Fixtures never become source-rights evidence. Durable identity/ordering/limits are future transactional gates, not claims a signature can establish.
+
+Future source batches have a server-owned immutable batch identity tied to operation, immutable request/policy identity and stable dispatch/provider idempotency key. Candidate/acceptance references are unique per source; exact-body replay returns the existing decision, changed-body/key/reference reuse conflicts. Each batch contains 1–25 records and bounded provider usage. The sum of accepted batches never exceeds the original reserved lead count or current grant/rights bounds. Every record still requires canonical phone qualification, US/Canada scope, taxonomy precision, explicit source rights and independently attested committed exact isolated R2 fingerprints. No arbitrary larger job target may mint data or weaken existing qualification.
+
+Do not settle/release the whole reservation on the first batch. Persist each verified batch, tenant fingerprint backstop and payload atomically under the existing workspace lock. Track bounded accrued actual usage separately from final settled counters; retain the entire original reservation while any source outcome/final marker is unknown. Final whole-job reconciliation derives totals from durable batch evidence, checks reservation/period/caps and settles once. Confirmed no-effect and pending safe-cancellation paths remain separate. Unknown effects cannot be inferred cancelled, refunded or retried. A trusted final-source manifest must bind exact batch identities and terminal provider-call totals; gaps/conflicts require reconciliation rather than guessed completeness.
+
+Pagination is additive and bounded to 25 displayed results per response and signed continuations bound to actor/workspace/job/request/filter identity, immutable upper watermark and expiry. Use stable stored sequence plus UUID tie-breaker; each page rechecks membership, grant deadline and current source rights/retention before emitting fields. Do not preload every payload to paginate. New inserts beyond the watermark do not enter an existing continuation. Erased/expired/revoked rows remain withheld; visible/filtered/withheld/page counts must be explicitly scoped so they do not imply total delivery or resurrect deleted payloads.
+
+Exports remain explicit current selection of at most 25 rows with short-lived signed actor/job/page/filter/field scope, current intersected source grants and once-only prepared-file accounting. A cursor or row ID does not grant export authority. Continuations, signed previews and redacted histories require no-referrer and protected access-log handling before deployment. Never retain raw signed events, source records, CSVs or keys just to simplify recovery.
+
+## Migration and verification sequence
+
+1. Pure bounded v3 manifest validator plus adversarial DB-forbidden tests; separate empty-default authority and no consumer/endpoint.
+2. Add durable batch and terminal-manifest models with uniqueness/order/cap constraints, legacy protocol classification and evidence-preserving rollback. Preserve all existing v2 rows and references.
+3. Atomic batch reconciliation and final whole-job settlement; PostgreSQL duplicate/conflicting-batch, cross-job reference reuse, concurrent cap, terminal/partial, expiry/revocation, crash/rollback and period races. Test that unknown work keeps its reservation.
+4. Tenant-scoped keyset page contract/service with signed watermark/filter context, live rights/grant checks, payload-size limits and no full-payload scan.
+5. Native Next continuation and selected-page CSV flows with actual Django/Next HTTP auth/CSRF/filter/replay/erasure tests. Browser/keyboard/WCAG/customer acceptance remains separate.
+6. Real signer/source/rights/key lifecycle/crash reconciliation, backup/retention/encryption and deployment acceptance before any activation.
+
+## Trade-off and scope
+
+An additive protocol costs new models and explicit reconciliation, but preserves the known v2 accounting boundary. Broadly rewriting acceptance or raising the current 25-row limit is rejected because the existing job finalization is terminal. No stack change, paid dependency, pricing decision, source rights claim, core ANPOS protocol change or external launch commitment is needed for the pure development slice. Broader product milestones remain in progress; this ADR is architecture evidence only.
+
+## Pure manifest slice
+
+`core.batch_manifest` has no ORM/network or state writes. Trusted immutable coordinates include batch/operation/provider/candidate/request/policy identity and reserved bounds; signatures use separate source/isolated-registry registries with empty defaults. Exact bytes, strict v3 kind, duplicate-key denial, bounded 1–25 unique record/fingerprint triples, short issuance and provider-call caps are checked. Returned immutable redacted evidence has no record payload/tokens/signature/secret. Ten adversarial `SimpleTestCase` cases forbid database access. No accepted record, durable batch, ordering/idempotency, terminal settlement or source qualification truth is created by verification.
