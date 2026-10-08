@@ -102,7 +102,6 @@ class IntakeFixture:
     SAAS_BATCH_VERIFIERS={"fixture": {"source": manifests.SOURCE}},
 )
 class BatchIntakeTests(IntakeFixture, TestCase):
-
     def test_default_gate_and_exact_replay_preserve_original_reservation(self):
         with override_settings(SAAS_BATCH_ACCEPTANCE_ENABLED=False):
             with self.assertRaises(PermissionDenied):

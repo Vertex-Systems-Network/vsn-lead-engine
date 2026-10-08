@@ -86,7 +86,9 @@ def allocate_result_batch(
         or operation.status not in {"started", "unknown"}
         or intent.expires_at is not None
         and intent.expires_at <= timezone.now()
-        or (SourceBatchTerminal.objects.filter(operation=operation).exists() and not terminal_replay)
+        or (
+            SourceBatchTerminal.objects.filter(operation=operation).exists() and not terminal_replay
+        )
         or DispatchReceipt.objects.filter(operation__outbox=intent).exists()
         or CandidateEvidence.objects.filter(operation__outbox=intent).exists()
         or ResultAcceptance.objects.filter(operation__outbox=intent).exists()
