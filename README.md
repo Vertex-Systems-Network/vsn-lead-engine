@@ -33,7 +33,7 @@ and dedupe.
 - Verified plan snapshot: **2026-10-08**. Latest inspected feature main: `20e2362e` (PR #212); billing/diagnostics, v3 metadata schema and pure batch/terminal proofs are verified. Transactional v3 enrollment/intake/accounting remains open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
-- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: gated v3 enrollment/server-owned allocation, partial intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
+- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: quarantined v3 enrollment review, then server-owned allocation, partial intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
 - Continuation: **full ready frontier per invocation**; milestone/PR completion is a checkpoint, not an instruction to stop. Recoverable errors are AI-owned; human approval is reserved for genuine external authorization/consent/paid or irreversible commitments. CI runs `scripts/verify_readme_progress.py` to reject README/machine-state divergence and feature PRs that omit a README update.
 
 <!-- ANPOS-CONTINUITY:END -->
@@ -2352,3 +2352,18 @@ These tables are inert scaffolding: no endpoint, command, worker, v3 enrollment,
 ### Bounded source-final proof — verified PR #212
 
 A pure v3 terminal validator compares the source-signed canonical batch set with trusted immutable accepted-evidence coordinates, including acceptance-body digests and accrued counts/calls; equality covers accepted evidence, while allocated/unknown effects remain a separate service gate. Exact scope, duplicate-key/schema denial, separate empty-default terminal authority, short issuance, at most 1,000 batches / 256 KiB, original lead/call bounds and terminal calls at least accrued calls are required. Empty accepted sets may attest zero or nonzero calls; no refund is inferred. Ten DB-forbidden tests include set omissions/additions/duplicates/order/body mutation and the 1,000-batch boundary. PR #212 passed all five workflows, PostgreSQL 37816828169 (all 329 tests/migrations/settings) and Web 37816828126 (14 transport/build/type/HTTP). No ORM writes, allocated-identity completeness, replay persistence, enrollment or settlement is supplied by signature verification.
+
+
+### Gated v3 protocol enrollment — development review
+
+New outboxes default to v2. A disabled trusted-local admin service can select v3
+only for a current queued/pending job before any attempt or operation exists,
+under workspace/user/job locks and current source/entitlement/period/cap checks.
+An empty-default source allowlist is also required. Replay rechecks current gates;
+job revision, reservation and payload counts remain unchanged. V3 is quarantined:
+pre-dispatch refuses it, and v1 receipts/v2 candidate and acceptance services reject
+its selector before evidence processing. Pending cancellation remains available.
+Migration 0019 preserves legacy v2 classification and refuses reversal with any
+v3 enrollment, including cancelled history. Nine new tests include two explicit
+PostgreSQL enrollment/replay/first-lease races; exact-head CI pending. This does not
+enable batch allocation, intake, settlement, provider execution or a live signer.

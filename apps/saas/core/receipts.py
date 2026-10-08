@@ -141,6 +141,8 @@ def reconcile_receipt(user, workspace_id, operation_id, body, signature):
         raise Http404("Workspace resource not found.")
     job = Job.objects.select_for_update().get(pk=operation.job_id, workspace_id=workspace_id)
     intent = JobOutbox.objects.select_for_update().get(pk=operation.outbox_id, job=job)
+    if intent.result_protocol != 2:
+        raise RevisionConflict()
     reservation = UsageReservation.objects.select_for_update().get(
         pk=intent.reservation_id, workspace_id=workspace_id
     )

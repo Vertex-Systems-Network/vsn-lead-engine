@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Implement disabled trusted-local v3 job enrollment/server-owned batch allocation, candidate/acceptance intake and exact terminal-manifest verification with aggregate reservation caps and PostgreSQL replay/finality races per ADR-SAAS-003. Preserve v2 behavior and no live signer/provider activation.",
+    "Implement quarantined v3 server-owned batch allocation and candidate/accepted-payload intake with aggregate original-reservation caps, durable replay and exact source-final/unknown-effect reconciliation. Keep v3 dispatch disabled until the full guarded transactional path is reviewed.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "saas_329_postgres_and_14_web_http_verified_transactional_v3_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "20e2362ec6000a72e679a8716d428795f1a9d077",
+  "last_reconciled_repository_ref": "56220af9775cf9f30cff49721fcd467b390b3cae",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [
