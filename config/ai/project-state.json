@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Implement separately gated durable v3 batch identity/ledger and terminal manifests per ADR-SAAS-003, with additive evidence-preserving migrations and PostgreSQL cap/replay/terminal races. Preserve v2 intake/accounting and no live signer/provider activation.",
+    "Implement disabled trusted-local v3 job enrollment/server-owned batch allocation, candidate/acceptance intake and exact terminal-manifest verification with aggregate reservation caps and PostgreSQL replay/finality races per ADR-SAAS-003. Preserve v2 behavior and no live signer/provider activation.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "saas_306_postgres_and_14_web_http_verified_browser_customer_release_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "176f8309a1d68c2feb650898d240bd2ed5aa89fc",
+  "last_reconciled_repository_ref": "3d5d50397e9413526bbfbd4339c5577497e3ab3e",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

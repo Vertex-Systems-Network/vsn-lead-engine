@@ -488,6 +488,109 @@ class ResultAcceptance(models.Model):
         ]
 
 
+class ResultBatch(models.Model):
+    """V3 server-owned identity scaffold; no intake or accounting service is exposed."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    operation = models.ForeignKey(
+        DispatchOperation, on_delete=models.PROTECT, related_name="batches"
+    )
+    ordinal = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["operation", "ordinal"], name="saas_batch_ordinal"),
+            models.CheckConstraint(condition=models.Q(ordinal__gte=1), name="saas_batch_positive"),
+        ]
+
+
+class BatchCandidateEvidence(models.Model):
+    """Redacted v3 candidate metadata; distinct from the v2 one-operation event."""
+
+    batch = models.OneToOneField(ResultBatch, on_delete=models.PROTECT)
+    source_code = models.CharField(max_length=64)
+    event_ref = models.CharField(max_length=96)
+    body_hash = models.CharField(max_length=64)
+    candidate_count = models.PositiveIntegerField()
+    earliest_delete_at = models.DateTimeField()
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source_code", "event_ref"], name="saas_batch_candidate_ref"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(candidate_count__gte=1, candidate_count__lte=25),
+                name="saas_batch_candidate_count",
+            ),
+        ]
+
+
+class BatchAcceptance(models.Model):
+    """V3 evidence metadata only; creating a row never accepts payload or settles usage."""
+
+    candidate = models.OneToOneField(BatchCandidateEvidence, on_delete=models.PROTECT)
+    source_code = models.CharField(max_length=64)
+    receipt_ref = models.CharField(max_length=96)
+    source_key_id = models.CharField(max_length=64)
+    dedupe_key_id = models.CharField(max_length=64)
+    body_hash = models.CharField(max_length=64)
+    namespace = models.CharField(max_length=96)
+    accepted_count = models.PositiveIntegerField()
+    provider_calls = models.PositiveIntegerField()
+    issued_at = models.DateTimeField()
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source_code", "receipt_ref"], name="saas_batch_accept_ref"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(accepted_count__gte=1, accepted_count__lte=25),
+                name="saas_batch_accepted_count",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(provider_calls__gte=1), name="saas_batch_calls"
+            ),
+        ]
+
+
+class SourceBatchTerminal(models.Model):
+    """Redacted final-manifest coordinates; no completeness or settlement inferred."""
+
+    operation = models.OneToOneField(DispatchOperation, on_delete=models.PROTECT)
+    source_code = models.CharField(max_length=64)
+    receipt_ref = models.CharField(max_length=96)
+    source_key_id = models.CharField(max_length=64)
+    body_hash = models.CharField(max_length=64)
+    batch_set_hash = models.CharField(max_length=64)
+    batch_count = models.PositiveIntegerField()
+    accepted_count = models.PositiveIntegerField()
+    provider_calls = models.PositiveIntegerField()
+    issued_at = models.DateTimeField()
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source_code", "receipt_ref"], name="saas_batch_terminal_ref"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(batch_count=0, accepted_count=0)
+                | models.Q(
+                    batch_count__gte=1,
+                    accepted_count__gte=models.F("batch_count"),
+                    accepted_count__lte=25 * models.F("batch_count"),
+                    provider_calls__gte=1,
+                ),
+                name="saas_batch_terminal_counts",
+            ),
+        ]
+
+
 class AcceptedResult(models.Model):
     """Isolated tenant payload with source-derived eligibility/deletion deadline."""
 

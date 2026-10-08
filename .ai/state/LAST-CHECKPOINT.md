@@ -3,7 +3,7 @@
 ## Snapshot
 
 - Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 UTC / PKT.
-- Exact protected feature main `176f8309a1d68c2feb650898d240bd2ed5aa89fc` after PR #209, before documentation-only checkpoint merge. Reconcile live main, open Issues then open PRs before mutations. No open Issues at final feature checkpoint.
+- Exact protected main `3d5d50397e9413526bbfbd4339c5577497e3ab3e` after PR #210. V3 metadata schema is in development review; protected CI pending. Reconcile live main, open Issues then open PRs before mutations. No open Issues at final feature checkpoint.
 - Product 0.66.1 / ANPOS 1.4.0; Next frontend and isolated Django/DRF/PostgreSQL authority. Existing production CLI/R2/Google namespaces and phone-only US/Canada/taxonomy/quota invariants preserved.
 
 ## Verified
@@ -16,7 +16,7 @@
 
 ## Not Verified
 
-- Durable v3 batch/terminal ledger, partial intake/accounting, multi-source/multi-batch pagination/native UI not yet implemented. v3 signature/schema success does not prove signer qualification, committed R2 objects, payment truth or rights.
+- V3 durable metadata schema is in review; transactional batch intake/finality/accounting and multi-source/multi-batch pagination/native UI remain unimplemented. v3 signature/schema success does not prove signer qualification, committed R2 objects, payment truth or rights.
 - Live source/qualification/isolated R2 signer/client, billing/provider/webhook/consumer/scheduler and Next deployment remain disabled. Keys empty; synthetic proofs/rights are fixtures only.
 - Real payment sandbox/account mapping, signup/recovery, browser/responsive/WCAG/customer, qualified privacy/source rights, log redaction/retention/encryption/backups/TLS/proxy and launch remain open.
 - Latest retained production quota remains 6,855 / 12,000 on 2026-10-04. No new production quota observation. Distributed runtime/Supervisor identity unverified; no work after invocation ends claimed.
@@ -30,6 +30,6 @@
 
 ## Next Action
 
-1. Implement separately gated durable v3 batch identity/ledger and terminal manifests per ADR-SAAS-003, with additive evidence-preserving migrations and PostgreSQL cap/replay/terminal races. Preserve v2 intake/accounting and no live signer/provider activation.
+1. Implement disabled trusted-local v3 job enrollment/server-owned batch allocation, candidate/acceptance intake and exact terminal-manifest verification with aggregate reservation caps and PostgreSQL replay/finality races per ADR-SAAS-003. Preserve v2 behavior and no live signer/provider activation.
 2. Then add stable-watermark signed 25-row page services and native selected-page CSV, preserving current rights/expiry/no-referrer/once-only preparation semantics.
 3. Keep README/machine/checkpoint evidence synchronized after protected merges; checkpoints are recovery aids, not permission gates. Continue safe frontier within the next invocation's host budget. Do not replay merged mutations.
