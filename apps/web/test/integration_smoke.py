@@ -206,24 +206,6 @@ def main():
                     with response:
                         return response.code, response.read().decode(), response.headers
 
-                _, form, _ = account("/accounts/login/")
-                csrf = Csrf()
-                csrf.feed(form)
-                assert csrf.token
-                code, _, returned = account(
-                    "/accounts/login/",
-                    {
-                        "username": user.username,
-                        "password": "disposable-http-password",
-                        "csrfmiddlewaretoken": csrf.token,
-                        "next": "https://evil.example.test/",
-                    },
-                )
-                assert code == 302 and returned["Location"] == origin + "/dashboard"
-                # The real login session, shared by localhost ports, must render Next.
-                with opener.open(origin + "/dashboard", timeout=10) as response:
-                    assert "Synthetic &lt;workspace&gt;" in response.read().decode()
-
                 def native_form(path):
                     with opener.open(origin + path, timeout=10) as response:
                         body = response.read().decode()
@@ -231,6 +213,58 @@ def main():
                     parser = Csrf()
                     parser.feed(body)
                     return body, parser
+
+                unprepared, parser = native_form("/account/sign-in")
+                assert "Start sign-in" in unprepared and parser.token is None
+                code, _, started = account("/accounts/start-sign-in/?next=https://evil.test/")
+                assert code == 303 and started["Location"] == origin + "/account/sign-in"
+                form, csrf = native_form("/account/sign-in")
+                assert csrf.token and csrf.action == backend + "/accounts/login/"
+                assert csrf.hidden["native_login"] == "1"
+                credentials = {
+                    **csrf.hidden,
+                    "username": user.username,
+                    "password": "disposable-http-password",
+                    "next": "/health/",
+                }
+                assert account("/accounts/login/", credentials, "http://localhost:3999")[0] == 403
+                code, _, failed = account(
+                    "/accounts/login/",
+                    {**credentials, "password": "never-render-this-password"},
+                    origin,
+                )
+                assert (
+                    code == 303 and failed["Location"] == origin + "/account/sign-in?notice=invalid"
+                )
+                failed_page, _ = native_form("/account/sign-in?notice=invalid")
+                assert (
+                    "We could not sign you in" in failed_page
+                    and "never-render-this-password" not in failed_page
+                )
+                from core.login_security import ACCOUNT_LIMIT, allow_login
+
+                for _ in range(ACCOUNT_LIMIT):
+                    assert allow_login("http-limited-account", "127.0.0.1")
+                code, _, limited = account(
+                    "/accounts/login/", {**credentials, "username": "http-limited-account"}, origin
+                )
+                assert (
+                    code == 303
+                    and limited["Location"] == origin + "/account/sign-in?notice=limited"
+                )
+                assert limited["Retry-After"] == "900"
+                limited_page, _ = native_form("/account/sign-in?notice=limited")
+                assert "Too many sign-in attempts" in limited_page
+                previous_csrf = next(cookie.value for cookie in jar if cookie.name == "csrftoken")
+                code, _, returned = account("/accounts/login/?next=/health/", credentials, origin)
+                assert code == 302 and returned["Location"] == origin + "/dashboard"
+                assert (
+                    next(cookie.value for cookie in jar if cookie.name == "csrftoken")
+                    != previous_csrf
+                )
+                # The real login session, shared by localhost ports, must render Next.
+                with opener.open(origin + "/dashboard", timeout=10) as response:
+                    assert "Synthetic &lt;workspace&gt;" in response.read().decode()
 
                 missing_feedback, _ = native_form(
                     f"/dashboard/workspaces/{workspace.id}/search/new?feedback=00000000-0000-0000-0000-000000000000"
@@ -344,7 +378,18 @@ def main():
                     and "Foreign private marker" not in denied_catalog
                 )
                 enqueue_job(user, workspace.id, created.id, 0)
-                assert account(cancel_action, stale.hidden, origin)[0] == 409
+                code, _, cancel_error = account(cancel_action, stale.hidden, origin)
+                assert (
+                    code == 303
+                    and cancel_error["Location"] == origin + detail_path + "/cancel?notice=changed"
+                )
+                error_page, error_form = native_form(detail_path + "/cancel?notice=changed")
+                assert "Cancellation needs review" in error_page and "queued" in error_page
+                assert (
+                    "Review current job" in error_page and "confirmation" not in error_form.hidden
+                )
+                assert error_form.action is None
+                assert native_form(detail_path + "/cancel?notice=invalid")[1].token is None
                 assert UsageReservation.objects.get().status == "reserved"
                 cancel_body, current = native_form(detail_path + "/cancel")
                 assert "Current status: " in cancel_body and "queued" in cancel_body
@@ -396,7 +441,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

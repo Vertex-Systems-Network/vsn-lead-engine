@@ -1,11 +1,14 @@
 from datetime import timedelta
 from unicodedata import normalize
 
+from django.conf import settings
 from django.contrib.auth.views import LoginView
 from django.db import transaction
+from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 
+from .account_forms import native_login, sign_in_return
 from .models import LoginBucket
 
 WINDOW = timedelta(minutes=15)
@@ -50,6 +53,10 @@ def allow_login(username, remote_addr, *, now=None):
 class ProtectedLoginView(LoginView):
     def post(self, request, *args, **kwargs):
         if not allow_login(request.POST.get("username", ""), request.META.get("REMOTE_ADDR", "")):
+            if native_login(request):
+                response = HttpResponseRedirect(sign_in_return("limited"), status=303)
+                response["Retry-After"] = str(int(WINDOW.total_seconds()))
+                return response
             # An unbound form avoids checking credentials after the limit.
             form = self.get_form_class()(request=request)
             response = self.render_to_response(self.get_context_data(form=form, login_limited=True))
@@ -57,3 +64,13 @@ class ProtectedLoginView(LoginView):
             response["Retry-After"] = str(int(WINDOW.total_seconds()))
             return response
         return super().post(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        if native_login(self.request):
+            return HttpResponseRedirect(sign_in_return("invalid"), status=303)
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+        if native_login(self.request):
+            return settings.LOGIN_REDIRECT_URL
+        return super().get_success_url()

@@ -167,7 +167,7 @@ class FormContextTests(TestCase):
             self.client.post(
                 self.cancel_submit, data, HTTP_ORIGIN="http://localhost:3000"
             ).status_code,
-            409,
+            303,
         )
         Job.objects.filter(pk=self.job.id).update(status="running")
         self.assertEqual(self.client.get(self.cancel).status_code, 400)
@@ -175,7 +175,7 @@ class FormContextTests(TestCase):
             self.client.post(
                 self.cancel_submit, data, HTTP_ORIGIN="http://localhost:3000"
             ).status_code,
-            409,
+            303,
         )
         self.job.refresh_from_db()
         self.assertEqual(self.job.status, "running")

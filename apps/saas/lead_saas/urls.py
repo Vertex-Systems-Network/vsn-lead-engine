@@ -1,4 +1,5 @@
 from core import views
+from core.account_forms import sign_in_form, start_sign_in
 from core.form_context import (
     CancelFormContext,
     DraftFeedbackContext,
@@ -12,6 +13,8 @@ from django.urls import path
 urlpatterns = [
     path("health/", views.health),
     path("", views.overview),
+    path("accounts/start-sign-in/", start_sign_in),
+    path("api/v1/account/sign-in-form/", sign_in_form),
     path("accounts/login/", ProtectedLoginView.as_view()),
     path("accounts/check-session/", views.check_session_page, name="check-session-page"),
     path("api/v1/workspaces/<uuid:workspace_id>/draft-form/", DraftFormContext.as_view()),

@@ -6,6 +6,10 @@
 - Protected feature main re-read: `bec879cb7b7ed925e64a623d2ce197c7c590eafa` / PR #184. This records the verified feature base before its own documentation merge; reconcile live main/issues/PRs before mutation replay.
 - Owner selected Next.js + TypeScript; Django/DRF/PostgreSQL retain session, tenant, role, CSRF and mutation authority. Production CLI/R2/Google behavior is isolated.
 
+## Current candidate
+
+- Native Next sign-in with explicit CSRF bootstrap/generic failures/unchanged attempt caps and cancellation-error snapshot/review implemented. Local 146 pass/16 PostgreSQL skips (162 cases), nine transport tests, Next build/type/lint/format and HTTP flows pass; exact-head CI pending. No provider/payment activation or browser/deployment certification.
+
 ## Verified
 
 - PR #184 merged at bec879cb7b7ed925e64a623d2ce197c7c590eafa; head 034cd99a40dbd3c2254e1a3a832e01f05f56501c passed required checks/Actions CodeQL, PostgreSQL 37755784470 (154 tests/migration/settings) and Next/HTTP 37755784437 (eight transport tests, escaped feedback/correction/replay/conflict/missing-context recovery and native sign-out).

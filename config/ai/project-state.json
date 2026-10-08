@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Continue native login and cancellation-error workflows under Django session/CSRF and abuse-control authority; signed billing events and phone-qualified results/export remain independent without provider/payment/scheduler activation.",
+    "Verify native sign-in/cancellation-error CI and merge; continue accepted-result and source-aware export contracts with trusted evidence, exact R2 authority and no provider/payment activation.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete lead results/export and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,7 +35,7 @@
   "critical_defects": [],
   "qa_readiness": "saas_130_postgres_cases_and_next_http_auth_verified_full_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "bec879cb7b7ed925e64a623d2ce197c7c590eafa",
+  "last_reconciled_repository_ref": "9abfead754aefdd51683448ab6a38735714aa219",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

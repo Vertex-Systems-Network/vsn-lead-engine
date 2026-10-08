@@ -276,3 +276,13 @@ export function signOutContext(v: unknown): v is SignOutContext {
     /^[A-Za-z0-9]{64}$/.test(v.csrf_token)
   );
 }
+
+export type SignInContext = { kind: "sign-in"; csrf_token: string };
+export function signInContext(v: unknown): v is SignInContext {
+  return (
+    object(v) &&
+    v.kind === "sign-in" &&
+    typeof v.csrf_token === "string" &&
+    /^[A-Za-z0-9]{64}$/.test(v.csrf_token)
+  );
+}
