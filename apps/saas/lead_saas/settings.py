@@ -114,3 +114,5 @@ SAAS_RESULT_VERIFIERS = {}
 # No provider, registry signer or payload intake is activated by these empty maps.
 SAAS_ACCEPTANCE_VERIFIERS = {}
 SAAS_DEDUPE_VERIFIERS = {}
+# Separate normalized billing-event adapter authority; no webhook/payment enabled.
+SAAS_BILLING_VERIFIERS = {}
