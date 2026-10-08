@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "3449cce03108a4b52def854162578d905a9ea5e3",
-  "observed_main_semantics": "Exact main #215 before quarantined allocation review.",
+  "observed_main_sha": "469c4ec883f0533f42291e9c717b39ec82a4a1d8",
+  "observed_main_semantics": "Exact protected allocation feature main #216 before candidate-proof review.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -64,10 +64,9 @@
     "saas_draft_form": "PR #165 head 7bb1124545a230a3349e383d4fe30d5dcff6ecc2 passed required checks, CodeQL and SaaS PostgreSQL 37695370079",
     "saas_pending_cancellation": "PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks, CodeQL and PostgreSQL 37695788773",
     "saas_source_preview": "PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks, CodeQL and PostgreSQL 37696123260",
-    "saas_terminal_receipts": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_periods": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
     "saas_daily_occurrences": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
-    "latest_saas_verified_head": "f68067283ab1ab16d437e8bd4093a182ab4cda01",
+    "latest_saas_verified_head": "508878f54f85fe32f23b1719f48c5f5771a8fa6e",
     "saas_native_next_forms": "PR #180: required checks, PostgreSQL 37703540378 (138 tests/migrations/settings) and Next/HTTP 37703540308 (native draft/cancel/CSRF/auth) passed; full evidence in history.",
     "saas_next_validation_signout": "PR #184: required checks/Actions CodeQL, PostgreSQL 37755784470 and Next/HTTP 37755784437 passed; exact head and full evidence retained in git history.",
     "saas_native_login_cancel": "PR #186: required checks/Actions CodeQL, PostgreSQL 37766322082 and Next/HTTP 37766321955 passed; exact head and full evidence retained in git history.",
@@ -88,7 +87,8 @@
     "saas_batch_schema": "PR #211 / head bc07f8d2: all five workflows passed, PG 37816152759 (319 tests/migrations/settings), Web 37816152845 (14 tests/HTTP). Inert metadata only; detailed evidence in checkpoint/schema contract.",
     "saas_terminal_manifest": "PR #212 / head b0f19291: all five workflows passed; PG 37816828169 (329 tests/migrations/settings), Web 37816828126 (14 tests/HTTP). Pure accepted-set proof only; no enrollment/intake/settlement.",
     "saas_batch_enrollment": "PR #214 / head f6806728: all five workflows passed; PG 37821424861 (338 tests/migrations/settings), Web 37821424914 (14 tests/HTTP). Disabled enrollment, explicit v3 quarantine/v2 exclusion; no allocation/intake.",
-    "saas_batch_allocation": "Development review: disabled server-owned UUID/ordinal allocation, original-budget gates and unknown-effect preservation; twelve cases / three PG skips. CI pending; no reachable v3 start/intake."
+    "saas_batch_allocation": "PR #216 / head 508878f5: all five workflows passed, PG 37823442614 (350 tests/migrations/settings), Web 37823442485 (14 tests/HTTP). Disabled allocation; no reachable v3 start/intake.",
+    "saas_batch_candidates": "Development review: eight DB-forbidden v3 candidate-proof cases, shared pure eligibility preserving legacy contract; no durable events/acceptance. CI pending."
   },
   "governance": {
     "main_ruleset_id": 24086362,

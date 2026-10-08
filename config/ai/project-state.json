@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-SAAS-IDENTITY",
   "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PR #214 merged at 412c29286500d8db88491e13074baa77a7648eb5; head f68067283ab1ab16d437e8bd4093a182ab4cda01 passed all five workflows, PostgreSQL 37821424861 (338 tests/migrations/settings) and Web 37821424914 (14 transport/build/type/HTTP). Disabled quarantined admin v3 enrollment, default-v2 classification, legacy proof exclusion and preserved cancellation; no allocation/intake/dispatch.",
+  "last_verified_completion": "PR #216 merged at 469c4ec883f0533f42291e9c717b39ec82a4a1d8; head 508878f54f85fe32f23b1719f48c5f5771a8fa6e passed all five workflows, PostgreSQL 37823442614 (350 tests/migrations/settings) and Web 37823442485 (14 transport/build/type/HTTP). Disabled server-owned UUID/ordinal allocation, original caps, exact identity replay and unknown-effect preservation; no reachable v3 start/intake.",
   "next_valid_work_unit": "WU-SAAS-FOUNDATION",
   "progress": {
     "total_work_units": 21,
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_338_postgres_and_14_web_http_verified_v3_quarantined",
+  "qa_readiness": "saas_350_postgres_and_14_web_http_verified_candidate_proof_review",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "3449cce03108a4b52def854162578d905a9ea5e3",
+  "last_reconciled_repository_ref": "469c4ec883f0533f42291e9c717b39ec82a4a1d8",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [
