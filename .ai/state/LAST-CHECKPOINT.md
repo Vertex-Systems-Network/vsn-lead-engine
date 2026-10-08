@@ -3,7 +3,7 @@
 ## Snapshot
 
 - Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 UTC / PKT.
-- Exact protected event-ledger feature main `15814cf0bf0c52f58c4b1d1e31cc208bc3445199` after PR #218, before documentation-only checkpoint merge. Live open Issues/PRs reconciled before development; none open at feature checkpoint.
+- Exact protected payload-schema feature main `2c422919a607d116b687ca45994597b581773faa` after PR #220, before documentation-only checkpoint merge. Live open Issues/PRs reconciled before development; none open at feature checkpoint.
 - Product 0.66.1 / ANPOS 1.4.0; Next frontend and isolated Django/DRF/PostgreSQL authority. Existing production CLI/R2/Google namespaces and phone-only US/Canada/taxonomy/quota invariants preserved.
 
 ## Verified
@@ -46,10 +46,8 @@
 2. Then add stable-watermark signed 25-row page services and native selected-page CSV, preserving current rights/expiry/no-referrer/once-only preparation semantics.
 3. Keep README/machine/checkpoint evidence synchronized after protected merges; checkpoints are recovery aids, not permission gates. Continue safe frontier within the next invocation's host budget. Do not replay merged mutations.
 
-## Additive payload schema review
+## Protected payload schema checkpoint
 
-Additive v3 payload-link schema under review on protected main 17adbaaf659e91bfb3a61403838c773f318d894f: exclusive legacy/v3 acceptance links, bounded unique batch positions, shared tenant fingerprints and erasure, populated/tombstone rollback guard, and explicit v3 withholding from legacy display/export. No v3 payload intake or accounting service enabled; CI pending.
+PR #220 merged at 2c422919a607d116b687ca45994597b581773faa; head 57c54ce52681d63603f87151785f4f818cf68be0 passed all five workflows, PostgreSQL 37826291597 (375 tests/migrations/settings) and Web 37826291595 (14 transport/build/type/HTTP). Exclusive v3 payload links, bounded positions, shared fingerprints/erasure, protected populated rollback and legacy visibility withholding verified; no v3 intake/finality/dispatch.
 
-Next ready frontier: Review additive v3 payload schema, then implement separately gated atomic accepted-batch reconciliation with current dual proofs, tenant fingerprints and aggregate original caps. Final-source/unknown-effect reconciliation must precede whole-job settlement and internal write-ahead entry; signed 25-row pagination follows. Keep ordinary v3 dispatch quarantined.
-
-Local schema review verification: 375 SaaS cases / 42 explicit PostgreSQL-only skips; nine new cases (one PostgreSQL uniqueness race). Real legacy reverse/reapply and populated v3 refusal passed locally. Ruff, format, migration drift, ANPOS and README continuity passed. Exact-head protected CI remains the merge gate.
+Next ready frontier: Implement paired candidate/acceptance proof-to-payload mapping with exact record-set and conditional domain-token checks, then gated atomic accepted-batch reconciliation and original aggregate caps. Reconcile every allocated identity and unknown effect before terminal whole-job settlement; internal write-ahead entry and signed 25-row pages follow. Keep v3 dispatch quarantined.

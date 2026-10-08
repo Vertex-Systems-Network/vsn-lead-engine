@@ -14,8 +14,8 @@
     "last_completed_task": "WU-ANPOS-ASSURANCE-VERIFY",
     "next_control_plane_task": "continuous_safe_frontier"
   },
-  "observed_main_sha": "17adbaaf659e91bfb3a61403838c773f318d894f",
-  "observed_main_semantics": "Verified #218 checkpoint reconciled by documentation PR #219 before additive payload schema review.",
+  "observed_main_sha": "2c422919a607d116b687ca45994597b581773faa",
+  "observed_main_semantics": "Exact protected payload-schema feature main #220 before documentation reconciliation.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -65,7 +65,7 @@
     "saas_pending_cancellation": "PR #166 cb323bf27e51f89bfae5380f933bc7932b7f6fca passed required checks, CodeQL and PostgreSQL 37695788773",
     "saas_source_preview": "PR #167 head 868e4df27281ed80b4503f129af840c463cdfcca passed required checks, CodeQL and PostgreSQL 37696123260",
     "saas_daily_occurrences": "Earlier exact-head verified implementation and CI evidence retained in git history through PR #199.",
-    "latest_saas_verified_head": "f9d0173c03fac4a757a605dfed3e30f38c98cb3e",
+    "latest_saas_verified_head": "57c54ce52681d63603f87151785f4f818cf68be0",
     "saas_native_next_forms": "PR #180: required checks, PostgreSQL 37703540378 (138 tests/migrations/settings) and Next/HTTP 37703540308 (native draft/cancel/CSRF/auth) passed; full evidence in history.",
     "saas_next_validation_signout": "PR #184: required checks/Actions CodeQL, PostgreSQL 37755784470 and Next/HTTP 37755784437 passed; exact head and full evidence retained in git history.",
     "saas_native_login_cancel": "PR #186: required checks/Actions CodeQL, PostgreSQL 37766322082 and Next/HTTP 37766321955 passed; exact head and full evidence retained in git history.",
@@ -89,7 +89,7 @@
     "saas_batch_allocation": "PR #216 / head 508878f5: all five workflows passed, PG 37823442614 (350 tests/migrations/settings), Web 37823442485 (14 tests/HTTP). Disabled allocation; no reachable v3 start/intake.",
     "saas_batch_candidates": "PR #217 / head ca1cd8ec: all five workflows passed; PG 37824016673 (358 tests/migrations/settings), Web 37824016597 (14 tests/HTTP). Pure proof/shared eligibility only.",
     "saas_batch_events": "PR #218 / head f9d0173c: all five workflows passed; PG 37824615261 (366 tests/migrations/settings), Web 37824615227 (14 tests/HTTP). Disabled redacted candidate ledger; no payload/finality/dispatch.",
-    "saas_batch_payload_schema": "Development review: exclusive links, bounded positions, shared fingerprints/erasure and rollback protection; CI pending."
+    "saas_batch_payload_schema": "PR #220 / head 57c54ce5: all five workflows passed; PG 37826291597 (375 tests/migrations/settings), Web 37826291595 (14 tests/HTTP). Protected shared payload schema only."
   },
   "governance": {
     "main_ruleset_id": 24086362,
@@ -136,7 +136,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Review additive v3 payload schema, then implement separately gated atomic accepted-batch reconciliation with current dual proofs, tenant fingerprints and aggregate original caps. Final-source/unknown-effect reconciliation must precede whole-job settlement and internal write-ahead entry; signed 25-row pagination follows. Keep ordinary v3 dispatch quarantined.",
+  "exact_next_safe_action": "Implement paired candidate/acceptance proof-to-payload mapping with exact record-set and conditional domain-token checks, then gated atomic accepted-batch reconciliation and original aggregate caps. Reconcile every allocated identity and unknown effect before terminal whole-job settlement; internal write-ahead entry and signed 25-row pages follow. Keep v3 dispatch quarantined.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",

@@ -30,7 +30,7 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected feature main: `15814cf0` (PR #218); v3 enrollment/allocation/candidate ledger primitives are verified but disabled/quarantined. Candidate metadata is durable; accepted-payload intake/accounting remains open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected feature main: `2c422919` (PR #220); v3 enrollment/allocation/candidate ledger primitives are verified but disabled/quarantined. Candidate metadata is durable; accepted-payload intake/accounting remains open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
 - Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: additive accepted-payload schema/intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
@@ -38,7 +38,7 @@ and dedupe.
 
 <!-- ANPOS-CONTINUITY:END -->
 
-Snapshot: **2026-10-08 PKT**, reconciled through protected feature `main` commit `15814cf0` / merged PR #218. Scoped filters/CSV/receipt history and isolated normalized billing-evidence validation are verified through required checks, 366 PostgreSQL tests and 14-test Next/HTTP CI. Internal ledger reconciliation and validity guards are verified but default disabled; live payments/signers/consumers stay disabled. Production P01–P70 runtime remains separate. Bars are engineering estimates, not customer/provider/legal/deployment/launch certification.
+Snapshot: **2026-10-08 PKT**, reconciled through protected feature `main` commit `2c422919` / merged PR #220. Scoped filters/CSV/receipt history and isolated normalized billing-evidence validation are verified through required checks, 375 PostgreSQL tests and 14-test Next/HTTP CI. Internal ledger reconciliation and validity guards are verified but default disabled; live payments/signers/consumers stay disabled. Production P01–P70 runtime remains separate. Bars are engineering estimates, not customer/provider/legal/deployment/launch certification.
 
 | Milestone | Start date | Status | Progress |
 |---|---:|---|---|
@@ -2411,6 +2411,10 @@ PR #218 merged at 15814cf0bf0c52f58c4b1d1e31cc208bc3445199; head f9d0173c03fac4a
 
 Next safe frontier: Add isolated v3 accepted-payload schema with evidence-preserving rollback, then gated atomic acceptance and exact terminal/unknown-effect accounting; preserve original reservations. Internal write-ahead entry and signed 25-row pagination follow. Ordinary v3 dispatch remains quarantined. Whole work-unit counts and engineering estimates remain unchanged; real provider/rights/privacy/customer/deployment/launch gates remain open.
 
-### Additive v3 accepted-payload schema — development review
+### Additive v3 accepted-payload schema — verified, quarantined
 
-Additive v3 payload-link schema under review on protected main 17adbaaf659e91bfb3a61403838c773f318d894f: exclusive legacy/v3 acceptance links, bounded unique batch positions, shared tenant fingerprints and erasure, populated/tombstone rollback guard, and explicit v3 withholding from legacy display/export. No v3 payload intake or accounting service enabled; CI pending. Existing payloads retain their legacy links. Both versions use the same workspace/token uniqueness backstop and expiry erasure; R2 remains the authoritative committed exact dedupe proof. Database constraints enforce one protocol per row and 1–25 unique positions per batch. Application services must still bind workspace/job/source identity and prove qualification/rights; model rows alone cannot certify acceptance. Nine new schema/migration tests cover real legacy reversal/reapply and shared retention/visibility boundaries.
+Additive v3 payload-link schema under review on protected main 17adbaaf659e91bfb3a61403838c773f318d894f: exclusive legacy/v3 acceptance links, bounded unique batch positions, shared tenant fingerprints and erasure, populated/tombstone rollback guard, and explicit v3 withholding from legacy display/export. No v3 payload intake or accounting service enabled; exact-head CI passed. Existing payloads retain their legacy links. Both versions use the same workspace/token uniqueness backstop and expiry erasure; R2 remains the authoritative committed exact dedupe proof. Database constraints enforce one protocol per row and 1–25 unique positions per batch. Application services must still bind workspace/job/source identity and prove qualification/rights; model rows alone cannot certify acceptance. Nine new schema/migration tests cover real legacy reversal/reapply and shared retention/visibility boundaries.
+
+PR #220 merged at 2c422919a607d116b687ca45994597b581773faa; head 57c54ce52681d63603f87151785f4f818cf68be0 passed all five workflows, PostgreSQL 37826291597 (375 tests/migrations/settings) and Web 37826291595 (14 transport/build/type/HTTP). Exclusive v3 payload links, bounded positions, shared fingerprints/erasure, protected populated rollback and legacy visibility withholding verified; no v3 intake/finality/dispatch.
+
+Next safe frontier: Implement paired candidate/acceptance proof-to-payload mapping with exact record-set and conditional domain-token checks, then gated atomic accepted-batch reconciliation and original aggregate caps. Reconcile every allocated identity and unknown effect before terminal whole-job settlement; internal write-ahead entry and signed 25-row pages follow. Keep v3 dispatch quarantined.
