@@ -27,7 +27,28 @@ export default async function NewDraft({
         `/api/v1/workspaces/${workspaceId}/draft-form/`,
         draftContext,
       );
-  if (result.kind !== "ok") return <FormUnavailable kind={result.kind} />;
+  if (result.kind !== "ok")
+    return (
+      <>
+        <FormUnavailable kind={result.kind} />
+        {feedback ? (
+          <p>
+            This saved form may have expired or become unavailable.{" "}
+            <Link
+              href={`/dashboard/workspaces/${workspaceId}/search/new`}
+              prefetch={false}
+            >
+              Open a new draft form
+            </Link>{" "}
+            or{" "}
+            <Link href={`/dashboard/workspaces/${workspaceId}`}>
+              return to your workspace
+            </Link>
+            .
+          </p>
+        ) : null}
+      </>
+    );
   const data = result.data;
   if (data.workspace.id !== workspaceId)
     return <FormUnavailable kind="unavailable" />;

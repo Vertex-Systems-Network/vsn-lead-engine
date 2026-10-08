@@ -232,6 +232,14 @@ def main():
                     parser.feed(body)
                     return body, parser
 
+                missing_feedback, _ = native_form(
+                    f"/dashboard/workspaces/{workspace.id}/search/new?feedback=00000000-0000-0000-0000-000000000000"
+                )
+                assert "saved form may have expired" in missing_feedback
+                assert (
+                    "Open a new draft form" in missing_feedback
+                    and "return to your workspace" in missing_feedback
+                )
                 source_path = f"/dashboard/workspaces/{workspace.id}/sources"
                 empty_catalog, _ = native_form(source_path)
                 assert "No source policies are configured" in empty_catalog
