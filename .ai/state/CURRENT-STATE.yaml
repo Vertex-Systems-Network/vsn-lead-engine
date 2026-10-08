@@ -92,8 +92,8 @@
     "saas_batch_payload_schema": "PR #220 / head 57c54ce5: all five workflows passed; PG 37826291597 (375 tests/migrations/settings), Web 37826291595 (14 tests/HTTP). Protected shared payload schema only.",
     "saas_batch_payload_proof": "PR #222 merged after all five workflows passed; eight pure DB-forbidden cases.",
     "saas_batch_intake": "PR #224 merged at 43b8816de7f9b7bb0977651d42ff775eeabfa844; head b55789af passed all five workflows, including 389 PostgreSQL tests and 14 Web tests/HTTP. Default-off atomic v3 batch acceptance, shared fingerprints and original aggregate caps; no source finality or settlement.",
-    "saas_source_final": "PR #225 merged at 794bb3b42d3525fc2436aed578f6380b4590246a; head d9eb4cfb passed all five workflows, including 394 PostgreSQL tests and 14 Web tests/HTTP. Default-off exact source-final metadata over complete accepted batches; no whole-job settlement.",
-    "saas_whole_job_accounting": "Development review: pure aggregate guard only; no settlement; CI pending."
+    "saas_source_final": "PR #225: five CI workflows, 394 PostgreSQL and 14 Web tests passed; default-off source final.",
+    "saas_whole_job_accounting": "Pure guard under review; no settlement; CI pending."
   },
   "governance": {
     "main_ruleset_id": 24086362,
