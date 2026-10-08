@@ -4,7 +4,7 @@
   "current_phase": "PHASE-SAAS-WEB-MVP",
   "current_module": "MOD-WEB-EXPERIENCE",
   "current_work_unit": "WU-SAAS-LEAD-WEB",
-  "last_verified_completion": "PR #188 merged at 1baf1d80fa6aafca5420cf21a640ce7e7a9e7146; head a942efbacd299ee2460eb560da00d899b7f58f3f passed required checks/Actions CodeQL, PostgreSQL 37770063209 (172 tests/migration/settings) and Next/HTTP 37770063198 (nine transport tests/build/type and earlier native workflows).",
+  "last_verified_completion": "PR #189 merged at 0a81b3e24f45edfa72b5101c8241891030a88f1c; head fb58dd787290a81813f3c85a412f897782b5ffd7 passed required checks/Actions CodeQL, PostgreSQL 37770588647 (all 182 tests, including three candidate-event races, migrations/settings) and Next/HTTP 37770588715 (nine transport tests/build/type and native workflows).",
   "next_valid_work_unit": "WU-SAAS-LEAD-WEB",
   "progress": {
     "total_work_units": 21,
@@ -33,9 +33,9 @@
     "Final public/commercial production launch commitment."
   ],
   "critical_defects": [],
-  "qa_readiness": "saas_172_postgres_cases_and_next_http_verified_browser_customer_release_acceptance_open",
+  "qa_readiness": "saas_182_postgres_cases_and_next_http_verified_browser_customer_release_acceptance_open",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "1baf1d80fa6aafca5420cf21a640ce7e7a9e7146",
+  "last_reconciled_repository_ref": "0a81b3e24f45edfa72b5101c8241891030a88f1c",
   "last_reconciled_at": "2026-10-08",
   "reconciliation": {
     "source_of_truth_order": [

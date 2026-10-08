@@ -3,41 +3,35 @@
 ## Snapshot
 
 - Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 UTC / PKT.
-- Protected feature main re-read: `c5c26d15f5cbb8e9865014c125f13489895755a4` / PR #186. Recorded feature base precedes this documentation merge; reconcile live main/issues/PRs before mutation replay.
-- Owner selected Next.js + TypeScript; Django/DRF/PostgreSQL retain session, tenant, role, CSRF, abuse-control and mutation authority. Production CLI/R2/Google behavior is isolated.
+- Protected feature main read: `0a81b3e24f45edfa72b5101c8241891030a88f1c` / PR #189. This recorded feature base precedes the checkpoint documentation merge; reconcile exact live main/issues/PRs before replay.
+- Next.js/TypeScript frontend; Django/DRF/PostgreSQL retain auth, tenant/role/CSRF and transactional authority. Production CLI/R2/Google behavior remains isolated.
 
 ## Verified
 
-- PR #186 merged at c5c26d15f5cbb8e9865014c125f13489895755a4; head be357389f869b5b2cc667eff5280718d0e687789 passed required checks/Actions CodeQL, PostgreSQL 37766322082 (162 tests/migration/settings) and Next/HTTP 37766321955 (nine transport tests, native login bootstrap/failure/limit/rotation and cancellation-error review, plus earlier workflows).
-- Native sign-in uses explicit Django browser cookie bootstrap with fixed Next return and one exact stateless masked-CSRF context. Only CSRF is forwarded for that anonymous context; all authenticated contexts retain validated session requirements. Password/username do not enter Next POST handlers, error URLs or feedback storage.
-- Native login POST retains existing account/IP budgets and trusted connection-address policy. CSRF/Origin failures occur before budgets/auth. Generic failed/limited notices are presentation only; limit response is 303 plus Retry-After 900 without credential checks. Standalone login retains 200/429. Native success ignores supplied next and uses configured return with Django session/CSRF rotation.
-- Cancellation errors return fixed invalid/changed/unavailable notices; native notice reads show the authorized current snapshot without confirmation issuance, auto-retry or cancellation. Explicit fresh review is required. Stale/started/terminal jobs remain protected; role/CSRF/foreign denial cannot become a recovery redirect.
-- PR #184 remains verified: five-minute bounded draft feedback/correction/conflict/missing-context recovery and native sign-out. PRs #180–#182: native draft/cancel, bounded readonly source view and state-filter pagination. Earlier CI evidence is retained in CURRENT-STATE/review documents.
-- PRs #175–#178: internal terminal receipts/usage bypass guards, manual periods/rollover, bounded disabled daily draft occurrences/DST and fixed session navigation. Unknown outcomes retain capacity until valid whole-job proof; unresolved reservations block rollover and late proofs account to original periods. Accepted leads/exports remain zero.
-- Local SaaS 162 cases: 146 passed/16 PostgreSQL-only skipped. Final PostgreSQL CI all 162 passed; migrations/settings, Next lint/format/nine transport tests/build/type and real HTTP complete workflows pass. Root 376 passed, 1 skipped, 28 subtests; ANPOS/Ruff/drift pass.
-- M5 85%, M6 70%, M7 70%, overall ~45% are engineering indicators. Work units unchanged: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21.
+- PR #189 merged at 0a81b3e24f45edfa72b5101c8241891030a88f1c; head fb58dd787290a81813f3c85a412f897782b5ffd7 passed required checks/Actions CodeQL, PostgreSQL 37770588647 (all 182 tests, including three candidate-event races, migrations/settings) and Next/HTTP 37770588715 (nine transport tests/build/type and native workflows).
+- PR #188 head a942efbacd299ee2460eb560da00d899b7f58f3f / merge 1baf1d80fa6aafca5420cf21a640ce7e7a9e7146: required/Actions CodeQL, PostgreSQL 37770063209 (172 cases), Next/HTTP 37770063198 passed.
+- Internal signed candidate preflight binds current tenant/job/operation/source/provider key/request hash/policy fingerprint. Separate verifier registry empty by default; exact-byte schema, bounds, phone/USCA/saved scope, field lineage, purpose, explicit display/storage/retention and current kill switch fail closed.
+- Frozen review exposes only event ref/digest/count/deadline. Redacted one-event-per-operation ledger records no payload/signature/source record references. Same bytes replay without refreshing timestamps; changed bytes/event and global source-event rebind conflict. Every replay rechecks current role/rights/expiry. Three PostgreSQL races pass; failed writes roll back. Additive migration supports empty reversal and refuses populated evidence loss.
+- PR #186 native login/bootstrap/attempt limits/rotation and cancellation-error review remain verified. PRs #180–#184 native Next draft/cancel/source/filter/validation/sign-out remain verified. No fresh cancel authority is minted by an error page; direct browser credentials go to Django.
+- PRs #175–#178 zero-lead terminal receipt reconciliation, manual periods, disabled daily occurrences and session navigation remain verified. Unknown effects retain reserved capacity; current terminal receipts still settle zero leads/exports.
+- PostgreSQL all 182 cases/migrations/settings pass. Local 163 passed/19 PostgreSQL-only skips. Next lint/format/nine transport tests/build/type and real HTTP pass. Root 376 passed/1 skipped/28 subtests; Ruff/ANPOS/drift pass. Actions CodeQL is Actions-only.
+- M5 85%, M6 70%, M7 70%, overall ~45% are engineering indicators. Work units unchanged: 9 complete, 5 in progress, 1 blocked, 2 deferred, 4 not started of 21. README and traceability reflect verified slices rather than whole-work-unit completion.
 
 ## Not Verified
 
-- Accepted-result/export store, billing-event reconciliation, recovery/signup and browser/customer acceptance remain open. No provider consumer, configured receipt verifier, payment activation, scheduler timer/scanner or automatic enqueue activation.
-- No production Next deployment, provider exactly-once or visual/responsive/WCAG certification. No local browser binary available; HTTP checks do not replace browser assessment.
+- No accepted-result store, nonzero accounting, R2 uniqueness grant, result/export endpoint or live adapter follows from candidate evidence. Receipt and candidate verifier registries remain unconfigured. Payment/provider/scheduler consumers remain disabled.
+- Billing events, recovery/signup, browser/responsive/WCAG/customer acceptance, shared-origin TLS/proxy/cookies, retention/encryption/physical cleanup/backup acceptance and production Next deployment remain open. No usable local browser binary was available; HTTP is not browser certification.
 - Persistent distributed-agent identity remains unverified. No work after turn end claimed. Latest retained production evidence: 6,855/12,000 on 2026-10-04; no new quota observation.
 
 ## Known Risk
 
-- Native separate-port HTTP flows require deployment shared-origin TLS/proxy/cookie/CSRF acceptance; unrelated domains do not share browser session/CSRF cookies automatically. Native login's generic PRG notice is not an authentication or quota grant.
-- Existing draft feedback read expiry is not physical erasure: session retention/clearsessions cleanup applies. Concurrent session last-write can evict/lose feedback; missing context fails closed. Login/cancellation notices introduce no additional error store.
-- Unknown external outcomes retain capacity until valid proof; provider rights/evidence/replay contracts remain necessary. Evidence migrations refuse destructive rollback.
-- ESLint 9 is unsupported while plugin peers exclude 10; compatible maintained tooling remains a production gate. Manual windows and disabled schedule configs are not paid activation or a customer execution scheduler.
-
-## Candidate event implementation in progress
-
-PR #188 merged at 1baf1d80fa6aafca5420cf21a640ce7e7a9e7146; head a942efbacd299ee2460eb560da00d899b7f58f3f passed required checks/Actions CodeQL, PostgreSQL 37770063209 (172 tests/migration/settings) and Next/HTTP 37770063198 (nine transport tests/build/type and earlier native workflows). See docs/ai/SAAS-RESULT-EVIDENCE-REVIEW-20261008.md.
-
-Redacted candidate event ledger implemented: identical bytes replay once, changed bytes/event conflict and source-event reuse cannot cross workspace/operation boundaries. No payload, accepted leads, accounting, export or provider activation. Ten new tests include three PostgreSQL races; exact-head CI pending.
+- Phone syntax/provenance signatures are not reachability, territory accuracy, provider rights or exact cross-day dedupe proof. Candidate count cannot settle leads or be shown as accepted results.
+- Candidate freshness deadline does not physically erase redacted audit metadata. DATA-006 records the before-production retention/cleanup/backup gate; opaque event references must exclude personal data. One event/operation does not support multi-batch intake without a versioned extension.
+- Current authority is rechecked on candidate replay; closed/expired/revoked/drifted operations fail closed even when evidence was previously recorded. Evidence migrations protect history rather than silently deleting it.
+- Existing draft feedback read expiry is not physical session erasure; cleanup/encryption acceptance remains open. Unknown provider effects retain capacity until valid terminal evidence. ESLint 9/plugin compatibility EOL remains a production gate.
 
 ## Next Action
 
-1. Continue bounded accepted-result and source-aware export contracts under trusted source evidence, phone qualification and exact R2 dedupe authority; billing-event reconciliation is independent. Keep provider/payment/scheduler consumers disabled.
-2. Define accepted-result ingestion provenance/idempotency, rights/phone/export-field checks and denied-by-default routes before any live adapter. Do not duplicate or replace production R2 authority or count synthetic fixtures as accepted production leads.
-3. Continue ready work within invocation budget. Checkpoints are recovery aids, not permission gates; no execution after turn end is claimed.
+1. Continue reviewed versioned nonzero accepted-result/accounting and trusted dedupe contracts; then bounded tenant result reads and source-aware export. Keep production R2 namespaces/workbooks isolated and live consumers disabled.
+2. Preserve atomic lead/export caps, source field/export rights, revocation/retention/tombstones, safe CSV and privacy-safe audits. Existing candidate validation/replay must not be reimplemented as completed acceptance.
+3. Billing-event reconciliation is independent safe work; external source/legal/customer/provider/deployment evidence remains separate. Continue ready frontier within invocation budget; checkpoints are recovery aids, not permission gates.

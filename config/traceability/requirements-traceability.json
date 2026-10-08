@@ -1709,9 +1709,11 @@
       "branch_refs": [
         "saas/candidate-event-ledger"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #189"
+      ],
       "test_evidence": [
-        "Ten ledger tests including three PostgreSQL races; exact-head CI pending."
+        "PR #189 merged at 0a81b3e24f45edfa72b5101c8241891030a88f1c; head fb58dd787290a81813f3c85a412f897782b5ffd7 passed required checks/Actions CodeQL, PostgreSQL 37770588647 (all 182 tests, including three candidate-event races, migrations/settings) and Next/HTTP 37770588715 (nine transport tests/build/type and native workflows)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1728,7 +1730,9 @@
       ],
       "sbom_refs": [],
       "attestation_refs": [],
-      "release_refs": [],
+      "release_refs": [
+        "main:0a81b3e24f45edfa72b5101c8241891030a88f1c"
+      ],
       "status": "implemented",
       "verification_status": "partially_verified"
     }

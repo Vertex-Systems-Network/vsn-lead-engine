@@ -16,7 +16,7 @@ Ten new tests cover redacted immutable/repeated review, unchanged accounting, un
 
 ## Next acceptance gates
 
-Add durable event collision/replay records and a reviewed versioned nonzero result/accounting contract before storing accepted results. Preserve production exact R2 authority and isolated SaaS namespaces; candidate input cannot assert uniqueness. Then implement bounded tenant reads and source-aware export authorization/field rights, atomic export caps, safe CSV output, retention/deletion/tombstones and privacy-safe audits together. Current preflight has no export permission or export endpoint. Source/provider review, encryption/physical deletion/backup acceptance, deployment and customer/browser validation remain external or subsequent implementation work.
+PR #189 now provides durable redacted candidate event collision/replay records. A reviewed versioned nonzero result/accounting contract remains required before storing accepted results. Preserve production exact R2 authority and isolated SaaS namespaces; candidate input cannot assert uniqueness. Then implement bounded tenant reads and source-aware export authorization/field rights, atomic export caps, safe CSV output, retention/deletion/tombstones and privacy-safe audits together. Current preflight has no export permission or export endpoint. Source/provider review, encryption/physical deletion/backup acceptance, deployment and customer/browser validation remain external or subsequent implementation work.
 
 
-Follow-on redacted event ledger implementation is described in `SAAS-CANDIDATE-EVENT-REVIEW-20261008.md`; its exact-head CI remains pending.
+Follow-on redacted event ledger implementation is described in `SAAS-CANDIDATE-EVENT-REVIEW-20261008.md`; PR #189 exact-head PostgreSQL/required/Web CI passed.
