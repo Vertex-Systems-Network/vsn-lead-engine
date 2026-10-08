@@ -6,10 +6,14 @@ PRs #194–#196 now verify guarded CSV preparation/accounting, explicit bounded 
 
 ## Next bounded implementation
 
-1. Country filters and explicit native row/field selection are verified and merged through PR #198; 247 PostgreSQL tests and 12-test Next/HTTP CI pass. Saved category/source filters and exact combined export scope are a current candidate; see SAAS-RESULT-METADATA-FILTER-REVIEW-20261008.md and verify protected-head CI before marking delivered. Keep displayed/filtered/withheld counts distinct and preserve the single-batch 25-row ceiling.
+1. Country filters and explicit native row/field selection are verified and merged through PR #198; 247 PostgreSQL tests and 12-test Next/HTTP CI pass. PR #200 verifies saved category/source filters and exact combined export scope; 253 PostgreSQL tests and 13-test Next/HTTP CI pass. See SAAS-RESULT-METADATA-FILTER-REVIEW-20261008.md. Keep displayed/filtered/withheld counts distinct and preserve the single-batch 25-row ceiling.
 2. Current signed previews bind filtered row scope and require an explicit subset. Maintain common field grants, conservative deadlines, current role/rights checks and once-only prepared-file accounting. See SAAS-RESULT-FILTER-SELECTION-REVIEW-20261008.md; browser/customer acceptance remains open.
 3. Review audit/fingerprint retention and backup/WAL/replica/downstream erasure before production. Existing command erases active row payloads only; it does not certify every copy erased or permit reaccepting duplicates.
 4. Real isolated R2 signer onboarding must prove canonical qualification/fingerprint mapping, committed objects, independent keys and crash reconciliation. Preserve production CLI/R2/Google namespaces and zero-new-spend behavior; fixtures are not provider rights.
 5. Multi-source/multi-batch intake and larger pagination require versioned contracts/concurrency tests. Signed billing-event reconciliation is independent safe work.
 
 Recovery/signup, browser/keyboard/WCAG/customer, shared-origin TLS/proxy/cookies, provider rights and deployment/launch acceptance remain open.
+
+## Next ready receipt-recovery slice
+
+Expose bounded readonly tenant/job export-receipt metadata from the existing redacted ledger, with explicit current role/creator scope. Show preparation accounting/expiry and explain that no retained CSV copy or confirmed download exists. GET must not prepare/replay CSV, refund, reserve or charge usage. Avoid contact fields, digests, signing/source references and mutable provider activation. Signed billing-event reconciliation remains a separate M5 frontier.
