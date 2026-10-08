@@ -105,24 +105,20 @@ def accept_result_batch(
     previous = BatchAcceptance.objects.select_for_update().filter(candidate=candidate).first()
     if previous is not None:
         if (
-            (
-                previous.body_hash,
-                previous.receipt_ref,
-                previous.accepted_count,
-                previous.provider_calls,
-                previous.namespace,
-                previous.source_code,
-            )
-            != (
-                proof.body_hash,
-                proof.receipt_ref,
-                len(records),
-                proof.provider_calls,
-                namespace,
-                operation.source_code,
-            )
-            or AcceptedResult.objects.filter(batch_acceptance=previous).count() != len(records)
-        ):
+            previous.body_hash,
+            previous.receipt_ref,
+            previous.accepted_count,
+            previous.provider_calls,
+            previous.namespace,
+            previous.source_code,
+        ) != (
+            proof.body_hash,
+            proof.receipt_ref,
+            len(records),
+            proof.provider_calls,
+            namespace,
+            operation.source_code,
+        ) or AcceptedResult.objects.filter(batch_acceptance=previous).count() != len(records):
             raise IdempotencyConflict()
         return previous, False
     if operation.status != "started" or review.earliest_delete_at <= timezone.now():
