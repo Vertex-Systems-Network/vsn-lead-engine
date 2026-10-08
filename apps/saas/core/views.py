@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import (
+    HttpResponse,
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseRedirect,
@@ -29,6 +30,26 @@ from .services import change_membership, create_draft, create_workspace, members
 
 def health(request):
     return JsonResponse({"status": "ok", "service": "vsn-lead-saas", "provider_dispatch": False})
+
+
+@method_decorator(never_cache, name="dispatch")
+class ResultExportDownload(APIView):
+    def post(self, request, workspace_id, job_id):
+        from rest_framework.exceptions import ValidationError
+
+        from .result_exports import prepare_export
+
+        membership_for(request.user, workspace_id)
+        if request.query_params:
+            raise ValidationError("Export query parameters are unavailable.")
+        result = prepare_export(
+            request.user, workspace_id, job_id, request.headers.get("Idempotency-Key"), request.data
+        )
+        response = HttpResponse(result.csv_bytes, content_type="text/csv; charset=utf-8")
+        response["Content-Disposition"] = 'attachment; filename="available-results.csv"'
+        response["X-Content-Type-Options"] = "nosniff"
+        response["X-Export-Receipt"] = str(result.receipt_id)
+        return response
 
 
 @login_required
