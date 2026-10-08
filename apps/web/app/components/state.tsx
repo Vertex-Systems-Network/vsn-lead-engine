@@ -1,4 +1,4 @@
-import { backendLink } from "../../lib/backend";
+import Link from "next/link";
 export function State({ kind }: { kind: string }) {
   const message =
     kind === "signin"
@@ -16,13 +16,10 @@ export function State({ kind }: { kind: string }) {
           : "Information unavailable"}
       </h1>
       <p>{message}</p>
-      <a className="button" href={backendLink("/accounts/login/")}>
+      <Link className="button" href="/account/sign-in" prefetch={false}>
         Sign in
-      </a>
-      <p className="muted">
-        Sign in opens the account form. If your deployment has no dashboard
-        return configured, return here after signing in.
-      </p>
+      </Link>
+      <p className="muted">Sign in opens the secure account screen.</p>
     </section>
   );
 }

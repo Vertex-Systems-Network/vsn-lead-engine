@@ -246,6 +246,7 @@ def draft_search_page(request, workspace_id):
     )
 
 
+@never_cache
 @login_required
 @require_http_methods(["GET", "POST"])
 def cancel_pending_page(request, workspace_id, job_id):
@@ -270,6 +271,7 @@ def cancel_pending_page(request, workspace_id, job_id):
     else:
         form = PendingCancellationForm(request.POST, **kwargs)
         response_status = 400
+        notice = "invalid"
         if form.is_valid():
             try:
                 cancel_pending_job(request.user, workspace_id, job_id, form.expected_revision)
@@ -278,10 +280,16 @@ def cancel_pending_page(request, workspace_id, job_id):
             except RevisionConflict:
                 form.add_error(None, "The job changed. Review its details before cancelling again.")
                 response_status = 409
+                notice = "changed"
             except ValidationError:
                 form.add_error(None, "Cancellation is unavailable. Review the job again.")
+                notice = "unavailable"
             else:
                 return HttpResponseRedirect(job_return(workspace_id, job_id), status=303)
+    if request.method == "POST" and settings.WEB_DASHBOARD_URL:
+        return HttpResponseRedirect(
+            f"{job_return(workspace_id, job_id)}/cancel?notice={notice}", status=303
+        )
     return render(
         request,
         "core/cancel_pending.html",

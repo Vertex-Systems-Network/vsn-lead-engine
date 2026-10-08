@@ -200,3 +200,55 @@ test("saved-job state filters stay on the exact job-list path", async () => {
   ])
     await assert.rejects(readBackend("http://localhost:8000", bad, session));
 });
+
+test("anonymous login context forwards only bounded CSRF on one exact path", async () => {
+  const path = "/api/v1/account/sign-in-form/";
+  const csrf = "A".repeat(32);
+  assert.equal(
+    (
+      await readBackend("http://localhost:8000", path, undefined, () => {
+        throw Error("must not fetch");
+      })
+    ).kind,
+    "denied",
+  );
+  for (const sessionValue of [undefined, session, "untrusted;cookie=1"]) {
+    const result = await readBackend(
+      "http://localhost:8000",
+      path,
+      sessionValue,
+      async (_, options) => {
+        assert.equal(options.headers.Cookie, `csrftoken=${csrf}`);
+        assert.equal(options.cache, "no-store");
+        assert.equal(options.redirect, "manual");
+        return new Response("{}", {
+          headers: { "content-type": "application/json" },
+        });
+      },
+      csrf,
+    );
+    assert.equal(result.kind, "ok");
+  }
+  for (const other of [
+    "/api/v1/account/sign-in-form/?next=/",
+    "/api/v1/account/login/",
+    "/api/v1/account/sign-in-form/../sign-out-form/",
+  ]) {
+    await assert.rejects(
+      readBackend("http://localhost:8000", other, undefined, undefined, csrf),
+      /Unsupported/,
+    );
+  }
+  assert.equal(
+    (
+      await readBackend(
+        "http://localhost:8000",
+        "/api/v1/account/sign-out-form/",
+        undefined,
+        undefined,
+        csrf,
+      )
+    ).kind,
+    "signin",
+  );
+});

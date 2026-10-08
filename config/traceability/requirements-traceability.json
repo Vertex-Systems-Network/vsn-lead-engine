@@ -1604,6 +1604,49 @@
       ],
       "status": "implemented",
       "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "VSN-SAAS-NATIVE-LOGIN-CANCEL-RECOVERY",
+      "source": "VSN product intake; project-specific requirement, not an ANPOS normative extension.",
+      "source_provenance_ref": "PROJECT-IDEA.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-WEB-EXPERIENCE",
+        "MOD-JOB-ORCHESTRATION"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [
+        "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md"
+      ],
+      "design_component_refs": [],
+      "branch_refs": [
+        "codex/next-account-cancellation-recovery"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Native Next sign-in with explicit CSRF bootstrap/generic failures/unchanged attempt caps and cancellation-error snapshot/review implemented. Local 146 pass/16 PostgreSQL skips (162 cases), nine transport tests, Next build/type/lint/format and HTTP flows pass; exact-head CI pending. No provider/payment activation or browser/deployment certification."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-NATIVE-LOGIN-CANCEL-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/account_forms.py",
+        "apps/saas/core/test_native_accounts.py",
+        "apps/saas/core/test_native_cancel_errors.py",
+        "apps/web/app/account/sign-in/page.tsx",
+        "apps/web/test/integration_smoke.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [],
+      "status": "implemented",
+      "verification_status": "partially_verified"
     }
   ],
   "link_template": {

@@ -25,7 +25,11 @@ export async function readBackend(
   fetcher = fetch,
   csrf,
 ) {
-  const form = formPath.test(path) || path === "/api/v1/account/sign-out-form/";
+  const publicForm = path === "/api/v1/account/sign-in-form/";
+  const form =
+    publicForm ||
+    formPath.test(path) ||
+    path === "/api/v1/account/sign-out-form/";
   if (
     !form &&
     !filteredJobsPath.test(path) &&
@@ -35,13 +39,16 @@ export async function readBackend(
   ) {
     throw new Error("Unsupported backend path");
   }
-  if (!/^[a-z0-9]{32}$/.test(session ?? "")) return { kind: "signin" };
+  if (!publicForm && !/^[a-z0-9]{32}$/.test(session ?? ""))
+    return { kind: "signin" };
   if (form && !/^[A-Za-z0-9]{32}$/.test(csrf ?? "")) return { kind: "denied" };
   try {
     const response = await fetcher(new URL(path, trustedOrigin(origin)), {
       headers: {
         Accept: "application/json",
-        Cookie: `sessionid=${session}${form ? `; csrftoken=${csrf}` : ""}`,
+        Cookie: publicForm
+          ? `csrftoken=${csrf}`
+          : `sessionid=${session}${form ? `; csrftoken=${csrf}` : ""}`,
       },
       cache: "no-store",
       redirect: "manual",
