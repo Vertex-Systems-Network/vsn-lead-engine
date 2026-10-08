@@ -33,6 +33,16 @@ export default async function Results({
         ← Saved search
       </Link>
       <h1>Available results</h1>
+      {data.can_review_export ? (
+        <p>
+          <Link
+            prefetch={false}
+            href={`/dashboard/workspaces/${workspaceId}/jobs/${jobId}/export`}
+          >
+            Review CSV export
+          </Link>
+        </p>
+      ) : null}
       <p>
         Records shown pass current source rights and retention checks. Recorded
         job totals may include results that are no longer available. This

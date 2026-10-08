@@ -77,6 +77,30 @@ def csv_cell(value):
     return value
 
 
+def export_rights(policy):
+    rights = policy.controls.get("export_contract")
+    stored = policy.controls["result_contract"]
+    if (
+        not isinstance(rights, dict)
+        or set(rights) != EXPORT_RIGHTS
+        or type(rights["version"]) is not int
+        or rights["version"] != 1
+        or rights["allowed"] is not True
+        or not isinstance(rights["fields"], list)
+        or not rights["fields"]
+        or any(type(x) is not str for x in rights["fields"])
+        or not set(rights["fields"]) <= ALLOWED_FIELDS
+        or rights["purpose"] != stored["purpose"]
+        or rights["retention_version"] != stored["retention_version"]
+        or type(rights["attribution"]) is not str
+        or not rights["attribution"].strip()
+        or len(rights["attribution"]) > 240
+        or any(ord(c) < 32 or ord(c) == 127 for c in rights["attribution"])
+    ):
+        raise PermissionDenied("Source export rights are unavailable.")
+    return rights
+
+
 @transaction.atomic
 def prepare_export(user, workspace_id, job_id, key, data):
     lock_workspace(user, workspace_id)
@@ -106,26 +130,7 @@ def prepare_export(user, workspace_id, job_id, key, data):
     attribution = {}
     for code in sorted(codes):
         policy = SourcePolicy.objects.select_for_update().get(pk=code)
-        rights = policy.controls.get("export_contract")
-        stored = policy.controls["result_contract"]
-        if (
-            not isinstance(rights, dict)
-            or set(rights) != EXPORT_RIGHTS
-            or type(rights["version"]) is not int
-            or rights["version"] != 1
-            or rights["allowed"] is not True
-            or not isinstance(rights["fields"], list)
-            or not rights["fields"]
-            or any(type(x) is not str for x in rights["fields"])
-            or not set(rights["fields"]) <= ALLOWED_FIELDS
-            or rights["purpose"] != stored["purpose"]
-            or rights["retention_version"] != stored["retention_version"]
-            or type(rights["attribution"]) is not str
-            or not rights["attribution"].strip()
-            or len(rights["attribution"]) > 240
-            or any(ord(c) < 32 or ord(c) == 127 for c in rights["attribution"])
-        ):
-            raise PermissionDenied("Source export rights are unavailable.")
+        rights = export_rights(policy)
         policies[code] = ExportPolicy(
             code=code,
             countries=frozenset(policy.countries),

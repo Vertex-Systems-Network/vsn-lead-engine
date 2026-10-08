@@ -286,3 +286,32 @@ test("result snapshots require session and permit only exact bounded read paths"
     );
   }
 });
+
+test("export preview forwards validated form cookies only on exact path", async () => {
+  const path = `/api/v1/workspaces/${"a".repeat(36)}/jobs/${"b".repeat(36)}/export-form/`;
+  const csrf = "C".repeat(32);
+  assert.equal(
+    (await readBackend("http://localhost:8000", path, session)).kind,
+    "denied",
+  );
+  const result = await readBackend(
+    "http://localhost:8000",
+    path,
+    session,
+    async (url, options) => {
+      assert.equal(
+        options.headers.Cookie,
+        `sessionid=${session}; csrftoken=${csrf}`,
+      );
+      assert.equal(options.cache, "no-store");
+      return new Response("{}", {
+        headers: { "content-type": "application/json" },
+      });
+    },
+    csrf,
+  );
+  assert.equal(result.kind, "ok");
+  await assert.rejects(
+    readBackend("http://localhost:8000", path + "?all=1", session),
+  );
+});

@@ -1887,9 +1887,11 @@
       "branch_refs": [
         "saas/result-retention"
       ],
-      "pull_request_refs": [],
+      "pull_request_refs": [
+        "PR #195"
+      ],
       "test_evidence": [
-        "Bounded current-admin source-deadline erasure/tombstones implemented: clear payload/lineage/source reference, retain fingerprints/usage, fail-closed reads/export and irreversible-erasure rollback guard. Local/full CI evidence pending."
+        "PR #195 merged at 92657c5c8bbdb27115e95f5642f841e8a1c975c3; head dc84dce770bf14580e9d2691880510fc6615ba14 passed required checks/Actions CodeQL, PostgreSQL 37780165591 (235 tests/expiry races/migrations/settings) and Next/HTTP 37780165669 (10 transport tests/build/type and payload erasure/tombstone flow)."
       ],
       "visual_evidence_refs": [],
       "accessibility_evidence_refs": [],
@@ -1904,6 +1906,47 @@
         "apps/saas/core/result_retention.py",
         "apps/saas/core/test_result_retention.py",
         "apps/saas/core/management/commands/expire_result_payloads.py"
+      ],
+      "sbom_refs": [],
+      "attestation_refs": [],
+      "release_refs": [
+        "main:92657c5c8bbdb27115e95f5642f841e8a1c975c3"
+      ],
+      "status": "implemented",
+      "verification_status": "partially_verified"
+    },
+    {
+      "requirement_id": "SAAS-NEXT-EXPORT-001",
+      "source": "Native bounded export preview and confirmation",
+      "source_provenance_ref": "docs/ai/SAAS-UX-INTERACTION-CONTRACT-20261008.md",
+      "option_ids": [],
+      "module_ids": [
+        "MOD-LEAD-DATA-WORKFLOW",
+        "MOD-WEB-EXPERIENCE"
+      ],
+      "work_unit_ids": [
+        "WU-SAAS-LEAD-WEB"
+      ],
+      "design_surface_refs": [],
+      "design_component_refs": [],
+      "branch_refs": [
+        "saas/next-export-preview"
+      ],
+      "pull_request_refs": [],
+      "test_evidence": [
+        "Native Next export preview/confirmation implemented: bounded field omissions/attribution/count/deadline/one-unit notice, actor/job/selection/expiry-bound confirmation, direct CSRF POST CSV/replay and safe failure review. Full local/CI evidence pending."
+      ],
+      "visual_evidence_refs": [],
+      "accessibility_evidence_refs": [],
+      "security_evidence_refs": [
+        "docs/ai/SAAS-NEXT-EXPORT-REVIEW-20261008.md"
+      ],
+      "threat_model_refs": [],
+      "migration_refs": [],
+      "artifact_refs": [
+        "apps/saas/core/export_forms.py",
+        "apps/saas/core/test_export_forms.py",
+        "apps/web/app/dashboard/workspaces/[workspaceId]/jobs/[jobId]/export/page.tsx"
       ],
       "sbom_refs": [],
       "attestation_refs": [],
