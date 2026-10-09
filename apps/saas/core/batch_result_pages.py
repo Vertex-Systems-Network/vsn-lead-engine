@@ -171,7 +171,6 @@ def batch_results_page(
         or not 1 <= job.result_count <= 1000
         or reservation is None
         or reservation.status != "settled"
-        or reservation.request_hash != job.request_hash
         or job.result_count > reservation.leads
         or job.result_count > job.search["result_limit"]
     ):
