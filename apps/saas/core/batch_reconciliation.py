@@ -69,9 +69,9 @@ def bounded_source_evidence(sources, expected_sources, reserved_leads, reserved_
                 )
             )
             or item.call_limit < 1
-            or not 1 <= item.allocated_batches <= min(
-                1000, item.call_limit, reserved_leads, reserved_calls
-            )
+            or not 1
+            <= item.allocated_batches
+            <= min(1000, item.call_limit, reserved_leads, reserved_calls)
         ):
             raise ValidationError("Complete source evidence is unavailable.")
         if item.outcome == "source-final":
