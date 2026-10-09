@@ -81,6 +81,11 @@ def _key():
     return key.encode("utf-8")
 
 
+def require_page_signing_key():
+    """Fail before a read, including a final page with no continuation."""
+    _key()
+
+
 def _b64(raw):
     return base64.urlsafe_b64encode(raw).rstrip(b"=").decode("ascii")
 
