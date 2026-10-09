@@ -16,6 +16,7 @@ from .batch_events import record_batch_candidates
 from .batch_noeffect_events import record_source_batch_noeffect
 from .batch_reconciliation_settlement import settle_reconciled_batch_job
 from .batch_result_pages import batch_results_page
+from .batch_settlement_replay import replay_settled_batch_job
 from .batch_terminal_events import record_source_batch_terminal
 from .dispatch import begin_dispatch
 from .jobs import RevisionConflict, enqueue_job
@@ -31,6 +32,7 @@ from .models import (
     UsageReservation,
 )
 from .serializers import SearchSerializer
+from .services import IdempotencyConflict
 from .test_batch_candidates import BatchCandidateTests
 from .test_batch_events import KEY as CANDIDATE_KEY
 from .test_batch_intake import IntakeFixture
@@ -285,3 +287,37 @@ class MixedSettlementTests(TestCase):
             SourceBatchNoEffect.objects.filter(operation=self.zero_operation).update(batch_count=2)
             with self.assertRaises(RevisionConflict):
                 batch_results_page(self.user, self.operation.workspace_id, self.operation.job_id)
+
+    def test_mixed_settled_replay_checks_fresh_proofs_without_second_charge(self):
+        zero_proof = self.zero_proof()
+        record_source_batch_noeffect(
+            self.user, self.zero_operation.workspace_id, self.zero_operation.pk, *zero_proof
+        )
+        proofs = {self.operation.pk: self.terminal_proof_value, self.zero_operation.pk: zero_proof}
+        settle_reconciled_batch_job(
+            self.user, self.operation.workspace_id, self.operation.job_id, proofs
+        )
+        args = (self.user, self.operation.workspace_id, self.operation.job_id, proofs)
+        with override_settings(SAAS_BATCH_SETTLED_REPLAY_ENABLED=True):
+            with self.assertRaises(PermissionDenied):
+                replay_settled_batch_job(*args)
+        with override_settings(
+            SAAS_BATCH_SETTLED_REPLAY_ENABLED=True,
+            SAAS_BATCH_MIXED_SETTLED_REPLAY_ENABLED=True,
+        ):
+            job, created = replay_settled_batch_job(*args)
+            self.assertFalse(created)
+            self.assertEqual(job.status, "completed")
+            with self.assertRaises(ValidationError):
+                replay_settled_batch_job(
+                    *args[:3], {**proofs, self.zero_operation.pk: (zero_proof[0], "0" * 64)}
+                )
+            with override_settings(SAAS_BATCH_NOEFFECT_VERIFIERS={}):
+                with self.assertRaises(ValidationError):
+                    replay_settled_batch_job(*args)
+            SourceBatchNoEffect.objects.filter(operation=self.zero_operation).update(
+                batch_set_hash="0" * 64
+            )
+            with self.assertRaises(IdempotencyConflict):
+                replay_settled_batch_job(*args)
+        self.assertEqual(UsageCounter.objects.get(workspace_id=self.operation.workspace_id).jobs, 1)
