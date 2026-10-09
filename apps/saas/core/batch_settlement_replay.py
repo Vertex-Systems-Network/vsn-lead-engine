@@ -1,19 +1,22 @@
-"""Default-off read-only exact replay of an already settled positive v3 job."""
+"""Default-off read-only exact replay of already settled v3 source evidence."""
 
 from django.conf import settings
 from django.db import transaction
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
+from .batch_noeffect_manifest import NoEffectBatch, NoEffectBinding, verified_noeffect_manifest
 from .jobs import RevisionConflict, eligible_sources, locked_job
 from .models import (
     AcceptedResult,
     BatchAcceptance,
+    BatchCandidateEvidence,
     DispatchOperation,
     Entitlement,
     JobAttempt,
     JobOutbox,
     ResultBatch,
+    SourceBatchNoEffect,
     SourceBatchTerminal,
     UsageReservation,
 )
@@ -25,8 +28,9 @@ from .terminal_manifest import TerminalBatch, TerminalBinding, verified_terminal
 def replay_settled_batch_job(user, workspace_id, job_id, terminal_proofs):
     """Prove exact settled evidence again; never update a counter or state.
 
-    Only current 24-hour source-final proof is accepted. Expired signatures,
-    changed source rights, missing batches or ambiguous states fail closed.
+    Current 24-hour source-final and, behind a separate gate, source-noeffect
+    proofs are required. Expired signatures, changed source rights, missing
+    batches or ambiguous states fail closed.
     No API or worker calls this internal service.
     """
     if settings.SAAS_BATCH_SETTLED_REPLAY_ENABLED is not True:
@@ -63,7 +67,7 @@ def replay_settled_batch_job(user, workspace_id, job_id, terminal_proofs):
         or type(terminal_proofs) is not dict
         or set(terminal_proofs) != {op.pk for op in operations}
         or any(
-            op.status != "success"
+            op.status not in {"success", "noeffect"}
             or op.request_hash != job.request_hash
             or snapshot[op.source_code]
             != {"version": op.policy_version, "hash": op.policy_fingerprint}
@@ -86,7 +90,77 @@ def replay_settled_batch_job(user, workspace_id, job_id, terminal_proofs):
             or not isinstance(supplied[0], bytes)
             or not isinstance(supplied[1], str)
         ):
-            raise ValidationError("Current exact source-final proof is required.")
+            raise ValidationError("Current exact source proof is required.")
+        if op.status == "noeffect":
+            if settings.SAAS_BATCH_MIXED_SETTLED_REPLAY_ENABLED is not True:
+                raise PermissionDenied("Mixed batch replay is unavailable.")
+            batches = list(
+                ResultBatch.objects.select_for_update()
+                .filter(operation=op)
+                .order_by("ordinal")[:1001]
+            )
+            candidates = list(
+                BatchCandidateEvidence.objects.select_for_update().filter(batch__operation=op)
+            )
+            by_batch = {item.batch_id: item for item in candidates}
+            batch_ids = {batch.pk for batch in batches}
+            if (
+                not 1 <= len(batches) <= min(1000, op.call_limit, reservation.leads)
+                or len(by_batch) != len(candidates)
+                or any(batch.ordinal != position for position, batch in enumerate(batches, 1))
+                or any(
+                    item.batch_id not in batch_ids or item.source_code != op.source_code
+                    for item in candidates
+                )
+                or SourceBatchTerminal.objects.filter(operation=op).exists()
+                or BatchAcceptance.objects.filter(candidate__batch__operation=op).exists()
+                or AcceptedResult.objects.filter(
+                    batch_acceptance__candidate__batch__operation=op
+                ).exists()
+            ):
+                raise RevisionConflict()
+            binding = NoEffectBinding(
+                op.workspace_id,
+                op.job_id,
+                op.pk,
+                op.provider_key,
+                op.source_code,
+                op.request_hash,
+                op.policy_fingerprint,
+                tuple(
+                    NoEffectBatch(
+                        batch.pk, by_batch[batch.pk].body_hash if batch.pk in by_batch else None
+                    )
+                    for batch in batches
+                ),
+            )
+            proof = verified_noeffect_manifest(supplied[0], supplied[1], binding)
+            zero = SourceBatchNoEffect.objects.select_for_update().filter(operation=op).first()
+            if zero is None:
+                raise RevisionConflict()
+            if (
+                zero.source_code,
+                zero.receipt_ref,
+                zero.source_key_id,
+                zero.body_hash,
+                zero.batch_set_hash,
+                zero.batch_count,
+                zero.provider_calls,
+                zero.issued_at,
+            ) != (
+                op.source_code,
+                proof.receipt_ref,
+                proof.key_id,
+                proof.body_hash,
+                proof.batch_set_hash,
+                proof.batch_count,
+                0,
+                proof.issued_at,
+            ):
+                raise IdempotencyConflict()
+            continue
+        if SourceBatchNoEffect.objects.filter(operation=op).exists():
+            raise RevisionConflict()
         batches = list(
             ResultBatch.objects.select_for_update().filter(operation=op).order_by("ordinal")[:1001]
         )
