@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 37227)
-Total output lines: 2560
-
 # VSN Lead Engine
 
 Zero-paid-discovery-API lead engine for Vertex Systems Network.
@@ -1229,7 +1226,691 @@ three-cycle recovery immediately before P47, the scheduler issued exactly
 were productive, but the US attempts returned 35 unique accepted leads versus
 14 from Canada.
 
-P48 pre…7227 tokens truncated…s is the primary hourly controller at **:00** from 08:00 through
+P48 preserves country coverage while allowing evidence-backed tail weighting:
+
+- it activates only when 4 or fewer categories remain incomplete;
+- both countries need at least 4 category-specific observed visits before any
+  preference is applied;
+- the stronger country must show at least a 1.5x accepted-per-visit advantage;
+- the preferred country receives at most **2x** weight;
+- every country still receives a guaranteed base layer of attempts.
+
+With insufficient evidence or a small yield difference, routing remains the
+existing balanced sequence. The feature is runtime-configurable and does not
+change per-cycle shard limits, event time, providers, Google writes or R2
+dedupe semantics.
+
+### P49 combined daily state snapshot
+
+P47 tail mode can run up to eight cycles in one process. Each production cycle
+previously read live category totals and live country totals with two separate
+Google Sheets `batchGet` requests at cycle start and again after commit.
+
+P49 adds `daily_state_snapshot()`, which reads each category's date+country
+columns and review status once and derives both views from the same response.
+The engine now uses one snapshot for workbook readiness, one at cycle start,
+and one after commit.
+
+Existing `category_counts()` and `daily_country_counts()` methods remain
+available for backward compatibility. Lead writes, R2 dedupe, quota logic and
+the Google workbook schema are unchanged.
+
+For tail events this removes one full Sheets state request at every state-read
+boundary, reducing free API pressure and latency without relaxing freshness.
+
+### P50 centralized runtime identity
+
+P50 removes version drift between package releases and outbound public-network
+requests. Overture STAC resolution and official-site/Common Crawl enrichment now
+derive their default `User-Agent` from the package `__version__` through one
+canonical helper.
+
+The stale version-pinned enrichment override was removed from production config.
+An explicit operator-provided `enrichment.user_agent` is still honored, while
+normal releases now advance network identity automatically with the package
+version.
+
+This is a reliability and observability hardening only: discovery scope, quota
+logic, R2 dedupe, Google writes, enrichment budgets and provider selection are
+unchanged.
+
+### P51 single-source release version
+
+P51 removes the remaining duplicate release-version source. Packaging metadata
+now derives `project.version` dynamically from `vsn_lead_engine.__version__`
+through setuptools, so one version bump controls installed package metadata and
+the P50 canonical outbound identity together.
+
+A regression test verifies that `importlib.metadata.version("vsn-lead-engine")`
+always matches the runtime `__version__`.
+
+This is release-process hardening only; lead discovery, quota scheduling,
+enrichment, R2 dedupe and Google write behavior are unchanged.
+
+### P52 tail geography retention
+
+The 2026-09-28 live workbook reached **11,829 / 12,000** accepted daily rows
+with every category complete except Motorbikes at **829 / 1,000**. Motorbikes
+was already highly dedupe-saturated, while the existing P43/P44 geography
+helper stopped widening metro bounds once category completion rose above 25%.
+
+P52 keeps a bounded **1.5x metro bbox** active when four or fewer categories
+remain incomplete, until the category reaches quota. Existing low-completion
+expansion still wins: 1.75x and 2.25x critical expansion are never reduced by
+tail mode.
+
+This expands tail discovery into nearby suburbs/outskirts without adding paid
+sources, increasing per-shard limits, weakening taxonomy checks, or changing
+R2/Google write semantics.
+
+Production certification on 2026-09-28 used protected-main trigger sequence 31.
+GitHub Actions run #162 completed successfully in **616.207 seconds**. Runtime
+telemetry recorded **236** source-search events with
+`bbox_expansion_factor=1.5`, and the live workbook finished at:
+
+- **12,000 / 12,000** accepted daily rows;
+- **Motorbikes 1,000 / 1,000** with shortfall **0**;
+- **United States 7,459** and **Canada 4,541** accepted rows;
+- final workbook status **Complete**.
+
+A proposed 2.0x follow-up widening was intentionally not promoted because P52
+closed the quota with the smaller bounded horizon.
+
+### P54 Node 24 workflow runtime modernization
+
+GitHub Actions production logs on 2026-09-28 emitted deprecation warnings
+because the repository still referenced `actions/checkout@v4` and
+`actions/setup-python@v5`, both Node 20-era action majors.
+
+P54 upgrades all nine repository workflows to `actions/checkout@v7` and
+`actions/setup-python@v7`. Their current upstream action metadata uses
+`node24`, matching the GitHub-hosted runner runtime instead of relying on
+GitHub's compatibility override.
+
+A repository regression test now asserts that every managed workflow stays on
+the Node 24 action majors and rejects the previous v4/v5 pair. Workflow
+triggers, permissions, schedules, secrets, Python version, commands and quota
+logic are otherwise unchanged.
+
+### P55 immutable GitHub Actions pinning
+
+P54 moved repository workflows onto the Node 24 action line. P55 closes the
+remaining CI supply-chain gap by replacing mutable action tags with immutable
+release commit SHAs across all nine managed workflows.
+
+Pinned releases:
+
+- `actions/checkout v7.0.1` → `3d3c42e5aac5ba805825da76410c181273ba90b1`
+- `actions/setup-python v7.0.0` → `5fda3b95a4ea91299a34e894583c3862153e4b97`
+
+Version comments remain beside each pinned SHA for maintainability, while the
+actual executable reference is immutable. A regression test requires these
+exact SHAs and rejects both mutable `@v7` refs and the previous v4/v5 majors.
+
+This changes only CI dependency integrity. Workflow triggers, permissions,
+schedules, Python version, secrets, quota behavior, R2 dedupe and Google writes
+are unchanged.
+
+### P56 persistent AI supervisor resume state
+
+P56 adds a repository-native compact recovery layer so future supervisor
+sessions do not depend on chat history or broad re-audits before resuming work.
+
+Canonical resume files:
+
+- `.ai/state/CURRENT-STATE.yaml` — <= 12 KiB machine-readable snapshot/index;
+- `.ai/state/LAST-CHECKPOINT.md` — <= 16 KiB last verified checkpoint;
+- `.ai/state/RECOVERY-PROTOCOL.md` — deterministic resume/reconciliation order;
+- `AGENTS.md` — repository-local supervisor execution and safety contract.
+
+On every fresh session, `continue`, timeout, or connector recovery, the
+supervisor must read the compact state/checkpoint first, resolve live protected
+`main`, reconcile open Issues before open PRs, and let live GitHub/CI/R2/
+workbook evidence override stale compact state or chat memory.
+
+A CI regression test enforces required fields, size bounds, recovery headings,
+resume ordering and the immutable GitHub Actions security rule. This milestone
+does not change lead discovery, quota logic, R2 dedupe, Google writes, schedules
+or production runtime behavior.
+
+### P57 automated dependency update PRs
+
+P55 made GitHub Actions execution immutable by pinning reviewed release SHAs.
+P57 adds the update path needed to keep those pins and Python dependencies from
+silently aging.
+
+`.github/dependabot.yml` now monitors:
+
+- GitHub Actions at the repository root, weekly;
+- Python/pip dependencies from the root `pyproject.toml`, weekly;
+- both schedules in `Asia/Karachi`;
+- grouped updates to reduce PR noise;
+- a small open-PR ceiling so automation cannot flood protected main.
+
+Dependabot only proposes changes. Every generated PR must still pass the normal
+protected-main validation before it can merge. The pip policy uses
+`increase-if-necessary`, so version constraints are only raised when the
+existing manifest does not already allow the update.
+
+A repository regression test guards the required ecosystems, weekly schedule,
+timezone, grouping and PR limits.
+
+### P58 reproducible Python dependency installs
+
+P58 removes install-time transitive dependency drift from the Python 3.12
+GitHub-hosted Ubuntu execution path.
+
+A clean `pip --dry-run --ignore-installed --report` resolver run on PR #104
+produced the exact transitive environment. The resulting `requirements.txt`
+locks **35 runtime/dev packages** while `pyproject.toml` remains the source of
+the project's supported direct dependency ranges.
+
+Build isolation is also deterministic:
+
+- `setuptools==84.0.0`;
+- `wheel==0.48.0`.
+
+Every workflow that installs VSN Lead Engine now uses
+`-c requirements.txt`, so the project metadata is still installed normally
+but all resolved runtime/dev packages must match the reviewed lock. The primary
+CI and production workflow also runs `pip check` before application
+validation or lead execution.
+
+Dependabot's pip updater can maintain both PEP 621 `pyproject.toml` metadata
+and `.txt` dependency files; generated update PRs still have to pass protected
+main CI before merge.
+
+Repository tests enforce exact lock syntax, declared-dependency coverage,
+build-backend pins, constrained editable installs and dependency-integrity
+preflight coverage.
+
+### P59 hash-verified Python dependency artifacts
+
+P58 pinned exact dependency versions. P59 additionally verifies the bytes of
+every external package artifact used by the GitHub-hosted Ubuntu / CPython 3.12
+CI and production paths.
+
+Three reviewed hash surfaces are authoritative:
+
+- `requirements-bootstrap.txt` — pip, setuptools, wheel and packaging;
+- `requirements-runtime.txt` — 30 runtime packages;
+- `requirements-dev.txt` — runtime plus 5 test-only packages.
+
+Each package line is exact-version pinned and carries the SHA-256 of the
+artifact selected on a clean PR #105 GitHub runner. The old unhashed
+`requirements.txt` has been retired so there is no parallel dependency lock.
+
+All project-installing workflows call `scripts/install_locked.py`. That
+installer fails closed unless it is running on Linux + CPython 3.12, installs
+external artifacts with `pip --require-hashes`, then installs the local VSN
+package with `--no-deps --no-build-isolation` and runs `pip check`.
+
+This means normal production execution cannot silently resolve a different
+transitive version or accept different bytes for the selected dependency
+artifacts. Dependency-update PRs must regenerate reviewed hashes when the
+selected artifact set changes.
+
+The main-protection controller is intentionally excluded because it does not
+install the project or third-party Python dependencies.
+
+### P60 controlled hash-lock regeneration
+
+P59 made external Python artifacts hash-verified. P60 adds the controlled update
+path required when dependency versions change.
+
+The lock generator is now repository-native:
+
+- `scripts/regenerate_hash_locks.py --check` resolves the current
+  `pyproject.toml` runtime/dev dependency graph and fails with a unified diff
+  when committed SHA-256 locks are stale;
+- `--write` regenerates bootstrap, runtime and dev lock files in one
+  deterministic pass;
+- generation is Linux + CPython 3.12 only;
+- the resolver itself is fixed by
+  `.github/dependency-resolver.txt` at hash-verified `pip==25.2`.
+
+`.github/workflows/dependency-lock.yml` runs the drift check only when the
+dependency surface changes. Its manual regeneration job has job-scoped
+`contents: write`, rejects `main`/`master`, and accepts only an existing
+`dependabot/*` or `deps/*` target branch. It regenerates locks, re-checks
+them, performs a hash-verified dev install, validates runtime configuration,
+runs the full test suite, and only then commits the three generated lock files
+back to that update branch.
+
+There is no automatic merge and no direct-main regeneration path. Normal branch
+protection and PR CI remain the release gate.
+
+The pre-P59 Dependabot PR #103 was closed as stale because it targeted the
+retired unhashed `requirements.txt` model. Future dependency PRs are required
+to reconcile against the P60 generator instead.
+
+### P61 dependency-update certification
+
+P61 used the first post-P60 Dependabot update as a real end-to-end certification
+of the dependency integrity workflow.
+
+Dependabot proposed:
+
+- `phonenumbers 8.13.55 -> 9.0.40`;
+- `pytest 8.4.2 -> 9.1.1`;
+- direct dependency range widening to allow the new majors.
+
+The initial bot-generated lock lines carried multiple hashes and were rejected
+by both the repository lock contract and the fresh-resolver drift check, as
+designed. P60's pinned pip 25.2 resolver then produced the canonical selected
+artifacts:
+
+- `phonenumbers==9.0.40` →
+  `sha256:189c028c4acd41ee80782e50f74a91260bd76d9115c83be94302509e1cdb5e84`;
+- `pytest==9.1.1` →
+  `sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c`.
+
+After canonical normalization, Dependency Lock Integrity matched a fresh
+resolver result and Lead Engine CI passed the complete suite. Phone
+normalization remains covered for US/Canada E.164 behavior, so the
+`phonenumbers` major upgrade is certified rather than blindly accepted.
+
+This establishes the intended update path:
+
+Dependabot proposal → fail-closed drift detection → canonical regeneration →
+full application validation → protected-main merge.
+
+### P62 next-day workbook preflight and early recovery
+
+P62 moves daily workbook readiness from a single last-minute check into a
+two-stage preflight without changing lead collection or dedupe behavior.
+
+Readiness cadence in `Asia/Karachi`:
+
+- **20:50 PKT (15:50 UTC)** — preflight the **next day's** workbook;
+- **07:50 PKT (02:50 UTC)** — re-check/recover the **current day's** workbook;
+- **08:00 PKT** — normal primary lead-collection window begins.
+
+The earlier preflight creates or repairs tomorrow's dated workbook through the
+existing readiness path roughly eleven hours before production. If My Drive
+ownership or template-copy permissions block creation, the incident is visible
+well before the morning run instead of leaving only a ten-minute recovery
+window.
+
+CLI readiness is now date-aware but intentionally bounded:
+
+```
+python -m vsn_lead_engine.cli workbook-ready --next-day
+python -m vsn_lead_engine.cli workbook-ready-recover --next-day --attempts 3 --delay-seconds 60
+python -m vsn_lead_engine.cli workbook-ready --date YYYY-MM-DD
+```
+
+Explicit dates must be strict `YYYY-MM-DD` and may target only local **today**
+or **tomorrow**. Historical dates and dates beyond tomorrow are rejected, which
+prevents this repair path from mutating arbitrary workbooks.
+
+The readiness workflow also supports a manual `today` / `next-day` target
+choice. Next-day readiness events use distinct `prestart-next-day` health
+telemetry and persist `target_kind`, while the morning readiness event keeps
+the existing `prestart` origin.
+
+This path still performs no lead discovery, no R2 dedupe mutation, no quota
+lead writes, and no source/enrichment work.
+
+### P63 deployment catch-up next-day readiness
+
+P62 added a 20:50 PKT next-day preflight, but its first production deployment
+landed after that day's scheduled slot. That exposed a deployment-timing gap:
+new readiness logic could be correct and CI-green while tomorrow's workbook
+still remained unprepared until the next scheduled readiness run.
+
+P63 adds a bounded **main-push catch-up trigger** to the Daily Workbook
+Readiness workflow. It runs only when readiness-related production files change:
+
+- `.github/workflows/daily-workbook-readiness.yml`;
+- readiness CLI/schedule/health/engine/Sheets modules.
+
+A qualifying main deployment always targets **next-day** readiness. Unrelated
+README/docs-only pushes do not trigger the workflow.
+
+The catch-up uses the same bounded readiness repair path introduced by P62:
+no lead discovery, no source/enrichment work, no quota lead writes, and no R2
+dedupe mutation. It exists only to ensure a readiness deployment cannot miss
+the evening preflight window.
+
+### P64 ownership-safe Google My Drive authentication
+
+P63 certified the deployment catch-up trigger in production, but the real
+next-day readiness run exposed the Google ownership boundary: the target folder
+is **My Drive**, owned by the VSN user account, while the GitHub service account
+is only a writer. The push catch-up correctly targeted `2026-09-29`, retried
+three times, recorded the incident in the target-date health ledger, and failed
+closed when the service account could not create the missing file.
+
+Google's Drive model does not give service accounts personal Drive storage
+quota. P64 therefore adds an ownership-safe human-user OAuth path.
+
+Credential priority:
+
+1. `GOOGLE_OAUTH_USER_JSON` — Google authorized-user JSON; preferred for
+   My Drive reads/writes and new dated workbook creation;
+2. `GOOGLE_SERVICE_ACCOUNT_JSON` — preserved as a fallback for existing
+   shared files and backward compatibility.
+
+The OAuth secret is never logged. `validate` reports only the non-secret mode:
+`user-oauth`, `service-account`, or `missing`.
+
+All Google-write workflows expose both credential options and their credential
+gates accept either one. Runtime version is **0.60.0**.
+
+As immediate incident recovery, the connected user-owned Drive authority
+precreated `US + Canada Business Leads — 2026-09-29` in the configured folder.
+The file is owned by the VSN Google user and shared to the service account as
+writer, so existing-file readiness can proceed while user OAuth is configured
+for future autonomous creation.
+
+### P65 OAuth onboarding and Drive creation certification
+
+P64 added an OAuth-first runtime path, but a refresh-token credential still has
+to be provisioned once by the VSN Google user. P65 makes that onboarding and
+future creation verification repository-native.
+
+#### Local OAuth onboarding
+
+Create a Google Cloud **Desktop application** OAuth client with Drive + Sheets
+access, download its client JSON, then run:
+
+```bash
+python scripts/google_oauth_onboard.py client_secret.json
+```
+
+The helper uses a localhost callback, PKCE, offline access and explicit consent.
+It writes the resulting authorized-user credential to
+`.google-oauth-user.json` with private file permissions where supported. It
+does **not** print the refresh token or client secret.
+
+Both `.google-oauth-user.json` and `client_secret*.json` are git-ignored.
+
+After local authorization, add the complete generated JSON to the repository
+secret `GOOGLE_OAUTH_USER_JSON`.
+
+#### Production capability certification
+
+P65 adds:
+
+```bash
+python -m vsn_lead_engine.cli google-drive-capability --next-day --probe-create
+```
+
+and a manual **Google Drive Capability** GitHub Actions workflow. The probe
+creates a temporary Google Sheet in the configured lead folder and immediately
+moves it to trash. A successful probe proves the active credentials can create
+new files in the actual production location.
+
+Normal readiness does not perform the destructive-safe probe on every run.
+Instead, when a dated workbook is missing it first inspects target-folder
+capability. A service-account + My Drive ownership blocker is now classified as
+permanent and fails after **one attempt** rather than waiting through three
+60-second retries. Shared-drive/service-account and user-OAuth paths remain
+eligible for creation.
+
+Runtime version is **0.61.0**.
+
+### P66 strict user-OAuth autonomy certification
+
+P65 added the onboarding helper and create/trash capability probe. P66 makes
+the final production certification **strict** so service-account fallback can
+never be mistaken for autonomous My Drive readiness.
+
+The `google-drive-capability` CLI now supports:
+
+```bash
+python -m vsn_lead_engine.cli google-drive-capability \
+  --next-day \
+  --require-user-oauth \
+  --probe-create
+```
+
+With `--require-user-oauth`, any active mode other than `user-oauth`
+returns a permanent blocked result **before** a probe is attempted.
+
+The manual **Google Drive Capability** workflow now also:
+
+- fails immediately if `GOOGLE_OAUTH_USER_JSON` is missing;
+- refuses service-account fallback as certification evidence;
+- requires the strict user-OAuth CLI gate;
+- performs the real production-folder create → trash probe only after the
+  secret is present.
+
+This keeps existing service-account fallback available for normal operations on
+already-shared files, while autonomous missing-workbook creation is certified
+only with the intended user-owned OAuth authority.
+
+Runtime version is **0.62.0**.
+
+### P67 midnight-safe recovery runway
+
+P67 closes an end-of-day boundary gap in the production/recovery scheduler.
+
+Before P67, the local-hour gate considered the entire **23:00-23:59 PKT**
+hour valid. The recovery supervisor also used a separate hour-only gate, so a
+late dispatch could start close to midnight while the process watchdog still
+allowed roughly 26 minutes of execution.
+
+Scheduled production and recovery runs now require enough time to finish or be
+terminated **before local midnight**.
+
+The required runway is derived from the active runtime budgets:
+
+- process watchdog: `1560s`;
+- kill grace: `20s`;
+- event budget: `1500s + 60s guard`;
+- midnight safety buffer: `60s`.
+
+Current minimum runway is therefore **1640 seconds (27m20s)**.
+
+Under the current configuration:
+
+- **23:30 PKT** → allowed;
+- **23:32:40 PKT** → exact threshold, allowed;
+- **23:32:41 PKT and later** → blocked by
+  `insufficient-midnight-runway`;
+- 23:40 / 23:50 recovery heartbeats can still run their lightweight quota
+  checks, but they cannot dispatch a real lead process.
+
+The same `scheduled_run_window()` gate is used by both the native Lead Engine
+schedule and the Recovery Supervisor. Recovery-supervisor and recovery-push
+runs also re-check the gate at **actual execution start**, protecting against
+GitHub queue delay after dispatch.
+
+Recovery origin telemetry is preserved through the scheduled gate. Explicit
+human `manual` workflow runs remain operator-controlled and are not silently
+reclassified as scheduled recovery.
+
+Runtime version is **0.63.0**.
+
+### P68 health-ledger recovery and schedule-gate telemetry
+
+P68 makes the operational health ledger accurately distinguish **real recovery
+runs** from **recovery attempts intentionally blocked by schedule policy**.
+
+Recovery accounting now includes both production origins:
+
+- `recovery-push`;
+- `recovery-supervisor`.
+
+The summary exposes:
+
+- `recovery_runs` — combined executed recovery runs;
+- `recovery_push_runs`;
+- `recovery_supervisor_runs`;
+- `schedule_blocks`;
+- `midnight_guard_blocks`;
+- `latest_schedule_block_reason`.
+
+A `scheduled-window-skipped` event is **not** counted as an executed run.
+
+Run-health events now persist the P67 schedule evidence:
+
+- schedule status / block reason;
+- within-hours and midnight-safe flags;
+- seconds remaining to local midnight;
+- required watchdog runway;
+- configured safety buffer.
+
+P68 also adds a PII-free `schedule-gate` health event and
+`health-schedule-gate` CLI command. The Recovery Supervisor records a blocked
+pre-dispatch gate directly into the existing R2 daily health ledger, so a
+23:40/23:50 intentional midnight guard is auditable even though no Lead Engine
+child process starts.
+
+Telemetry failure is non-blocking for the Recovery Supervisor itself; it does
+not turn an intentional safe skip into an operational outage.
+
+Runtime version is **0.64.0**.
+
+### P69 serialized daily-workbook lifecycle
+
+P69 removes a race between the Daily Workbook Readiness workflow and real Lead
+Engine runs.
+
+Before P69, both workflows could operate on the same dated Google workbook at
+the same time because they used different GitHub Actions concurrency groups.
+That becomes more important once user OAuth enables autonomous workbook
+creation: a delayed 07:50 readiness run and the 08:00 production run could both
+observe a missing workbook and race to create the same dated file.
+
+Production workbook-mutating runs now share the repository-wide concurrency
+group:
+
+`vsn-lead-engine-production`
+
+Both Lead Engine production events and Daily Workbook Readiness use
+`queue: max`, so overlapping production work waits instead of replacing an
+already pending run. Pull-request validation remains isolated in a
+PR-number-specific concurrency group and does not block production.
+
+Drive lookup is also fail-closed:
+
+- zero exact active matches → creation is allowed through the existing
+  capability/auth controls;
+- one exact active match → use it;
+- more than one exact active match → raise
+  `DuplicateDailyWorkbookError` and stop before writes;
+- after a new copy is created, a second exact lookup verifies that the created
+  file is still the sole canonical dated workbook before further sheet writes.
+
+This protects against both GitHub workflow overlap and an external/manual file
+appearing during the create window.
+
+The current `2026-09-29` production folder was checked before rollout and has
+exactly one active dated workbook.
+
+Runtime version is **0.65.0**.
+
+### P70 day-boundary-aware deployment readiness
+
+P70 corrects the deployment catch-up target around local midnight.
+
+Before P70, every readiness-related push to protected main forced
+`next-day`. A deployment at 00:20 PKT therefore skipped the current upcoming
+production day and targeted tomorrow instead.
+
+Deployment catch-up now uses the configured **20:50 PKT evening preflight
+cutoff**:
+
+- **00:00–20:49:59 PKT** → target local **today**;
+- **20:50:00–23:59:59 PKT** → target local **next-day**.
+
+At midnight the rule naturally resets to the new local day. This means a
+00:20 deployment on September 29 targets **September 29**, not September 30.
+
+The cutoff is explicit in runtime configuration:
+
+- `readiness_evening_preflight_hour = 20`;
+- `readiness_evening_preflight_minute = 50`.
+
+The workflow target-resolution step now uses the shared Python schedule module
+instead of duplicating push-date logic in Bash. It records the resolved target
+kind, run date, resolution reason and local resolution time in the Actions log.
+
+Scheduled semantics remain unchanged:
+
+- 07:50 PKT schedule → today;
+- 20:50 PKT schedule → next-day;
+- manual `today` / `next-day` selection remains explicit.
+
+P69's first post-merge catch-up at 00:20 PKT correctly exposed the old behavior
+by targeting September 30. That run hit the already-known My Drive
+service-account creation blocker; September 29 remained intact with exactly
+one active workbook. September 30 was then precreated under the VSN user owner
+so the OAuth blocker cannot disrupt its evening readiness.
+
+Runtime version is **0.66.0**.
+
+## Primary free source
+
+Production discovery uses **Overture Maps Places**, queried directly from its
+public GeoParquet release with DuckDB. The dataset exposes place names,
+taxonomy, phones, websites, emails, socials and addresses when available.
+
+The engine resolves the current Overture release from the official STAC
+catalog instead of hardcoding a release.
+
+See [DATA_SOURCES.md](DATA_SOURCES.md) for licensing/compliance notes.
+
+## Taxonomy-first category precision
+
+Category selection uses Overture's canonical `taxonomy.primary`,
+`taxonomy.hierarchy` and `basic_category` fields.
+
+Rules:
+
+- taxonomy entries are matched as complete tokens, never loose substrings;
+- a business name cannot override a conflicting taxonomy;
+- name fallback is allowed only when taxonomy is missing and the phrase is
+  category-specific;
+- the accepted lead note records the classification reason for later audits;
+- the Python classifier re-checks every SQL result before it can become a lead;
+- rows quarantined as `Needs Review` are excluded from daily target counts and
+  Overview totals;
+- matching Master Registry rows use `NeedsReview`, which no longer blocks
+  dedupe, so a business may be rediscovered later into the correct category.
+
+## Country-balanced priority scheduler
+
+Every workflow run gets an independent cursor (GitHub run number in Actions).
+
+1. US and Canada metros are interleaved; the underrepresented country runs first.
+2. Categories below 25% of target receive 3× shard weight, 25-50% receive 2×,
+   and categories above 50% receive normal weight.
+3. Metro order rotates with the run cursor.
+4. Each shard also receives a rotating deterministic Overture candidate
+   partition, so repeated runs do not keep replaying the same first limited
+   cohort.
+
+Each collection cycle can try up to 18 category/geography shards with a
+1,000-lead accepted ceiling. One production event can execute up to **3
+controlled cycles**, re-reading live quota state between cycles, so it can add
+up to 3,000 accepted leads without waiting for the next hourly event.
+
+## Pipeline
+
+```
+GitHub event / schedule
+ -> GitHub-hosted ubuntu runner
+ -> resolve Asia/Karachi date
+ -> find/create US + Canada Business Leads — YYYY-MM-DD
+ -> Overture Places discovery
+ -> country/category priority scheduler
+ -> taxonomy-first classification
+ -> official website / bounded Common Crawl contact enrichment
+ -> normalize phone
+ -> Registry dedupe (Sheets migration source; R2 permanent ledger)
+ -> Registry PendingDaily
+ -> dated workbook append
+ -> Registry Active
+ -> dated Overview counters
+```
+
+## Reliability and schedule
+
+GitHub Actions is the primary hourly controller at **:00** from 08:00 through
 23:00 Asia/Karachi. The separate recovery supervisor runs at **:20** and checks
 the live dated workbook before acting. It creates a protected-main-compatible
 recovery PR only when the native run is missing/failed or the live quota still
