@@ -32,7 +32,7 @@ from .test_batch_noeffect_manifest import KEY
     SAAS_BATCH_NOEFFECT_VERIFIERS={"fixture": {"zero": KEY}},
 )
 class NoEffectEventTests(IntakeFixture, TestCase):
-    def manifest(self, **changes):
+    def noeffect_manifest(self, **changes):
         operation = self.operation
         data = {
             "version": 3,
@@ -61,7 +61,10 @@ class NoEffectEventTests(IntakeFixture, TestCase):
 
     def record(self, **changes):
         return record_source_batch_noeffect(
-            self.user, self.operation.workspace_id, self.operation.pk, *self.manifest(**changes)
+            self.user,
+            self.operation.workspace_id,
+            self.operation.pk,
+            *self.noeffect_manifest(**changes),
         )
 
     def test_disabled_replay_and_no_accounting(self):
