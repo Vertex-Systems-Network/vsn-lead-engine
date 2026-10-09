@@ -32,6 +32,10 @@ from .test_batch_noeffect_manifest import KEY
     SAAS_BATCH_NOEFFECT_VERIFIERS={"fixture": {"zero": KEY}},
 )
 class NoEffectEventTests(IntakeFixture, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.noeffect_issued_at = int(timezone.now().timestamp())
+
     def noeffect_manifest(self, **changes):
         operation = self.operation
         data = {
@@ -46,7 +50,7 @@ class NoEffectEventTests(IntakeFixture, TestCase):
             "policy_fingerprint": operation.policy_fingerprint,
             "source_key_id": "zero",
             "receipt_ref": "zero-1",
-            "issued_at": int(timezone.now().timestamp()),
+            "issued_at": self.noeffect_issued_at,
             "provider_calls": 0,
             "batches": [
                 {
