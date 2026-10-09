@@ -2558,3 +2558,10 @@ one job, attempt and outbox update atomically. All-zero evidence retains the
 original reservation for separate business resolution. This service has no
 route, worker or live signer/R2 activation; SQLite smoke tests cannot certify
 PostgreSQL locking and race behavior.
+
+The same disabled internal 25-row page service now accepts a mixed settled job
+only when each positive source retains exact final/count evidence and each
+no-effect source retains its original batch identity/digest and zero accepted
+payload. A changed no-effect batch set, ordinal, status or settlement denies
+the whole page. This is an internal read, not a customer route or CSV export;
+settled mixed-proof replay and external source qualification remain open.
