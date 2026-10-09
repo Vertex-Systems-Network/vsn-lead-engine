@@ -207,7 +207,8 @@ def batch_results_page(
         or sum(final.accepted_count for final in finals) != job.result_count
         or type(settlement) is not dict
         or set(settlement) != {"leads", "jobs", "provider_calls", "exports"}
-        or settlement != {
+        or settlement
+        != {
             "leads": job.result_count,
             "jobs": 1,
             "provider_calls": sum(final.provider_calls for final in finals),
@@ -218,9 +219,9 @@ def batch_results_page(
         raise RevisionConflict()
     for op in operations:
         final = next((item for item in finals if item.operation_id == op.pk), None)
-        batch_counts = BatchAcceptance.objects.filter(
-            candidate__batch__operation=op
-        ).aggregate(total=Sum("accepted_count"), calls=Sum("provider_calls"))
+        batch_counts = BatchAcceptance.objects.filter(candidate__batch__operation=op).aggregate(
+            total=Sum("accepted_count"), calls=Sum("provider_calls")
+        )
         if (
             final is None
             or final.source_code != op.source_code
