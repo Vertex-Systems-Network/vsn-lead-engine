@@ -58,9 +58,7 @@ class PositiveReconciliationReadTests(TerminalFixture, TestCase):
             UsageReservation.objects.get(pk=self.operation.outbox.reservation_id).status,
             "reserved",
         )
-        self.assertEqual(
-            UsageCounter.objects.get(workspace_id=self.operation.workspace_id).jobs, 0
-        )
+        self.assertEqual(UsageCounter.objects.get(workspace_id=self.operation.workspace_id).jobs, 0)
 
     def test_changed_proof_or_missing_original_source_fails(self):
         with self.assertRaises(RevisionConflict):

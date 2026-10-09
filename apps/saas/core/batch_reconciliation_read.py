@@ -105,15 +105,18 @@ def inspect_batch_reconciliation(user, workspace_id, job_id, source_proofs):
             )
             if created or replay.pk != final.pk:
                 raise RevisionConflict()
-            aggregate = BatchAcceptance.objects.filter(
-                candidate__batch__operation=op
-            ).aggregate(calls=Sum("provider_calls"))
+            aggregate = BatchAcceptance.objects.filter(candidate__batch__operation=op).aggregate(
+                calls=Sum("provider_calls")
+            )
             committed = aggregate["calls"] or 0
-            if AcceptedResult.objects.filter(
-                batch_acceptance__candidate__batch__operation=op,
-                workspace_id=workspace_id,
-                job=job,
-            ).count() != final.accepted_count:
+            if (
+                AcceptedResult.objects.filter(
+                    batch_acceptance__candidate__batch__operation=op,
+                    workspace_id=workspace_id,
+                    job=job,
+                ).count()
+                != final.accepted_count
+            ):
                 raise RevisionConflict()
             sources.append(
                 SourceEvidenceTotals(
@@ -150,8 +153,11 @@ def inspect_batch_reconciliation(user, workspace_id, job_id, source_proofs):
     totals = bounded_source_evidence(
         tuple(sources), frozenset(snapshot), reservation.leads, reservation.provider_calls
     )
-    if AcceptedResult.objects.filter(
-        workspace_id=workspace_id, job=job, batch_acceptance__isnull=False
-    ).count() != totals.leads:
+    if (
+        AcceptedResult.objects.filter(
+            workspace_id=workspace_id, job=job, batch_acceptance__isnull=False
+        ).count()
+        != totals.leads
+    ):
         raise RevisionConflict()
     return totals
