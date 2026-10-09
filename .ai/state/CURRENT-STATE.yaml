@@ -15,7 +15,7 @@
     "next_control_plane_task": "continuous_safe_frontier"
   },
   "observed_main_sha": "930cc4d37f71303905954ca9a3e619c71ad4a66a",
-  "observed_main_semantics": "Default-off v3 result pages #230; no route.",
+  "observed_main_semantics": "Default-off v3 pages with ledger guard #231; no route.",
   "active_issue": null,
   "active_pr": null,
   "active_branch": "main",
@@ -141,7 +141,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Finish v3 page ledger guard; then signed settled-state replay and unknown/no-effect reconciliation, write-ahead and bounded exports. Keep dispatch and external gates closed.",
+  "exact_next_safe_action": "Add signed settled-state replay and explicit unknown/no-effect reconciliation; then write-ahead and bounded export/page routes. Keep dispatch and external gates closed.",
   "last_reconciled_at": "2026-10-08",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
