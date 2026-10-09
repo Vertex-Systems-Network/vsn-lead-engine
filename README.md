@@ -30,7 +30,7 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected main: `61ae5663` (PR #229); v3 batch acceptance, source finality, positive-result accounting and an isolated signed cursor are verified but disabled/quarantined. Unknown/no-effect reconciliation, replay, page delivery and external activation remain open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected main: `d195481f` (PR #230); v3 batch acceptance, source finality, positive-result accounting and bounded internal pages are verified but disabled/quarantined. Unknown/no-effect reconciliation, replay, routes/export and external activation remain open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
 - Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: additive accepted-payload schema/intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
@@ -2462,3 +2462,8 @@ raw proof references are never returned. This does not expose an HTTP endpoint,
 enable export, turn on v3 dispatch or establish live provider rights. Current
 source policy changes deny subsequent pages; page signing remains empty by
 default.
+
+PR #230 merged at `d195481f`; all five exact-head workflows passed, including
+416 PostgreSQL tests and 14 Web tests. A following guard reconciles each
+source's accepted payload count and the exact settled amount before displaying
+any row; this follow-up is under review.
