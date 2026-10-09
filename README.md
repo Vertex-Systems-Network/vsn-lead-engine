@@ -2525,3 +2525,6 @@ be treated as a zero-effect outcome. This preflight accepts trusted input only:
 the signed proof, durable identity/acceptance set and current source authority
 must still be verified together under database locks before reconciliation.
 It has no database, status, counter or refund write.
+
+The no-effect replay test now keeps one issuance timestamp per fixture so an
+unrelated second boundary cannot change the signed body during replay.
