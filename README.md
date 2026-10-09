@@ -2564,4 +2564,11 @@ only when each positive source retains exact final/count evidence and each
 no-effect source retains its original batch identity/digest and zero accepted
 payload. A changed no-effect batch set, ordinal, status or settlement denies
 the whole page. This is an internal read, not a customer route or CSV export;
-settled mixed-proof replay and external source qualification remain open.
+external source qualification and customer delivery remain open.
+
+An additional default-off mixed settled-state replay accepts fresh exact
+positive and zero-effect signatures under current rights. It reconstructs
+allocated identities and recorded candidate digests, checks the durable
+no-effect metadata and original settlement, and never writes usage. Expired
+proofs, revoked keys and changed stored evidence fail closed. This remains an
+internal inspection with no route or external signer activation.
