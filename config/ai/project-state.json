@@ -35,8 +35,8 @@
   "critical_defects": [],
   "qa_readiness": "saas_406_postgres_and_14_web_http_verified",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "930cc4d37f71303905954ca9a3e619c71ad4a66a",
-  "last_reconciled_at": "2026-10-08",
+  "last_reconciled_repository_ref": "a90b909881b67486174dee53b0e0c4fd14fbee9c",
+  "last_reconciled_at": "2026-10-09",
   "reconciliation": {
     "source_of_truth_order": [
       "live GitHub repository and Actions evidence",
