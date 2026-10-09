@@ -1,5 +1,6 @@
 """Default-off bounded v3 pages; every continuation rechecks current rights."""
 
+import hashlib
 import json
 
 from django.conf import settings
@@ -21,10 +22,13 @@ from .jobs import RevisionConflict, eligible_sources
 from .models import (
     AcceptedResult,
     BatchAcceptance,
+    BatchCandidateEvidence,
     DispatchOperation,
     Entitlement,
     Job,
     JobOutbox,
+    ResultBatch,
+    SourceBatchNoEffect,
     SourceBatchTerminal,
     SourcePolicy,
     UsageReservation,
@@ -136,6 +140,43 @@ def _visible(row, rights, search, now):
     return entry
 
 
+def _noeffect_matches(operation, event, reserved_leads):
+    """Match the durable no-effect batch identity set recorded at settlement."""
+    batches = list(ResultBatch.objects.filter(operation=operation).order_by("ordinal")[:1001])
+    candidates = list(BatchCandidateEvidence.objects.filter(batch__operation=operation))
+    by_batch = {item.batch_id: item for item in candidates}
+    batch_ids = {batch.pk for batch in batches}
+    if (
+        event.source_code != operation.source_code
+        or event.provider_calls != 0
+        or not 1
+        <= len(batches)
+        == event.batch_count
+        <= min(1000, operation.call_limit, reserved_leads)
+        or len(by_batch) != len(candidates)
+        or any(batch.ordinal != index for index, batch in enumerate(batches, 1))
+        or any(
+            item.source_code != operation.source_code or item.batch_id not in batch_ids
+            for item in candidates
+        )
+    ):
+        return False
+    batch_set = sorted(
+        (
+            {
+                "batch_id": str(batch.pk),
+                "candidate_body_hash": (
+                    by_batch[batch.pk].body_hash if batch.pk in by_batch else None
+                ),
+            }
+            for batch in batches
+        ),
+        key=lambda item: item["batch_id"],
+    )
+    encoded = json.dumps(batch_set, sort_keys=True, separators=(",", ":")).encode("ascii")
+    return hashlib.sha256(encoded).hexdigest() == event.batch_set_hash
+
+
 @transaction.atomic
 def batch_results_page(
     user, workspace_id, job_id, cursor=None, *, country="", category="", source=""
@@ -191,7 +232,7 @@ def batch_results_page(
         or len({op.source_code for op in operations}) != len(operations)
         or {op.source_code for op in operations} != set(snapshot)
         or any(
-            op.status != "success"
+            op.status not in {"success", "noeffect"}
             or op.request_hash != job.request_hash
             or snapshot[op.source_code]
             != {"version": op.policy_version, "hash": op.policy_fingerprint}
@@ -200,9 +241,15 @@ def batch_results_page(
     ):
         raise RevisionConflict()
     finals = list(SourceBatchTerminal.objects.filter(operation__in=operations))
+    noeffects = list(SourceBatchNoEffect.objects.filter(operation__in=operations))
+    positive = {op.pk for op in operations if op.status == "success"}
+    zero = {op.pk for op in operations if op.status == "noeffect"}
     settlement = reservation.settlement
     if (
-        len(finals) != len(operations)
+        {item.operation_id for item in finals} != positive
+        or {item.operation_id for item in noeffects} != zero
+        or len(finals) != len(positive)
+        or len(noeffects) != len(zero)
         or sum(final.accepted_count for final in finals) != job.result_count
         or type(settlement) is not dict
         or set(settlement) != {"leads", "jobs", "provider_calls", "exports"}
@@ -218,9 +265,24 @@ def batch_results_page(
         raise RevisionConflict()
     for op in operations:
         final = next((item for item in finals if item.operation_id == op.pk), None)
+        noeffect = next((item for item in noeffects if item.operation_id == op.pk), None)
         batch_counts = BatchAcceptance.objects.filter(candidate__batch__operation=op).aggregate(
             total=Sum("accepted_count"), calls=Sum("provider_calls")
         )
+        if op.status == "noeffect":
+            if (
+                noeffect is None
+                or not _noeffect_matches(op, noeffect, reservation.leads)
+                or batch_counts["total"] is not None
+                or batch_counts["calls"] is not None
+                or AcceptedResult.objects.filter(
+                    workspace_id=workspace_id,
+                    job=job,
+                    batch_acceptance__candidate__batch__operation=op,
+                ).exists()
+            ):
+                raise RevisionConflict()
+            continue
         if (
             final is None
             or final.source_code != op.source_code
