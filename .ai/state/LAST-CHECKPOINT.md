@@ -3,7 +3,7 @@
 ## Snapshot
 
 - Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 UTC / PKT.
-- Latest verified feature main `e258d6cce9ce2e1ce32d73a09d82e226ce2e9418` after PR #237; PR #238 read-only reconciliation under review.
+- Latest verified feature main `a90b909881b67486174dee53b0e0c4fd14fbee9c` after PR #238; explicit-outcome settlement is in local development review.
 - Product 0.66.1 / ANPOS 1.4.0; Next frontend and isolated Django/DRF/PostgreSQL authority. Existing production CLI/R2/Google namespaces and phone-only US/Canada/taxonomy/quota invariants preserved.
 
 ## Verified
@@ -42,7 +42,7 @@
 
 ## Next Action
 
-1. Verify read-only all-source replay, then separately design atomic mixed/unknown outcome transitions under original reservations. Internal write-ahead entry and gated page/export routes follow. Ordinary v3 dispatch remains quarantined.
+1. Verify default-off atomic mixed/unknown outcome transition under original reservations in PostgreSQL CI. All-zero business treatment stays reserved. Internal write-ahead entry and gated page/export routes follow. Ordinary v3 dispatch remains quarantined.
 2. Complete native selected-page CSV and bounded routes using existing signed 25-row page services, preserving current rights/expiry/no-referrer/once-only preparation semantics.
 3. Keep README/machine/checkpoint evidence synchronized after protected merges; checkpoints are recovery aids, not permission gates. Continue safe frontier within the next invocation's host budget. Do not replay merged mutations.
 
