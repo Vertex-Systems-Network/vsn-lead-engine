@@ -30,7 +30,7 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected main: `e8ad8d24` (PR #233); v3 batch acceptance, source finality, positive-result accounting, bounded internal pages and exact settled-state replay are verified but disabled/quarantined. Unknown/no-effect reconciliation, routes/export and external activation remain open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected main: `f55f1972` (PR #235); v3 batch acceptance, source finality, positive-result accounting, bounded internal pages, exact settled-state replay and pure source no-effect proof are verified but disabled/quarantined. Durable unknown/no-effect reconciliation, routes/export and external activation remain open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
 - Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: explicit unknown/no-effect reconciliation and internal write-ahead before gated export/page routes; do not activate payments, providers, production collections or a customer launch without verified gates.
@@ -2484,7 +2484,7 @@ including 419 PostgreSQL tests and 14 Web tests. Current signed proof and
 recorded settlement replay without mutating usage; key, source-policy and
 batch-evidence drift fail closed. The replay gate remains false by default.
 
-### Separate v3 no-effect proof — isolated contract under review
+### Separate v3 no-effect proof — verified, isolated contract
 
 A pure source-signed `source-noeffect` manifest binds the exact allocated batch
 IDs and any candidate-body hashes to the original workspace/job/operation,
@@ -2494,3 +2494,19 @@ source-final proofs. Even an empty batch set requires an explicit signed zero
 effect claim. This parser has no database, reservation, refund or operation
 write; current rights, absent accepted payload and complete durable identity
 reconciliation remain future service gates. No live source authority is claimed.
+
+PR #235 merged at `f55f1972` after all five exact-head workflows passed,
+including 424 PostgreSQL tests and 14 Web tests. Verification only proves the
+signed claim's shape and exact supplied batch set; it does not make a zero-call
+claim from missing acceptance evidence.
+
+### Durable v3 no-effect evidence — development review, disabled
+
+A separate default-off internal service rechecks current admin, entitlement,
+source policy, original reservation, contiguous server-owned identities and
+the exact recorded candidate hashes before storing redacted zero-effect proof
+metadata. Existing positive evidence, changed proof, revoked key or additional
+batch identity fails closed. Exact replay rechecks current rights. No operation,
+job, counter or reservation change follows: unknown effects remain reserved,
+and live source authority is still unverified. Empty batch sets remain a pure
+proof contract; this recorder requires at least one durable identity.

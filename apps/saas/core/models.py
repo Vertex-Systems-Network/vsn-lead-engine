@@ -595,6 +595,34 @@ class SourceBatchTerminal(models.Model):
         ]
 
 
+class SourceBatchNoEffect(models.Model):
+    """Redacted signed zero-effect claim; it never releases reserved capacity."""
+
+    operation = models.OneToOneField(DispatchOperation, on_delete=models.PROTECT)
+    source_code = models.CharField(max_length=64)
+    receipt_ref = models.CharField(max_length=96)
+    source_key_id = models.CharField(max_length=64)
+    body_hash = models.CharField(max_length=64)
+    batch_set_hash = models.CharField(max_length=64)
+    batch_count = models.PositiveIntegerField()
+    provider_calls = models.PositiveIntegerField(default=0)
+    issued_at = models.DateTimeField()
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source_code", "receipt_ref"], name="saas_batch_noeffect_ref"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(provider_calls=0), name="saas_batch_noeffect_zero_calls"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(batch_count__lte=1000), name="saas_batch_noeffect_bound"
+            ),
+        ]
+
+
 class AcceptedResult(models.Model):
     """Isolated tenant payload with source-derived eligibility/deletion deadline."""
 
