@@ -42,7 +42,7 @@
 
 ## Next Action
 
-1. PR #239 default-off atomic mixed/unknown outcome transition passed exact-head PostgreSQL CI; mixed internal page consistency is a follow-up change under review. All-zero business treatment stays reserved. Settled mixed-proof replay, internal write-ahead entry and gated page/export routes follow. Ordinary v3 dispatch remains quarantined.
+1. PR #239 default-off atomic mixed/unknown outcome transition and mixed internal page consistency passed prior exact-head PostgreSQL CI; mixed settled-proof replay is a further follow-up under review. All-zero business treatment stays reserved. Internal write-ahead entry and gated page/export routes follow. Ordinary v3 dispatch remains quarantined.
 2. Complete native selected-page CSV and bounded routes using existing signed 25-row page services, preserving current rights/expiry/no-referrer/once-only preparation semantics.
 3. Keep README/machine/checkpoint evidence synchronized after protected merges; checkpoints are recovery aids, not permission gates. Continue safe frontier within the next invocation's host budget. Do not replay merged mutations.
 
