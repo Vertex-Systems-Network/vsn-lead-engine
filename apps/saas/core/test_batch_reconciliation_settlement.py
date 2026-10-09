@@ -15,6 +15,7 @@ from .batch_allocation import allocate_result_batch
 from .batch_events import record_batch_candidates
 from .batch_noeffect_events import record_source_batch_noeffect
 from .batch_reconciliation_settlement import settle_reconciled_batch_job
+from .batch_result_pages import batch_results_page
 from .batch_terminal_events import record_source_batch_terminal
 from .dispatch import begin_dispatch
 from .jobs import RevisionConflict, enqueue_job
@@ -23,6 +24,8 @@ from .models import (
     Entitlement,
     Job,
     JobOutbox,
+    ResultBatch,
+    SourceBatchNoEffect,
     SourcePolicy,
     UsageCounter,
     UsageReservation,
@@ -242,3 +245,43 @@ class MixedSettlementTests(TestCase):
             "reserved",
         )
         self.assertEqual(UsageCounter.objects.get(workspace_id=self.operation.workspace_id).jobs, 0)
+
+    def test_mixed_settlement_page_reads_positive_and_rejects_zero_evidence_drift(self):
+        zero_proof = self.zero_proof()
+        record_source_batch_noeffect(
+            self.user, self.zero_operation.workspace_id, self.zero_operation.pk, *zero_proof
+        )
+        settle_reconciled_batch_job(
+            self.user,
+            self.operation.workspace_id,
+            self.operation.job_id,
+            {self.operation.pk: self.terminal_proof_value, self.zero_operation.pk: zero_proof},
+        )
+        with override_settings(
+            SAAS_BATCH_PAGE_READ_ENABLED=True,
+            SAAS_BATCH_PAGE_SIGNING_KEY="test-page-key-with-at-least-32-bytes",
+        ):
+            page = batch_results_page(self.user, self.operation.workspace_id, self.operation.job_id)
+            self.assertEqual(len(page["results"]), 1)
+            self.assertEqual(page["results"][0]["source_code"], "fixture")
+            SourceBatchNoEffect.objects.filter(operation=self.zero_operation).update(
+                batch_set_hash="0" * 64
+            )
+            with self.assertRaises(RevisionConflict):
+                batch_results_page(self.user, self.operation.workspace_id, self.operation.job_id)
+            event = SourceBatchNoEffect.objects.get(operation=self.zero_operation)
+            event.batch_set_hash = hashlib.sha256(
+                json.dumps(
+                    [{"batch_id": str(self.zero_batch.pk), "candidate_body_hash": None}],
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode("ascii")
+            ).hexdigest()
+            event.save(update_fields=["batch_set_hash"])
+            ResultBatch.objects.filter(pk=self.zero_batch.pk).update(ordinal=2)
+            with self.assertRaises(RevisionConflict):
+                batch_results_page(self.user, self.operation.workspace_id, self.operation.job_id)
+            ResultBatch.objects.filter(pk=self.zero_batch.pk).update(ordinal=1)
+            SourceBatchNoEffect.objects.filter(operation=self.zero_operation).update(batch_count=2)
+            with self.assertRaises(RevisionConflict):
+                batch_results_page(self.user, self.operation.workspace_id, self.operation.job_id)
