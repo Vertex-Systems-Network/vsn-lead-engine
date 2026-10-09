@@ -6,7 +6,14 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from . import test_batch_manifest as manifests
 from .batch_result_pages import batch_results_page
 from .batch_settlement import settle_batch_job
-from .models import AcceptedFingerprint, AcceptedResult, Entitlement, SourcePolicy
+from .models import (
+    AcceptedFingerprint,
+    AcceptedResult,
+    Entitlement,
+    SourceBatchTerminal,
+    SourcePolicy,
+    UsageReservation,
+)
 from .test_batch_events import SETTINGS
 from .test_batch_terminal_events import TERMINAL_KEY, TerminalFixture
 
@@ -87,5 +94,20 @@ class BatchResultPageTests(TerminalFixture, TestCase):
         self.settle()
         AcceptedFingerprint.objects.filter(result__job=self.operation.job).delete()
         AcceptedResult.objects.filter(job=self.operation.job).delete()
+        with self.assertRaises(RevisionConflict):
+            self.read()
+
+    def test_settlement_and_source_final_drift_deny_page(self):
+        from .jobs import RevisionConflict
+
+        self.settle()
+        reservation = UsageReservation.objects.get(pk=self.operation.outbox.reservation_id)
+        reservation.settlement = {**reservation.settlement, "provider_calls": 0}
+        reservation.save(update_fields=["settlement"])
+        with self.assertRaises(RevisionConflict):
+            self.read()
+        reservation.settlement = {**reservation.settlement, "provider_calls": 1}
+        reservation.save(update_fields=["settlement"])
+        SourceBatchTerminal.objects.filter(operation=self.operation).update(accepted_count=2)
         with self.assertRaises(RevisionConflict):
             self.read()

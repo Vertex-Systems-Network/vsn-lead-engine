@@ -20,6 +20,7 @@ from .job_history import locked_workspace
 from .jobs import RevisionConflict, eligible_sources
 from .models import (
     AcceptedResult,
+    BatchAcceptance,
     DispatchOperation,
     Entitlement,
     Job,
@@ -157,15 +158,22 @@ def batch_results_page(
     entitlement = Entitlement.objects.filter(workspace_id=workspace_id).first()
     if entitlement is None or not entitlement.is_current:
         raise PermissionDenied("Workspace entitlement is inactive.")
+    reservation = None
+    if intent is not None:
+        reservation = UsageReservation.objects.filter(
+            pk=intent.reservation_id, workspace_id=workspace_id
+        ).first()
     if (
         intent is None
         or intent.result_protocol != 3
         or intent.status != "done"
         or job.status != "completed"
         or not 1 <= job.result_count <= 1000
-        or not UsageReservation.objects.filter(
-            pk=intent.reservation_id, workspace_id=workspace_id, status="settled"
-        ).exists()
+        or reservation is None
+        or reservation.status != "settled"
+        or reservation.request_hash != job.request_hash
+        or job.result_count > reservation.leads
+        or job.result_count > job.search["result_limit"]
     ):
         raise RevisionConflict()
     try:
@@ -192,13 +200,41 @@ def batch_results_page(
         )
     ):
         raise RevisionConflict()
-    finals = SourceBatchTerminal.objects.filter(operation__in=operations).aggregate(
-        total=Sum("accepted_count")
-    )["total"]
-    if finals != job.result_count or SourceBatchTerminal.objects.filter(
-        operation__in=operations
-    ).count() != len(operations):
+    finals = list(SourceBatchTerminal.objects.filter(operation__in=operations))
+    settlement = reservation.settlement
+    if (
+        len(finals) != len(operations)
+        or sum(final.accepted_count for final in finals) != job.result_count
+        or type(settlement) is not dict
+        or set(settlement) != {"leads", "jobs", "provider_calls", "exports"}
+        or settlement != {
+            "leads": job.result_count,
+            "jobs": 1,
+            "provider_calls": sum(final.provider_calls for final in finals),
+            "exports": 0,
+        }
+        or settlement["provider_calls"] > reservation.provider_calls
+    ):
         raise RevisionConflict()
+    for op in operations:
+        final = next((item for item in finals if item.operation_id == op.pk), None)
+        batch_counts = BatchAcceptance.objects.filter(
+            candidate__batch__operation=op
+        ).aggregate(total=Sum("accepted_count"), calls=Sum("provider_calls"))
+        if (
+            final is None
+            or final.source_code != op.source_code
+            or final.provider_calls > op.call_limit
+            or batch_counts["total"] != final.accepted_count
+            or batch_counts["calls"] > final.provider_calls
+            or AcceptedResult.objects.filter(
+                workspace_id=workspace_id,
+                job=job,
+                batch_acceptance__candidate__batch__operation=op,
+            ).count()
+            != final.accepted_count
+        ):
+            raise RevisionConflict()
     rights = {
         op.source_code: _rights(SourcePolicy.objects.get(pk=op.source_code)) for op in operations
     }
