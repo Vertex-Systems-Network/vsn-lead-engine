@@ -19,7 +19,6 @@ from .test_batch_intake import IntakeFixture
 from .test_batch_noeffect_manifest import KEY as ZERO_KEY
 from .test_batch_terminal_events import TERMINAL_KEY, TerminalFixture
 
-
 FLAGS = dict(
     **SETTINGS,
     SAAS_BATCH_ACCEPTANCE_ENABLED=True,
@@ -55,8 +54,13 @@ class PositiveReconciliationReadTests(TerminalFixture, TestCase):
         self.assertEqual(first, second)
         self.assertEqual((first.leads, first.provider_calls), (1, 1))
         self.assertEqual(first.positive_operation_ids, (self.operation.pk,))
-        self.assertEqual(UsageReservation.objects.get(pk=self.operation.outbox.reservation_id).status, "reserved")
-        self.assertEqual(UsageCounter.objects.get(workspace_id=self.operation.workspace_id).jobs, 0)
+        self.assertEqual(
+            UsageReservation.objects.get(pk=self.operation.outbox.reservation_id).status,
+            "reserved",
+        )
+        self.assertEqual(
+            UsageCounter.objects.get(workspace_id=self.operation.workspace_id).jobs, 0
+        )
 
     def test_changed_proof_or_missing_original_source_fails(self):
         with self.assertRaises(RevisionConflict):
@@ -119,7 +123,10 @@ class NoEffectReconciliationReadTests(IntakeFixture, TestCase):
         result = self.inspect(proof)
         self.assertEqual((result.leads, result.provider_calls), (0, 0))
         self.assertEqual(result.noeffect_operation_ids, (self.operation.pk,))
-        self.assertEqual(UsageReservation.objects.get(pk=self.operation.outbox.reservation_id).status, "reserved")
+        self.assertEqual(
+            UsageReservation.objects.get(pk=self.operation.outbox.reservation_id).status,
+            "reserved",
+        )
         self.assertEqual(DispatchOperation.objects.get(pk=self.operation.pk).status, "unknown")
 
     def test_revoked_noeffect_authority_denies_read(self):

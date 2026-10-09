@@ -117,8 +117,15 @@ def inspect_batch_reconciliation(user, workspace_id, job_id, source_proofs):
                 raise RevisionConflict()
             sources.append(
                 SourceEvidenceTotals(
-                    op.pk, op.source_code, op.status, "source-final", op.call_limit,
-                    final.batch_count, final.accepted_count, committed, final.provider_calls,
+                    op.pk,
+                    op.source_code,
+                    op.status,
+                    "source-final",
+                    op.call_limit,
+                    final.batch_count,
+                    final.accepted_count,
+                    committed,
+                    final.provider_calls,
                 )
             )
         else:
@@ -129,8 +136,15 @@ def inspect_batch_reconciliation(user, workspace_id, job_id, source_proofs):
                 raise RevisionConflict()
             sources.append(
                 SourceEvidenceTotals(
-                    op.pk, op.source_code, op.status, "source-noeffect", op.call_limit,
-                    zero.batch_count, 0, 0, 0,
+                    op.pk,
+                    op.source_code,
+                    op.status,
+                    "source-noeffect",
+                    op.call_limit,
+                    zero.batch_count,
+                    0,
+                    0,
+                    0,
                 )
             )
     totals = bounded_source_evidence(
