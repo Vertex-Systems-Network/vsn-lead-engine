@@ -5,11 +5,13 @@ import hmac
 import importlib
 import json
 
-from django.db import IntegrityError, transaction
+from django.apps import apps
+from django.db import IntegrityError, connection, transaction
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
+from . import test_batch_manifest as manifests
 from .batch_allocation import allocate_result_batch
 from .batch_noeffect_events import record_source_batch_noeffect
 from .batch_terminal_events import record_source_batch_terminal
@@ -19,7 +21,6 @@ from .services import IdempotencyConflict
 from .test_batch_events import SETTINGS
 from .test_batch_intake import IntakeFixture
 from .test_batch_noeffect_manifest import KEY
-from . import test_batch_manifest as manifests
 
 
 @override_settings(
@@ -47,7 +48,12 @@ class NoEffectEventTests(IntakeFixture, TestCase):
             "receipt_ref": "zero-1",
             "issued_at": int(timezone.now().timestamp()),
             "provider_calls": 0,
-            "batches": [{"batch_id": str(self.batch.pk), "candidate_body_hash": hashlib.sha256(self.candidate_body).hexdigest()}],
+            "batches": [
+                {
+                    "batch_id": str(self.batch.pk),
+                    "candidate_body_hash": hashlib.sha256(self.candidate_body).hexdigest(),
+                }
+            ],
         }
         data.update(changes)
         body = json.dumps(data).encode()
@@ -84,7 +90,10 @@ class NoEffectEventTests(IntakeFixture, TestCase):
         with self.assertRaises(ValidationError):
             self.record()
         rows = [
-            {"batch_id": str(self.batch.pk), "candidate_body_hash": hashlib.sha256(self.candidate_body).hexdigest()},
+            {
+                "batch_id": str(self.batch.pk),
+                "candidate_body_hash": hashlib.sha256(self.candidate_body).hexdigest(),
+            },
             {"batch_id": str(other.pk), "candidate_body_hash": None},
         ]
         self.record(batches=sorted(rows, key=lambda row: row["batch_id"]))
@@ -115,11 +124,10 @@ class NoEffectEventTests(IntakeFixture, TestCase):
             with self.assertRaises(ValidationError):
                 self.record()
         migration = importlib.import_module("core.migrations.0021_batch_noeffect")
-        from django.apps import apps
-        from django.db import connection
-
         with self.assertRaises(RuntimeError):
-            migration.protect_noeffect_rollback(apps, type("Schema", (), {"connection": connection})())
+            migration.protect_noeffect_rollback(
+                apps, type("Schema", (), {"connection": connection})()
+            )
 
     def test_db_constraints(self):
         first, _ = self.record()

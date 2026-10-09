@@ -63,8 +63,9 @@ def record_source_batch_noeffect(user, workspace_id, operation_id, body, signatu
         BatchCandidateEvidence.objects.select_for_update().filter(batch__operation=operation)
     )
     by_batch = {item.batch_id: item for item in candidates}
+    batch_ids = {batch.pk for batch in batches}
     if len(by_batch) != len(candidates) or any(
-        item.source_code != operation.source_code or item.batch_id not in {batch.pk for batch in batches}
+        item.source_code != operation.source_code or item.batch_id not in batch_ids
         for item in candidates
     ):
         raise RevisionConflict()
@@ -85,7 +86,9 @@ def record_source_batch_noeffect(user, workspace_id, operation_id, body, signatu
             operation.request_hash,
             operation.policy_fingerprint,
             tuple(
-                NoEffectBatch(batch.pk, by_batch[batch.pk].body_hash if batch.pk in by_batch else None)
+                NoEffectBatch(
+                    batch.pk, by_batch[batch.pk].body_hash if batch.pk in by_batch else None
+                )
                 for batch in batches
             ),
         ),
