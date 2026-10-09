@@ -30,10 +30,10 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected main: `d195481f` (PR #230); v3 batch acceptance, source finality, positive-result accounting and bounded internal pages are verified but disabled/quarantined. Unknown/no-effect reconciliation, replay, routes/export and external activation remain open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected main: `f95e8068` (PR #231); v3 batch acceptance, source finality, positive-result accounting and bounded internal pages with settled-ledger reconciliation are verified but disabled/quarantined. Unknown/no-effect reconciliation, replay, routes/export and external activation remain open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
-- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: additive accepted-payload schema/intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
+- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: settled-state replay, explicit unknown/no-effect reconciliation and internal write-ahead before gated export/page routes; do not activate payments, providers, production collections or a customer launch without verified gates.
 - Continuation: **full ready frontier per invocation**; milestone/PR completion is a checkpoint, not an instruction to stop. Recoverable errors are AI-owned; human approval is reserved for genuine external authorization/consent/paid or irreversible commitments. CI runs `scripts/verify_readme_progress.py` to reject README/machine-state divergence and feature PRs that omit a README update.
 
 <!-- ANPOS-CONTINUITY:END -->
@@ -2464,6 +2464,7 @@ source policy changes deny subsequent pages; page signing remains empty by
 default.
 
 PR #230 merged at `d195481f`; all five exact-head workflows passed, including
-416 PostgreSQL tests and 14 Web tests. A following guard reconciles each
-source's accepted payload count and the exact settled amount before displaying
-any row; this follow-up is under review.
+416 PostgreSQL tests and 14 Web tests. PR #231 merged at `f95e8068` after all
+five exact-head workflows passed, including 417 PostgreSQL tests. It reconciles
+each source's accepted payload count and the exact settled amount before
+displaying any row. The service and key remain disabled by default.
