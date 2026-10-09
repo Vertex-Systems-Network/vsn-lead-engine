@@ -30,10 +30,10 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected main: `f95e8068` (PR #231); v3 batch acceptance, source finality, positive-result accounting and bounded internal pages with settled-ledger reconciliation are verified but disabled/quarantined. Unknown/no-effect reconciliation, replay, routes/export and external activation remain open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected main: `e8ad8d24` (PR #233); v3 batch acceptance, source finality, positive-result accounting, bounded internal pages and exact settled-state replay are verified but disabled/quarantined. Unknown/no-effect reconciliation, routes/export and external activation remain open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
-- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: settled-state replay, explicit unknown/no-effect reconciliation and internal write-ahead before gated export/page routes; do not activate payments, providers, production collections or a customer launch without verified gates.
+- Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: explicit unknown/no-effect reconciliation and internal write-ahead before gated export/page routes; do not activate payments, providers, production collections or a customer launch without verified gates.
 - Continuation: **full ready frontier per invocation**; milestone/PR completion is a checkpoint, not an instruction to stop. Recoverable errors are AI-owned; human approval is reserved for genuine external authorization/consent/paid or irreversible commitments. CI runs `scripts/verify_readme_progress.py` to reject README/machine-state divergence and feature PRs that omit a README update.
 
 <!-- ANPOS-CONTINUITY:END -->
@@ -2478,3 +2478,8 @@ and the settled reservation. Exact recent proof returns the completed job
 without touching usage; changed proof, revoked key, missing batch or accounting
 drift fails closed. The source-final proof window is 24 hours; this is not an
 unknown/no-effect resolver, refund path or active dispatch/HTTP route.
+
+PR #233 merged at `e8ad8d24` after all five exact-head workflows passed,
+including 419 PostgreSQL tests and 14 Web tests. Current signed proof and
+recorded settlement replay without mutating usage; key, source-policy and
+batch-evidence drift fail closed. The replay gate remains false by default.
