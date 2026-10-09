@@ -23,7 +23,13 @@ KEY = b"isolated-noeffect-source-key-for-tests-12345"
 class NoEffectManifestTests(SimpleTestCase):
     def setUp(self):
         self.binding = NoEffectBinding(
-            uuid4(), uuid4(), uuid4(), uuid4(), "fixture", "a" * 64, "b" * 64,
+            uuid4(),
+            uuid4(),
+            uuid4(),
+            uuid4(),
+            "fixture",
+            "a" * 64,
+            "b" * 64,
             (NoEffectBatch(uuid4(), "c" * 64), NoEffectBatch(uuid4(), None)),
         )
         self.data = {
@@ -42,7 +48,10 @@ class NoEffectManifestTests(SimpleTestCase):
             "provider_calls": 0,
             "batches": sorted(
                 [
-                    {"batch_id": str(item.batch_id), "candidate_body_hash": item.candidate_body_hash}
+                    {
+                        "batch_id": str(item.batch_id),
+                        "candidate_body_hash": item.candidate_body_hash,
+                    }
                     for item in self.binding.batches
                 ],
                 key=lambda row: row["batch_id"],
@@ -111,4 +120,6 @@ class NoEffectManifestTests(SimpleTestCase):
             self.verify(key=b"different-key-32-bytes-long-for-tests")
         raw = json.dumps(self.data).encode()
         with self.assertRaises(ValidationError):
-            verified_noeffect_manifest(raw + b" ", hmac.new(KEY, raw, hashlib.sha256).hexdigest(), self.binding)
+            verified_noeffect_manifest(
+                raw + b" ", hmac.new(KEY, raw, hashlib.sha256).hexdigest(), self.binding
+            )
