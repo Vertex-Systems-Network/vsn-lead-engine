@@ -30,7 +30,7 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected main: `854a176f` (PR #236); v3 batch acceptance, source finality, positive-result accounting, bounded internal pages, settled-state replay and signed no-effect evidence are verified but disabled/quarantined. All-source unknown/no-effect reconciliation, routes/export and external activation remain open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected main: `e258d6cc` (PR #237); v3 batch acceptance, source finality, positive-result accounting, bounded internal pages, settled-state replay, signed no-effect evidence and pure all-source bounds are verified but disabled/quarantined. Durable all-source reconciliation, routes/export and external activation remain open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
 - Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: explicit unknown/no-effect reconciliation and internal write-ahead before gated export/page routes; do not activate payments, providers, production collections or a customer launch without verified gates.
@@ -2528,3 +2528,18 @@ It has no database, status, counter or refund write.
 
 The no-effect replay test now keeps one issuance timestamp per fixture so an
 unrelated second boundary cannot change the signed body during replay.
+
+PR #237 merged at `e258d6cc` after all five exact-head workflows passed,
+including 436 PostgreSQL tests and 14 Web tests. The pure preflight accepts
+trusted explicit outcomes only and cannot settle, refund or prove source rights.
+
+### Read-only all-source reconciliation — development review, disabled
+
+A separate default-off internal inspection replays current signed proof for
+each original source against previously stored positive-final or no-effect
+metadata, current admin/entitlement/source rights and exact durable batches.
+It requires the full original reservation to remain reserved, compares source
+totals to its caps, and returns metadata counts only. Unknown status alone
+never supplies an outcome; this service changes no status, counter, job or
+reservation. Real signer/R2 authority and any later state transition remain
+separate gates.

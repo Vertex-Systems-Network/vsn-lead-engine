@@ -148,6 +148,7 @@ SAAS_BATCH_ACCEPTANCE_ENABLED = False
 # and no-effect proof are separate capabilities, never implied by this flag.
 SAAS_BATCH_TERMINAL_EVENTS_ENABLED = False
 SAAS_BATCH_NOEFFECT_EVENTS_ENABLED = False
+SAAS_BATCH_RECONCILIATION_READ_ENABLED = False
 
 # Entire-job positive-result accounting is internal and separately disabled.
 # Unknown/no-effect recovery and settled-state replay are not activated.
