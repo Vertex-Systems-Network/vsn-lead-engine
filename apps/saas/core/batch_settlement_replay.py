@@ -88,9 +88,7 @@ def replay_settled_batch_job(user, workspace_id, job_id, terminal_proofs):
         ):
             raise ValidationError("Current exact source-final proof is required.")
         batches = list(
-            ResultBatch.objects.select_for_update()
-            .filter(operation=op)
-            .order_by("ordinal")[:1001]
+            ResultBatch.objects.select_for_update().filter(operation=op).order_by("ordinal")[:1001]
         )
         accepted = list(
             BatchAcceptance.objects.select_for_update()
