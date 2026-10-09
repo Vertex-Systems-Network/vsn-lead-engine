@@ -149,3 +149,7 @@ SAAS_BATCH_TERMINAL_EVENTS_ENABLED = False
 # Entire-job positive-result accounting is internal and separately disabled.
 # Unknown/no-effect recovery and settled-state replay are not activated.
 SAAS_BATCH_SETTLEMENT_ENABLED = False
+
+# Future v3 page continuation uses an independent key; empty disables issuance.
+# It does not turn on a result route or weaken current-rights checks.
+SAAS_BATCH_PAGE_SIGNING_KEY = ""
