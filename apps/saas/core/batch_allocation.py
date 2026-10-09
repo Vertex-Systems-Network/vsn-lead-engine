@@ -20,6 +20,7 @@ from .models import (
     JobOutbox,
     ResultAcceptance,
     ResultBatch,
+    SourceBatchNoEffect,
     SourceBatchTerminal,
     SourcePolicy,
     UsageCounter,
@@ -88,6 +89,9 @@ def allocate_result_batch(
         and intent.expires_at <= timezone.now()
         or (
             SourceBatchTerminal.objects.filter(operation=operation).exists() and not terminal_replay
+        )
+        or (
+            SourceBatchNoEffect.objects.filter(operation=operation).exists() and not terminal_replay
         )
         or DispatchReceipt.objects.filter(operation__outbox=intent).exists()
         or CandidateEvidence.objects.filter(operation__outbox=intent).exists()

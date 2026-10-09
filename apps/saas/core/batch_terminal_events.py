@@ -15,6 +15,7 @@ from .models import (
     AcceptedResult,
     BatchAcceptance,
     ResultBatch,
+    SourceBatchNoEffect,
     SourceBatchTerminal,
 )
 from .services import IdempotencyConflict
@@ -43,6 +44,8 @@ def record_source_batch_terminal(user, workspace_id, operation_id, body, signatu
     if locked.pk != first.pk or first.ordinal != 1:
         raise RevisionConflict()
     operation = locked.operation
+    if SourceBatchNoEffect.objects.filter(operation=operation).exists():
+        raise RevisionConflict()
     reservation = operation.outbox.reservation
     batches = list(
         ResultBatch.objects.select_for_update()
