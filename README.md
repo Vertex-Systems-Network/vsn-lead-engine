@@ -30,7 +30,7 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected main: `f55f1972` (PR #235); v3 batch acceptance, source finality, positive-result accounting, bounded internal pages, exact settled-state replay and pure source no-effect proof are verified but disabled/quarantined. Durable unknown/no-effect reconciliation, routes/export and external activation remain open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected main: `854a176f` (PR #236); v3 batch acceptance, source finality, positive-result accounting, bounded internal pages, settled-state replay and signed no-effect evidence are verified but disabled/quarantined. All-source unknown/no-effect reconciliation, routes/export and external activation remain open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
 - Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: explicit unknown/no-effect reconciliation and internal write-ahead before gated export/page routes; do not activate payments, providers, production collections or a customer launch without verified gates.
@@ -2510,3 +2510,18 @@ batch identity fails closed. Exact replay rechecks current rights. No operation,
 job, counter or reservation change follows: unknown effects remain reserved,
 and live source authority is still unverified. Empty batch sets remain a pure
 proof contract; this recorder requires at least one durable identity.
+
+PR #236 merged at `854a176f` after all five exact-head workflows passed,
+including 430 PostgreSQL tests and 14 Web tests. The additive metadata schema
+has a populated rollback guard; no no-effect settlement or status transition
+was added.
+
+### Pure all-source evidence bounds — development review
+
+A pure preflight compares an explicit positive or zero-effect outcome for every
+original source with original lead and call caps. Zero-effect sources must have
+no accepted payload or provider calls; unknown operation status cannot itself
+be treated as a zero-effect outcome. This preflight accepts trusted input only:
+the signed proof, durable identity/acceptance set and current source authority
+must still be verified together under database locks before reconciliation.
+It has no database, status, counter or refund write.
