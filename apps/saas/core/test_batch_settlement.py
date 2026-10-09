@@ -4,12 +4,20 @@ from unittest.mock import patch
 
 from django.test import TestCase, override_settings
 from django.utils import timezone
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from . import test_batch_manifest as manifests
 from .batch_settlement import settle_batch_job
+from .batch_settlement_replay import replay_settled_batch_job
 from .jobs import RevisionConflict
-from .models import DispatchOperation, Job, UsageCounter, UsageReservation
+from .models import (
+    BatchAcceptance,
+    DispatchOperation,
+    Job,
+    SourcePolicy,
+    UsageCounter,
+    UsageReservation,
+)
 from .services import IdempotencyConflict
 from .test_batch_events import SETTINGS
 from .test_batch_terminal_events import TERMINAL_KEY, TerminalFixture
@@ -57,6 +65,23 @@ class BatchSettlementTests(TerminalFixture, TestCase):
         counter.refresh_from_db()
         self.assertEqual((counter.leads, counter.jobs, counter.provider_calls), (1, 1, 1))
 
+    def test_replay_revocation_and_batch_evidence_drift_fail_closed(self):
+        self.settle()
+        args = (
+            self.user,
+            self.operation.workspace_id,
+            self.operation.job_id,
+            {self.operation.pk: self.terminal_proof()},
+        )
+        with override_settings(SAAS_BATCH_SETTLED_REPLAY_ENABLED=True):
+            SourcePolicy.objects.filter(pk="fixture").update(enabled=False)
+            with self.assertRaises(PermissionDenied):
+                replay_settled_batch_job(*args)
+            SourcePolicy.objects.filter(pk="fixture").update(enabled=True)
+            BatchAcceptance.objects.filter(candidate__batch=self.batch).update(body_hash="b" * 64)
+            with self.assertRaises(ValidationError):
+                replay_settled_batch_job(*args)
+
     def test_changed_or_missing_final_proofs_do_not_settle(self):
         with self.assertRaises(IdempotencyConflict):
             self.settle({"receipt_ref": "changed"})
@@ -89,3 +114,29 @@ class BatchSettlementTests(TerminalFixture, TestCase):
         counter = UsageCounter.objects.get(workspace_id=self.operation.workspace_id)
         self.assertEqual((counter.leads, counter.jobs, counter.provider_calls), (0, 0, 0))
         self.assertEqual(DispatchOperation.objects.get(pk=self.operation.pk).status, "started")
+
+    def test_separate_settled_replay_checks_current_proof_without_double_charge(self):
+        self.settle()
+        args = (
+            self.user,
+            self.operation.workspace_id,
+            self.operation.job_id,
+            {self.operation.pk: self.terminal_proof()},
+        )
+        with self.assertRaises(PermissionDenied):
+            replay_settled_batch_job(*args)
+        with override_settings(SAAS_BATCH_SETTLED_REPLAY_ENABLED=True):
+            job, created = replay_settled_batch_job(*args)
+            self.assertFalse(created)
+            self.assertEqual(job.status, "completed")
+            with self.assertRaises(IdempotencyConflict):
+                replay_settled_batch_job(
+                    *args[:3], {self.operation.pk: self.terminal_proof({"receipt_ref": "changed"})}
+                )
+            with self.assertRaises(RevisionConflict):
+                replay_settled_batch_job(*args[:3], {})
+            with override_settings(SAAS_BATCH_TERMINAL_VERIFIERS={}):
+                with self.assertRaises(ValidationError):
+                    replay_settled_batch_job(*args)
+        counter = UsageCounter.objects.get(workspace_id=self.operation.workspace_id)
+        self.assertEqual((counter.leads, counter.jobs, counter.provider_calls), (1, 1, 1))

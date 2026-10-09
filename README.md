@@ -2468,3 +2468,13 @@ PR #230 merged at `d195481f`; all five exact-head workflows passed, including
 five exact-head workflows passed, including 417 PostgreSQL tests. It reconciles
 each source's accepted payload count and the exact settled amount before
 displaying any row. The service and key remain disabled by default.
+
+### Exact settled-state v3 replay — under review, disabled
+
+A separate default-off internal read-only service rechecks current tenant
+administrator, entitlement and source policy, then verifies the original
+source-final signatures against all allocated batch/acceptance/payload evidence
+and the settled reservation. Exact recent proof returns the completed job
+without touching usage; changed proof, revoked key, missing batch or accounting
+drift fails closed. The source-final proof window is 24 hours; this is not an
+unknown/no-effect resolver, refund path or active dispatch/HTTP route.
