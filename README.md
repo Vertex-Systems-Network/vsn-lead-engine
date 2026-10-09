@@ -30,7 +30,7 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected main: `a293e6a5` (PR #228); v3 batch acceptance, source finality and positive-result whole-job accounting are verified but disabled/quarantined. Unknown/no-effect reconciliation, replay, pagination and external activation remain open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected main: `61ae5663` (PR #229); v3 batch acceptance, source finality, positive-result accounting and an isolated signed cursor are verified but disabled/quarantined. Unknown/no-effect reconciliation, replay, page delivery and external activation remain open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
 - Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: additive accepted-payload schema/intake and terminal accounting; do not activate payments, providers, production collections or a customer launch without verified gates.
@@ -2448,3 +2448,17 @@ positions are limited to 1,000 batches and 25 rows per batch. It returns no
 results and has no database access. Current membership, entitlement, source
 rights, completed-job finality and immutable ordering must be rechecked by a
 future page service. There is no v3 result endpoint or export path yet.
+
+PR #229 merged at `61ae5663`; all five exact-head workflows passed. The
+cursor is now verified as an isolated primitive; no route uses it by default.
+
+### Internal v3 result pages — under review, disabled
+
+A separate default-off read service queries at most 26 accepted positions to
+return 25 per page with signed continuation. It verifies completed and settled
+v3 state, exact source-final counts, current entitlement and source display
+rights on every request. Expired, erased or malformed rows are withheld and
+raw proof references are never returned. This does not expose an HTTP endpoint,
+enable export, turn on v3 dispatch or establish live provider rights. Current
+source policy changes deny subsequent pages; page signing remains empty by
+default.
