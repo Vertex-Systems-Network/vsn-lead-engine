@@ -86,7 +86,9 @@ class NoEffectEventTests(IntakeFixture, TestCase):
     def test_candidate_and_identity_drift_denied(self):
         with self.assertRaises(ValidationError):
             self.record(batches=[{"batch_id": str(self.batch.pk), "candidate_body_hash": None}])
-        other, _ = allocate_result_batch(self.user, self.operation.workspace_id, self.operation.pk, 2)
+        other, _ = allocate_result_batch(
+            self.user, self.operation.workspace_id, self.operation.pk, 2
+        )
         with self.assertRaises(ValidationError):
             self.record()
         rows = [
@@ -98,7 +100,9 @@ class NoEffectEventTests(IntakeFixture, TestCase):
         ]
         self.record(batches=sorted(rows, key=lambda row: row["batch_id"]))
         with self.assertRaises(IdempotencyConflict):
-            self.record(batches=sorted(rows, key=lambda row: row["batch_id"]), receipt_ref="changed")
+            self.record(
+                batches=sorted(rows, key=lambda row: row["batch_id"]), receipt_ref="changed"
+            )
 
     def test_existing_acceptance_and_revoked_key_fail_closed(self):
         self.intake()

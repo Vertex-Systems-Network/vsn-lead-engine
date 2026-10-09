@@ -55,8 +55,10 @@ def record_source_batch_noeffect(user, workspace_id, operation_id, body, signatu
         .filter(operation=operation)
         .order_by("ordinal")[:1001]
     )
-    if not batches or len(batches) > 1000 or any(
-        item.ordinal != position for position, item in enumerate(batches, 1)
+    if (
+        not batches
+        or len(batches) > 1000
+        or any(item.ordinal != position for position, item in enumerate(batches, 1))
     ):
         raise RevisionConflict()
     candidates = list(
@@ -71,7 +73,9 @@ def record_source_batch_noeffect(user, workspace_id, operation_id, body, signatu
         raise RevisionConflict()
     if (
         BatchAcceptance.objects.filter(candidate__batch__operation=operation).exists()
-        or AcceptedResult.objects.filter(batch_acceptance__candidate__batch__operation=operation).exists()
+        or AcceptedResult.objects.filter(
+            batch_acceptance__candidate__batch__operation=operation
+        ).exists()
     ):
         raise ValidationError("Accepted source effects require positive reconciliation.")
     proof = verified_noeffect_manifest(

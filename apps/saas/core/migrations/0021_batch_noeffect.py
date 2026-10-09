@@ -3,9 +3,11 @@ from django.db import migrations, models
 
 
 def protect_noeffect_rollback(apps, schema_editor):
-    if apps.get_model("core", "SourceBatchNoEffect").objects.using(
-        schema_editor.connection.alias
-    ).exists():
+    if (
+        apps.get_model("core", "SourceBatchNoEffect")
+        .objects.using(schema_editor.connection.alias)
+        .exists()
+    ):
         raise RuntimeError("V3 no-effect evidence exists; rollback requires a preservation plan.")
 
 

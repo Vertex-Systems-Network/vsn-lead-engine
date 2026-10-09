@@ -90,7 +90,9 @@ def allocate_result_batch(
         or (
             SourceBatchTerminal.objects.filter(operation=operation).exists() and not terminal_replay
         )
-        or (SourceBatchNoEffect.objects.filter(operation=operation).exists() and not terminal_replay)
+        or (
+            SourceBatchNoEffect.objects.filter(operation=operation).exists() and not terminal_replay
+        )
         or DispatchReceipt.objects.filter(operation__outbox=intent).exists()
         or CandidateEvidence.objects.filter(operation__outbox=intent).exists()
         or ResultAcceptance.objects.filter(operation__outbox=intent).exists()
