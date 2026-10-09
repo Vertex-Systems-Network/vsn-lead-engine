@@ -3,7 +3,7 @@
 ## Snapshot
 
 - Vertex-Systems-Network/vsn-lead-engine; 2026-10-08 UTC / PKT.
-- Exact protected payload-schema feature main `2c422919a607d116b687ca45994597b581773faa` after PR #220, before documentation-only checkpoint merge. Live open Issues/PRs reconciled before development; none open at feature checkpoint.
+- Latest verified feature main `e258d6cce9ce2e1ce32d73a09d82e226ce2e9418` after PR #237; PR #238 read-only reconciliation under review.
 - Product 0.66.1 / ANPOS 1.4.0; Next frontend and isolated Django/DRF/PostgreSQL authority. Existing production CLI/R2/Google namespaces and phone-only US/Canada/taxonomy/quota invariants preserved.
 
 ## Verified
@@ -28,7 +28,7 @@
 
 ## Not Verified
 
-- V3 durable metadata schema and pure terminal proof are verified; transactional batch intake/finality/accounting and multi-source/multi-batch pagination/native UI remain unimplemented. v3 signature/schema success does not prove signer qualification, committed R2 objects, payment truth or rights.
+- V3 gated batch intake/finality, positive-result accounting, internal page reads, no-effect evidence and pure all-source bounds are verified; durable mixed-source settlement, routes/export and native UI remain unimplemented. v3 signature/schema success does not prove signer qualification, committed R2 objects, payment truth or rights.
 - Live source/qualification/isolated R2 signer/client, billing/provider/webhook/consumer/scheduler and Next deployment remain disabled. Keys empty; synthetic proofs/rights are fixtures only.
 - Real payment sandbox/account mapping, signup/recovery, browser/responsive/WCAG/customer, qualified privacy/source rights, log redaction/retention/encryption/backups/TLS/proxy and launch remain open.
 - Latest retained production quota remains 6,855 / 12,000 on 2026-10-04. No new production quota observation. Distributed runtime/Supervisor identity unverified; no work after invocation ends claimed.
@@ -42,39 +42,9 @@
 
 ## Next Action
 
-1. Add isolated v3 accepted-payload schema with evidence-preserving rollback, then gated atomic acceptance and exact terminal/unknown-effect accounting; preserve original reservations. Internal write-ahead entry and signed 25-row pagination follow. Ordinary v3 dispatch remains quarantined.
-2. Then add stable-watermark signed 25-row page services and native selected-page CSV, preserving current rights/expiry/no-referrer/once-only preparation semantics.
+1. Verify read-only all-source replay, then separately design atomic mixed/unknown outcome transitions under original reservations. Internal write-ahead entry and gated page/export routes follow. Ordinary v3 dispatch remains quarantined.
+2. Complete native selected-page CSV and bounded routes using existing signed 25-row page services, preserving current rights/expiry/no-referrer/once-only preparation semantics.
 3. Keep README/machine/checkpoint evidence synchronized after protected merges; checkpoints are recovery aids, not permission gates. Continue safe frontier within the next invocation's host budget. Do not replay merged mutations.
-
-## Protected payload schema checkpoint
-
-PR #220 merged at 2c422919a607d116b687ca45994597b581773faa; head 57c54ce52681d63603f87151785f4f818cf68be0 passed all five workflows, PostgreSQL 37826291597 (375 tests/migrations/settings) and Web 37826291595 (14 transport/build/type/HTTP). Exclusive v3 payload links, bounded positions, shared fingerprints/erasure, protected populated rollback and legacy visibility withholding verified; no v3 intake/finality/dispatch.
-
-Next ready frontier: Implement paired candidate/acceptance proof-to-payload mapping with exact record-set and conditional domain-token checks, then gated atomic accepted-batch reconciliation and original aggregate caps. Reconcile every allocated identity and unknown effect before terminal whole-job settlement; internal write-ahead entry and signed 25-row pages follow. Keep v3 dispatch quarantined.
-
-## Paired payload proof review
-
-Pure paired v3 candidate/acceptance payload mapping under review: exact signed record sets, candidate digest/ref binding, independent isolated dedupe key, issuance order, current phone/territory/taxonomy/rights checks and website-dependent domain fingerprints. Immutable in-memory rows suppress sensitive repr; no durable intake, job mutation or usage settlement. Eight DB-forbidden adversarial cases; exact-head CI pending.
-
-Next ready frontier: Implement disabled atomic v3 accepted-batch intake using paired current proofs, durable candidate identity, exact replay/reference collision checks, shared tenant fingerprints and summed original lead/source-call/outbox-call caps. Preserve the full reservation and unknown effects until every allocated identity is reconciled and exact source-final/whole-job accounting passes; then internal write-ahead entry and signed 25-row pages.
-
-Paired-proof local verification: 383 SaaS cases / 42 explicit PostgreSQL-only skips; eight new DB-forbidden proof mapping cases passed. Ruff/format pass; pending exact-head CI remains the merge gate.
-
-## Disabled atomic batch intake — development review
-
-The paired-proof PR #222 merged after all five exact-head workflows passed on the branch updated with CI path scoping. The next isolated service under review writes a v3 acceptance, 1–25 payload rows and shared tenant fingerprints in one transaction after rechecking current actor/source/entitlement, the recorded exact candidate event and original lead/call caps across all batches. Exact replay returns the existing acceptance; changed bytes, source/key revocation, duplicate fingerprints, expiry and ambiguous effects fail closed. No HTTP route, ordinary dispatch, terminal settlement or usage release is enabled. `SAAS_BATCH_ACCEPTANCE_ENABLED` defaults false; external signer/R2 truth remains unverified. CI for this intake slice is pending.
-
-## Source-final evidence — development review
-
-PR #224 merged after 389 PostgreSQL tests, 14 Web tests and all five workflows passed. The next default-off service under review records one redacted signed source-final set only after all server-owned allocated batch identities have accepted evidence, bounded payload counts and exact trusted hashes. Unknown effects cannot create new finality; an exact existing final may replay under current rights. Empty source sets, whole-job settlement, quota release, dispatch and pagination remain unavailable. CI for source-final evidence is pending.
-
-## Whole-job aggregate guard — development review
-
-PR #225 merged after 394 PostgreSQL tests, 14 Web tests and all five workflows passed. A pure bounded guard under review compares the exact original source set, started operation status, nonempty accepted batch totals, committed calls and original reservation caps before proposing one job and actual leads/calls. No database write, usage settlement, no-effect proof or dispatch is enabled. CI for this guard is pending.
-
-## Atomic positive-result settlement — development review
-
-PR #226 merged after 402 PostgreSQL tests, 14 Web tests and all five workflows passed. A separately default-off transactional service under review re-verifies signed source-final proofs for every original source under workspace/actor/job/reservation locks, checks current entitlement/period and aggregate original caps, then settles actual positive-result usage and job/attempt/operation states together. Unknown/no-effect paths, settled-state replay, ordinary dispatch and live signer/provider trust remain disabled. CI for this slice is pending.
 
 ## Verified atomic positive-result settlement checkpoint
 
