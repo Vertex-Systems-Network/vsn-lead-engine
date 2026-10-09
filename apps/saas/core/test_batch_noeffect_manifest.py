@@ -102,9 +102,7 @@ class NoEffectManifestTests(SimpleTestCase):
     def test_allocated_identity_candidate_and_order_must_match_exactly(self):
         rows = self.data["batches"]
         changed_candidate = [
-            {**row, "candidate_body_hash": None}
-            if row["candidate_body_hash"] is not None
-            else row
+            {**row, "candidate_body_hash": None} if row["candidate_body_hash"] is not None else row
             for row in rows
         ]
         for altered in (
