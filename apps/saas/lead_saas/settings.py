@@ -155,6 +155,7 @@ SAAS_BATCH_RECONCILIATION_SETTLEMENT_ENABLED = False
 # Unknown/no-effect recovery and settled-state replay are not activated.
 SAAS_BATCH_SETTLEMENT_ENABLED = False
 SAAS_BATCH_SETTLED_REPLAY_ENABLED = False
+SAAS_BATCH_MIXED_SETTLED_REPLAY_ENABLED = False
 
 # Future v3 page continuation uses an independent key; empty disables issuance.
 # It does not turn on a result route or weaken current-rights checks.
