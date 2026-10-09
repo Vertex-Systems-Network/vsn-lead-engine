@@ -2483,3 +2483,14 @@ PR #233 merged at `e8ad8d24` after all five exact-head workflows passed,
 including 419 PostgreSQL tests and 14 Web tests. Current signed proof and
 recorded settlement replay without mutating usage; key, source-policy and
 batch-evidence drift fail closed. The replay gate remains false by default.
+
+### Separate v3 no-effect proof — isolated contract under review
+
+A pure source-signed `source-noeffect` manifest binds the exact allocated batch
+IDs and any candidate-body hashes to the original workspace/job/operation,
+provider key, request/policy hashes and zero provider calls. A separate
+empty-default verifier registry keeps this authority apart from positive
+source-final proofs. Even an empty batch set requires an explicit signed zero
+effect claim. This parser has no database, reservation, refund or operation
+write; current rights, absent accepted payload and complete durable identity
+reconciliation remain future service gates. No live source authority is claimed.

@@ -124,6 +124,8 @@ SAAS_BATCH_VERIFIERS = {}
 SAAS_BATCH_DEDUPE_VERIFIERS = {}
 # Separate source-final authority; empty by default and no intake service enabled.
 SAAS_BATCH_TERMINAL_VERIFIERS = {}
+# Separate authoritative zero-effect source keys; no provider is enrolled.
+SAAS_BATCH_NOEFFECT_VERIFIERS = {}
 
 # Enrollment only; batch dispatch/intake remain unavailable even when locally enabled.
 SAAS_BATCH_ENROLLMENT_ENABLED = False
