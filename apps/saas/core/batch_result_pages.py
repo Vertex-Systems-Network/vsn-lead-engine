@@ -175,8 +175,9 @@ def batch_results_page(
     if snapshot != intent.source_snapshot:
         raise PermissionDenied("Current source policy differs from the job.")
     operations = list(
-        DispatchOperation.objects.filter(job=job, outbox=intent, workspace_id=workspace_id)
-        .order_by("source_code")[:13]
+        DispatchOperation.objects.filter(
+            job=job, outbox=intent, workspace_id=workspace_id
+        ).order_by("source_code")[:13]
     )
     if (
         not 1 <= len(operations) <= 12
