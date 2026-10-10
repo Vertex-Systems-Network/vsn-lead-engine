@@ -388,6 +388,7 @@ def main():
                 assert Job.objects.get(pk=created.pk).status == "queued"
                 queued_detail, _ = native_form(detail_path)
                 assert "Queued for collection" in queued_detail
+                assert "updates automatically" in queued_detail
                 assert "Submit job" not in queued_detail
                 code, _, resubmit = account(submit_action, submit_form.hidden, origin)
                 assert code == 303 and resubmit["Location"] == origin + detail_path
