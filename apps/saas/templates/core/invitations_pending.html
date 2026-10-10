@@ -1,0 +1,28 @@
+{% extends "core/job_base.html" %}
+{% block title %}Pending workspace invitations{% endblock %}
+{% block content %}
+<h1>Pending invitations — {{ workspace.name }}</h1>
+<p>These are existing-account invitations that are not yet accepted, revoked or
+expired. Only owners/admins can review this list. Bearer codes and hashes are
+never displayed here. An accepted code cannot be revoked through this screen;
+use the separately audited member-removal flow if needed.</p>
+{% if pending %}
+<div class="table-scroll" tabindex="0">
+<table>
+<caption>Current unused invitation codes (at most 10)</caption>
+<thead><tr><th scope="col">Target account</th><th scope="col">Role</th>
+<th scope="col">Expires UTC</th><th scope="col">Review</th></tr></thead>
+<tbody>
+{% for invitation in pending %}
+<tr><th scope="row"><code>{{ invitation.target.username }}</code></th>
+<td>{{ invitation.role }}</td>
+<td>{{ invitation.expires_at|date:"Y-m-d H:i" }}</td>
+<td>{% if can_revoke_admin or invitation.role != "admin" %}
+<a href="{% url 'invitation-revoke-page' workspace.id invitation.id %}">Review revocation</a>
+{% else %}Owner only{% endif %}</td></tr>
+{% endfor %}
+</tbody></table></div>
+{% else %}<p>No pending invitations.</p>{% endif %}
+<p><a href="{% url 'invitation-issue-page' workspace.id %}">Issue another existing-account invitation</a></p>
+<p><a href="/dashboard/workspaces/{{ workspace.id }}/members">Back to workspace members</a></p>
+{% endblock %}
