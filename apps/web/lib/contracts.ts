@@ -6,6 +6,14 @@ const object = (v: unknown): v is Record<string, unknown> =>
 const count = (v: unknown): v is number =>
   typeof v === "number" && Number.isSafeInteger(v) && v >= 0;
 export type Workspace = { id: string; name: string; timezone: string };
+export function workspace(v: unknown): v is Workspace {
+  return (
+    object(v) &&
+    uuid(v.id) &&
+    typeof v.name === "string" &&
+    typeof v.timezone === "string"
+  );
+}
 export type Workspaces = {
   results: Workspace[];
   count: number;
@@ -18,13 +26,7 @@ export function workspaces(v: unknown): v is Workspaces {
     (v.next === null || typeof v.next === "string") &&
     Array.isArray(v.results) &&
     v.results.length <= 25 &&
-    v.results.every(
-      (w) =>
-        object(w) &&
-        uuid(w.id) &&
-        typeof w.name === "string" &&
-        typeof w.timezone === "string",
-    )
+    v.results.every(workspace)
   );
 }
 export const memberRoles = ["owner", "admin", "member", "viewer"] as const;
