@@ -2,10 +2,10 @@
   "schema_version": 1,
   "lifecycle_stage": "implementation_started",
   "current_phase": "PHASE-SAAS-WEB-MVP",
-  "current_module": "MOD-SAAS-IDENTITY",
-  "current_work_unit": "WU-SAAS-FOUNDATION",
-  "last_verified_completion": "PR #227 merged at 930cc4d37f71303905954ca9a3e619c71ad4a66a; head c6cfbd2 passed all five workflows, 406 PostgreSQL and 14 Web tests/HTTP. Default-off atomic positive-result settlement; unknown/no-effect/replay and dispatch unavailable.",
-  "next_valid_work_unit": "WU-SAAS-FOUNDATION",
+  "current_module": "MOD-JOB-ORCHESTRATION",
+  "current_work_unit": "WU-SAAS-COLLECTION",
+  "last_verified_completion": "PR #240 merged at 7bfbe0525aa22f01fc6242747c1518dade22c691: collector duplicate-append, Overpass escaping and .env.example fixes; all required checks passed. SaaS foundation 436 PostgreSQL / 14 Web tests through PR #238.",
+  "next_valid_work_unit": "WU-SAAS-COLLECTION",
   "progress": {
     "total_work_units": 21,
     "complete": 9,
@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Add signed settled-state replay under current proofs and explicit unknown/no-effect reconciliation without refund inference; then internal write-ahead and signed 25-row page/export services. Keep ordinary v3 dispatch and external signer/provider gates closed.",
+    "Stop-loss: v3 batch-evidence modules are frozen (CI-enforced). Next: diagnose the production 12,000/day shortfall, then dispatch queued SaaS jobs to the existing collector behind a staging flag and expose accepted results/CSV export end to end.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],
@@ -35,8 +35,8 @@
   "critical_defects": [],
   "qa_readiness": "saas_406_postgres_and_14_web_http_verified",
   "security_readiness": "tenant_session_draft_boundaries_tested_not_production_certified",
-  "last_reconciled_repository_ref": "930cc4d37f71303905954ca9a3e619c71ad4a66a",
-  "last_reconciled_at": "2026-10-08",
+  "last_reconciled_repository_ref": "7bfbe0525aa22f01fc6242747c1518dade22c691",
+  "last_reconciled_at": "2026-10-10",
   "reconciliation": {
     "source_of_truth_order": [
       "live GitHub repository and Actions evidence",
