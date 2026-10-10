@@ -63,6 +63,11 @@ urlpatterns = [
         name="daily-plan-page",
     ),
     path(
+        "workspaces/<uuid:workspace_id>/daily-plans/<uuid:plan_id>/stop/",
+        views.daily_plan_stop_page,
+        name="daily-plan-stop-page",
+    ),
+    path(
         "workspaces/<uuid:workspace_id>/schedule-preview/",
         views.daily_time_preview_page,
         name="daily-time-preview-page",
