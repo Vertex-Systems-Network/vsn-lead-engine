@@ -1,0 +1,48 @@
+name: SaaS Staging Image Build
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "deploy/**"
+      - ".dockerignore"
+      - "apps/saas/requirements.txt"
+      - "apps/web/package.json"
+      - "apps/web/package-lock.json"
+      - "apps/web/next.config.ts"
+      - "requirements-runtime.txt"
+      - ".github/workflows/saas-staging-images.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: saas-staging-images-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            dockerfile: deploy/saas/Dockerfile
+            target: api
+          - name: worker
+            dockerfile: deploy/saas/Dockerfile
+            target: worker
+          - name: web
+            dockerfile: deploy/web/Dockerfile
+            target: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build staging image without uploading or running external services
+        env:
+          DOCKER_BUILDKIT: "1"
+        run: docker build --target "${{ matrix.target }}" --file "${{ matrix.dockerfile }}" --tag "vsn-stage-${{ matrix.name }}:ci" .

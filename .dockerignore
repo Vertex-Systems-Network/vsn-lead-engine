@@ -1,0 +1,18 @@
+# Build context intentionally excludes account data, local credentials and generated assets.
+.git
+.github
+.ai
+**/.env
+**/.env.*
+**/node_modules
+**/.next
+**/__pycache__
+**/.pytest_cache
+**/.venv
+**/*.sqlite3
+**/*.db
+**/*.pem
+**/*.key
+**/fulfilment-keys*.json
+**/secrets
+**/secrets/**
