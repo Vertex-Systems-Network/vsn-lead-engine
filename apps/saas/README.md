@@ -318,3 +318,20 @@ DST resolution, an explicit `advisory_only` field and a list of execution gates.
 No plan is enabled, materialized or dispatched by this endpoint. HTTP and
 PostgreSQL tenant/mutation tests cover the authorization boundary; it does not
 replace scheduler fencing, source and entitlement acceptance or deployment.
+
+## Revision-fenced emergency daily-plan stop
+
+A workspace owner/admin can inspect a currently enabled plan and open the
+Django route `/workspaces/<uuid>/daily-plans/<plan-id>/stop/`. GET shows a
+read-only warning and CSRF-protected explicit confirmation with a one-hour
+signed actor/workspace/plan/revision token. POST validates exact form fields,
+rechecks current membership and revision under the workspace and schedule row
+locks, then atomically sets `enabled=False` and increments the revision. A
+stale/replayed request fails with conflict; viewer, foreign or revoked requests
+fail closed. No scheduler can materialize later dates under an old revision.
+This only blocks **future occurrence materialization**: it does not cancel
+already-created drafts, queued/running provider jobs, network operations or
+charges, and it does not constitute an operational shutdown of an external
+worker. There is no UI or API to re-enable a plan. The stop feature requires
+no provider credentials or commercial activation. PostgreSQL safety tests and
+real Next/Django confirmation-route tests cover the boundary.
