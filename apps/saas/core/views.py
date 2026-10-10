@@ -108,9 +108,7 @@ class DailyOccurrenceHistory(APIView):
         from .daily_occurrence_history import daily_occurrences_page
 
         return Response(
-            daily_occurrences_page(
-                request.user, workspace_id, plan_id, request.query_params
-            )
+            daily_occurrences_page(request.user, workspace_id, plan_id, request.query_params)
         )
 
 
