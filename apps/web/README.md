@@ -64,6 +64,15 @@ independent browser/WCAG, visual, performance, source-license and legal review.
 The disposable HTTP integration smoke asserts public access, safe status labels,
 no payment flow and absence of synthetic private tenant content.
 
+## Exact active workspace identity
+
+The Next workspace overview and member pages now read `GET /api/v1/workspaces/<uuid>/`
+through the same session-only allowlisted server transport. The backend returns
+only the member-authorized workspace name, timezone and existing serializer
+metadata with no change endpoint. The UI validates the exact requested ID before
+rendering and never reuses a workspaces-list page as an identity source. This
+avoids showing another workspace's name when memberships change.
+
 ## Member visibility in the web dashboard
 
 The workspace overview links to `/dashboard/workspaces/<workspace-id>/members`.

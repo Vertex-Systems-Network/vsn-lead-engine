@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { backend } from "../../../../../lib/backend";
-import { members, uuid } from "../../../../../lib/contracts";
+import { members, uuid, workspace } from "../../../../../lib/contracts";
 import { State } from "../../../../components/state";
 
 export default async function MembersPage({
@@ -18,11 +18,16 @@ export default async function MembersPage({
     typeof page === "string" && /^[1-9][0-9]{0,5}$/.test(page)
       ? Number(page)
       : 1;
-  const result = await backend(
-    `/api/v1/workspaces/${workspaceId}/members/?page=${current}`,
-    members,
-  );
+  const [result, identity] = await Promise.all([
+    backend(
+      `/api/v1/workspaces/${workspaceId}/members/?page=${current}`,
+      members,
+    ),
+    backend(`/api/v1/workspaces/${workspaceId}/`, workspace),
+  ]);
   if (result.kind !== "ok") return <State kind={result.kind} />;
+  if (identity.kind !== "ok") return <State kind={identity.kind} />;
+  if (identity.data.id !== workspaceId) return <State kind="unavailable" />;
 
   return (
     <>
@@ -31,6 +36,10 @@ export default async function MembersPage({
       </Link>
       <p className="eyebrow">Workspace access</p>
       <h1>Workspace members</h1>
+      <p className="muted">
+        Active workspace: <strong>{identity.data.name}</strong> ·{" "}
+        {identity.data.timezone}
+      </p>
       <p className="muted">
         Owners and administrators can review current workspace roles. This view
         is read-only: invitations, removals and role changes are not available

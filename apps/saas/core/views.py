@@ -92,6 +92,15 @@ class WorkspaceList(generics.ListCreateAPIView):
 
 
 @method_decorator(never_cache, name="dispatch")
+class WorkspaceDetail(APIView):
+    """Read-only exact workspace identity under current membership authority."""
+
+    def get(self, request, workspace_id):
+        membership = membership_for(request.user, workspace_id)
+        return Response(WorkspaceSerializer(membership.workspace).data)
+
+
+@method_decorator(never_cache, name="dispatch")
 class JobList(APIView):
     def get(self, request, workspace_id):
         membership_for(request.user, workspace_id)
