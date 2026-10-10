@@ -32,9 +32,9 @@ export default async function MembersPage({
       <p className="eyebrow">Workspace access</p>
       <h1>Workspace members</h1>
       <p className="muted">
-        Owners and administrators can review current workspace roles.
-        This view is read-only: invitations, removals and role changes are not
-        available from the Next dashboard.
+        Owners and administrators can review current workspace roles. This view
+        is read-only: invitations, removals and role changes are not available
+        from the Next dashboard.
       </p>
       {result.data.results.length > 0 ? (
         <div className="table-scroll">
