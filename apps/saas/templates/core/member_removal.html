@@ -1,0 +1,33 @@
+{% extends "core/job_base.html" %}
+{% block title %}Remove workspace member{% endblock %}
+{% block content %}
+<h1>Remove workspace member — {{ workspace.name }}</h1>
+<p>Member ID: <code>{{ target.user_id }}</code>. Current role: <strong>{{ target.role }}</strong>.</p>
+<p><strong>Access warning:</strong> This revokes the selected member's current access to
+this workspace immediately. It does not delete their account, erase lead data,
+cancel already-submitted jobs, alter bills or contact providers. The final owner
+cannot be removed; administrators cannot remove owners. A fresh review is required
+if the member's role or audit history changes.</p>
+{% if removed %}
+<section role="status" aria-label="Removal receipt">
+<h2>Workspace member removed</h2>
+<p><code>{{ target.user_id }}</code> no longer has workspace membership.
+The removal was recorded in membership audit history.</p>
+</section>
+{% elif form %}
+<form method="post" action="{% url 'member-removal-page' workspace.id target.user_id %}">
+{% csrf_token %}
+{{ form.removal_token }}
+{% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
+{% if form.removal_token.errors %}<div role="alert">{{ form.removal_token.errors }}</div>{% endif %}
+<div class="form-field">
+<label for="{{ form.confirm_removal.id_for_label }}">
+{{ form.confirm_removal }} I understand this immediately revokes this workspace membership.
+</label>
+{% if form.confirm_removal.errors %}<div role="alert">{{ form.confirm_removal.errors }}</div>{% endif %}
+</div>
+<button type="submit">Confirm: remove member from this workspace</button>
+</form>
+{% endif %}
+<p><a href="/dashboard/workspaces/{{ workspace.id }}/members">Back to workspace members</a></p>
+{% endblock %}
