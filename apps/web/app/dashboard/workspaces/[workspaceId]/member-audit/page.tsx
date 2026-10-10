@@ -11,7 +11,10 @@ export default async function MemberAuditPage({
   params: Promise<{ workspaceId: string }>;
   searchParams: Promise<{ offset?: string }>;
 }) {
-  const [{ workspaceId }, { offset }] = await Promise.all([params, searchParams]);
+  const [{ workspaceId }, { offset }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   if (!uuid(workspaceId)) notFound();
   const current =
     typeof offset === "string" && /^(0|[1-9][0-9]{0,5})$/.test(offset)
