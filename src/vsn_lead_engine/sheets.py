@@ -22,6 +22,7 @@ DAILY_COLUMNS = [
     "State/Province","ZIP/Postal Code","Latitude","Longitude","Nearby / Landmark / Neighborhood","Rating",
     "Reviews","Contact Person","Lead Score","Pitch","Outreach Status","Unique Key","Notes"
 ]
+DAILY_FINGERPRINT_INDEX = DAILY_COLUMNS.index("Unique Key")
 
 REGISTRY_COLUMNS = [
     "First Added","Field","Region","Country","City","Category","Business Name","Website",
@@ -1045,12 +1046,23 @@ class GoogleSheetsStore:
         category = leads[0].category
         if any(lead.category != category for lead in leads):
             raise ValueError("A daily append batch must contain a single category.")
+        # Appends are not idempotent: a retry after a timed-out but applied
+        # append would duplicate rows, so skip fingerprints already on the tab.
+        key_letter = self._column_letter(DAILY_FINGERPRINT_INDEX)
+        existing = self.sheets.spreadsheets().values().get(
+            spreadsheetId=workbook["id"],
+            range=f"'{category}'!{key_letter}:{key_letter}"
+        ).execute(num_retries=self.api_retries).get("values", [])
+        written = {str(row[0]).strip() for row in existing if row and str(row[0]).strip()}
+        rows = [row for row in self._daily_rows(leads) if row[DAILY_FINGERPRINT_INDEX] not in written]
+        if not rows:
+            return
         self.sheets.spreadsheets().values().append(
             spreadsheetId=workbook["id"],
             range=f"'{category}'!A:AC",
             valueInputOption="RAW",
             insertDataOption="INSERT_ROWS",
-            body={"values":self._daily_rows(leads)}
+            body={"values":rows}
         ).execute(num_retries=self.api_retries)
 
     def commit_leads(self, workbook: dict, leads: list[Lead]):

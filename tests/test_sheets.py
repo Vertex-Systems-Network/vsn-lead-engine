@@ -364,3 +364,53 @@ def test_daily_state_snapshot_keeps_zero_countries_when_no_rows_exist():
         "United States":0,
         "Canada":0,
     }
+
+
+class _AppendValues:
+    def __init__(self,existing_keys):
+        self.existing_keys=existing_keys
+        self.get_ranges=[]
+        self.appended=[]
+
+    def get(self,**kwargs):
+        self.get_ranges.append(kwargs.get("range"))
+        return _ExecResult({"values":[[key] for key in self.existing_keys]})
+
+    def append(self,**kwargs):
+        self.appended.append(kwargs["body"]["values"])
+        return _ExecResult({})
+
+
+def _append_store(existing_keys):
+    store=object.__new__(GoogleSheetsStore)
+    store.api_retries=0
+    values=_AppendValues(existing_keys)
+    store.sheets=_BootstrapSheetsService(values)
+    return store,values
+
+
+def _daily_lead(name,phone):
+    from vsn_lead_engine.models import Lead
+    return Lead(
+        country="United States",category="Salon",business_name=name,phone=phone,
+        city="Austin",region="TX",source="Overture",source_id=name,
+    )
+
+
+def test_daily_append_skips_fingerprints_already_written_by_an_earlier_attempt():
+    from vsn_lead_engine.dedupe import fingerprints
+    first=_daily_lead("Alpha Salon","+1 512 555 0101")
+    second=_daily_lead("Beta Salon","+1 512 555 0102")
+    store,values=_append_store([fingerprints(first).unique])
+    store.append_daily_leads({"id":"sheet123"},[first,second])
+    assert values.get_ranges==["'Salon'!AB:AB"]
+    assert len(values.appended)==1
+    assert [row[27] for row in values.appended[0]]==[fingerprints(second).unique]
+
+
+def test_daily_append_is_a_no_op_when_every_row_is_already_written():
+    from vsn_lead_engine.dedupe import fingerprints
+    lead=_daily_lead("Alpha Salon","+1 512 555 0101")
+    store,values=_append_store([fingerprints(lead).unique])
+    store.append_daily_leads({"id":"sheet123"},[lead])
+    assert values.appended==[]

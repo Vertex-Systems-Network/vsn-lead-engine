@@ -31,6 +31,11 @@ PUBLIC_OVERPASS_HOSTS = {
 }
 
 
+def escape_overpass_string(value: str) -> str:
+    """Escape a value for an Overpass QL double-quoted string literal."""
+    return str(value).replace("\\","\\\\").replace('"','\\"').replace("\n","\\n")
+
+
 class OverpassSource:
     """Optional self-hosted Overpass adapter.
 
@@ -63,7 +68,7 @@ class OverpassSource:
         filters=CATEGORY_FILTERS.get(category,[])
         if not filters:
             return []
-        city=location["city"].replace('"','\"')
+        city=escape_overpass_string(location["city"])
         country=location["country"]
         region=location["region"]
         pieces=[]
