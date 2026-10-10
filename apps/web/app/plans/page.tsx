@@ -15,7 +15,7 @@ const concepts = [
   [
     "Team",
     "Collaborative workspaces",
-    "Role-based access exists; invitations, billing seats and operational controls need more development.",
+    "Role-based access, audited changes and manually shared short-lived existing-account invitations are implemented in development. Invitation email, paid seats and production acceptance remain unavailable.",
   ],
   [
     "Custom",
