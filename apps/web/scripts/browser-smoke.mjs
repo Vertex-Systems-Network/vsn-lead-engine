@@ -431,6 +431,33 @@ async function run(origin) {
         }
       }
 
+      async function clickVisible(selector) {
+        const point = await cdp.js(`(() => {
+          const control = document.querySelector(${JSON.stringify(selector)});
+          if (!control) return null;
+          control.scrollIntoView({block: "center"});
+          const rect = control.getBoundingClientRect();
+          return {x: rect.left + rect.width / 2, y: rect.top + rect.height / 2};
+        })()`);
+        assert.ok(point, `Missing interactive control: ${selector}`);
+        for (const type of ["mousePressed", "mouseReleased"]) {
+          await cdp.send("Input.dispatchMouseEvent", {
+            type,
+            x: point.x,
+            y: point.y,
+            button: "left",
+            clickCount: 1,
+          });
+        }
+      }
+      async function waitForInteraction(condition, description) {
+        for (let attempt = 0; attempt < 100; attempt++) {
+          if (await cdp.js(condition)) return;
+          await delay(80);
+        }
+        assert.fail(`Browser interaction did not reach expected state: ${description}`);
+      }
+
       for (const width of [320, 1280]) {
         await cdp.send("Emulation.setDeviceMetricsOverride", {
           width,
@@ -508,6 +535,60 @@ async function run(origin) {
         assert.equal(filtered.selected, "draft");
         assert.equal(filtered.next, true, "Draft job pagination must retain its status filter.");
 
+        // Exercise native form submission and actual Next-link pagination
+        // instead of merely opening prepared URLs. Never submit a job.
+        await inspectPrivate(
+          `/dashboard/workspaces/${ownWorkspace}`,
+          "Workspace overview",
+          ["Foreign private marker"],
+        );
+        assert.equal(
+          await cdp.js(`(() => {
+            const select = document.querySelector('select[name="status"]');
+            if (!select) return false;
+            select.value = "draft";
+            select.dispatchEvent(new Event("change", {bubbles: true}));
+            return select.value === "draft";
+          })()`),
+          true,
+          "Job status selector must allow selecting draft",
+        );
+        await clickVisible('form[method="get"] button[type="submit"]');
+        await waitForInteraction(
+          `(() => location.pathname === ${JSON.stringify(`/dashboard/workspaces/${ownWorkspace}`)}
+            && new URLSearchParams(location.search).get("status") === "draft"
+            && document.querySelector('select[name="status"]')?.value === "draft"
+            && document.querySelectorAll('main span.badge').length === 25)()`,
+          "Apply filter must navigate to the first 25 draft jobs",
+        );
+        await clickVisible('nav[aria-label="Search pages"] a[href*="after="]');
+        await waitForInteraction(
+          `(() => new URLSearchParams(location.search).has("after")
+            && document.querySelectorAll("main span.badge").length === 2)()`,
+          "Second page must show only the last two draft jobs",
+        );
+        const pageTwoState = await cdp.js(`(() => ({
+          status: new URLSearchParams(location.search).get("status"),
+          after: new URLSearchParams(location.search).get("after"),
+          count: document.querySelectorAll("main span.badge").length,
+          first: !![...document.querySelectorAll('nav[aria-label="Search pages"] a')].find(
+            (a) => a.textContent.trim() === "First page"
+          ),
+          foreign: document.querySelector("main")?.textContent.includes("Foreign private marker"),
+        }))()`);
+        assert.equal(pageTwoState.status, "draft");
+        assert.ok(uuid.test(pageTwoState.after || ""));
+        assert.equal(pageTwoState.count, 2);
+        assert.equal(pageTwoState.first, true);
+        assert.equal(pageTwoState.foreign, false);
+        await clickVisible('nav[aria-label="Search pages"] a[href*="status=draft"]:not([href*="after="])');
+        await waitForInteraction(
+          `(() => new URLSearchParams(location.search).get("status") === "draft"
+            && !new URLSearchParams(location.search).has("after")
+            && document.querySelectorAll("main span.badge").length === 25)()`,
+          "First-page link must keep draft status without cursor",
+        );
+
         await inspectPrivate(
           `/dashboard/workspaces/${ownWorkspace}/sources`,
           "Source configuration",
@@ -557,7 +638,7 @@ async function run(origin) {
         );
       }
       console.log(
-        "PASS: 2 Chromium private viewports: anonymous/foreign/cookie deletion deny access; own workspace/job, read-only draft form, status pagination, source catalog and daily plans",
+        "PASS: 2 Chromium private viewports: anonymous/foreign/cookie deletion deny access; own workspace/job, read-only draft form, actual filter submit/Next/First links, source catalog and daily plans",
       );
     }
     // Fail closed if an anonymous page initiates ANY remote HTTP(S) or WS(S)
