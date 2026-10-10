@@ -69,9 +69,11 @@ def revoke_pending_invitation(actor, workspace_id, invitation_id):
     current = membership_for(actor, workspace_id, lock=True)
     if current.role not in {"owner", "admin"}:
         raise PermissionDenied("Only owners/admins can revoke invitations.")
-    invitation = WorkspaceInvitation.objects.select_for_update().filter(
-        workspace_id=workspace_id, pk=invitation_id
-    ).first()
+    invitation = (
+        WorkspaceInvitation.objects.select_for_update()
+        .filter(workspace_id=workspace_id, pk=invitation_id)
+        .first()
+    )
     if invitation is None:
         raise Http404("Invitation not found.")
     if current.role != "owner" and invitation.role == "admin":
