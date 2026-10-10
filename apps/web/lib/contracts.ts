@@ -273,7 +273,8 @@ export function jobStatusSummary(v: unknown): v is JobStatusSummary {
     !uuid(v.workspace_id) ||
     !count(v.total) ||
     !object(v.statuses)
-  ) return false;
+  )
+    return false;
   const values = v.statuses;
   return (
     Object.keys(values).length === jobStates.length &&
@@ -281,7 +282,6 @@ export function jobStatusSummary(v: unknown): v is JobStatusSummary {
     jobStates.reduce((sum, state) => sum + Number(values[state]), 0) === v.total
   );
 }
-
 
 export type DraftFeedback = Omit<DraftContext, "kind"> & {
   kind: "draft-feedback";
