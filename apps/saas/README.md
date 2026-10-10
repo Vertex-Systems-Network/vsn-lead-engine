@@ -281,3 +281,28 @@ records, signer keys or creator identity. It does not accept query parameters or
 write verbs and cannot schedule or dispatch work. Foreign, anonymous and revoked
 membership, plan-ID swapping, invalid persisted data and mutation denial have
 regression coverage.
+
+## Read-only due-plan diagnostics (no scheduler)
+
+After obtaining a verified owner/admin account UUID and workspace UUID, a
+trusted operator can run:
+
+```bash
+python manage.py inspect_daily_plans --actor <actor-uuid> --workspace <workspace-uuid> --limit 25
+```
+
+The command verifies the current actor's membership and owner/admin role,
+returns at most 25 plan records, and can continue with `--after <next-uuid>`.
+It does **not** write schedules, occurrences, jobs, outbox entries, usage or
+provider requests. Results contain only the plan ID, current enabled flag,
+revision, redacted status and local-date/DST-resolution candidates. Inactive
+plans remain `disabled`. Synthetically enabled plans are rechecked for saved
+search fingerprint, timezone, active creator membership and current entitlement,
+but any `candidate_due_requires_execution_gates` status is **advisory only**:
+it does not certify available quota, provider rights, valid credentials, signed
+operator authorization or a working scheduler. No customer scheduling or
+collection starts by inspecting plans. Time calculations follow the same seven
+local-calendar-date catch-up limit as internal `materialize_daily`; dates already
+materialized are omitted. Clock changes between inspection and future execution
+require all gates to be freshly checked. Do not automate this command as a
+substitute for a fenced, consented scheduler.
