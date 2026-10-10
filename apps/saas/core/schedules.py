@@ -12,7 +12,7 @@ from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .jobs import RevisionConflict, revision
-from .models import DailySchedule, Entitlement, ScheduleOccurrence
+from .models import DailySchedule, Entitlement, ScheduleOccurrence, Workspace
 from .serializers import SearchSerializer
 from .services import IdempotencyConflict, create_draft, membership_for
 from .usage import lock_workspace
@@ -100,8 +100,6 @@ def disable_daily_schedule(actor, workspace_id, schedule_id, expected_revision):
     """Stop future local-day materialization; do not cancel existing jobs."""
     expected_revision = revision(expected_revision)
     membership_for(actor, workspace_id)
-    from .models import Workspace
-
     Workspace.objects.select_for_update().get(pk=workspace_id)
     member = membership_for(actor, workspace_id, lock=True)
     if member.role not in {"owner", "admin"}:
