@@ -239,3 +239,20 @@ providers. Read-only review is available to workspace viewers as well as owners.
 The action to save, enable and operate a daily customer schedule is deliberately
 **not** available; it requires separate role, entitlement, recheck, dispatcher,
 audit and deployment acceptance. This preview is not recurring collection.
+
+## Disabled daily schedule plans from drafts
+
+Owners/admins/members may open
+`/workspaces/<uuid>/jobs/<draft-id>/daily-plan/` from a **currently saved draft**
+and submit an HTML form with an IANA timezone and daily HH:MM. Django CSRF and a
+one-hour signed actor/workspace/job-bound idempotency token are required. Only
+the server-side immutable saved job search is used; no search input is accepted
+from the browser. The internal `create_daily_schedule` service explicitly sets
+`enabled=False` even if model defaults change. Exact replay returns the same
+plan; divergent settings for the same key return a conflict. Revocation, viewer,
+foreign draft, stale job status and non-CSRF requests are denied. The plan save
+creates no occurrence/job/outbox, source request, charge, or automatic timer.
+The route renders a receipt showing the actual plan state. Enabling and running
+a schedule needs separate reviewed user controls, durable scheduler fencing,
+entitlement/provider policy checks and release acceptance; do not conflate this
+page with active recurring collection.
