@@ -789,3 +789,74 @@ export function exportReceipts(v: unknown): v is ExportReceipts {
     )
   );
 }
+
+export type DailyOccurrence = {
+  id: string;
+  local_date: string;
+  local_time: string;
+  timezone: string;
+  schedule_revision: number;
+  resolution: "normal" | "gap_forward" | "ambiguous_earlier" | "skipped_day";
+  scheduled_for: string | null;
+  job_id: string | null;
+  job_status: (typeof jobStates)[number] | null;
+};
+export type DailyOccurrenceHistory = {
+  workspace_id: string;
+  plan_id: string;
+  total: number;
+  results: DailyOccurrence[];
+  next: string | null;
+  advisory_only: true;
+};
+export function dailyOccurrenceHistory(v: unknown): v is DailyOccurrenceHistory {
+  if (
+    !object(v) ||
+    !uuid(v.workspace_id) ||
+    !uuid(v.plan_id) ||
+    !count(v.total) ||
+    v.advisory_only !== true ||
+    !Array.isArray(v.results) ||
+    v.results.length > 25 ||
+    v.results.length > v.total ||
+    (v.next !== null && (
+      typeof v.next !== "string" ||
+      !/^\\d{4}-\\d{2}-\\d{2}$/.test(v.next)
+    ))
+  )
+    return false;
+  if (
+    !v.results.every(
+      (r: unknown) =>
+        object(r) &&
+        uuid(r.id) &&
+        typeof r.local_date === "string" &&
+        /^\\d{4}-\\d{2}-\\d{2}$/.test(r.local_date) &&
+        Number.isFinite(Date.parse(r.local_date)) &&
+        typeof r.local_time === "string" &&
+        /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(r.local_time) &&
+        typeof r.timezone === "string" &&
+        r.timezone.length > 0 &&
+        r.timezone.length <= 64 &&
+        count(r.schedule_revision) &&
+        r.schedule_revision >= 1 &&
+        ["normal", "gap_forward", "ambiguous_earlier", "skipped_day"].includes(String(r.resolution)) &&
+        (r.scheduled_for === null ||
+          (typeof r.scheduled_for === "string" && Number.isFinite(Date.parse(r.scheduled_for)))) &&
+        (r.job_id === null || uuid(r.job_id)) &&
+        (r.job_status === null || jobState(r.job_status)) &&
+        (r.job_id === null ? r.job_status === null : r.job_status !== null) &&
+        (r.resolution === "skipped_day"
+          ? r.scheduled_for === null && r.job_id === null
+          : r.scheduled_for !== null && r.job_id !== null),
+    )
+  )
+    return false;
+  const dates = v.results.map((row: DailyOccurrence) => row.local_date);
+  return (
+    new Set(dates).size === dates.length &&
+    dates.every((d, i) => i === 0 || dates[i - 1] > d) &&
+    (v.next === null ||
+      (dates.length > 0 && v.next === dates[dates.length - 1]))
+  );
+}
