@@ -20,12 +20,12 @@ class SearchAssistanceEvaluationTests(SimpleTestCase):
         corpus = json.loads(FIXTURE.read_text(encoding="utf-8"))
         self.assertEqual(corpus["schema_version"], 1)
         rows = corpus["cases"]
-        self.assertEqual(len(rows), 36)
+        self.assertEqual(len(rows), 50)
         self.assertEqual(len({row["id"] for row in rows}), len(rows))
         tally = Counter(row["status"] for row in rows)
         self.assertGreaterEqual(tally["ready_for_manual_review"], 12)
         self.assertGreaterEqual(tally["needs_details"], 15)
-        self.assertGreaterEqual(tally["invalid"], 5)
+        self.assertGreaterEqual(tally["invalid"], 19)
         for row in rows:
             with self.subTest(id=row["id"]):
                 self.assertEqual(

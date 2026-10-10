@@ -37,7 +37,7 @@ def search_assistance_page(request, workspace_id):
         preview = search_assistance_preview(form.cleaned_data["intent"])
         status = 200
     else:
-        error = "Enter 4–280 characters without links, phone numbers or private contact details."
+        error = "Enter 4–280 characters without links, phone numbers, email addresses or secrets."
     # Never echo free-form input back to the browser, even on validation errors.
     return render(
         request,
