@@ -247,6 +247,78 @@ class UsageDetail(APIView):
 @never_cache
 @login_required
 @require_http_methods(["GET", "POST"])
+def pause_daily_plan_page(request, workspace_id, plan_id):
+    """Owner/admin explicit CSRF confirmation; can only disable future planning."""
+    from rest_framework.exceptions import PermissionDenied, ValidationError
+
+    from .daily_plan_pause import PauseDailyPlanForm, issue_pause_token, pause_daily_schedule
+    from .jobs import RevisionConflict
+    from .models import DailySchedule
+
+    membership = membership_for(request.user, workspace_id)
+    if membership.role not in {"owner", "admin"}:
+        return HttpResponseForbidden("Only workspace owners and admins can pause plans.")
+    workspace = membership.workspace
+    plan = get_object_or_404(DailySchedule, pk=plan_id, workspace_id=workspace_id)
+    if request.method == "GET":
+        if request.GET:
+            return HttpResponseBadRequest("Pause confirmation does not accept query parameters.")
+        form = (
+            PauseDailyPlanForm(
+                actor=request.user,
+                workspace_id=workspace_id,
+                plan_id=plan_id,
+                initial={
+                    "expected_revision": plan.revision,
+                    "pause_token": issue_pause_token(
+                        request.user, workspace_id, plan_id, plan.revision
+                    ),
+                },
+            )
+            if plan.enabled
+            else None
+        )
+        return render(
+            request,
+            "core/daily_plan_pause.html",
+            {"workspace": workspace, "plan": plan, "form": form, "receipt": False},
+        )
+    fields = {"csrfmiddlewaretoken", "expected_revision", "pause_token"}
+    if set(request.POST) != fields or any(
+        len(request.POST.getlist(key)) != 1 for key in request.POST
+    ):
+        return HttpResponseBadRequest("Unsupported pause confirmation fields.")
+    form = PauseDailyPlanForm(
+        request.POST, actor=request.user, workspace_id=workspace_id, plan_id=plan_id
+    )
+    status_code, receipt = 400, False
+    if form.is_valid():
+        try:
+            plan, changed = pause_daily_schedule(
+                request.user, workspace_id, plan_id, form.cleaned_data["expected_revision"]
+            )
+        except RevisionConflict:
+            form.add_error(None, "Plan changed. Refresh the form before retrying.")
+            status_code = 409
+        except ValidationError:
+            form.add_error(None, "Plan revision is not valid.")
+        except PermissionDenied:
+            return HttpResponseForbidden("Plan pause permission is no longer available.")
+        else:
+            status_code, receipt = 200, True
+            # A replay with an unchanged, already-disabled revision is a no-op.
+            plan.refresh_from_db()
+    return render(
+        request,
+        "core/daily_plan_pause.html",
+        {"workspace": workspace, "plan": plan, "form": form, "receipt": receipt},
+        status=status_code,
+    )
+
+
+@never_cache
+@login_required
+@require_http_methods(["GET", "POST"])
 def daily_plan_page(request, workspace_id, job_id):
     """Create only an inactive schedule plan from the saved draft's server-side scope."""
     from rest_framework.exceptions import PermissionDenied, ValidationError
