@@ -55,6 +55,7 @@ Snapshot: **2026-10-08 PKT**, reconciled through protected feature `main` commit
 | **Overall SaaS direction** | **2026-10-04** | **Design and contract implementation advancing; runtime, provider, validation and launch gates remain open** | **`████░░░░░░` ~52% engineering-plan indicator** |
 
 Progress notes:
+- 2026-10-10 SaaS staging preflight (M9 preparation; no deploy): added fail-closed `manage.py check_staging` for non-DEBUG security, explicit hosts/Next origin, SMTP, real-source key configuration, read-only PostgreSQL connectivity and pending migrations. It does not replace live proxy, email-delivery, source-rights, backup or customer acceptance. No hosting/SMTP provider has been provisioned.
 - Owner-selected Next.js UI is recorded in [ADR-SAAS-002](docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md); backend auth/tenant authority remains Django. Percentages describe implemented engineering slices; browser/customer/deployment/release limits remain open.
 - M0 is complete from repository audit evidence.
 - 2026-10-10 job progress (M7): queued/running job pages refresh themselves (Next `router.refresh()` every 15 s for up to 30 min; Django `meta refresh`), and stop once the job finishes. 1 new test; the HTTP smoke checks the queued copy.
