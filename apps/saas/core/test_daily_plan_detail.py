@@ -87,9 +87,7 @@ class DailyPlanDetailTests(TestCase):
         self.assertNotIn(b"Synthetic bakery", response.content)
         self.client.force_login(self.owner)
         other_id = self.foreign_plan.id
-        swapped = self.client.get(
-            f"/api/v1/workspaces/{self.workspace.id}/daily-plans/{other_id}/"
-        )
+        swapped = self.client.get(f"/api/v1/workspaces/{self.workspace.id}/daily-plans/{other_id}/")
         self.assertEqual(swapped.status_code, 404)
         Membership.objects.filter(workspace=self.workspace, user=self.owner).delete()
         self.assertEqual(self.client.get(self.path).status_code, 404)
