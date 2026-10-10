@@ -78,6 +78,11 @@ export default async function MembersPage({
           <Link href={`?page=${current + 1}`}>Next page</Link>
         ) : null}
       </nav>
+      <p>
+        <Link href={`/dashboard/workspaces/${workspaceId}/member-audit`}>
+          Review member role change history →
+        </Link>
+      </p>
       <p className="muted">
         Server permissions are checked on every request. A link or a visible
         member identifier never grants access to another workspace.
