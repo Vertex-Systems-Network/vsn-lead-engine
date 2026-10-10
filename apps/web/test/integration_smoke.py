@@ -36,7 +36,7 @@ def main():
         import django
 
         django.setup()
-        from core.jobs import CONTROLS, EVIDENCE, enqueue_job
+        from core.jobs import CONTROLS, EVIDENCE
         from core.models import (
             Entitlement,
             Job,
@@ -378,7 +378,20 @@ def main():
                     "http-fixture" not in denied_catalog
                     and "Foreign private marker" not in denied_catalog
                 )
-                enqueue_job(user, workspace.id, created.id, 0)
+                # Customer submit through the native Next form, not an internal call.
+                submit_page, submit_form = native_form(detail_path + "/submit")
+                submit_action = f"/workspaces/{workspace.id}/jobs/{created.id}/submit/"
+                assert "Confirm and submit" in submit_page and "at most 25 new leads" in submit_page
+                assert submit_form.action == backend + submit_action
+                code, _, submitted = account(submit_action, submit_form.hidden, origin)
+                assert code == 303 and submitted["Location"] == origin + detail_path
+                assert Job.objects.get(pk=created.pk).status == "queued"
+                queued_detail, _ = native_form(detail_path)
+                assert "Queued for collection" in queued_detail
+                assert "Submit job" not in queued_detail
+                code, _, resubmit = account(submit_action, submit_form.hidden, origin)
+                assert code == 303 and resubmit["Location"] == origin + detail_path
+                assert JobOutbox.objects.filter(job=created).count() == 1
                 code, _, cancel_error = account(cancel_action, stale.hidden, origin)
                 assert (
                     code == 303
@@ -564,7 +577,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, country/category/source result filters and native selected-row export preview/confirmation/empty/outside-filter denial/subset-only/conflict and readonly redacted receipt-history/no-charge/retained-after-erasure flows and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, native submit/replay, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, country/category/source result filters and native selected-row export preview/confirmation/empty/outside-filter denial/subset-only/conflict and readonly redacted receipt-history/no-charge/retained-after-erasure flows and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

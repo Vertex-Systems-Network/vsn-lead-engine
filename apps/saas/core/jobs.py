@@ -1,4 +1,4 @@
-"""Atomic internal pre-dispatch intents. No worker/provider/customer submit API."""
+"""Atomic pre-dispatch intents: customer submit (views.submit_job_page) and cancel."""
 
 import hashlib
 import json

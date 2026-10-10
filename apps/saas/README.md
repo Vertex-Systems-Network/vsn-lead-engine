@@ -25,6 +25,7 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 - `/workspaces/{workspace_id}/sources/`: bounded read-only application policy configuration, without rights/availability claims.
 - `/workspaces/{workspace_id}/search/new/`: CSRF-protected draft form for owners/admins/members, never execution.
 - `/workspaces/{workspace_id}/jobs/`: newest-first read-only history, 25-row signed workspace-bound continuation.
+- `/workspaces/{workspace_id}/jobs/{job_id}/submit/`: review then signed, revision-bound submit for writers; reserves allowance and queues the draft via `enqueue_job`. Refusals (inactive plan, limits, no covering source) do not queue.
 - `/workspaces/{workspace_id}/jobs/{job_id}/cancel/`: review then signed, revision-bound pending cancellation for writers.
 - `/workspaces/{workspace_id}/jobs/{job_id}/`: read-only saved scope, recorded status/counts and UTC times.
 - `/workspaces/{workspace_id}/usage/`: session-authenticated read-only settled/reserved/limit table.
@@ -51,7 +52,7 @@ python apps/saas/manage.py seed_local_source
 python apps/saas/manage.py run_jobs --limit 25
 ```
 
-One job holds at most 25 accepted leads (the v2 batch bound). A workspace still needs an active entitlement and a queued job; customer submit and sign-up are the next slices.
+One job holds at most 25 accepted leads (the v2 batch bound). A workspace still needs an active entitlement; customers queue jobs with **Submit job**. Sign-up is the next slice.
 
 ## Security and recovery
 

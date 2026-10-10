@@ -111,6 +111,7 @@ test("form paths require a bounded CSRF cookie and ordinary reads never forward 
     `/api/v1/workspaces/${id}/draft-form/`,
     `/api/v1/workspaces/${id}/draft-feedback/${id}/`,
     `/api/v1/workspaces/${id}/jobs/${id}/cancel-form/`,
+    `/api/v1/workspaces/${id}/jobs/${id}/submit-form/`,
   ]) {
     for (const bad of [undefined, "bad", csrf + ";evil=1"])
       assert.equal(

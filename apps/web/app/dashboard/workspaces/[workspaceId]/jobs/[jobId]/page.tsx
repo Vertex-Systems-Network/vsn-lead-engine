@@ -41,6 +41,30 @@ export default async function Detail({
           <dt>Created (UTC)</dt>
           <dd>{new Date(j.created_at).toISOString()}</dd>
         </dl>
+        {j.status === "draft" ? (
+          <p>
+            <Link
+              prefetch={false}
+              className="button"
+              href={`/dashboard/workspaces/${workspaceId}/jobs/${jobId}/submit`}
+            >
+              Submit job
+            </Link>
+          </p>
+        ) : null}
+        {["queued", "running"].includes(j.status) ? (
+          <p className="notice">
+            {j.status === "queued"
+              ? "Queued for collection. Refresh this page to see progress."
+              : "Collecting leads. Refresh this page to see results."}
+          </p>
+        ) : null}
+        {j.status === "failed" && j.result_count === 0 ? (
+          <p className="notice">
+            No new leads were found for this search; unused allowance was
+            released.
+          </p>
+        ) : null}
         {["draft", "queued"].includes(j.status) ? (
           <Link
             prefetch={false}

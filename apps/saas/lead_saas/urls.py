@@ -7,6 +7,7 @@ from core.form_context import (
     DraftFeedbackContext,
     DraftFormContext,
     SignOutFormContext,
+    SubmitFormContext,
 )
 from core.login_security import ProtectedLoginView
 from django.contrib.auth import views as auth_views
@@ -70,6 +71,15 @@ urlpatterns = [
         "workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/cancel/",
         views.cancel_pending_page,
         name="cancel-pending-page",
+    ),
+    path(
+        "workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/submit/",
+        views.submit_job_page,
+        name="submit-job-page",
+    ),
+    path(
+        "api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/submit-form/",
+        SubmitFormContext.as_view(),
     ),
     path(
         "workspaces/<uuid:workspace_id>/sources/",

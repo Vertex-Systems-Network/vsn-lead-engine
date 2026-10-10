@@ -207,6 +207,8 @@ def job_detail_page(request, workspace_id, job_id):
             "job": job,
             "can_cancel_pending": job.status in {"draft", "queued"}
             and membership_for(request.user, workspace_id).role in {"owner", "admin", "member"},
+            "can_submit": job.status == "draft"
+            and membership_for(request.user, workspace_id).role in {"owner", "admin", "member"},
         },
     )
 
@@ -314,6 +316,62 @@ def cancel_pending_page(request, workspace_id, job_id):
     return render(
         request,
         "core/cancel_pending.html",
+        {"workspace": workspace, "job": job, "form": form},
+        status=response_status,
+    )
+
+
+@never_cache
+@login_required
+@require_http_methods(["GET", "POST"])
+def submit_job_page(request, workspace_id, job_id):
+    """Customer submit: reserve usage and queue a draft for fulfilment."""
+    from rest_framework.exceptions import PermissionDenied, ValidationError
+
+    from .cancellation_forms import JobSubmissionForm, submission_token
+    from .job_history import detail_snapshot
+    from .jobs import RevisionConflict, enqueue_job
+
+    member = membership_for(request.user, workspace_id)
+    if member.role not in {"owner", "admin", "member"}:
+        return HttpResponseForbidden("This role cannot submit jobs.")
+    workspace, job = detail_snapshot(request.user, workspace_id, job_id)
+    kwargs = {"user": request.user, "workspace_id": workspace_id, "job_id": job_id}
+    if request.method == "GET":
+        if job.status != "draft":
+            return HttpResponseBadRequest("Only draft jobs can be submitted.", status=409)
+        form = JobSubmissionForm(
+            initial={"confirmation": submission_token(request.user, workspace_id, job)}, **kwargs
+        )
+        response_status = 200
+    else:
+        form = JobSubmissionForm(request.POST, **kwargs)
+        response_status = 400
+        notice = "invalid"
+        if form.is_valid():
+            try:
+                enqueue_job(request.user, workspace_id, job_id, form.expected_revision)
+            except PermissionDenied:
+                # Inactive plan, exhausted limits or a source that cannot serve this search.
+                form.add_error(None, "This workspace cannot run this search right now.")
+                response_status = 403
+                notice = "limits"
+            except RevisionConflict:
+                form.add_error(None, "The job changed. Review its details before submitting.")
+                response_status = 409
+                notice = "changed"
+            except ValidationError:
+                form.add_error(None, "Submission is unavailable. Review the job again.")
+                notice = "unavailable"
+            else:
+                return HttpResponseRedirect(job_return(workspace_id, job_id), status=303)
+    if request.method == "POST" and settings.WEB_DASHBOARD_URL:
+        return HttpResponseRedirect(
+            f"{job_return(workspace_id, job_id)}/submit?notice={notice}", status=303
+        )
+    return render(
+        request,
+        "core/submit_job.html",
         {"workspace": workspace, "job": job, "form": form},
         status=response_status,
     )

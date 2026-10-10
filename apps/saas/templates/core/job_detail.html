@@ -12,5 +12,6 @@
 <dt>Created (UTC)</dt><dd><time datetime="{{ job.created_at|date:'c' }}">{{ job.created_at|date:"Y-m-d H:i:s" }}</time></dd>
 <dt>Updated (UTC)</dt><dd><time datetime="{{ job.updated_at|date:'c' }}">{{ job.updated_at|date:"Y-m-d H:i:s" }}</time></dd></dl>
 <p>Source selections describe the saved request; they do not establish source availability or approved rights. Attempt and start/finish details are not exposed by this preview.</p>
+{% if can_submit %}<p><a href="{% url 'submit-job-page' workspace.id job.id %}">Submit job</a></p>{% endif %}
 {% if can_cancel_pending %}<p><a href="{% url 'cancel-pending-page' workspace.id job.id %}">Review cancellation</a></p>{% endif %}
 {% endblock %}

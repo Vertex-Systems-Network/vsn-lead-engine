@@ -122,6 +122,13 @@ export type CancelContext = {
   confirmation: string;
   job: Job;
 };
+export type SubmitContext = {
+  kind: "submit";
+  workspace: { id: string; name: string };
+  csrf_token: string;
+  confirmation: string;
+  job: Job;
+};
 function formBase(v: unknown): v is Record<string, unknown> {
   return (
     object(v) &&
@@ -146,6 +153,17 @@ export function cancelContext(v: unknown): v is CancelContext {
     signedToken(v.confirmation) &&
     job(v.job) &&
     ["draft", "queued"].includes(v.job.status) &&
+    object(v.workspace) &&
+    v.job.workspace_id === v.workspace.id
+  );
+}
+export function submitContext(v: unknown): v is SubmitContext {
+  return (
+    formBase(v) &&
+    v.kind === "submit" &&
+    signedToken(v.confirmation) &&
+    job(v.job) &&
+    v.job.status === "draft" &&
     object(v.workspace) &&
     v.job.workspace_id === v.workspace.id
   );

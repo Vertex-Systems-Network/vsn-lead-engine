@@ -11,7 +11,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .cancellation_forms import cancellation_token
+from .cancellation_forms import cancellation_token, submission_token
 from .forms import new_draft_token
 from .models import Job, Workspace
 from .serializers import JobSerializer
@@ -61,6 +61,23 @@ class CancelFormContext(APIView):
                 "kind": "cancel",
                 "job": JobSerializer(job).data,
                 "confirmation": cancellation_token(request.user, workspace_id, job),
+            }
+        )
+
+
+@method_decorator(never_cache, name="dispatch")
+class SubmitFormContext(APIView):
+    def get(self, request, workspace_id, job_id):
+        data = context_base(request, workspace_id)
+        job = get_object_or_404(Job, workspace_id=workspace_id, pk=job_id)
+        if job.status != "draft":
+            raise ValidationError("Only draft jobs may be submitted.")
+        return Response(
+            {
+                **data,
+                "kind": "submit",
+                "job": JobSerializer(job).data,
+                "confirmation": submission_token(request.user, workspace_id, job),
             }
         )
 
