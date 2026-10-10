@@ -195,6 +195,24 @@ def main():
                 assert "Private bakery marker" not in plans_page
                 assert "Foreign private marker" not in plans_page
                 assert "no-store" in plans_headers.get("Cache-Control", "")
+                assert (
+                    f'href="/dashboard/workspaces/{workspace.id}/daily-diagnostics"' in page
+                )
+                diagnostics_page, diagnostic_headers = read(
+                    f"/dashboard/workspaces/{workspace.id}/daily-diagnostics"
+                )
+                assert "Daily schedule readiness review" in diagnostics_page
+                assert "Redacted read-only daily plan diagnostics" in diagnostics_page
+                assert "Advisory snapshot only" in diagnostics_page
+                assert "disabled" in diagnostics_page.lower()
+                assert "Private bakery marker" not in diagnostics_page
+                assert "Foreign private marker" not in diagnostics_page
+                assert "no-store" in diagnostic_headers.get("Cache-Control", "")
+                foreign_diagnostics, _ = read(
+                    f"/dashboard/workspaces/{other.id}/daily-diagnostics"
+                )
+                assert "Foreign private marker" not in foreign_diagnostics
+                assert "Redacted read-only daily plan diagnostics" not in foreign_diagnostics
                 with urlopen(
                     Request(
                         backend + f"/api/v1/workspaces/{workspace.id}/daily-plans/",
