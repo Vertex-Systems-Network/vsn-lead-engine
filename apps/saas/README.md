@@ -185,7 +185,9 @@ Pure `core.batch_manifest` v3 proof validation has separate empty source/registr
 The read-only \`check_staging\` management command is a **fail-closed preflight**,
 not a deployment tool or launch certification. On a separately provisioned
 staging host, use independently managed secrets, a private PostgreSQL database,
-HTTPS and a trusted ingress. Do not use production collector credentials or
+HTTPS and a trusted ingress. Django and Next must share one public HTTPS
+origin behind the reviewed reverse proxy; a separate subdomain cannot use
+the current host-only Django session cookie. Do not use production collector credentials or
 customer data. Prepare the runtime with the existing pinned Python dependencies
 and the separately reviewed Overture/duckdb runtime requirements; configure
 the Next service with explicit HTTPS backend/public origins.
