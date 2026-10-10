@@ -264,9 +264,7 @@ function catchUpBudgetCapacity(v: unknown): boolean {
           dueJobs,
           ...rows.map((row: Record<string, number>) => {
             const perJob = row.requested / (dueJobs || 1);
-            return perJob === 0
-              ? dueJobs
-              : Math.floor(row.headroom / perJob);
+            return perJob === 0 ? dueJobs : Math.floor(row.headroom / perJob);
           }),
         )) &&
     (v.status !== "no_due_job_candidates" || v.due_job_candidates === 0) &&
