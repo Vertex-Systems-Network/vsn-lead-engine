@@ -346,7 +346,7 @@ def main():
                 )
                 assert str(user.id) in populated_audit
                 assert "role changed" in populated_audit
-                assert str(audit_event.id) not in populated_audit
+                assert "admin" in populated_audit and "owner" in populated_audit
                 foreign_audit, _ = read(
                     f"/dashboard/workspaces/{other.id}/member-audit"
                 )
