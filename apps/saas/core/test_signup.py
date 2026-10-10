@@ -13,6 +13,7 @@ class SignUpTests(TestCase):
     def post(self, **changes):
         data = {
             "username": "new-customer",
+            "email": "owner@acme.example",
             "password1": PASSWORD,
             "password2": PASSWORD,
             "workspace_name": "Acme Leads",
@@ -50,6 +51,10 @@ class SignUpTests(TestCase):
         self.post()
         self.client.logout()
         self.assertEqual(self.post(username="NEW-customer").status_code, 400)
+        self.assertEqual(
+            self.post(username="other-customer", email="OWNER@acme.example").status_code, 400
+        )
+        self.assertEqual(self.post(username="no-email", email="").status_code, 400)
         self.assertEqual((User.objects.count(), Workspace.objects.count()), (1, 1))
 
     @override_settings(WEB_DASHBOARD_URL="http://localhost:3000/dashboard")
@@ -61,10 +66,12 @@ class SignUpTests(TestCase):
         self.client.logout()
         taken = self.post(native_signup="1", username="New-Customer")
         self.assertEqual(taken.url, "http://localhost:3000/account/sign-up?notice=taken")
+        taken_email = self.post(native_signup="1", username="another", email="Owner@Acme.example")
+        self.assertEqual(taken_email.url, "http://localhost:3000/account/sign-up?notice=taken")
 
     def test_attempts_are_rate_limited(self):
         for i in range(20):
-            self.post(username=f"spam-{i}", password2="mismatch-passphrase-1")
+            self.post(username=f"spam-{i}", email=f"s{i}@x.example", password2="mismatch-pass-1")
         response = self.post(username="spam-final")
         self.assertEqual(response.status_code, 429)
         self.assertFalse(User.objects.exists())

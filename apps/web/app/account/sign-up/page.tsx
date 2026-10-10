@@ -5,7 +5,7 @@ import { signInContext } from "../../../lib/contracts";
 const notices: Record<string, string> = {
   invalid:
     "We could not create the account. Use a password of at least 8 characters that is not too common or similar to your username, and type it the same way twice.",
-  taken: "That username is already in use. Choose another or sign in.",
+  taken: "That username or email is already in use. Choose another or sign in.",
   limited: "Too many attempts. Wait 15 minutes before trying again.",
 };
 export default async function SignUp({
@@ -48,6 +48,15 @@ export default async function SignUp({
             name="username"
             maxLength={150}
             autoComplete="username"
+            required
+          />
+          <label htmlFor="email">Email (for password reset)</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            maxLength={254}
+            autoComplete="email"
             required
           />
           <label htmlFor="workspace_name">Workspace name (optional)</label>

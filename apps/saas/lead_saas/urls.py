@@ -10,6 +10,7 @@ from core.form_context import (
     SubmitFormContext,
 )
 from core.login_security import ProtectedLoginView
+from core.password_reset import urlpatterns as password_reset_urls
 from core.signup import sign_up_page
 from django.contrib.auth import views as auth_views
 from django.urls import path
@@ -92,4 +93,4 @@ urlpatterns = [
     path("api/v1/workspaces/", views.WorkspaceList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/", views.JobList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/", views.JobDetail.as_view()),
-]
+] + password_reset_urls

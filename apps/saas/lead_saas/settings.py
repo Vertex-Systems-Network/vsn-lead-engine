@@ -200,3 +200,17 @@ if _starter:
             ("lead_limit", "job_limit", "provider_call_limit", "export_limit"), _values, strict=True
         )
     )
+
+# Outgoing email (password reset). Debug prints to the console; otherwise SMTP
+# settings come from the deployment environment.
+DEFAULT_FROM_EMAIL = os.environ.get("SAAS_FROM_EMAIL", "no-reply@localhost")
+if DEBUG or not os.environ.get("SAAS_EMAIL_HOST"):
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = os.environ["SAAS_EMAIL_HOST"]
+    EMAIL_PORT = int(os.environ.get("SAAS_EMAIL_PORT", "587"))
+    EMAIL_HOST_USER = os.environ.get("SAAS_EMAIL_USER", "")
+    EMAIL_HOST_PASSWORD = os.environ.get("SAAS_EMAIL_PASSWORD", "")
+    EMAIL_USE_TLS = True
+PASSWORD_RESET_TIMEOUT = 3600

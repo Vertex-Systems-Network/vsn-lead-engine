@@ -557,9 +557,14 @@ def main():
                 # with a starter allowance so the new workspace can submit jobs).
                 signup_page, signup_form = native_form("/account/sign-up")
                 signup_action = "/accounts/sign-up/"
-                assert "Create account" in signup_page
+                assert "Create account" in signup_page and 'name="email"' in signup_page
                 assert signup_form.action == backend + signup_action
-                bad = {**signup_form.hidden, "username": "native-signup", "password1": "x"}
+                bad = {
+                    **signup_form.hidden,
+                    "username": "native-signup",
+                    "email": "native@signup.example",
+                    "password1": "x",
+                }
                 code, _, bad_signup = account(signup_action, {**bad, "password2": "y"}, origin)
                 assert code == 303
                 assert bad_signup["Location"] == origin + "/account/sign-up?notice=invalid"
@@ -568,6 +573,7 @@ def main():
                 good = {
                     **signup_form.hidden,
                     "username": "native-signup",
+                    "email": "native@signup.example",
                     "workspace_name": "Native signup workspace",
                     "password1": secret,
                     "password2": secret,
