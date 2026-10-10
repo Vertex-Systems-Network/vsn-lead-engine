@@ -72,9 +72,7 @@ class DailyOccurrenceHistoryTests(TestCase):
         self.assertEqual(occurrence.job.status, "draft")
         from .daily_plan_pause import pause_daily_schedule
 
-        self.assertTrue(
-            pause_daily_schedule(self.owner, self.workspace.id, self.plan.id, 1)[1]
-        )
+        self.assertTrue(pause_daily_schedule(self.owner, self.workspace.id, self.plan.id, 1)[1])
         self.client.force_login(self.viewer)
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
@@ -136,9 +134,12 @@ class DailyOccurrenceHistoryTests(TestCase):
         self.assertEqual(foreign.status_code, 404)
         self.assertNotIn(b"Private occurrence history", foreign.content)
         other_plan, _ = create_daily_schedule(
-            self.foreign_user, self.foreign.id,
+            self.foreign_user,
+            self.foreign.id,
             {"countries": ["US"], "categories": ["Private foreign marker"]},
-            "UTC", time(8), "foreign-plan",
+            "UTC",
+            time(8),
+            "foreign-plan",
         )
         self.client.force_login(self.owner)
         swapped = self.client.get(
