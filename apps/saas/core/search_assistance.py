@@ -16,7 +16,7 @@ MAX_INTENT_LENGTH = 280
 
 # All patterns and output labels are trusted code, never user-configurable prompts.
 COUNTRY_PATTERNS = (
-    ("US", re.compile(r"\b(?:united states(?: of america)?|usa|u\\.s\\.|us)\b", re.I)),
+    ("US", re.compile(r"\b(?:united states(?: of america)?|usa|u\.s\.|us)\b", re.I)),
     ("CA", re.compile(r"\bcanada\b", re.I)),
 )
 CATEGORY_PATTERNS = (
@@ -52,9 +52,9 @@ class SearchAssistForm(forms.Form):
         # material before classification, and never reflect raw intent in the page.
         if (
             any(ord(char) < 32 and char not in "\t\n\r" for char in value)
-            or re.search(r"\b(?:https?://|www\\.)", value, re.I)
-            or re.search(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}", value)
-            or re.search(r"(?<!\\w)\\+?\\d[\\d().\s-]{6,}\\d(?!\\w)", value)
+            or re.search(r"\b(?:https?://|www\.)", value, re.I)
+            or re.search(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", value)
+            or re.search(r"(?<!\w)\+?\d[\d().\s-]{6,}\d(?!\w)", value)
         ):
             raise forms.ValidationError(
                 "Remove links, email addresses, telephone numbers and control characters."
