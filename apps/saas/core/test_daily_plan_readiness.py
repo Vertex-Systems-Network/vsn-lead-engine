@@ -182,9 +182,7 @@ class PlanReadinessTests(TestCase):
         self.entitlement.lead_limit = 500
         self.entitlement.job_limit = 4
         self.entitlement.provider_call_limit = 4
-        self.entitlement.save(
-            update_fields=["lead_limit", "job_limit", "provider_call_limit"]
-        )
+        self.entitlement.save(update_fields=["lead_limit", "job_limit", "provider_call_limit"])
         UsageCounter.objects.create(workspace=self.workspace, jobs=1)
         UsageReservation.objects.create(
             workspace=self.workspace,
