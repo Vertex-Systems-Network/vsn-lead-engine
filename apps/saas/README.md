@@ -417,3 +417,19 @@ payload is exposed. The estimate is **not** a quota reservation, cannot
 authorize a provider, and does not forecast a 7-day catch-up batch; it is a
 momentary comparison for *one job*. Actual job enqueue must take fresh DB
 locks and revalidate entitlement, source rights, pending usage and capacity.
+
+## Seven-local-day catch-up budget preview (read-only)
+
+An enabled plan's owner/admin source-readiness response also contains
+`catch_up_budget_snapshot`. It compares a **hypothetical** maximum seven-local-day
+backlog with the current single-job accounting snapshot. The estimator first
+removes already-materialized local dates and not-yet-due UTC instants; fully
+skipped civil dates have no linked job and consume zero job quota. Up to seven
+remaining job candidates multiply the plan's result limit, one job per date,
+and internal provider-call budget. No usage reservation or job/source write
+occurs. Disabled plans display status `disabled` with zero candidates and no
+capacity claim; invalid plans and unverified source policies display
+`unavailable`. Results can differ from a future real run because membership,
+usage, provider rights and time continuously change. `advisory_batch_fits`
+certifies **nothing** about commercial source rights, provider credentials,
+recurrence activation, next-month rollover or actual ability to deliver.
