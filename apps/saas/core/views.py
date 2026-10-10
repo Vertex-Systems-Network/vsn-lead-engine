@@ -221,9 +221,7 @@ def daily_plan_page(request, workspace_id, job_id):
         len(request.POST.getlist(key)) != 1 for key in request.POST
     ):
         return HttpResponseBadRequest("Unsupported daily plan form fields.")
-    form = DailyPlanForm(
-        request.POST, user=request.user, workspace_id=workspace_id, job_id=job_id
-    )
+    form = DailyPlanForm(request.POST, user=request.user, workspace_id=workspace_id, job_id=job_id)
     plan = None
     response_status = 400
     if form.is_valid():
