@@ -114,7 +114,9 @@ export function dailyPlanDetail(v: unknown): v is DailyPlanDetail {
     s.statuses.every((x) => ["active", "closed", "opening_soon"].includes(x)) &&
     Array.isArray(s.required_fields) &&
     s.required_fields.length <= 4 &&
-    s.required_fields.every((x) => ["phone", "name", "website", "address"].includes(x)) &&
+    s.required_fields.every((x) =>
+      ["phone", "name", "website", "address"].includes(x),
+    ) &&
     Array.isArray(s.source_codes) &&
     s.source_codes.length <= 12 &&
     s.source_codes.every((x) => typeof x === "string" && x.length <= 64) &&
