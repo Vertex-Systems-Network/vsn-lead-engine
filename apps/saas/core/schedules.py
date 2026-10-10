@@ -91,6 +91,7 @@ def create_daily_schedule(user, workspace_id, search, zone_name, local_time, key
         local_time=local_time,
         search=search,
         request_hash=request_hash,
+        enabled=False,  # Human-authored plans cannot schedule or dispatch work.
     ), True
 
 
