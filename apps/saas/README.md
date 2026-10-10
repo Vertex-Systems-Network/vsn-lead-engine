@@ -39,6 +39,20 @@ Draft creation requires an `Idempotency-Key` header. Search JSON accepts countri
 
 Drafts never enqueue, reserve usage, dispatch source calls, collect data, export, schedule or charge. Source codes and statuses in drafts are requested preferences, not verified capabilities. Internal entitlement/source policy enforcement and atomic usage/outbox services now exist; bounded pre-dispatch leases and current-gate rechecks exist, while external execution/idempotency/recovery contracts are required before any consumer is enabled. Public registration, member invitations, source activation and billing remain unavailable. Existing member role changes and removal are available to authorized owners/admins, with role-only audit records committed in the same transaction. Users are created locally by the management command for development testing only.
 
+## Local end-to-end job fulfilment (development only)
+
+`manage.py run_jobs` fulfils queued jobs: it claims the pre-dispatch lease, records the write-ahead operation, asks the source adapter for leads, drops anything already accepted in the workspace, and settles through the existing candidate review and dual-attested acceptance services. A search that finds nothing new ends with a no-effect receipt that releases the reservation; an adapter error leaves the operation `unknown` with the reservation held.
+
+Today the only adapter is the synthetic `local-fixture` source, and its attestations come from an in-process signer whose keys are derived from `SAAS_SECRET_KEY`. Both exist only with `SAAS_LOCAL_FULFILMENT=1`, which refuses to start unless `SAAS_DEBUG=1`. Production verifier registries stay empty, so outside this mode `run_jobs` refuses to run.
+
+```sh
+export SAAS_DEBUG=1 SAAS_LOCAL_FULFILMENT=1
+python apps/saas/manage.py seed_local_source
+python apps/saas/manage.py run_jobs --limit 25
+```
+
+One job holds at most 25 accepted leads (the v2 batch bound). A workspace still needs an active entitlement and a queued job; customer submit and sign-up are the next slices.
+
 ## Security and recovery
 
 Non-debug settings require HTTPS, secure cookies, HSTS, CSRF, HTTP-only sessions and a supplied secret. No production collector variables, R2/Google credentials or customer contact data are consumed. Do not expose the development server publicly. Do not use this scaffold as production certification: operational deployment, independent security review and the external rights/privacy gates remain open.
