@@ -135,9 +135,7 @@ class PlanReadinessTests(TestCase):
     def test_reserved_usage_and_remaining_quota_block_single_job_preflight(self):
         from .models import UsageCounter, UsageReservation
 
-        UsageCounter.objects.create(
-            workspace=self.workspace, leads=12, jobs=2, provider_calls=1
-        )
+        UsageCounter.objects.create(workspace=self.workspace, leads=12, jobs=2, provider_calls=1)
         UsageReservation.objects.create(
             workspace=self.workspace,
             key="pending-test",
@@ -190,9 +188,7 @@ class PlanReadinessTests(TestCase):
         self.entitlement.active = True
         self.entitlement.save(update_fields=["active"])
         self.source.delete()
-        self.assertEqual(
-            self.client.get(self.path).json()["budget_snapshot"]["counters"], []
-        )
+        self.assertEqual(self.client.get(self.path).json()["budget_snapshot"]["counters"], [])
         self.assertFalse(Job.objects.exists())
 
     def test_foreign_anonymous_viewer_revoked_and_write_methods_denied(self):
