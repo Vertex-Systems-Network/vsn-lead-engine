@@ -26,9 +26,7 @@ class MemberRoleChangePageTests(TestCase):
             (self.viewer, "viewer"),
         ):
             Membership.objects.create(workspace=self.workspace, user=user, role=role)
-        self.path = (
-            f"/workspaces/{self.workspace.id}/members/{self.member.id}/role/"
-        )
+        self.path = f"/workspaces/{self.workspace.id}/members/{self.member.id}/role/"
         self.client = Client(enforce_csrf_checks=True)
 
     def payload(self, actor=None, *, path=None, new_role="viewer"):
