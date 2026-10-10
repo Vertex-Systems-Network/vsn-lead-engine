@@ -111,3 +111,15 @@ daily execution decisions for an IANA timezone and local time, including DST
 folds/gaps, but cannot create, activate or dispatch a recurring schedule.
 Django authorization, validation and calendar tests plus real Next-to-Django
 HTTP link coverage are required; automatic scheduling is a later milestone.
+
+## Save disabled daily plan from a draft
+
+The Next saved-draft detail links to Django's existing-session route
+`/workspaces/<uuid>/jobs/<draft-id>/daily-plan/`, with the trusted fixed backend
+public origin. This is an explicit CSRF-protected Django form; Next does not
+proxy a write or treat visible links as authorization. Owners/admins/members can
+save an inactive plan based only on the persisted draft search and a chosen
+local time. The backend enforces exact actor/job binding, idempotency and
+`enabled=False`, with no recurrence or source dispatch. Real Next/Django HTTP
+checks exercise the link and form; authorization and replay have PostgreSQL
+regressions. No UI action here activates scheduling.
