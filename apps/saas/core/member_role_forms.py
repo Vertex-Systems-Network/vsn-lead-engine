@@ -22,9 +22,7 @@ class StaleMemberRole(Exception):
 
 def latest_audit_id(workspace_id, target_user_id):
     return (
-        MembershipAudit.objects.filter(
-            workspace_id=workspace_id, target_user_id=target_user_id
-        )
+        MembershipAudit.objects.filter(workspace_id=workspace_id, target_user_id=target_user_id)
         .order_by("-id")
         .values_list("id", flat=True)
         .first()
@@ -65,7 +63,9 @@ class MemberRoleChangeForm(forms.Form):
         try:
             claims = signing.loads(data["confirmation_token"], salt=SALT, max_age=3600)
         except (signing.BadSignature, ValueError, TypeError):
-            raise forms.ValidationError("Confirmation expired or invalid. Open a new form.") from None
+            raise forms.ValidationError(
+                "Confirmation expired or invalid. Open a new form."
+            ) from None
         if (
             not isinstance(claims, dict)
             or set(claims) != {"actor", "workspace", "target", "role", "audit_id"}
@@ -87,7 +87,9 @@ class MemberRoleChangeForm(forms.Form):
 
 
 @transaction.atomic
-def change_role_confirmed(actor, workspace_id, target_user_id, *, expected_role, expected_audit_id, new_role):
+def change_role_confirmed(
+    actor, workspace_id, target_user_id, *, expected_role, expected_audit_id, new_role
+):
     """Serialize reads, reject stale/A-B-A replays, then use existing authority rules."""
     membership_for(actor, workspace_id)
     Workspace.objects.select_for_update().get(pk=workspace_id)
