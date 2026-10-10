@@ -49,11 +49,17 @@ export default async function MembersPage({
         CSRF-protected confirmation. Removals require a separate explicit
         warning and confirmation. Existing-account invitations use a separate
         private one-time code and explicit acceptance; no messages are sent
-        automatically.
+        automatically. Unused codes may be explicitly revoked by authorized
+        administrators.
       </p>
       <p>
         <a href={backendLink(`/workspaces/${workspaceId}/invitations/new/`)}>
           Invite an existing user with a private one-time code →
+        </a>
+      </p>
+      <p>
+        <a href={backendLink(`/workspaces/${workspaceId}/invitations/`)}>
+          Review and revoke pending invitations →
         </a>
       </p>
       {result.data.results.length > 0 ? (
