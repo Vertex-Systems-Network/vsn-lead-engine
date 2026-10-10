@@ -198,15 +198,15 @@ async function run(origin) {
         })()`);
         // Deterministic byte/request envelope and computed visual contrast.
         // Do not gate CI on wall-clock paint timing on variable runner hardware.
-        const quality = await cdp.js(\`(() => {
+        const quality = await cdp.js(`(() => {
           const resources = performance.getEntriesByType("resource");
           const documentTransfer = performance.getEntriesByType("navigation")[0]?.transferSize || 0;
           const bytes = documentTransfer + resources.reduce(
             (sum, item) => sum + item.transferSize, 0
           );
           const parseColor = (color) => {
-            if (!/^rgba?\\(/.test(color)) return null;
-            const matches = color.match(/[\\d.]+/g);
+            if (!/^rgba?\(/.test(color)) return null;
+            const matches = color.match(/[\d.]+/g);
             if (!matches || matches.length < 3) return null;
             const values = matches.map(Number);
             return {
@@ -260,23 +260,23 @@ async function run(origin) {
             requests: resources.length + 1,
             samples,
           };
-        })()\`);
+        })()`);
         peakBytes = Math.max(peakBytes, quality.bytes);
         peakRequests = Math.max(peakRequests, quality.requests);
         contrastSamples += quality.samples.length;
         assert.ok(
           quality.bytes <= 4 * 1024 * 1024,
-          \`Page-weight regression \${path} \${width}px: \${quality.bytes} bytes\`,
+          `Page-weight regression ${path} ${width}px: ${quality.bytes} bytes`,
         );
         assert.ok(
           quality.requests <= 100,
-          \`First-party request regression \${path} \${width}px: \${quality.requests} requests\`,
+          `First-party request regression ${path} ${width}px: ${quality.requests} requests`,
         );
-        assert.ok(quality.samples.length >= 2, \`Missing readability samples: \${path}\`);
+        assert.ok(quality.samples.length >= 2, `Missing readability samples: ${path}`);
         for (const sample of quality.samples) {
           assert.ok(
             sample.value >= 4.5,
-            \`Text contrast regression \${path} \${width}px \${sample.selector}: \${sample.value.toFixed(2)}:1\`,
+            `Text contrast regression ${path} ${width}px ${sample.selector}: ${sample.value.toFixed(2)}:1`,
           );
         }
         assert.ok(
