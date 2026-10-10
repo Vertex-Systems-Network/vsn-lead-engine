@@ -9,6 +9,7 @@ from core.form_context import (
     SignOutFormContext,
     SubmitFormContext,
 )
+from core.invitation_pages import issue_invitation_page, redeem_invitation_page
 from core.login_security import ProtectedLoginView
 from core.member_removal_page import member_removal_page
 from core.member_role_page import member_role_change_page
@@ -39,6 +40,12 @@ urlpatterns = [
     path("", views.overview),
     path("accounts/start-sign-in/", start_sign_in),
     path("accounts/sign-up/", sign_up_page, name="sign-up-page"),
+    path("accounts/accept-invitation/", redeem_invitation_page, name="invitation-redeem-page"),
+    path(
+        "workspaces/<uuid:workspace_id>/invitations/new/",
+        issue_invitation_page,
+        name="invitation-issue-page",
+    ),
     path("api/v1/account/sign-in-form/", sign_in_form),
     path("accounts/login/", ProtectedLoginView.as_view()),
     path("accounts/check-session/", views.check_session_page, name="check-session-page"),
