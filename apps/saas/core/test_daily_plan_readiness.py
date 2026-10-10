@@ -93,6 +93,73 @@ class PlanReadinessTests(TestCase):
         self.plan.refresh_from_db()
         self.assertFalse(self.plan.enabled)
 
+    def test_disabled_plan_has_no_catch_up_capacity_claim(self):
+        self.client.force_login(self.owner)
+        report = self.client.get(self.path).json()
+        forecast = report["catch_up_budget_snapshot"]
+        self.assertEqual(forecast["status"], "disabled")
+        self.assertTrue(forecast["advisory_only"])
+        self.assertEqual(forecast["max_local_days"], 7)
+        self.assertEqual(forecast["due_job_candidates"], 0)
+        self.assertEqual(forecast["counters"], [])
+        self.assertFalse(Job.objects.exists())
+        self.assertFalse(ScheduleOccurrence.objects.exists())
+
+    def test_enabled_plan_seven_due_days_exceeds_single_job_allowance_without_reserving(self):
+        from datetime import UTC, datetime
+        from unittest.mock import patch
+
+        DailySchedule.objects.filter(pk=self.plan.pk).update(enabled=True)
+        self.client.force_login(self.owner)
+        now = datetime(2026, 11, 1, 16, tzinfo=UTC)
+        with patch("core.daily_catchup_budget.timezone.now", return_value=now):
+            report = self.client.get(self.path).json()
+        self.assertEqual(report["status"], "internal_catalog_match_only")
+        self.assertEqual(report["budget_snapshot"]["status"], "advisory_single_job_fits")
+        catchup = report["catch_up_budget_snapshot"]
+        self.assertEqual(catchup["status"], "advisory_batch_exceeds")
+        self.assertEqual(catchup["due_job_candidates"], 7)
+        self.assertEqual(catchup["skipped_day_candidates"], 0)
+        self.assertEqual(
+            [row["requested"] for row in catchup["counters"]],
+            [700, 7, 7],
+        )
+        self.assertEqual(
+            [row["headroom"] for row in catchup["counters"]],
+            [100, 10, 10],
+        )
+        self.assertNotIn(b"Synthetic bakery", str(catchup).encode())
+        self.assertFalse(Job.objects.exists())
+        self.assertFalse(ScheduleOccurrence.objects.exists())
+
+    def test_catchup_excludes_recorded_days_and_not_yet_due_local_hour(self):
+        from datetime import UTC, date, datetime
+        from unittest.mock import patch
+
+        DailySchedule.objects.filter(pk=self.plan.pk).update(enabled=True)
+        ScheduleOccurrence.objects.create(
+            schedule=self.plan,
+            workspace=self.workspace,
+            schedule_revision=1,
+            local_date=date(2026, 10, 30),
+            local_time=time(8),
+            timezone="UTC",
+            request_hash=self.plan.request_hash,
+            resolution="skipped_day",
+        )
+        self.client.force_login(self.owner)
+        with patch(
+            "core.daily_catchup_budget.timezone.now",
+            return_value=datetime(2026, 11, 1, 7, 30, tzinfo=UTC),
+        ):
+            report = self.client.get(self.path).json()
+        catchup = report["catch_up_budget_snapshot"]
+        self.assertEqual(catchup["due_job_candidates"], 5)
+        self.assertEqual(catchup["status"], "advisory_batch_exceeds")
+        self.assertEqual(catchup["counters"][0]["requested"], 500)
+        self.assertEqual(Job.objects.count(), 0)
+        self.assertEqual(ScheduleOccurrence.objects.count(), 1)
+
     def test_missing_source_or_bad_policy_is_blocked(self):
         self.client.force_login(self.owner)
         self.source.enabled = False
