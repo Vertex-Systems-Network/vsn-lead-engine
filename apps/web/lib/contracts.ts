@@ -262,6 +262,27 @@ export const jobStates = [
 export const jobState = (v: unknown): v is (typeof jobStates)[number] =>
   typeof v === "string" && jobStates.some((s) => s === v);
 
+export type JobStatusSummary = {
+  workspace_id: string;
+  total: number;
+  statuses: Record<(typeof jobStates)[number], number>;
+};
+export function jobStatusSummary(v: unknown): v is JobStatusSummary {
+  if (
+    !object(v) ||
+    !uuid(v.workspace_id) ||
+    !count(v.total) ||
+    !object(v.statuses)
+  ) return false;
+  const values = v.statuses;
+  return (
+    Object.keys(values).length === jobStates.length &&
+    jobStates.every((state) => count(values[state])) &&
+    jobStates.reduce((sum, state) => sum + Number(values[state]), 0) === v.total
+  );
+}
+
+
 export type DraftFeedback = Omit<DraftContext, "kind"> & {
   kind: "draft-feedback";
   status: 400 | 409;
