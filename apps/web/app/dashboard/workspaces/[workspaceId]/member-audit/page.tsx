@@ -11,10 +11,7 @@ export default async function MemberAuditPage({
   params: Promise<{ workspaceId: string }>;
   searchParams: Promise<{ offset?: string }>;
 }) {
-  const [{ workspaceId }, { offset }] = await Promise.all([
-    params,
-    searchParams,
-  ]);
+  const [{ workspaceId }, { offset }] = await Promise.all([params, searchParams]);
   if (!uuid(workspaceId)) notFound();
   const current =
     typeof offset === "string" && /^(0|[1-9][0-9]{0,5})$/.test(offset)
@@ -65,8 +62,12 @@ export default async function MemberAuditPage({
                 <tr key={entry.id}>
                   <td>{entry.created_at}</td>
                   <td>{entry.action.replaceAll("_", " ")}</td>
-                  <td><code>{entry.actor_user_id}</code></td>
-                  <td><code>{entry.target_user_id}</code></td>
+                  <td>
+                    <code>{entry.actor_user_id}</code>
+                  </td>
+                  <td>
+                    <code>{entry.target_user_id}</code>
+                  </td>
                   <td>{entry.previous_role}</td>
                   <td>{entry.new_role || "Removed"}</td>
                 </tr>
