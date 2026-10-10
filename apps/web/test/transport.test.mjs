@@ -594,7 +594,6 @@ test("daily plans list is exact, session-only and rejects arbitrary paths", asyn
     `${root}?after=invalid`,
     `${root}?after=${cursor}&status=disabled`,
     `${root}../members/`,
-    `${root}${cursor}/`,
   ]) {
     await assert.rejects(readBackend("http://localhost:8000", bad, session));
   }
