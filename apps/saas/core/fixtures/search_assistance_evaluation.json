@@ -307,6 +307,104 @@
       "status": "invalid",
       "countries": [],
       "categories": []
+    },
+    {
+      "id": "api-key-assignment",
+      "intent": "US salons api_key=FAKEKEY123456",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "access-token-assignment",
+      "intent": "Canada spas access_token=FAKE12345678",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "client-secret-assignment",
+      "intent": "US plumbers client_secret=FAKE12345678",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "password-assignment",
+      "intent": "US salons password=FAKEPASS123456",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "bearer-authorization",
+      "intent": "USA restaurants Bearer fakerandomtoken123456",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "openai-style-key",
+      "intent": "US salons sk-proj-aaaaaaaaaaaaaaaaaaaa",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "stripe-style-key",
+      "intent": "Canada dentists sk_live_aaaaaaaaaaaaaaaaaaaa",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "github-style-key",
+      "intent": "US law firms ghp_aaaaaaaaaaaaaaaaaaaaaaaa",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "github-fine-grained-key",
+      "intent": "US salons github_pat_aaaaaaaaaaaaaaaaaaaaaaaa",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "slack-style-key",
+      "intent": "US salons xoxb-aaaaaaaaaaaaaa",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "aws-style-key",
+      "intent": "US accountants AKIAAAAAAAAAAAAAAAAA",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "invisible-format-mark",
+      "intent": "US salons​ and spas",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "bidi-override-character",
+      "intent": "Canada salons‮ plumbers",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
+    },
+    {
+      "id": "authorization-header",
+      "intent": "US salons authorization:FAKE12345678",
+      "status": "invalid",
+      "countries": [],
+      "categories": []
     }
   ]
 }
