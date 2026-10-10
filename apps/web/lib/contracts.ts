@@ -169,10 +169,13 @@ export function planReadiness(v: unknown): v is PlanReadiness {
     !count(v.checked_source_count) ||
     v.checked_source_count > 12 ||
     !object(v.budget_snapshot) ||
-    !["unavailable", "entitlement_unavailable", "accounting_window_unavailable",
-      "advisory_single_job_fits", "advisory_single_job_exceeds"].includes(
-      String(v.budget_snapshot.status),
-    ) ||
+    ![
+      "unavailable",
+      "entitlement_unavailable",
+      "accounting_window_unavailable",
+      "advisory_single_job_fits",
+      "advisory_single_job_exceeds",
+    ].includes(String(v.budget_snapshot.status)) ||
     v.budget_snapshot.advisory_only !== true ||
     v.budget_snapshot.single_job_only !== true ||
     !["unavailable", "period_development", "cumulative_development"].includes(
@@ -204,7 +207,12 @@ export function planReadiness(v: unknown): v is PlanReadiness {
               capacity[index][field] <= 2147483647,
           ) &&
           capacity[index].headroom ===
-            Math.max(0, capacity[index].limit - capacity[index].settled - capacity[index].reserved)),
+            Math.max(
+              0,
+              capacity[index].limit -
+                capacity[index].settled -
+                capacity[index].reserved,
+            )),
     ) &&
     planReadinessCheckNames.every((name) =>
       checks.some(
