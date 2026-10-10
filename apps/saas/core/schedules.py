@@ -96,6 +96,35 @@ def create_daily_schedule(user, workspace_id, search, zone_name, local_time, key
 
 
 @transaction.atomic
+def disable_daily_schedule(actor, workspace_id, schedule_id, expected_revision):
+    """Stop future local-day materialization; do not cancel existing jobs."""
+    expected_revision = revision(expected_revision)
+    membership_for(actor, workspace_id)
+    from .models import Workspace
+
+    Workspace.objects.select_for_update().get(pk=workspace_id)
+    member = membership_for(actor, workspace_id, lock=True)
+    if member.role not in {"owner", "admin"}:
+        raise PermissionDenied("Only owners and admins may disable a daily plan.")
+    schedule = (
+        DailySchedule.objects.select_for_update()
+        .filter(pk=schedule_id, workspace_id=workspace_id)
+        .first()
+    )
+    if schedule is None:
+        raise Http404("Workspace daily plan not found.")
+    if schedule.revision != expected_revision:
+        raise RevisionConflict()
+    if not schedule.enabled:
+        return schedule, False
+    revision(schedule.revision)
+    schedule.enabled = False
+    schedule.revision += 1
+    schedule.save(update_fields=["enabled", "revision"])
+    return schedule, True
+
+
+@transaction.atomic
 def materialize_daily(user, workspace_id, schedule_id, local_date, expected_revision):
     """At most one due draft per call, seven local dates maximum catch-up; no capacity claim."""
     expected_revision = revision(expected_revision)
