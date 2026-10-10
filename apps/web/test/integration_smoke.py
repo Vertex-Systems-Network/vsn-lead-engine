@@ -295,7 +295,10 @@ def main():
                 # assertions for browser evidence or contact external sites.
                 # Use the real Django CSRF bootstrap route for the signed-in
                 # disposable test client. No token is forged or logged.
-                assert client.get("/accounts/start-sign-in/").status_code == 303
+                assert (
+                    client.get("/accounts/start-sign-in/", HTTP_HOST="localhost").status_code
+                    == 303
+                )
                 browser_csrf_cookie = client.cookies["csrftoken"].value
                 before_browser_jobs = Job.objects.filter(workspace=workspace).count()
                 before_browser_reservations = UsageReservation.objects.filter(
