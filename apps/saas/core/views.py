@@ -101,6 +101,20 @@ class WorkspaceDetail(APIView):
 
 
 @method_decorator(never_cache, name="dispatch")
+class DailyOccurrenceHistory(APIView):
+    """Current-member, no-store view of past local-day decisions, never new work."""
+
+    def get(self, request, workspace_id, plan_id):
+        from .daily_occurrence_history import daily_occurrences_page
+
+        return Response(
+            daily_occurrences_page(
+                request.user, workspace_id, plan_id, request.query_params
+            )
+        )
+
+
+@method_decorator(never_cache, name="dispatch")
 class DailyPlanDetail(APIView):
     """Current-member plan snapshot for review, with no mutation or scheduler."""
 
