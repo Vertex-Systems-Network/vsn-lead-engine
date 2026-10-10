@@ -296,8 +296,15 @@ def main():
                 subprocess.run(
                     ["node", "scripts/browser-smoke.mjs", origin],
                     cwd=ROOT / "web",
+                    env={
+                        **os.environ,
+                        "VSN_BROWSER_SMOKE_SESSION": session,
+                        "VSN_BROWSER_SMOKE_OWN_WORKSPACE": str(workspace.id),
+                        "VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE": str(other.id),
+                        "VSN_BROWSER_SMOKE_OWN_JOB": str(saved[0].id),
+                    },
                     check=True,
-                    timeout=110,
+                    timeout=140,
                 )
                 anonymous, _ = read("/dashboard", False)
                 assert "Sign in to see your workspaces" in anonymous

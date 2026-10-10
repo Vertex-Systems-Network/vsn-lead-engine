@@ -367,6 +367,131 @@ async function run(origin) {
         }
       }
     }
+    // Disposable test-only Django session: no login to external services, no
+    // real credentials, and never expose the cookie in arguments or logs.
+    const privateSession = process.env.VSN_BROWSER_SMOKE_SESSION;
+    const ownWorkspace = process.env.VSN_BROWSER_SMOKE_OWN_WORKSPACE;
+    const foreignWorkspace = process.env.VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE;
+    const ownJob = process.env.VSN_BROWSER_SMOKE_OWN_JOB;
+    const privateValues = [
+      privateSession,
+      ownWorkspace,
+      foreignWorkspace,
+      ownJob,
+    ];
+    if (privateValues.some(Boolean)) {
+      assert.ok(
+        privateValues.every(Boolean),
+        "Incomplete private browser smoke fixture.",
+      );
+      const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      assert.ok(uuid.test(ownWorkspace) && uuid.test(foreignWorkspace) && uuid.test(ownJob));
+      assert.notEqual(ownWorkspace, foreignWorkspace);
+      assert.ok(/^[a-zA-Z0-9:_-]{24,160}$/.test(privateSession));
+
+      async function inspectPrivate(path, requiredText, forbiddenTexts) {
+        const outcome = await cdp.send("Page.navigate", {
+          url: target.origin + path,
+        });
+        if (outcome.errorText) throw Error("Private browser page navigation failed.");
+        let ready = false;
+        for (let attempt = 0; attempt < 100; attempt++) {
+          ready = await cdp.js(`(() => {
+            if (location.pathname !== ${JSON.stringify(path)}) return false;
+            if (document.readyState !== "complete") return false;
+            const main = document.querySelector("main");
+            if (!main) return false;
+            return main.textContent.includes(${JSON.stringify(requiredText)});
+          })()`);
+          if (ready) break;
+          await delay(80);
+        }
+        assert.ok(ready, `Private browser state unavailable: ${path}`);
+        const state = await cdp.js(`(() => ({
+          content: document.querySelector("main")?.textContent || "",
+          scrollWidth: document.documentElement.scrollWidth,
+          viewportWidth: innerWidth,
+          titleCount: document.querySelectorAll("main h1").length,
+          mainFocusable: document.querySelector("main")?.tabIndex === -1,
+        }))()`);
+        assert.equal(state.titleCount, 1, `Heading regression: ${path}`);
+        assert.equal(state.mainFocusable, true, `Skip-target regression: ${path}`);
+        assert.ok(
+          state.scrollWidth <= state.viewportWidth + 1,
+          `Private workspace horizontal overflow: ${path}`,
+        );
+        for (const forbidden of forbiddenTexts) {
+          assert.equal(
+            state.content.includes(forbidden),
+            false,
+            `Private browser data crossed authorization boundary: ${path}`,
+          );
+        }
+      }
+
+      for (const width of [320, 1280]) {
+        await cdp.send("Emulation.setDeviceMetricsOverride", {
+          width,
+          height: 850,
+          deviceScaleFactor: 1,
+          mobile: width === 320,
+        });
+        await inspectPrivate("/dashboard", "Sign in to see your workspaces.", [
+          "Synthetic <workspace>",
+          "Foreign private marker",
+          "Synthetic bakery",
+        ]);
+        const cookie = await cdp.send("Network.setCookie", {
+          name: "sessionid",
+          value: privateSession,
+          url: target.origin,
+          httpOnly: true,
+          sameSite: "Lax",
+          secure: false,
+        });
+        assert.equal(cookie.success, true, "Synthetic session cookie could not be set.");
+        await inspectPrivate("/dashboard", "Workspaces", [
+          "Foreign private marker",
+        ]);
+        await inspectPrivate(
+          `/dashboard/workspaces/${ownWorkspace}`,
+          "Workspace overview",
+          ["Foreign private marker"],
+        );
+        const authorizedContent = await cdp.js(
+          'document.querySelector("main")?.textContent || ""',
+        );
+        assert.ok(authorizedContent.includes("Synthetic <workspace>"));
+        assert.ok(authorizedContent.includes("Synthetic bakery"));
+        await inspectPrivate(
+          `/dashboard/workspaces/${ownWorkspace}/jobs/${ownJob}`,
+          "Saved search",
+          ["Foreign private marker"],
+        );
+        await inspectPrivate(
+          `/dashboard/workspaces/${foreignWorkspace}`,
+          "Information unavailable",
+          ["Foreign private marker", "Synthetic <workspace>", "Synthetic bakery"],
+        );
+        await cdp.send("Network.deleteCookies", {
+          name: "sessionid",
+          url: target.origin,
+        });
+        await inspectPrivate("/dashboard", "Sign in to see your workspaces.", [
+          "Synthetic <workspace>",
+          "Foreign private marker",
+          "Synthetic bakery",
+        ]);
+        await inspectPrivate(
+          `/dashboard/workspaces/${ownWorkspace}`,
+          "Sign in to see your workspaces.",
+          ["Synthetic <workspace>", "Foreign private marker", "Synthetic bakery"],
+        );
+      }
+      console.log(
+        "PASS: 2 Chromium private viewport cases: anonymous denial, own workspace and job, foreign tenant denied, and post-logout denial",
+      );
+    }
     // Fail closed if an anonymous page initiates ANY remote HTTP(S) or WS(S)
     // request. Loopback-only Next static assets are the sole network authority.
     const remote = cdp.browserRequests.filter((url) => {
