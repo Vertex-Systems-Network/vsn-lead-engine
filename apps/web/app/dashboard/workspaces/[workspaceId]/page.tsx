@@ -71,6 +71,9 @@ export default async function Workspace({
         <Link href={`/dashboard/workspaces/${workspaceId}/sources`}>
           Source configuration
         </Link>
+        <a href={backendLink(`/workspaces/${workspaceId}/admin/health/`)}>
+          Operational health snapshot (admins)
+        </a>
         <Link href={`/dashboard/workspaces/${workspaceId}/members`}>
           Workspace members (admins)
         </Link>
