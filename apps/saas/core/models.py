@@ -34,6 +34,28 @@ class Membership(models.Model):
         ]
 
 
+
+class WorkspaceInvitation(models.Model):
+    """Existing-account invite secret is stored only as a SHA-256 digest."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
+    target = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="workspace_invitations"
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="issued_invitations"
+    )
+    role = models.CharField(
+        max_length=8, choices=[(r, r) for r in ("admin", "member", "viewer")]
+    )
+    token_hash = models.CharField(max_length=64, unique=True)
+    expires_at = models.DateTimeField()
+    accepted_at = models.DateTimeField(null=True)
+    revoked_at = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 class Job(models.Model):
     """Saved search intent. Internal enqueue persists an outbox; no provider dispatch."""
 
