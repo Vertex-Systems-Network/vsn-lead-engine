@@ -87,6 +87,13 @@ export default async function DailyPlanDetailPage({
           <dd>{item.search.result_limit}</dd>
         </dl>
       </section>
+      <p>
+        <Link
+          href={`/dashboard/workspaces/${workspaceId}/daily-plans/${planId}/occurrences`}
+        >
+          View recorded daily occurrences and existing jobs
+        </Link>
+      </p>
       {item.enabled ? (
         <p>
           <a

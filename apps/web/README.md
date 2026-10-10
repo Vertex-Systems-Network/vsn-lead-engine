@@ -174,3 +174,17 @@ link. Existing created jobs are not cancelled by this operation; the page
 explicitly discloses that limit. Real Django/Next HTTP, owner/admin, foreign,
 revocation, stale revision and PostgreSQL scheduler-race regressions cover the
 feature. This is a **safety stop**, not recurring collection activation.
+
+## Recorded daily plan occurrence and job history
+
+The member-scoped Next page
+`/dashboard/workspaces/<uuid>/daily-plans/<plan-id>/occurrences` shows an audited,
+read-only list of previously persisted schedule decisions. An exact backend
+session allowlist permits only the matching GET API and a strict local-date
+continuation; typed validation checks plan/workspace IDs, unique descending
+dates, status vocabulary, job IDs and skipped-day semantics. Where an occurrence
+has an existing job, the UI links to the already tenant-protected job detail.
+Neither viewing history nor pausing a plan erases those jobs or starts a worker.
+The PostgreSQL tests cover actual materialization-and-pause visibility, a
+29-day keyset history, foreign/revoked/anonymous access, unsupported fields and
+write refusal; disposable Django/Next HTTP checks cover the page and tenant denial.

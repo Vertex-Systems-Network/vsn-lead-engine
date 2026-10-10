@@ -336,3 +336,19 @@ drafts, queued jobs, reservations, completed results and previous occurrences
 are **not cancelled or erased** by pausing. A separate cancellation or retention
 workflow is required for those. No automatic scheduler, provider, recurring
 job dispatch, payment or production activation has been introduced.
+
+## Recorded daily occurrence history (read-only)
+
+A current workspace member can inspect
+`GET /api/v1/workspaces/<uuid>/daily-plans/<plan-id>/occurrences/` and optionally
+continue with `?before=YYYY-MM-DD`. The Django API verifies current membership,
+then the exact workspace-scoped plan; it rejects unsupported/repeated parameters,
+invalid dates and all write verbs. It returns up to 25 persisted local-calendar
+decisions in descending date order, with the recorded plan revision, timezone,
+local time, DST resolution, UTC scheduled instant, linked job ID and the job's
+current state (if present). Cross-workspace job linkage fails closed. History
+contains no saved search criteria, contact records, provider payloads, signer
+secrets, usernames or entitlement data. A paused plan's previously created
+drafts remain visible: **pause stops future occurrences; it does not retroactively
+cancel or delete previous jobs**. Read access cannot materialize or dispatch any
+work; an empty history is not proof of an active or inactive production worker.

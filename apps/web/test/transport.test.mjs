@@ -699,3 +699,49 @@ test("daily diagnostics path is a fixed authenticated read-only URL", async () =
   );
   assert.equal(anonymous.kind, "signin");
 });
+
+test("occurrence history is exact session-only read with local-date cursor", async () => {
+  const workspaceId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const planId = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+  const root = `/api/v1/workspaces/${workspaceId}/daily-plans/${planId}/occurrences/`;
+  for (const path of [root, `${root}?before=2026-11-01`]) {
+    const result = await readBackend(
+      "http://localhost:8000",
+      path,
+      session,
+      async (url, options) => {
+        assert.equal(url.pathname + url.search, path);
+        assert.deepEqual(options.headers, {
+          Accept: "application/json",
+          Cookie: `sessionid=${session}`,
+        });
+        assert.equal(options.cache, "no-store");
+        assert.equal(options.redirect, "manual");
+        return new Response(
+          `{"workspace_id":"${workspaceId}","plan_id":"${planId}","total":0,"results":[],"next":null,"advisory_only":true}`,
+          { headers: { "content-type": "application/json" } },
+        );
+      },
+    );
+    assert.equal(result.kind, "ok");
+  }
+  for (const path of [
+    `${root}?before=invalid`,
+    `${root}?after=2026-11-01`,
+    `${root}?before=2026-11-01&limit=100`,
+    `${root}?before=2026-11-01&before=2026-11-02`,
+    `${root}../`,
+    `${root}dispatch/`,
+  ]) {
+    await assert.rejects(readBackend("http://localhost:8000", path, session));
+  }
+  const anonymous = await readBackend(
+    "http://localhost:8000",
+    root,
+    undefined,
+    () => {
+      throw new Error("Anonymous occurrence history must not reach Django");
+    },
+  );
+  assert.equal(anonymous.kind, "signin");
+});
