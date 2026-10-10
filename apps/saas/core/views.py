@@ -247,6 +247,70 @@ class UsageDetail(APIView):
 @never_cache
 @login_required
 @require_http_methods(["GET", "POST"])
+def daily_plan_stop_page(request, workspace_id, plan_id):
+    """Explicit owner/admin confirmation to fence future schedule occurrences."""
+    from rest_framework.exceptions import PermissionDenied, ValidationError
+
+    from .daily_plan_stop_forms import DailyPlanStopForm, new_stop_token
+    from .jobs import RevisionConflict
+    from .models import DailySchedule
+    from .schedules import disable_daily_schedule
+
+    membership = membership_for(request.user, workspace_id)
+    if membership.role not in {"owner", "admin"}:
+        return HttpResponseForbidden("This role cannot stop daily plans.")
+    plan = get_object_or_404(DailySchedule, pk=plan_id, workspace_id=workspace_id)
+    if request.method == "GET":
+        if request.GET:
+            return HttpResponseBadRequest("Stop confirmation does not accept query parameters.")
+        form = DailyPlanStopForm(
+            actor=request.user,
+            workspace_id=workspace_id,
+            plan_id=plan_id,
+            initial={
+                "stop_token": new_stop_token(request.user, workspace_id, plan_id, plan.revision)
+            },
+        )
+        return render(
+            request, "core/daily_plan_stop.html",
+            {"workspace": membership.workspace, "plan": plan, "form": form, "done": False},
+        )
+    expected = {"csrfmiddlewaretoken", "stop_token"}
+    if set(request.POST) != expected or any(
+        len(request.POST.getlist(key)) != 1 for key in request.POST
+    ):
+        return HttpResponseBadRequest("Unsupported stop confirmation fields.")
+    form = DailyPlanStopForm(
+        request.POST, actor=request.user, workspace_id=workspace_id, plan_id=plan_id
+    )
+    if not form.is_valid():
+        return render(
+            request, "core/daily_plan_stop.html",
+            {"workspace": membership.workspace, "plan": plan, "form": form, "done": False},
+            status=400,
+        )
+    try:
+        plan, changed = disable_daily_schedule(
+            request.user, workspace_id, plan_id, form.expected_revision
+        )
+    except RevisionConflict:
+        form.add_error(None, "The plan changed. Open a new confirmation to stop it.")
+        return render(
+            request, "core/daily_plan_stop.html",
+            {"workspace": membership.workspace, "plan": plan, "form": form, "done": False},
+            status=409,
+        )
+    except (ValidationError, PermissionDenied):
+        return HttpResponseForbidden("Daily plan stop is no longer authorized.")
+    return render(
+        request, "core/daily_plan_stop.html",
+        {"workspace": membership.workspace, "plan": plan, "form": form, "done": True, "changed": changed},
+    )
+
+
+@never_cache
+@login_required
+@require_http_methods(["GET", "POST"])
 def daily_plan_page(request, workspace_id, job_id):
     """Create only an inactive schedule plan from the saved draft's server-side scope."""
     from rest_framework.exceptions import PermissionDenied, ValidationError
