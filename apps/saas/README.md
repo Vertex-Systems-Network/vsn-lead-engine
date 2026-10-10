@@ -437,3 +437,7 @@ capacity claim; invalid plans and unverified source policies display
 usage, provider rights and time continuously change. `advisory_batch_fits`
 certifies **nothing** about commercial source rights, provider credentials,
 recurrence activation, next-month rollover or actual ability to deliver.
+
+## M8 admin access audit review (2026-10-10)
+
+Authorized workspace owners and admins can review recorded membership role changes and removals at `GET /api/v1/workspaces/<uuid>/member-audit/?offset=0` or on the native Next member-audit screen. Entries show timestamp, actor/target UUIDs and previous/new role only; no emails, names, provider credentials or lead content are returned. Reads use existing session authentication, owner/admin checks and 25-row default offset pagination, with explicit no-store headers. No invite, role modification or member removal API is introduced by this view. It is an internal audit UI, not a certified external compliance log.
