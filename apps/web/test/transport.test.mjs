@@ -473,3 +473,40 @@ test("workspace members list is session-only, bounded and read-only", async () =
     await assert.rejects(readBackend("http://localhost:8000", path, session));
   }
 });
+
+test("workspace identity route accepts only an exact session-bound GET path", async () => {
+  const id = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const path = `/api/v1/workspaces/${id}/`;
+  assert.equal(
+    (
+      await readBackend("http://localhost:8000", path, session, async (_, options) => {
+        assert.deepEqual(options.headers, {
+          Accept: "application/json",
+          Cookie: `sessionid=${session}`,
+        });
+        assert.equal(options.redirect, "manual");
+        return new Response('{"id":"' + id + '","name":"Example","timezone":"UTC"}', {
+          headers: { "content-type": "application/json" },
+        });
+      })
+    ).kind,
+    "ok",
+  );
+  for (const bad of [
+    `${path}?fields=secret`,
+    `${path}../members/`,
+    `${path}change/`,
+    `/api/v1/workspaces/${id}/?page=1`,
+  ]) {
+    await assert.rejects(readBackend("http://localhost:8000", bad, session));
+  }
+  const anonymous = await readBackend(
+    "http://localhost:8000",
+    path,
+    undefined,
+    () => {
+      throw Error("Anonymous lookup must not reach backend");
+    },
+  );
+  assert.equal(anonymous.kind, "signin");
+});
