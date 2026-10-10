@@ -2,6 +2,7 @@
 
 This function does not activate plans, calculate occurrences or dispatch work.
 """
+
 from uuid import UUID
 
 from rest_framework.exceptions import ValidationError
