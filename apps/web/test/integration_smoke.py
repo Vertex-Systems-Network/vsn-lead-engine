@@ -122,6 +122,28 @@ def main():
                         time.sleep(0.1)
                 else:
                     raise RuntimeError("Next startup timeout")
+                # Public marketing pages must not require a session or expose
+                # private tenant data or pretend that billing/launch is active.
+                for public_path, expected in (
+                    ("/", "A clearer path from business search to lead review."),
+                    ("/capabilities", "Functionality with its real development status."),
+                    ("/plans", "Subscriptions are not yet on sale."),
+                    ("/data-handling", "Source rights and access controls before volume."),
+                ):
+                    public_html, _ = read(public_path, False)
+                    assert expected in public_html
+                    assert "Foreign private marker" not in public_html
+                    assert "Synthetic &lt;workspace&gt;" not in public_html
+                    assert 'href="/dashboard"' in public_html
+                homepage, _ = read("/", False)
+                assert 'href="/account/sign-in"' in homepage
+                assert "No result" in homepage and "guaranteed" in homepage
+                capabilities_page, _ = read("/capabilities", False)
+                assert "Implemented in development" in capabilities_page
+                assert "Planned / unverified" in capabilities_page
+                plans_page, _ = read("/plans", False)
+                assert "no checkout" in plans_page
+                assert "Price and limits: not published" in plans_page
                 anonymous, _ = read("/dashboard", False)
                 assert "Sign in to see your workspaces" in anonymous
                 dashboard, headers = read("/dashboard")
