@@ -178,3 +178,38 @@ Native Next sign-in uses explicit browser CSRF bootstrap and direct Django POST 
 Readonly `billing_status --actor <current-admin-uuid> --workspace <workspace-uuid>` reports redacted diagnostics only. It never enables or repairs billing. Trusted local operator context and current active admin membership are required; see the billing recovery runbook for preservation and external acceptance gates.
 
 Pure `core.batch_manifest` v3 proof validation has separate empty source/registry authorities and no endpoint/consumer/ORM/network. It preserves v2 intake behavior. See ADR-SAAS-003 for the next durable accounting/pagination gates; synthetic proof shape is not qualification, R2 commit truth or provider permission.
+
+
+## Staging readiness (no deployment performed)
+
+The read-only \`check_staging\` management command is a **fail-closed preflight**,
+not a deployment tool or launch certification. On a separately provisioned
+staging host, use independently managed secrets, a private PostgreSQL database,
+HTTPS and a trusted ingress. Do not use production collector credentials or
+customer data. Prepare the runtime with the existing pinned Python dependencies
+and the separately reviewed Overture/duckdb runtime requirements; configure
+the Next service with explicit HTTPS backend/public origins.
+
+1. Set \`SAAS_DEBUG=0\`, \`SAAS_SECRET_KEY\`, explicit non-local
+   \`SAAS_ALLOWED_HOSTS\`, \`SAAS_WEB_ORIGIN\`, PostgreSQL \`SAAS_DB_*\`,
+   a real \`SAAS_EMAIL_HOST\` / \`SAAS_FROM_EMAIL\` and the SMTP credentials
+   required by the chosen provider. Do not enable public sign-up by default.
+2. Generate and securely mount the four owner-only fulfilment keys with
+   \`generate_fulfilment_keys\` and set \`SAAS_FULFILMENT_KEYS_FILE\` in both
+   the web and worker processes. The fixture signer is forbidden outside DEBUG.
+3. With a tested restorable staging backup and a migration/rollback plan,
+   run \`python apps/saas/manage.py migrate --noinput\` as a **separate,
+   authorized deployment operation** (the preflight itself never migrates).
+4. Run \`python apps/saas/manage.py check --deploy --fail-level WARNING\`
+   and \`python apps/saas/manage.py check_staging\`. They must both pass.
+   \`check_staging\` checks local security settings, real-source key
+   configuration, SMTP selection, a read-only PostgreSQL query and pending
+   migration plan. It hides database exception details to prevent secret leaks.
+5. Separately verify the real reverse proxy/TLS/CSRF/cookie behavior, SMTP
+   delivery, Overture rights/attribution, worker schedule and queue recovery,
+   data retention, backup restore and tenant-access HTTP/browser tests. The
+   command cannot certify any of these. Do not open paid billing, production
+   collection or public launch on the strength of its output.
+
+No hosting vendor, public domain, SMTP account or production rollout is
+provisioned by this change.
