@@ -1,0 +1,54 @@
+{% extends "core/job_base.html" %}
+{% block title %}Daily time preview{% endblock %}
+{% block content %}
+<h1>Daily time preview — {{ workspace.name }}</h1>
+<p>Review when a local daily schedule <strong>would</strong> occur. This is a read-only preview.
+It does not save a schedule, queue a job, run a provider, reserve usage or enable recurring collection.</p>
+<form method="get" action="{% url 'daily-time-preview-page' workspace.id %}">
+  {% if form.non_field_errors %}
+  <div role="alert">{{ form.non_field_errors }}</div>
+  {% endif %}
+  <div class="form-field">
+    <label for="{{ form.timezone.id_for_label }}">{{ form.timezone.label }}</label>
+    {{ form.timezone }}
+    {% if form.timezone.errors %}<div role="alert">{{ form.timezone.errors }}</div>{% endif %}
+    <p>Examples: America/New_York, America/Toronto, America/Los_Angeles or UTC.</p>
+  </div>
+  <div class="form-field">
+    <label for="{{ form.time.id_for_label }}">{{ form.time.label }}</label>
+    {{ form.time }}
+    {% if form.time.errors %}<div role="alert">{{ form.time.errors }}</div>{% endif %}
+  </div>
+  <button type="submit">Preview next three local days</button>
+</form>
+{% if decisions %}
+<h2>Next three local-day decisions</h2>
+<p>Results reflect timezone rules at preview time; future timezone laws and actual execution are not guaranteed.
+Nonexistent times move to the first valid minute on that date. When a time repeats, the earlier UTC instant is selected.
+A civil day entirely skipped by a timezone transition has no run.</p>
+<div class="table-scroll" role="region" aria-label="Local time preview" tabindex="0">
+  <table>
+    <caption>Possible daily executions (not scheduled)</caption>
+    <thead><tr>
+      <th scope="col">Local date</th>
+      <th scope="col">Resolved local time</th>
+      <th scope="col">UTC instant</th>
+      <th scope="col">UTC offset</th>
+      <th scope="col">DST decision</th>
+    </tr></thead>
+    <tbody>
+      {% for row in decisions %}
+      <tr>
+        <th scope="row">{{ row.local_date }}</th>
+        <td>{{ row.resolved_local_time }}</td>
+        <td>{{ row.utc_instant }}</td>
+        <td>{{ row.offset }}</td>
+        <td>{{ row.resolution }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+<p>No automatic scheduling, notification, AI calls or commercial billing are activated by this page.</p>
+{% endblock %}
