@@ -205,7 +205,7 @@ def main():
                     ("/faq", "Frequently asked questions"),
                 ):
                     public_html, public_headers = read(public_path, False)
-                    assert public_headers.get("Referrer-Policy") == "no-referrer"
+                    assert public_headers.get("Referrer-Policy") == "strict-origin"
                     assert public_headers.get("X-Content-Type-Options") == "nosniff"
                     assert public_headers.get("X-Frame-Options") == "DENY"
                     assert public_headers.get("X-Robots-Tag") == "noindex, nofollow, noarchive"
@@ -964,7 +964,7 @@ def main():
                 assert export_receipt in history_html and native_headers["X-Export-Receipt"] in history_html
                 assert "50123" not in history_html and "synthetic-result" not in history_html
                 assert "no-store" in history_headers["Cache-Control"]
-                assert history_headers["Referrer-Policy"] == "no-referrer"
+                assert history_headers["Referrer-Policy"] == "strict-origin"
                 # Two genuine settled preparations, smaller readonly page for transport navigation.
                 from unittest.mock import patch
                 with patch("core.export_history.PAGE_SIZE", 1):
