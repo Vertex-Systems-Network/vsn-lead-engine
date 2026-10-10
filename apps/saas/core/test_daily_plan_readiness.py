@@ -4,6 +4,7 @@ from datetime import time
 
 from django.test import TestCase
 
+from .daily_catchup_budget import catchup_budget_snapshot
 from .jobs import CONTROLS, EVIDENCE
 from .models import (
     DailySchedule,
@@ -112,7 +113,10 @@ class PlanReadinessTests(TestCase):
         DailySchedule.objects.filter(pk=self.plan.pk).update(enabled=True)
         self.client.force_login(self.owner)
         now = datetime(2026, 11, 1, 16, tzinfo=UTC)
-        with patch("core.daily_catchup_budget.timezone.now", return_value=now):
+        with patch(
+            "core.daily_plan_readiness.catchup_budget_snapshot",
+            side_effect=lambda plan, budget: catchup_budget_snapshot(plan, budget, now=now),
+        ):
             report = self.client.get(self.path).json()
         self.assertEqual(report["status"], "internal_catalog_match_only")
         self.assertEqual(report["budget_snapshot"]["status"], "advisory_single_job_fits")
@@ -148,9 +152,10 @@ class PlanReadinessTests(TestCase):
             resolution="skipped_day",
         )
         self.client.force_login(self.owner)
+        now = datetime(2026, 11, 1, 7, 30, tzinfo=UTC)
         with patch(
-            "core.daily_catchup_budget.timezone.now",
-            return_value=datetime(2026, 11, 1, 7, 30, tzinfo=UTC),
+            "core.daily_plan_readiness.catchup_budget_snapshot",
+            side_effect=lambda plan, budget: catchup_budget_snapshot(plan, budget, now=now),
         ):
             report = self.client.get(self.path).json()
         catchup = report["catch_up_budget_snapshot"]
