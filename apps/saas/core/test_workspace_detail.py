@@ -15,9 +15,7 @@ class WorkspaceDetailTests(TestCase):
             self.owner,
             {"name": "Private workspace marker", "timezone": "America/Toronto"},
         )
-        Membership.objects.create(
-            workspace=self.workspace, user=self.viewer, role="viewer"
-        )
+        Membership.objects.create(workspace=self.workspace, user=self.viewer, role="viewer")
         self.path = f"/api/v1/workspaces/{self.workspace.id}/"
 
     def test_owner_and_viewer_can_read_exact_workspace_name_and_timezone(self):
@@ -53,9 +51,7 @@ class WorkspaceDetailTests(TestCase):
         self.client.force_login(self.owner)
         for method in ("post", "patch", "delete"):
             with self.subTest(method=method):
-                response = getattr(self.client, method)(
-                    self.path, {"name": "Forged new name"}
-                )
+                response = getattr(self.client, method)(self.path, {"name": "Forged new name"})
                 self.assertEqual(response.status_code, 405)
         self.workspace.refresh_from_db()
         self.assertEqual(self.workspace.name, "Private workspace marker")
