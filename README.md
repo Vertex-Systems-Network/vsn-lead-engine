@@ -55,6 +55,7 @@ Snapshot: **2026-10-08 PKT**, reconciled through protected feature `main` commit
 | **Overall SaaS direction** | **2026-10-04** | **Design and contract implementation advancing; runtime, provider, validation and launch gates remain open** | **`████░░░░░░` ~52% engineering-plan indicator** |
 
 Progress notes:
+- 2026-10-10 container packaging (M9 preparation; no deploy): host-neutral Docker image recipes for Django API, Next web and bounded Overture worker, with pinned serving dependencies, non-root runtime, secret-excluding build context and a separate build-only CI workflow. No registry publish, provider provisioning or reverse-proxy acceptance. See `deploy/README.md`.
 - 2026-10-10 SaaS staging preflight (M9 preparation; no deploy): added fail-closed `manage.py check_staging` for non-DEBUG security, explicit hosts/Next origin, SMTP, real-source key configuration, read-only PostgreSQL connectivity and pending migrations. It does not replace live proxy, email-delivery, source-rights, backup or customer acceptance. No hosting/SMTP provider has been provisioned.
 - Owner-selected Next.js UI is recorded in [ADR-SAAS-002](docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md); backend auth/tenant authority remains Django. Percentages describe implemented engineering slices; browser/customer/deployment/release limits remain open.
 - M0 is complete from repository audit evidence.
