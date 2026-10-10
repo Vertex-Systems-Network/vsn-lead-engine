@@ -75,6 +75,57 @@ export function dailyPlans(v: unknown): v is DailyPlans {
   );
 }
 
+export type DailyPlanDetail = DailyPlan & {
+  workspace_id: string;
+  search: {
+    countries: string[];
+    categories: string[];
+    statuses: string[];
+    required_fields: string[];
+    source_codes: string[];
+    result_limit: number;
+  };
+};
+export function dailyPlanDetail(v: unknown): v is DailyPlanDetail {
+  if (
+    !object(v) ||
+    !uuid(v.workspace_id) ||
+    !dailyPlans({
+      workspace_id: v.workspace_id,
+      total: 1,
+      results: [v],
+      next: null,
+    }) ||
+    !object(v.search)
+  )
+    return false;
+  const s = v.search;
+  return (
+    Array.isArray(s.countries) &&
+    s.countries.length >= 1 &&
+    s.countries.length <= 2 &&
+    s.countries.every((x) => x === "US" || x === "CA") &&
+    Array.isArray(s.categories) &&
+    s.categories.length >= 1 &&
+    s.categories.length <= 12 &&
+    s.categories.every((x) => typeof x === "string" && x.length <= 120) &&
+    Array.isArray(s.statuses) &&
+    s.statuses.length <= 3 &&
+    s.statuses.every((x) => ["active", "closed", "opening_soon"].includes(x)) &&
+    Array.isArray(s.required_fields) &&
+    s.required_fields.length <= 4 &&
+    s.required_fields.every((x) =>
+      ["phone", "name", "website", "address"].includes(x),
+    ) &&
+    Array.isArray(s.source_codes) &&
+    s.source_codes.length <= 12 &&
+    s.source_codes.every((x) => typeof x === "string" && x.length <= 64) &&
+    count(s.result_limit) &&
+    s.result_limit >= 1 &&
+    s.result_limit <= 1000
+  );
+}
+
 export const memberRoles = ["owner", "admin", "member", "viewer"] as const;
 export type Member = {
   user_id: string;

@@ -268,3 +268,16 @@ or external work are exposed. Invalid/repeated cursor arguments are rejected;
 write methods are not implemented. Viewer, foreign tenant, membership revocation,
 empty results, multiple pages and mutation denial are covered in tests.
 Recurring plan activation and scheduled collection remain separate, gated work.
+
+## Daily plan search-scope review
+
+`GET /api/v1/workspaces/<uuid>/daily-plans/<plan-id>/` returns a current-member,
+no-store, workspace-filtered read-only plan snapshot. The stored search is
+revalidated through the canonical `SearchSerializer`; malformed or tampered
+saved configuration fails closed instead of leaking arbitrary JSON. The response
+contains the requested search preferences, timezone, local time, revision,
+created timestamp and actual enabled flag. It contains no account/lead/contact
+records, signer keys or creator identity. It does not accept query parameters or
+write verbs and cannot schedule or dispatch work. Foreign, anonymous and revoked
+membership, plan-ID swapping, invalid persisted data and mutation denial have
+regression coverage.

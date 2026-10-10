@@ -136,3 +136,15 @@ plans they are authorized to see, but none can activate or mutate them through
 this page. A record marked enabled may only have been changed by a separate
 operator pathway; a visible state is not evidence that a hosted recurring worker
 is operating. No automatic collection, source request, or payment is activated.
+
+## Daily plan detail review
+
+Click **Review plan** in the read-only daily-plan list to inspect a specific
+saved local time and normalized search scope at
+`/dashboard/workspaces/<uuid>/daily-plans/<plan-id>`. The fixed server-only
+transport requests only a verified workspace-member plan via the exact Django
+GET endpoint; the typed contract bounds search arrays and required fields.
+Current workspace identity and plan identity must match the route before
+rendering. The screen offers no edit, enable, source dispatch or billing action.
+The rendered values are saved preferences, not verified provider coverage,
+accepted results, or an active recurring schedule.

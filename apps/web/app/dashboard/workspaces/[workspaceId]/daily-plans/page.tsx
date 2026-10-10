@@ -63,7 +63,14 @@ export default async function DailyPlansPage({
               {plans.data.results.map((plan) => (
                 <tr key={plan.id}>
                   <th scope="row">
-                    <code>{plan.id}</code>
+                    <Link
+                      href={`/dashboard/workspaces/${workspaceId}/daily-plans/${plan.id}`}
+                    >
+                      Review plan
+                    </Link>
+                    <p>
+                      <code>{plan.id}</code>
+                    </p>
                   </th>
                   <td>{plan.local_time}</td>
                   <td>{plan.timezone}</td>
