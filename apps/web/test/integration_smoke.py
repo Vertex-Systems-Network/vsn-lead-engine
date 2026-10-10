@@ -91,6 +91,8 @@ def main():
             request_hash="b" * 64,
             enabled=False,
         )
+        enabled_plan = DailySchedule.objects.filter(workspace=workspace).order_by("id").first()
+        DailySchedule.objects.filter(pk=enabled_plan.id).update(enabled=True)
         client = Client()
         client.force_login(user)
         session = client.cookies["sessionid"].value
@@ -232,7 +234,20 @@ def main():
                 assert "Daily plan details" in plan_detail
                 assert "Saved lead search preferences" in plan_detail
                 assert "Synthetic bakery" in plan_detail
-                assert "Disabled" in plan_detail
+                assert "Enabled by a separate operator action" in plan_detail
+                pause_path = f"/workspaces/{workspace.id}/daily-plans/{plan_id}/pause/"
+                assert backend + pause_path in plan_detail
+                with urlopen(
+                    Request(backend + pause_path, headers={"Cookie": f"sessionid={session}"}),
+                    timeout=10,
+                ) as response:
+                    pause_form = response.read().decode()
+                    assert response.status == 200
+                    assert "Confirm: pause future daily occurrences" in pause_form
+                    assert "Existing saved drafts" in pause_form
+                    assert 'name="pause_token"' in pause_form
+                    assert 'name="csrfmiddlewaretoken"' in pause_form
+                assert DailySchedule.objects.get(pk=plan_id).enabled
                 assert "Foreign private marker" not in plan_detail
                 assert "No activation or edit" in plan_detail
                 private_detail, _ = read(
