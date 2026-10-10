@@ -204,7 +204,11 @@ def main():
                     ("/data-handling", "Source rights and access controls before volume."),
                     ("/faq", "Frequently asked questions"),
                 ):
-                    public_html, _ = read(public_path, False)
+                    public_html, public_headers = read(public_path, False)
+                    assert public_headers.get("Referrer-Policy") == "no-referrer"
+                    assert public_headers.get("X-Content-Type-Options") == "nosniff"
+                    assert public_headers.get("X-Frame-Options") == "DENY"
+                    assert public_headers.get("X-Robots-Tag") == "noindex, nofollow, noarchive"
                     assert expected in public_html
                     assert "Foreign private marker" not in public_html
                     assert "Synthetic &lt;workspace&gt;" not in public_html
@@ -248,6 +252,8 @@ def main():
                         raise AssertionError("Unknown public page must return HTTP 404")
                     except HTTPError as exc:
                         assert exc.code == 404
+                        assert exc.headers.get("X-Robots-Tag") == "noindex, nofollow, noarchive"
+                        assert exc.headers.get("X-Frame-Options") == "DENY"
                         missing_page = exc.read().decode()
                     assert "This page is unavailable." in missing_page
                     assert 'href="/"' in missing_page
@@ -289,6 +295,8 @@ def main():
                 assert "Synthetic &lt;workspace&gt;" in dashboard
                 assert "Foreign private marker" not in dashboard
                 assert "no-store" in headers.get("Cache-Control", "")
+                assert headers.get("X-Robots-Tag") == "noindex, nofollow, noarchive"
+                assert headers.get("X-Frame-Options") == "DENY"
                 page, _ = read(f"/dashboard/workspaces/{workspace.id}")
                 assert "Synthetic bakery" in page and "Next page" in page
                 assert "Job status summary" in page
