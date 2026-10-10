@@ -653,3 +653,47 @@ test("daily plan detail allows exact session GET and refuses activation or query
   );
   assert.equal(anonymous.kind, "signin");
 });
+
+test("daily diagnostics path is a fixed authenticated read-only URL", async () => {
+  const id = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const cursor = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+  const root = `/api/v1/workspaces/${id}/daily-diagnostics/`;
+  for (const path of [root, `${root}?after=${cursor}`]) {
+    const result = await readBackend(
+      "http://localhost:8000",
+      path,
+      session,
+      async (url, options) => {
+        assert.equal(url.pathname + url.search, path);
+        assert.deepEqual(options.headers, {
+          Accept: "application/json",
+          Cookie: `sessionid=${session}`,
+        });
+        assert.equal(options.cache, "no-store");
+        assert.equal(options.redirect, "manual");
+        return new Response(
+          `{"workspace_id":"${id}","advisory_only":true,"total_plans":0,"inspected":0,"plans":[]}`,
+          { headers: { "content-type": "application/json" } },
+        );
+      },
+    );
+    assert.equal(result.kind, "ok");
+  }
+  for (const path of [
+    `${root}?page=2`,
+    `${root}?limit=999`,
+    `${root}?after=bad`,
+    `${root}?after=${cursor}&activate=true`,
+    `${root}../daily-plans/`,
+    `${root}run/`,
+  ]) {
+    await assert.rejects(readBackend("http://localhost:8000", path, session));
+  }
+  const anonymous = await readBackend(
+    "http://localhost:8000",
+    root,
+    undefined,
+    () => { throw Error("Anonymous diagnostics cannot reach Django"); },
+  );
+  assert.equal(anonymous.kind, "signin");
+});
