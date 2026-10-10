@@ -83,9 +83,7 @@ def issue_invitation(actor, workspace_id, username, role):
     if role == "admin" and current.role != "owner":
         raise PermissionDenied("Only owners can invite administrators.")
     target = User.objects.filter(username=username, is_active=True).first()
-    if target is None or Membership.objects.filter(
-        workspace_id=workspace_id, user=target
-    ).exists():
+    if target is None or Membership.objects.filter(workspace_id=workspace_id, user=target).exists():
         raise InvitationUnavailable()
     pending = WorkspaceInvitation.objects.filter(
         workspace_id=workspace_id,
@@ -134,7 +132,9 @@ def redeem_invitation(actor, code):
         invitation.role == "admin" and issuer.role != "owner"
     ):
         raise InvitationUnavailable()
-    Membership.objects.create(workspace_id=invitation.workspace_id, user=actor, role=invitation.role)
+    Membership.objects.create(
+        workspace_id=invitation.workspace_id, user=actor, role=invitation.role
+    )
     MembershipAudit.objects.create(
         workspace_id=invitation.workspace_id,
         actor=actor,
