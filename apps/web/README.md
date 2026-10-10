@@ -201,3 +201,13 @@ viewers and foreign members receive generic denial without plan leakage.
 This is deliberately a read-only diagnostic, not a live source-coverage,
 commercial rights, credentials, quota or scheduler approval. No activate/submit
 button is exposed. Disposable Django/Next HTTP tests cover the navigation.
+
+## Read-only one-job budget preview
+
+The source-readiness view now displays an owner/admin-only resource table:
+requested, settled, pending, internal limits and estimated headroom for leads,
+jobs and provider calls. Unavailable prerequisites render a safe empty state.
+The runtime contract rejects malformed counters and preserves the explicit
+single-job/advisory flags. This does not debit usage, reserve capacity,
+guarantee future allowance, activate a schedule, authorize paid services,
+enqueue jobs or certify live provider permissions.
