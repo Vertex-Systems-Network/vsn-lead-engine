@@ -772,7 +772,9 @@ test("daily source readiness is session-only at exact plan path", async () => {
     `${path}run/`,
     `${path}../`,
   ]) {
-    await assert.rejects(readBackend("http://localhost:8000", candidate, session));
+    await assert.rejects(
+      readBackend("http://localhost:8000", candidate, session),
+    );
   }
   const anonymous = await readBackend(
     "http://localhost:8000",
