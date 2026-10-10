@@ -15,9 +15,7 @@ CAPACITY_ORDER = ("leads", "jobs", "provider_calls")
 
 
 def single_job_budget_snapshot(actor, workspace_id, *, result_limit, provider_calls):
-    requested = amounts(
-        {"leads": result_limit, "jobs": 1, "provider_calls": provider_calls}
-    )
+    requested = amounts({"leads": result_limit, "jobs": 1, "provider_calls": provider_calls})
     snapshot = usage_snapshot(actor, workspace_id)
     period = snapshot["period"]
     current_window = True
