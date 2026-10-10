@@ -48,7 +48,9 @@ export default async function DailyPlanDetailPage({
         must be verified separately before any execution.
       </p>
       <p>
-        <Link href={`/dashboard/workspaces/${workspaceId}/daily-plans/${planId}/readiness`}>
+        <Link
+          href={`/dashboard/workspaces/${workspaceId}/daily-plans/${planId}/readiness`}
+        >
           Review internal source readiness (admins)
         </Link>
       </p>
