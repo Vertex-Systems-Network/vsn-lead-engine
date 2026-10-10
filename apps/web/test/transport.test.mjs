@@ -430,3 +430,38 @@ test("receipt history is readonly and forwards session only on exact bounded pat
     );
   }
 });
+
+test("workspace members list is session-only, bounded and read-only", async () => {
+  const id = "a".repeat(8) + "-" + "a".repeat(4) + "-" + "a".repeat(4) +
+    "-" + "a".repeat(4) + "-" + "a".repeat(12);
+  for (const path of [
+    `/api/v1/workspaces/${id}/members/`,
+    `/api/v1/workspaces/${id}/members/?page=2`,
+  ]) {
+    const result = await readBackend(
+      "http://localhost:8000",
+      path,
+      session,
+      async (_, options) => {
+        assert.deepEqual(options.headers, {
+          Accept: "application/json",
+          Cookie: `sessionid=${session}`,
+        });
+        assert.equal(options.cache, "no-store");
+        return new Response('{"count":0,"next":null,"results":[]}', {
+          headers: { "content-type": "application/json" },
+        });
+      },
+    );
+    assert.equal(result.kind, "ok");
+  }
+  for (const path of [
+    `/api/v1/workspaces/${id}/members/?page=0`,
+    `/api/v1/workspaces/${id}/members/?page=-1`,
+    `/api/v1/workspaces/${id}/members/?page=1&extra=1`,
+    `/api/v1/workspaces/${id}/members/?after=${id}`,
+    `/api/v1/workspaces/${id}/members/${id}/`,
+  ]) {
+    await assert.rejects(readBackend("http://localhost:8000", path, session));
+  }
+});
