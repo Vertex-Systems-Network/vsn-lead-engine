@@ -158,6 +158,26 @@ export type PlanReadiness = {
   }[];
   unverified_execution_gates: string[];
 };
+function budgetCapacityRow(row: unknown, name: string): boolean {
+  if (!object(row)) return false;
+  const requested = row.requested;
+  const settled = row.settled;
+  const reserved = row.reserved;
+  const limit = row.limit;
+  const headroom = row.headroom;
+  return (
+    row.name === name &&
+    count(requested) &&
+    count(settled) &&
+    count(reserved) &&
+    count(limit) &&
+    count(headroom) &&
+    [requested, settled, reserved, limit, headroom].every(
+      (value) => value <= 2147483647,
+    ) &&
+    headroom === Math.max(0, limit - settled - reserved)
+  );
+}
 export function planReadiness(v: unknown): v is PlanReadiness {
   if (
     !object(v) ||
@@ -198,21 +218,7 @@ export function planReadiness(v: unknown): v is PlanReadiness {
       : capacity.length === 3) &&
     ["leads", "jobs", "provider_calls"].every(
       (name, index) =>
-        capacity.length === 0 ||
-        (object(capacity[index]) &&
-          capacity[index].name === name &&
-          ["requested", "settled", "reserved", "limit", "headroom"].every(
-            (field) =>
-              count(capacity[index][field]) &&
-              capacity[index][field] <= 2147483647,
-          ) &&
-          capacity[index].headroom ===
-            Math.max(
-              0,
-              capacity[index].limit -
-                capacity[index].settled -
-                capacity[index].reserved,
-            )),
+        capacity.length === 0 || budgetCapacityRow(capacity[index], name),
     ) &&
     planReadinessCheckNames.every((name) =>
       checks.some(
