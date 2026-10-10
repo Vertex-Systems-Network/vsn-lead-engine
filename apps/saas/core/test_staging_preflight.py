@@ -20,7 +20,7 @@ def secure_config(**changes):
         "SESSION_COOKIE_SECURE": True,
         "CSRF_COOKIE_SECURE": True,
         "SECURE_CONTENT_TYPE_NOSNIFF": True,
-        "WEB_DASHBOARD_URL": "https://web.staging.example/dashboard",
+        "WEB_DASHBOARD_URL": "https://saas.staging.example/dashboard",
         "DATABASES": {"default": {"ENGINE": "django.db.backends.postgresql"}},
         "EMAIL_BACKEND": "django.core.mail.backends.smtp.EmailBackend",
         "DEFAULT_FROM_EMAIL": "no-reply@staging.example",
@@ -53,6 +53,13 @@ class ConfigurationPreflightTests(SimpleTestCase):
         self.assertTrue(any("PostgreSQL" in issue for issue in issues))
         self.assertTrue(any("synthetic" in issue for issue in issues))
         self.assertTrue(any("fulfilment keys" in issue for issue in issues))
+
+    def test_cross_origin_dashboard_cannot_share_host_only_sessions(self):
+        issues = configuration_issues(
+            secure_config(WEB_DASHBOARD_URL="https://other.staging.example/dashboard")
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertIn("same public HTTPS host", issues[0])
 
     def test_refuses_console_email_and_missing_next_origin(self):
         issues = configuration_issues(
