@@ -11,7 +11,10 @@ export default async function DueDiagnosticsPage({
   params: Promise<{ workspaceId: string }>;
   searchParams: Promise<{ after?: string }>;
 }) {
-  const [{ workspaceId }, { after }] = await Promise.all([params, searchParams]);
+  const [{ workspaceId }, { after }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   if (!uuid(workspaceId) || (after !== undefined && !uuid(after))) notFound();
   const base = `/api/v1/workspaces/${workspaceId}/`;
   const [report, identity] = await Promise.all([
@@ -43,8 +46,8 @@ export default async function DueDiagnosticsPage({
       <p className="notice">
         Advisory snapshot only — not a live scheduler. A due candidate does not
         grant permission to run any collection, create a job, contact a
-        provider, reserve usage or activate billing. All execution gates must
-        be rechecked separately. This screen has no activation controls.
+        provider, reserve usage or activate billing. All execution gates must be
+        rechecked separately. This screen has no activation controls.
       </p>
       <p>
         Inspected {report.data.inspected} plans on this page, out of{" "}
@@ -71,9 +74,13 @@ export default async function DueDiagnosticsPage({
                   >
                     Review plan
                   </Link>
-                  <p><code>{plan.id}</code></p>
+                  <p>
+                    <code>{plan.id}</code>
+                  </p>
                 </th>
-                <td>{plan.enabled ? "Enabled (external action)" : "Disabled"}</td>
+                <td>
+                  {plan.enabled ? "Enabled (external action)" : "Disabled"}
+                </td>
                 <td>{plan.status.replaceAll("_", " ")}</td>
                 <td>
                   {plan.due_local_dates.length
@@ -92,9 +99,7 @@ export default async function DueDiagnosticsPage({
       ) : null}
       <nav className="pagination" aria-label="Diagnostic pages">
         {after ? (
-          <Link
-            href={`/dashboard/workspaces/${workspaceId}/daily-diagnostics`}
-          >
+          <Link href={`/dashboard/workspaces/${workspaceId}/daily-diagnostics`}>
             First page
           </Link>
         ) : null}
@@ -103,9 +108,10 @@ export default async function DueDiagnosticsPage({
         ) : null}
       </nav>
       <p className="muted">
-        Remaining execution gates: {report.data.requires_execution_gates.join(", ")}.
-        This report does not verify provider availability, source rights,
-        credentials, spend authorization, scheduled execution or launch.
+        Remaining execution gates:{" "}
+        {report.data.requires_execution_gates.join(", ")}. This report does not
+        verify provider availability, source rights, credentials, spend
+        authorization, scheduled execution or launch.
       </p>
     </>
   );
