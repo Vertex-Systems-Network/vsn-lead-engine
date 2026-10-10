@@ -10,6 +10,7 @@ from core.form_context import (
     SubmitFormContext,
 )
 from core.login_security import ProtectedLoginView
+from core.member_role_page import member_role_change_page
 from core.password_reset import urlpatterns as password_reset_urls
 from core.signup import sign_up_page
 from django.contrib.auth import views as auth_views
@@ -53,6 +54,11 @@ urlpatterns = [
     path("accounts/sign-out/", views.sign_out_page, name="sign-out-page"),
     path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("api/v1/workspaces/<uuid:workspace_id>/members/", views.MemberList.as_view()),
+    path(
+        "workspaces/<uuid:workspace_id>/members/<uuid:target_user_id>/role/",
+        member_role_change_page,
+        name="member-role-change-page",
+    ),
     path(
         "api/v1/workspaces/<uuid:workspace_id>/member-audit/",
         views.MemberAuditList.as_view(),

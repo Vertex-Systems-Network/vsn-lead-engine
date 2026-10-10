@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { backend } from "../../../../../lib/backend";
+import { backend, backendLink } from "../../../../../lib/backend";
 import { members, uuid, workspace } from "../../../../../lib/contracts";
 import { State } from "../../../../components/state";
 
@@ -45,8 +45,9 @@ export default async function MembersPage({
       </p>
       <p className="muted">
         Owners and administrators can review current workspace roles. This view
-        is read-only: invitations, removals and role changes are not available
-        from the Next dashboard.
+        lists verified member roles. Role changes require a separate signed and
+        CSRF-protected confirmation. Invitations and removals are unavailable
+        from this dashboard.
       </p>
       {result.data.results.length > 0 ? (
         <div className="table-scroll">
@@ -56,6 +57,7 @@ export default async function MembersPage({
               <tr>
                 <th scope="col">Member ID</th>
                 <th scope="col">Role</th>
+                <th scope="col">Admin action</th>
               </tr>
             </thead>
             <tbody>
@@ -65,6 +67,15 @@ export default async function MembersPage({
                     <code>{member.user_id}</code>
                   </th>
                   <td>{member.role}</td>
+                  <td>
+                    <a
+                      href={backendLink(
+                        `/workspaces/${workspaceId}/members/${member.user_id}/role/`,
+                      )}
+                    >
+                      Review role change
+                    </a>
+                  </td>
                 </tr>
               ))}
             </tbody>

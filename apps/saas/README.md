@@ -441,3 +441,7 @@ recurrence activation, next-month rollover or actual ability to deliver.
 ## M8 admin access audit review (2026-10-10)
 
 Authorized workspace owners and admins can review recorded membership role changes and removals at `GET /api/v1/workspaces/<uuid>/member-audit/?offset=0` or on the native Next member-audit screen. Entries show timestamp, actor/target UUIDs and previous/new role only; no emails, names, provider credentials or lead content are returned. Reads use existing session authentication, owner/admin checks and 25-row default offset pagination, with explicit no-store headers. No invite, role modification or member removal API is introduced by this view. It is an internal audit UI, not a certified external compliance log.
+
+## M8 confirmed member role changes (2026-10-10)
+
+Existing workspace owners and admins can open `/workspaces/<workspace-uuid>/members/<user-uuid>/role/` from the Next member list and explicitly confirm a new role. Django requires session login, CSRF, a one-hour actor/workspace/target/previous-role/audit-state-bound confirmation, and current authorization inside the workspace row lock. Stale/replayed claims fail with a 409; administrators cannot change owners or promote to owner; the final owner cannot be demoted. The established transactional role service appends a member audit record. GET and invalid requests never mutate. No email invitation, user removal, external identity integration, provider contact, billing or deployment is activated.
