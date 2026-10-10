@@ -55,9 +55,7 @@ def operational_health(actor, workspace_id):
             ),
         ),
         accepted=Count("pk", filter=Q(accepted_at__isnull=False)),
-        revoked=Count(
-            "pk", filter=Q(accepted_at__isnull=True, revoked_at__isnull=False)
-        ),
+        revoked=Count("pk", filter=Q(accepted_at__isnull=True, revoked_at__isnull=False)),
         expired=Count(
             "pk",
             filter=Q(
