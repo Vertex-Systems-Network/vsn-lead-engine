@@ -55,9 +55,8 @@ export function dailyPlans(v: unknown): v is DailyPlans {
   )
     return false;
   return (
-    new Set(
-      v.results.map((row: unknown) => (object(row) ? row.id : null)),
-    ).size === v.results.length &&
+    new Set(v.results.map((row: unknown) => (object(row) ? row.id : null)))
+      .size === v.results.length &&
     v.results.every(
       (row: unknown) =>
         object(row) &&
