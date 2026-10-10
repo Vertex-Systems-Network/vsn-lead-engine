@@ -123,7 +123,15 @@ class MemberRoleChangePageTests(TestCase):
             400,
         )
         self.assertEqual(self.client.get(self.path + "?role=owner").status_code, 400)
-        self.assertEqual(self.client.put(self.path, {}).status_code, 405)
+        self.assertEqual(
+            self.client.put(
+                self.path,
+                {},
+                content_type="application/json",
+                HTTP_X_CSRFTOKEN=body["csrfmiddlewaretoken"],
+            ).status_code,
+            405,
+        )
         change_membership(self.owner, self.workspace.id, self.member.id, role="viewer")
         change_membership(self.owner, self.workspace.id, self.member.id, role="member")
         self.assertEqual(self.client.post(self.path, body).status_code, 409)
