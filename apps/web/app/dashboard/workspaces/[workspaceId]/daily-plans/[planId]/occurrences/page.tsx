@@ -64,7 +64,9 @@ export default async function DailyOccurrenceHistoryPage({
       {history.data.results.length ? (
         <div className="table-scroll">
           <table>
-            <caption>Recorded daily occurrences (newest local dates first)</caption>
+            <caption>
+              Recorded daily occurrences (newest local dates first)
+            </caption>
             <thead>
               <tr>
                 <th scope="col">Local date</th>
