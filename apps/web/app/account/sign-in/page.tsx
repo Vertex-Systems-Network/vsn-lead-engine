@@ -53,6 +53,11 @@ export default async function SignIn({
           <button className="button" type="submit">
             Sign in
           </button>
+          <p>
+            <a href={backendLink("/accounts/password-reset/")}>
+              Forgot your password?
+            </a>
+          </p>
           {result.data.signup_enabled ? (
             <p>
               New here? <Link href="/account/sign-up">Create an account</Link>

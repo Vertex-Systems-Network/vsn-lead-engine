@@ -3,5 +3,6 @@
 <body><main><h1>Sign in</h1><p>Development preview. Lead collection and billing are unavailable.</p>
 {% if login_limited %}<p role="alert">Too many sign-in attempts. Please try again in 15 minutes.</p>{% endif %}
 <form method="post">{% csrf_token %}{{ form.as_p }}<input type="hidden" name="next" value="{{ next }}"><button type="submit">Sign in</button></form>
+<p><a href="/accounts/password-reset/">Forgot your password?</a></p>
 {% if signup_enabled %}<p><a href="/accounts/sign-up/">Create an account</a></p>{% endif %}
 </main></body></html>

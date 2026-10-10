@@ -18,11 +18,18 @@ NOTICES = {"invalid", "taken", "limited"}
 
 
 class SignUpForm(UserCreationForm):
+    email = forms.EmailField(max_length=254, help_text="Used for password reset.")
     workspace_name = forms.CharField(max_length=120, required=False)
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ("username",)
+        fields = ("username", "email")
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("An account already uses this email address.")
+        return email
 
 
 def native_signup(request):
@@ -69,10 +76,12 @@ def sign_up_page(request):
     form = SignUpForm(request.POST)
     if not form.is_valid():
         if native:
+            username = request.POST.get("username", "")
+            email = request.POST.get("email", "").strip()
             taken = (
                 "username" in form.errors
-                and User.objects.filter(username__iexact=request.POST.get("username", "")).exists()
-            )
+                and User.objects.filter(username__iexact=username).exists()
+            ) or ("email" in form.errors and User.objects.filter(email__iexact=email).exists())
             return HttpResponseRedirect(sign_up_return("taken" if taken else "invalid"), status=303)
         return render(request, "registration/sign_up.html", {"form": form}, status=400)
     user = register(form)

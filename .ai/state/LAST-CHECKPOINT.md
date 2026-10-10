@@ -15,7 +15,7 @@
 
 ## Not Verified
 
-- Jobs are now fulfilled by `manage.py run_jobs`, but only against the synthetic `local-fixture` source with the DEBUG-only local signer; customers can sign up, submit and receive real Overture leads (live-verified on main); nothing is deployed yet and there is no email verification or password reset.
+- Jobs are now fulfilled by `manage.py run_jobs`, but only against the synthetic `local-fixture` source with the DEBUG-only local signer; customers can sign up, submit and receive real Overture leads (live-verified on main); nothing is deployed yet; password reset exists, separate email-address verification does not.
 - Latest retained production quota is 6,855 / 12,000 on 2026-10-04; no newer observation and no root cause recorded for the shortfall.
 - Live payments, signup/recovery, browser/WCAG, privacy/source rights, deployment and launch remain open external or later gates.
 - Distributed runtime/Supervisor identity unverified; no work after an invocation ends is claimed.
@@ -33,5 +33,5 @@ Owner direction (2026-10-10): finish the SaaS platform first; do not work on the
 1. Done: customer Submit job button/view (`/workspaces/<id>/jobs/<job>/submit/`).
 2. Done: self-service sign-up with owned workspace and starter allowance (`/accounts/sign-up/`).
 3. Job progress UI (queued → running → completed/failed) and a 25-lead-per-job explanation.
-4. Done: Overture source adapter (`core.sources.OvertureSource`, live check via the manual `SaaS Overture Smoke` workflow). Done: non-DEBUG signer via `SAAS_FULFILMENT_KEYS_FILE`. Next: email verification/password reset, then deployment once the owner picks hosting.
+4. Done: Overture source adapter (`core.sources.OvertureSource`, live check via the manual `SaaS Overture Smoke` workflow). Done: non-DEBUG signer via `SAAS_FULFILMENT_KEYS_FILE`. Done: password reset with required sign-up email. Next: job auto-refresh, then deployment once the owner picks hosting and an SMTP sender.
 5. Fold README/state corrections into code PRs. Do not replay merged mutations.

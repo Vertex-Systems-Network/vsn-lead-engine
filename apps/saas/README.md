@@ -21,6 +21,7 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 
 - `/health/`: liveness and explicit disabled provider dispatch; no credentials/database details.
 - `/accounts/sign-up/`: self-service account creation (rate-limited with the login buckets); creates an owned workspace and, when `SAAS_STARTER_ENTITLEMENT` is set, a starter allowance. On by default only with `SAAS_DEBUG=1`; production needs `SAAS_SIGNUP_ENABLED=1`.
+- `/accounts/password-reset/`: email reset link (Django one-time, 1-hour tokens); same response for unknown addresses; rate-limited per address and IP. Console email in debug; set `SAAS_EMAIL_HOST`, `SAAS_EMAIL_PORT`, `SAAS_EMAIL_USER`, `SAAS_EMAIL_PASSWORD` and `SAAS_FROM_EMAIL` for SMTP.
 - `/accounts/login/`, `/accounts/logout/`: Django same-origin sessions; CSRF-protected forms and POST logout.
 - `/`: authenticated workspace overview, with links to read-only workspace usage.
 - `/workspaces/{workspace_id}/sources/`: bounded read-only application policy configuration, without rights/availability claims.
