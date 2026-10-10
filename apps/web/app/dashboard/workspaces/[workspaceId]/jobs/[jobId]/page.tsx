@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { backend } from "../../../../../../lib/backend";
+import { backend, backendLink } from "../../../../../../lib/backend";
 import { job, uuid } from "../../../../../../lib/contracts";
 import { AutoRefresh } from "../../../../../components/auto-refresh";
 import { State } from "../../../../../components/state";
@@ -51,6 +51,17 @@ export default async function Detail({
             >
               Submit job
             </Link>
+          </p>
+        ) : null}
+        {j.status === "draft" ? (
+          <p>
+            <a
+              href={backendLink(
+                `/workspaces/${workspaceId}/jobs/${jobId}/daily-plan/`,
+              )}
+            >
+              Save a disabled daily plan
+            </a>
           </p>
         ) : null}
         {["queued", "running"].includes(j.status) ? (
