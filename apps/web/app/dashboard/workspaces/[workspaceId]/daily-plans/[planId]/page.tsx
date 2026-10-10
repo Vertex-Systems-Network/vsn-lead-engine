@@ -47,6 +47,11 @@ export default async function DailyPlanDetailPage({
         contact a source or charge a customer. Source permissions and coverage
         must be verified separately before any execution.
       </p>
+      <p>
+        <Link href={`/dashboard/workspaces/${workspaceId}/daily-plans/${planId}/readiness`}>
+          Review internal source readiness (admins)
+        </Link>
+      </p>
       <section className="card">
         <h2>Saved local time</h2>
         <dl>
