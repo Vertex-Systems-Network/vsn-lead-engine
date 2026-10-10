@@ -9,6 +9,7 @@ import {
   counterNames,
   jobStates,
   jobState,
+  jobStatusSummary,
 } from "../../../../lib/contracts";
 import { State } from "../../../components/state";
 export default async function Workspace({
@@ -29,14 +30,18 @@ export default async function Workspace({
   if (selected) query.set("status", selected);
   if (after) query.set("after", after);
   const base = `/api/v1/workspaces/${workspaceId}/`;
-  const [history, counters, identity] = await Promise.all([
+  const [history, counters, identity, summary] = await Promise.all([
     backend(`${base}jobs/${query.size ? `?${query}` : ""}`, jobs),
     backend(`${base}usage/`, usage),
     backend(base, workspace),
+    backend(`${base}job-summary/`, jobStatusSummary),
   ]);
   if (identity.kind !== "ok") return <State kind={identity.kind} />;
   if (identity.data.id !== workspaceId) return <State kind="unavailable" />;
   if (history.kind !== "ok") return <State kind={history.kind} />;
+  if (summary.kind !== "ok") return <State kind={summary.kind} />;
+  if (summary.data.workspace_id !== workspaceId)
+    return <State kind="unavailable" />;
   if (
     history.data.results.some(
       (j) =>
@@ -117,6 +122,26 @@ export default async function Workspace({
       ) : (
         <p>Usage is currently unavailable.</p>
       )}
+      <section aria-labelledby="job-status-summary-title">
+        <h2 id="job-status-summary-title">Job status summary</h2>
+        <p className="muted">
+          {summary.data.total} saved searches across all pages. These counts are
+          job states, not accepted leads or a guaranteed collection volume.
+        </p>
+        <div className="grid">
+          {jobStates.map((state) => (
+            <article className="card" key={state}>
+              <h3>{state.replaceAll("_", " ")}</h3>
+              <p>
+                <strong>{summary.data.statuses[state]}</strong> jobs
+              </p>
+              <Link href={`?status=${state}`}>
+                View {state} jobs
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
       <h2>Saved searches</h2>
       <form
         className="actions"
