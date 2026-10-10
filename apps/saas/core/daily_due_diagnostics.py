@@ -49,8 +49,11 @@ def due_plan_diagnostics(actor, workspace_id, *, now=None, limit=25, after=None)
         .values_list("user_id", "role")
     )
     materialized = set(
-        ScheduleOccurrence.objects.filter(schedule_id__in=[p.id for p in selected])
-        .values_list("schedule_id", "local_date")
+        ScheduleOccurrence.objects.filter(
+            schedule_id__in=[p.id for p in selected],
+            local_date__gte=instant_now.date() - timedelta(days=8),
+            local_date__lte=instant_now.date() + timedelta(days=2),
+        ).values_list("schedule_id", "local_date")
     )
     results = []
     for plan in selected:
