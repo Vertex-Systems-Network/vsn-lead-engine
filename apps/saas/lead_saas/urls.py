@@ -57,6 +57,11 @@ urlpatterns = [
         "api/v1/workspaces/<uuid:workspace_id>/members/<uuid:user_id>/",
         views.MemberDetail.as_view(),
     ),
+    path(
+        "workspaces/<uuid:workspace_id>/schedule-preview/",
+        views.daily_time_preview_page,
+        name="daily-time-preview-page",
+    ),
     path("workspaces/<uuid:workspace_id>/usage/", views.usage_page, name="usage-page"),
     path("api/v1/workspaces/<uuid:workspace_id>/usage/", views.UsageDetail.as_view()),
     path(
