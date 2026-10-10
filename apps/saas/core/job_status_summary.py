@@ -12,9 +12,7 @@ def job_status_snapshot(user, workspace_id):
     membership_for(user, workspace_id)
     counts = dict.fromkeys(JOB_STATES, 0)
     for row in (
-        Job.objects.filter(workspace_id=workspace_id)
-        .values("status")
-        .annotate(number=Count("id"))
+        Job.objects.filter(workspace_id=workspace_id).values("status").annotate(number=Count("id"))
     ):
         counts[row["status"]] = row["number"]
     return {
