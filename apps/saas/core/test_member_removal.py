@@ -47,9 +47,15 @@ class MemberRemovalPageTests(TestCase):
         result = self.client.post(self.path, claim)
         self.assertEqual(result.status_code, 200)
         self.assertContains(result, "Workspace member removed")
-        self.assertFalse(Membership.objects.filter(workspace=self.workspace, user=self.member).exists())
-        self.assertTrue(Membership.objects.filter(workspace=self.workspace, user=self.owner).exists())
-        self.assertTrue(Membership.objects.filter(workspace=self.workspace, user=self.admin).exists())
+        self.assertFalse(
+            Membership.objects.filter(workspace=self.workspace, user=self.member).exists()
+        )
+        self.assertTrue(
+            Membership.objects.filter(workspace=self.workspace, user=self.owner).exists()
+        )
+        self.assertTrue(
+            Membership.objects.filter(workspace=self.workspace, user=self.admin).exists()
+        )
         audit = MembershipAudit.objects.get()
         self.assertEqual(audit.action, "removed")
         self.assertEqual(audit.actor_id, self.owner.id)
@@ -65,7 +71,9 @@ class MemberRemovalPageTests(TestCase):
         owner_path = f"/workspaces/{self.workspace.id}/members/{self.owner.id}/remove/"
         self.client.force_login(self.admin)
         self.assertEqual(self.client.get(owner_path).status_code, 403)
-        self.assertTrue(Membership.objects.filter(workspace=self.workspace, user=self.owner).exists())
+        self.assertTrue(
+            Membership.objects.filter(workspace=self.workspace, user=self.owner).exists()
+        )
 
     def test_last_owner_and_unconfirmed_removals_are_blocked(self):
         path = f"/workspaces/{self.workspace.id}/members/{self.owner.id}/remove/"
@@ -96,8 +104,12 @@ class MemberRemovalPageTests(TestCase):
         )
         claim = self.confirmation()
         self.assertEqual(self.client.get(self.path + "?override=true").status_code, 400)
-        self.assertEqual(self.client.post(self.path, {**claim, "delete_account": "yes"}).status_code, 400)
-        self.assertEqual(self.client.post(self.path, {**claim, "removal_token": "forged"}).status_code, 400)
+        self.assertEqual(
+            self.client.post(self.path, {**claim, "delete_account": "yes"}).status_code, 400
+        )
+        self.assertEqual(
+            self.client.post(self.path, {**claim, "removal_token": "forged"}).status_code, 400
+        )
         self.assertEqual(
             self.client.put(
                 self.path,
