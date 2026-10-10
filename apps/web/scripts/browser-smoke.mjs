@@ -151,6 +151,9 @@ async function run(origin) {
     await cdp.send("Emulation.setEmulatedMedia", {
       features: [{ name: "prefers-reduced-motion", value: "reduce" }],
     });
+    let peakBytes = 0;
+    let peakRequests = 0;
+    let contrastSamples = 0;
     for (const width of viewports) {
       await cdp.send("Emulation.setDeviceMetricsOverride", {
         width,
@@ -193,6 +196,89 @@ async function run(origin) {
               document.documentElement.innerHTML.includes("synthetic-next-owner"),
           };
         })()`);
+        // Deterministic byte/request envelope and computed visual contrast.
+        // Do not gate CI on wall-clock paint timing on variable runner hardware.
+        const quality = await cdp.js(`(() => {
+          const resources = performance.getEntriesByType("resource");
+          const documentTransfer = performance.getEntriesByType("navigation")[0]?.transferSize || 0;
+          const bytes = documentTransfer + resources.reduce(
+            (sum, item) => sum + item.transferSize, 0
+          );
+          const parseColor = (color) => {
+            if (!/^rgba?\\(/.test(color)) return null;
+            const matches = color.match(/[\\d.]+/g);
+            if (!matches || matches.length < 3) return null;
+            const values = matches.map(Number);
+            return {
+              rgb: values.slice(0, 3),
+              alpha: values.length === 4 ? values[3] : 1,
+            };
+          };
+          const backgroundOf = (element) => {
+            for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
+              const value = parseColor(getComputedStyle(ancestor).backgroundColor);
+              if (value && value.alpha === 1) return value.rgb;
+            }
+            return [255, 255, 255];
+          };
+          const lightness = (rgb) => {
+            const channels = rgb.map((value) => {
+              const normalized = value / 255;
+              return normalized <= 0.04045
+                ? normalized / 12.92
+                : ((normalized + 0.055) / 1.055) ** 2.4;
+            });
+            return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+          };
+          const contrast = (one, two) => {
+            const a = lightness(one);
+            const b = lightness(two);
+            return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+          };
+          const samples = [
+            ".marketing-lead",
+            ".marketing-kicker",
+            ".marketing-disclosure",
+            ".marketing-card p",
+            ".marketing-tag",
+            ".marketing-tag-built",
+            ".faq-list summary",
+            ".faq-list details p",
+          ].flatMap((selector) =>
+            [...document.querySelectorAll(selector)].filter((node) =>
+              node.getClientRects().length > 0
+            ).map((node) => {
+              const foreground = parseColor(getComputedStyle(node).color);
+              return {
+                selector,
+                value: foreground ? contrast(foreground.rgb, backgroundOf(node)) : 0,
+              };
+            })
+          );
+          return {
+            bytes,
+            requests: resources.length + 1,
+            samples,
+          };
+        })()`);
+        peakBytes = Math.max(peakBytes, quality.bytes);
+        peakRequests = Math.max(peakRequests, quality.requests);
+        contrastSamples += quality.samples.length;
+        assert.ok(
+          quality.bytes <= 4 * 1024 * 1024,
+          `Page-weight regression ${path} ${width}px: ${quality.bytes} bytes`,
+        );
+        assert.ok(
+          quality.requests <= 100,
+          `First-party request regression ${path} ${width}px: ${quality.requests} requests`,
+        );
+        assert.ok(quality.samples.length >= 2, `Missing readability samples: ${path}`);
+        for (const sample of quality.samples) {
+          assert.ok(
+            sample.value >= 4.5,
+            `Text contrast regression ${path} ${width}px ${sample.selector}: ${sample.value.toFixed(2)}:1`,
+          );
+        }
         assert.ok(
           measured.scrollWidth <= measured.width + 1,
           `Horizontal overflow ${path} ${width}px: ${JSON.stringify(measured)}`,
@@ -276,7 +362,7 @@ async function run(origin) {
     });
     assert.deepEqual(remote, [], "Anonymous marketing must not contact external origins.");
     console.log(
-      `PASS: ${viewports.length * paths.length} Chromium page/viewport checks; skip-link keyboard, FAQ click/focus, reduced motion, no overflow, zero external requests and no private markers`,
+      `PASS: ${viewports.length * paths.length} Chromium page/viewport checks; skip-link keyboard, FAQ click/focus, reduced motion, no overflow, zero external requests and no private markers; ${contrastSamples} text-contrast samples >=4.5:1; max ${peakRequests} first-party requests, ${(peakBytes / 1024 / 1024).toFixed(2)} MiB transfer`,
     );
   } finally {
     if (ws) ws.close();
