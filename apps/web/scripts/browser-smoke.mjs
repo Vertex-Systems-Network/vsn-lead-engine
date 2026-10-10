@@ -370,11 +370,13 @@ async function run(origin) {
     // Disposable test-only Django session: no login to external services, no
     // real credentials, and never expose the cookie in arguments or logs.
     const privateSession = process.env.VSN_BROWSER_SMOKE_SESSION;
+    const privateCsrf = process.env.VSN_BROWSER_SMOKE_CSRF;
     const ownWorkspace = process.env.VSN_BROWSER_SMOKE_OWN_WORKSPACE;
     const foreignWorkspace = process.env.VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE;
     const ownJob = process.env.VSN_BROWSER_SMOKE_OWN_JOB;
     const privateValues = [
       privateSession,
+      privateCsrf,
       ownWorkspace,
       foreignWorkspace,
       ownJob,
@@ -450,6 +452,15 @@ async function run(origin) {
           secure: false,
         });
         assert.equal(cookie.success, true, "Synthetic session cookie could not be set.");
+        const csrfCookie = await cdp.send("Network.setCookie", {
+          name: "csrftoken",
+          value: privateCsrf,
+          url: target.origin,
+          httpOnly: false,
+          sameSite: "Lax",
+          secure: false,
+        });
+        assert.equal(csrfCookie.success, true, "Real test CSRF cookie could not be set.");
         await inspectPrivate("/dashboard", "Workspaces", [
           "Foreign private marker",
         ]);
