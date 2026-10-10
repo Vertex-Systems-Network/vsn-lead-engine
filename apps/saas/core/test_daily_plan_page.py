@@ -1,8 +1,6 @@
 """Browser daily plans are disabled, CSRF-protected and source-draft bound."""
 
 from django.test import Client, TestCase
-from rest_framework.exceptions import ValidationError
-
 from .daily_plan_forms import new_daily_plan_token
 from .models import DailySchedule, Job, Membership, ScheduleOccurrence, User
 from .serializers import SearchSerializer
