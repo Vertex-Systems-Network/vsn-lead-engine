@@ -218,12 +218,19 @@ async function run(origin) {
         }
         if (path === "/faq") {
           await cdp.js('document.querySelector("details summary").focus()');
-          await cdp.key("Enter", "Enter", 13);
           assert.equal(
-            await cdp.js('document.querySelector("details").open'),
+            await cdp.js('document.activeElement?.tagName === "SUMMARY"'),
             true,
-            `${width}px FAQ Enter must disclose answer`,
+            `${width}px FAQ summary must accept keyboard focus`,
           );
+          await cdp.key("Enter", "Enter", 13);
+          let expanded = false;
+          for (let i = 0; i < 20; i++) {
+            expanded = await cdp.js('document.querySelector("details").open');
+            if (expanded) break;
+            await delay(50);
+          }
+          assert.equal(expanded, true, `${width}px FAQ Enter must disclose answer`);
         }
       }
     }
