@@ -240,6 +240,29 @@ def main():
                 for destination in PUBLIC_NAVIGATION_DESTINATIONS:
                     destination_html, _ = read(destination, False)
                     assert '<main id="main"' in destination_html, destination
+                # Unknown public routes are real HTTP 404s and never expose
+                # tenant state or force anonymous visitors into private flows.
+                for with_session in (False, True):
+                    try:
+                        read("/no-such-marketing-page-404", with_session)
+                        raise AssertionError("Unknown public page must return HTTP 404")
+                    except HTTPError as exc:
+                        assert exc.code == 404
+                        missing_page = exc.read().decode()
+                    assert "This page is unavailable." in missing_page
+                    assert 'href="/"' in missing_page
+                    assert 'href="/capabilities"' in missing_page
+                    assert 'href="/faq"' in missing_page
+                    assert "Foreign private marker" not in missing_page
+                    assert "Synthetic &lt;workspace&gt;" not in missing_page
+                    assert "noindex" in missing_page
+                    missing_document = PublicMarketingContract()
+                    missing_document.feed(missing_page)
+                    assert missing_document.h1_count == 1
+                    assert missing_document.anchors.count("#main") == 1
+                    assert missing_document.main_elements == [
+                        {"id": "main", "tabindex": "-1", "aria-label": "Main content"}
+                    ]
                 homepage, _ = read("/", False)
                 assert 'href="/account/sign-in"' in homepage
                 assert "No result" in homepage and "guaranteed" in homepage
