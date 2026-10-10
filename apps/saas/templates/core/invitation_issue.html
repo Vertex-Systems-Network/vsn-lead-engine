@@ -1,0 +1,39 @@
+{% extends "core/job_base.html" %}
+{% block title %}Invite existing account{% endblock %}
+{% block content %}
+<h1>Invite an existing account — {{ workspace.name }}</h1>
+<p>Only existing, active VSN Lead Engine accounts can accept a code. No new
+account is created and no email, SMS or other provider is contacted. Share the
+code privately with the intended person and ask them to sign in first.
+Codes expire in 24 hours and can be used once. No owner role can be invited.</p>
+{% if invitation %}
+<section role="status" aria-label="Private invitation issued">
+<h2>One-time invitation code issued</h2>
+<p>Target account: <code>{{ invitation.target.username }}</code>. Role:
+<strong>{{ invitation.role }}</strong>.</p>
+<p><strong>Copy this code now. It will not be shown again.</strong></p>
+<pre><code>{{ code }}</code></pre>
+<p>Recipient must sign in to their existing account and visit
+<a href="{% url 'invitation-redeem-page' %}">the invitation acceptance form</a>.
+This code is not sent automatically.</p>
+</section>
+{% elif form %}
+<form method="post" action="{% url 'invitation-issue-page' workspace.id %}">
+{% csrf_token %}
+{{ form.confirmation_token }}
+{% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
+<div class="form-field">
+<label for="{{ form.username.id_for_label }}">Exact existing account username</label>
+{{ form.username }}
+{% if form.username.errors %}<div role="alert">{{ form.username.errors }}</div>{% endif %}
+</div>
+<div class="form-field">
+<label for="{{ form.role.id_for_label }}">Proposed workspace role</label>
+{{ form.role }}
+{% if form.role.errors %}<div role="alert">{{ form.role.errors }}</div>{% endif %}
+</div>
+<button type="submit">Issue private one-time code</button>
+</form>
+{% endif %}
+<p><a href="/dashboard/workspaces/{{ workspace.id }}/members">Back to members</a></p>
+{% endblock %}

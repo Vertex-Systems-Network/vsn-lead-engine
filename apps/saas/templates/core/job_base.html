@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">{% block head %}{% endblock %}<title>{% block title %}Jobs{% endblock %} — {{ workspace.name }} — VSN Lead Engine</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">{% block head %}{% endblock %}<title>{% block title %}Jobs{% endblock %}{% if workspace %} — {{ workspace.name }}{% endif %} — VSN Lead Engine</title>
 <style>
 body{margin:0;color:#17212b;background:#fff;font-family:system-ui,sans-serif;line-height:1.5}main{max-width:68rem;margin:auto;padding:1rem;overflow-wrap:anywhere}a{color:#174e96}a:focus-visible,button:focus-visible{outline:3px solid #174e96;outline-offset:3px}a,button{display:inline-block;min-height:24px}nav{display:flex;gap:1rem;flex-wrap:wrap}table{border-collapse:collapse;width:100%}caption{text-align:left;font-weight:600}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #c6cdd4;vertical-align:top}th{color:#17212b}button{font:inherit;padding:.4rem .8rem}.table-scroll{overflow-x:auto}.table-scroll:focus-visible{outline:3px solid #174e96}input,textarea{font:inherit;max-width:100%;box-sizing:border-box}textarea{width:100%}.form-field{margin-bottom:1.25rem}fieldset{min-width:0}.errorlist{color:#8c1515}input:focus-visible,textarea:focus-visible{outline:3px solid #174e96;outline-offset:3px}dt{font-weight:600}dd{margin:0 0 1rem}form{margin-top:1.5rem}
 </style></head><body><main>
-<nav aria-label="Workspace"><a href="/">Your workspaces</a><a href="{% url 'job-history-page' workspace.id %}">Jobs</a><a href="{% url 'usage-page' workspace.id %}">Usage</a><a href="{% url 'source-preview-page' workspace.id %}">Sources</a><a href="{% url 'daily-time-preview-page' workspace.id %}">Daily time preview</a></nav>
+<nav aria-label="Workspace"><a href="/">Your workspaces</a>{% if workspace %}<a href="{% url 'job-history-page' workspace.id %}">Jobs</a><a href="{% url 'usage-page' workspace.id %}">Usage</a><a href="{% url 'source-preview-page' workspace.id %}">Sources</a><a href="{% url 'daily-time-preview-page' workspace.id %}">Daily time preview</a>{% endif %}</nav>
 {% block content %}{% endblock %}
 <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit">Sign out</button></form>
 </main></body></html>
