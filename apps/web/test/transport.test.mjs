@@ -518,3 +518,41 @@ test("workspace identity route accepts only an exact session-bound GET path", as
   );
   assert.equal(anonymous.kind, "signin");
 });
+
+test("job summary uses a single exact session-only read and refuses query mutation", async () => {
+  const id = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const path = `/api/v1/workspaces/${id}/job-summary/`;
+  const response = await readBackend(
+    "http://localhost:8000",
+    path,
+    session,
+    async (url, options) => {
+      assert.equal(url.pathname, path);
+      assert.deepEqual(options.headers, {
+        Accept: "application/json",
+        Cookie: `sessionid=${session}`,
+      });
+      assert.equal(options.cache, "no-store");
+      assert.equal(options.redirect, "manual");
+      return new Response('{"workspace_id":"' + id + '","total":0,"statuses":{}}', {
+        headers: {"content-type":"application/json"},
+      });
+    },
+  );
+  assert.equal(response.kind, "ok");
+  for (const invalid of [
+    `${path}?status=completed`,
+    `${path}?page=2`,
+    `${path}?target=https://evil.example`,
+    `${path}../jobs/`,
+  ]) {
+    await assert.rejects(readBackend("http://localhost:8000", invalid, session));
+  }
+  const anonymous = await readBackend(
+    "http://localhost:8000",
+    path,
+    undefined,
+    () => { throw new Error("An anonymous summary must not reach Django"); },
+  );
+  assert.equal(anonymous.kind, "signin");
+});
