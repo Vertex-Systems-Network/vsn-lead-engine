@@ -2,14 +2,15 @@
 
 Production verifier registries stay empty. These keys exist only when
 SAAS_LOCAL_FULFILMENT=1 with SAAS_DEBUG=1, are derived from SECRET_KEY, and are
-registered for the single source code below, so they can never attest a real
-provider's results.
+registered only for the source codes below.
 """
 
 import hashlib
 import hmac
 
 SOURCE_CODE = "local-fixture"
+OVERTURE = "overture"
+LOCAL_SOURCES = (SOURCE_CODE, OVERTURE)
 ROLES = ("candidate", "acceptance", "dedupe", "receipt")
 NAMESPACE_PREFIX = "saas-results/v1/"
 
@@ -41,8 +42,10 @@ def verifier_settings(secret_key):
     keys = derived_keys(secret_key)
     return {
         "SAAS_LOCAL_SIGNER_KEYS": keys,
-        "SAAS_RESULT_VERIFIERS": {SOURCE_CODE: {"local-candidate": keys["candidate"]}},
-        "SAAS_ACCEPTANCE_VERIFIERS": {SOURCE_CODE: {"local-acceptance": keys["acceptance"]}},
+        "SAAS_RESULT_VERIFIERS": {c: {"local-candidate": keys["candidate"]} for c in LOCAL_SOURCES},
+        "SAAS_ACCEPTANCE_VERIFIERS": {
+            c: {"local-acceptance": keys["acceptance"]} for c in LOCAL_SOURCES
+        },
         "SAAS_DEDUPE_VERIFIERS": NamespaceKeys(keys["dedupe"]),
-        "SAAS_RECEIPT_VERIFIERS": {SOURCE_CODE: {"local-receipt": keys["receipt"]}},
+        "SAAS_RECEIPT_VERIFIERS": {c: {"local-receipt": keys["receipt"]} for c in LOCAL_SOURCES},
     }
