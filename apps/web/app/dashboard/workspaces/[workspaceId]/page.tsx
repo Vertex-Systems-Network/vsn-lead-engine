@@ -4,6 +4,7 @@ import { backend } from "../../../../lib/backend";
 import {
   jobs,
   usage,
+  workspace,
   uuid,
   counterNames,
   jobStates,
@@ -28,10 +29,13 @@ export default async function Workspace({
   if (selected) query.set("status", selected);
   if (after) query.set("after", after);
   const base = `/api/v1/workspaces/${workspaceId}/`;
-  const [history, counters] = await Promise.all([
+  const [history, counters, identity] = await Promise.all([
     backend(`${base}jobs/${query.size ? `?${query}` : ""}`, jobs),
     backend(`${base}usage/`, usage),
+    backend(base, workspace),
   ]);
+  if (identity.kind !== "ok") return <State kind={identity.kind} />;
+  if (identity.data.id !== workspaceId) return <State kind="unavailable" />;
   if (history.kind !== "ok") return <State kind={history.kind} />;
   if (
     history.data.results.some(
@@ -44,6 +48,10 @@ export default async function Workspace({
     <>
       <Link href="/dashboard">← Workspaces</Link>
       <h1>Workspace overview</h1>
+      <p className="muted">
+        Active workspace: <strong>{identity.data.name}</strong> ·{" "}
+        {identity.data.timezone}
+      </p>
       <div className="actions">
         <Link
           className="button"
