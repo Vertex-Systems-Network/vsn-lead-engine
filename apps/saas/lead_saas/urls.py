@@ -1,4 +1,5 @@
 from core import views
+from core.admin_health_page import admin_operational_health_page
 from core.account_forms import sign_in_form, start_sign_in
 from core.export_forms import ExportFormContext, confirmed_export
 from core.export_history import ExportReceiptList
@@ -62,6 +63,11 @@ urlpatterns = [
         "workspaces/<uuid:workspace_id>/search-assistance/",
         search_assistance_page,
         name="search-assistance-page",
+    ),
+    path(
+        "workspaces/<uuid:workspace_id>/admin/health/",
+        admin_operational_health_page,
+        name="admin-operational-health-page",
     ),
     path("api/v1/account/sign-in-form/", sign_in_form),
     path("accounts/login/", ProtectedLoginView.as_view()),
