@@ -6,7 +6,6 @@ open provider connections, or mutate schedule state. All findings are advisory.
 
 from datetime import UTC, timedelta
 from uuid import UUID
-from zoneinfo import ZoneInfo
 
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
