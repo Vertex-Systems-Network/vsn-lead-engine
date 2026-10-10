@@ -263,9 +263,9 @@ class MemberAuditList(generics.ListAPIView):
             raise PermissionDenied("Only workspace owners and admins can review access history.")
         if set(self.request.query_params) - {"offset"}:
             raise ValidationError("Member audit only accepts offset pagination.")
-        return MembershipAudit.objects.filter(
-            workspace_id=self.kwargs["workspace_id"]
-        ).order_by("-created_at", "-id")
+        return MembershipAudit.objects.filter(workspace_id=self.kwargs["workspace_id"]).order_by(
+            "-created_at", "-id"
+        )
 
 
 class MemberDetail(APIView):
