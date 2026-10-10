@@ -29,6 +29,8 @@ export default async function DailyPlanReadinessPage({
   )
     return <State kind="unavailable" />;
   const passed = report.data.status === "internal_catalog_match_only";
+  const affordable = report.data.catch_up_budget_snapshot.affordable_due_job_candidates;
+  const deferred = report.data.catch_up_budget_snapshot.deferred_due_job_candidates;
   return (
     <>
       <Link href={`/dashboard/workspaces/${workspaceId}/daily-plans/${planId}`}>
@@ -125,8 +127,7 @@ export default async function DailyPlanReadinessPage({
         running scheduler. Disabled plans have no runnable due candidates, and
         already-recorded days are excluded.
       </p>
-      {report.data.catch_up_budget_snapshot.affordable_due_job_candidates ===
-      null ? (
+      {affordable === null ? (
         <p className="muted">
           Affordable catch-up estimate unavailable: an active entitlement and
           valid accounting window are required. No capacity is authorized.
@@ -134,15 +135,9 @@ export default async function DailyPlanReadinessPage({
       ) : (
         <p className="notice">
           Current simultaneous allowance covers at most{" "}
-          <strong>
-            {report.data.catch_up_budget_snapshot.affordable_due_job_candidates}
-          </strong>{" "}
-          hypothetical due jobs;{" "}
-          <strong>
-            {report.data.catch_up_budget_snapshot.deferred_due_job_candidates}
-          </strong>{" "}
-          would exceed this snapshot. This is not execution order,
-          a reservation or permission to start them.
+          <strong>{affordable}</strong> hypothetical due jobs;{" "}
+          <strong>{deferred}</strong> would exceed this snapshot. This is not an
+          execution order, reservation or permission to start them.
         </p>
       )}
       {report.data.catch_up_budget_snapshot.counters.length ? (
