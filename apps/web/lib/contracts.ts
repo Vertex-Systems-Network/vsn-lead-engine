@@ -72,13 +72,18 @@ export function dueDiagnostics(v: unknown): v is DueDiagnostics {
   )
     return false;
   if (
-    !["fresh_membership", "entitlement_capacity", "source_rights", "provider_credentials", "operator_release"].every(
-      (gate) => v.requires_execution_gates.includes(gate),
-    )
+    ![
+      "fresh_membership",
+      "entitlement_capacity",
+      "source_rights",
+      "provider_credentials",
+      "operator_release",
+    ].every((gate) => v.requires_execution_gates.includes(gate))
   )
     return false;
   return (
-    new Set(v.plans.map((p: unknown) => (object(p) ? p.id : null))).size === v.plans.length &&
+    new Set(v.plans.map((p: unknown) => (object(p) ? p.id : null))).size ===
+      v.plans.length &&
     v.plans.every(
       (p: unknown) =>
         object(p) &&
@@ -94,9 +99,12 @@ export function dueDiagnostics(v: unknown): v is DueDiagnostics {
             object(date) &&
             typeof date.local_date === "string" &&
             /^\d{4}-\d{2}-\d{2}$/.test(date.local_date) &&
-            ["normal", "gap_forward", "ambiguous_earlier", "skipped_day"].includes(
-              String(date.resolution),
-            ),
+            [
+              "normal",
+              "gap_forward",
+              "ambiguous_earlier",
+              "skipped_day",
+            ].includes(String(date.resolution)),
         ),
     )
   );
