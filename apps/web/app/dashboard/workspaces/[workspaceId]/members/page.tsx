@@ -19,7 +19,10 @@ export default async function MembersPage({
       ? Number(page)
       : 1;
   const [result, identity] = await Promise.all([
-    backend(`/api/v1/workspaces/${workspaceId}/members/?page=${current}`, members),
+    backend(
+      `/api/v1/workspaces/${workspaceId}/members/?page=${current}`,
+      members,
+    ),
     backend(`/api/v1/workspaces/${workspaceId}/`, workspace),
   ]);
   if (result.kind !== "ok") return <State kind={result.kind} />;
