@@ -101,6 +101,16 @@ class WorkspaceDetail(APIView):
 
 
 @method_decorator(never_cache, name="dispatch")
+class DailyPlanList(APIView):
+    """Read-only list; all membership and cursor checks run on the Django side."""
+
+    def get(self, request, workspace_id):
+        from .daily_plan_query import daily_plans_page
+
+        return Response(daily_plans_page(request.user, workspace_id, request.query_params))
+
+
+@method_decorator(never_cache, name="dispatch")
 class JobStatusSummary(APIView):
     """All-state totals for a single currently authorized workspace."""
 
