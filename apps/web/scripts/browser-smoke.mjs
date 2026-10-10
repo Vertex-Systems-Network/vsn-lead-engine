@@ -465,7 +465,7 @@ async function run(origin) {
         assert.ok(authorizedContent.includes("Synthetic bakery"));
         await inspectPrivate(
           `/dashboard/workspaces/${ownWorkspace}/jobs/${ownJob}`,
-          "Search",
+          "Saved search",
           ["Foreign private marker"],
         );
         await inspectPrivate(
