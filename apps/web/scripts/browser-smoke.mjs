@@ -29,8 +29,12 @@ class Devtools {
     this.socket = socket;
     this.id = 0;
     this.pending = new Map();
+    this.browserRequests = [];
     socket.addEventListener("message", (event) => {
       const message = JSON.parse(event.data);
+      if (message.method === "Network.requestWillBeSent") {
+        this.browserRequests.push(message.params.request.url);
+      }
       const target = this.pending.get(message.id);
       if (!target) return;
       clearTimeout(target.timeout);
@@ -141,6 +145,8 @@ async function run(origin) {
     const cdp = new Devtools(ws);
     await cdp.send("Page.enable");
     await cdp.send("Runtime.enable");
+    await cdp.send("Network.enable");
+    await cdp.send("Network.setCacheDisabled", { cacheDisabled: true });
     await cdp.send("Page.bringToFront");
     await cdp.send("Emulation.setEmulatedMedia", {
       features: [{ name: "prefers-reduced-motion", value: "reduce" }],
@@ -181,6 +187,10 @@ async function run(origin) {
             faqCount: document.querySelectorAll("details > summary").length,
             noindex: !!document.querySelector('meta[name="robots"][content*="noindex"]'),
             linkMotion: link ? getComputedStyle(link).transitionDuration : "none",
+            privateMarkerPresent:
+              document.documentElement.innerHTML.includes("Foreign private marker") ||
+              document.documentElement.innerHTML.includes("Synthetic &lt;workspace&gt;") ||
+              document.documentElement.innerHTML.includes("synthetic-next-owner"),
           };
         })()`);
         assert.ok(
@@ -196,6 +206,11 @@ async function run(origin) {
           `${path} FAQ`,
         );
         assert.ok(measured.noindex, `${path} noindex`);
+        assert.equal(
+          measured.privateMarkerPresent,
+          false,
+          `${path} ${width}px anonymous browser must not embed workspace markers`,
+        );
         if (path === "/") {
           assert.ok(
             ["0s", "0ms"].includes(measured.linkMotion),
@@ -253,8 +268,15 @@ async function run(origin) {
         }
       }
     }
+    // Fail closed if an anonymous page initiates ANY remote HTTP(S) or WS(S)
+    // request. Loopback-only Next static assets are the sole network authority.
+    const remote = cdp.browserRequests.filter((url) => {
+      if (!/^https?:|^wss?:/i.test(url)) return false;
+      return new URL(url).origin !== target.origin;
+    });
+    assert.deepEqual(remote, [], "Anonymous marketing must not contact external origins.");
     console.log(
-      `PASS: ${viewports.length * paths.length} real Chromium public page/viewport checks, skip-link keyboard, FAQ click/focus, reduced motion and horizontal overflow`,
+      `PASS: ${viewports.length * paths.length} Chromium page/viewport checks; skip-link keyboard, FAQ click/focus, reduced motion, no overflow, zero external requests and no private markers`,
     );
   } finally {
     if (ws) ws.close();
