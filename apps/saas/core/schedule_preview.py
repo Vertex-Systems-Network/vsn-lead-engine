@@ -1,6 +1,6 @@
 """Read-only daily local-time/DST preview. Never creates or enables a schedule."""
 
-from datetime import UTC, time, timedelta
+from datetime import UTC, timedelta
 from zoneinfo import ZoneInfo
 
 from django import forms
