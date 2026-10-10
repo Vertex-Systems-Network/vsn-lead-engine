@@ -6,17 +6,10 @@ on:
     paths:
       - "deploy/**"
       - ".dockerignore"
-      - "apps/saas/**"
-      - "apps/web/**"
-      - "requirements-runtime.txt"
-      - ".github/workflows/saas-staging-images.yml"
-  push:
-    branches: [main]
-    paths:
-      - "deploy/**"
-      - ".dockerignore"
-      - "apps/saas/**"
-      - "apps/web/**"
+      - "apps/saas/requirements.txt"
+      - "apps/web/package.json"
+      - "apps/web/package-lock.json"
+      - "apps/web/next.config.ts"
       - "requirements-runtime.txt"
       - ".github/workflows/saas-staging-images.yml"
   workflow_dispatch:
