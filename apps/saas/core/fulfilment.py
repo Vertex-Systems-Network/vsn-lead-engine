@@ -35,7 +35,9 @@ MAX_BATCH = 25
 def _keys():
     keys = settings.SAAS_LOCAL_SIGNER_KEYS
     if not keys:
-        raise ImproperlyConfigured("Job fulfilment requires SAAS_LOCAL_FULFILMENT=1.")
+        raise ImproperlyConfigured(
+            "Job fulfilment requires SAAS_LOCAL_FULFILMENT=1 (dev) or SAAS_FULFILMENT_KEYS_FILE."
+        )
     return keys
 
 
@@ -143,7 +145,8 @@ def fulfil_outbox(outbox_id):
     """Run one queued intent end to end. Returns completed, empty, unknown or skipped."""
     intent = JobOutbox.objects.select_related("job").get(pk=outbox_id)
     codes = list(intent.source_snapshot)
-    adapter = adapter_for(codes[0]) if len(codes) == 1 else None
+    enabled = len(codes) == 1 and codes[0] in settings.SAAS_FULFILMENT_SOURCES
+    adapter = adapter_for(codes[0]) if enabled else None
     if adapter is None:
         return "skipped"
     job = intent.job
