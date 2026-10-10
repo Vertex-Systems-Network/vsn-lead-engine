@@ -32,6 +32,6 @@ Owner direction (2026-10-10): finish the SaaS platform first; do not work on the
 
 1. Done: customer Submit job button/view (`/workspaces/<id>/jobs/<job>/submit/`).
 2. Done: self-service sign-up with owned workspace and starter allowance (`/accounts/sign-up/`).
-3. Job progress UI (queued → running → completed/failed) and a 25-lead-per-job explanation.
-4. Done: Overture source adapter (`core.sources.OvertureSource`, live check via the manual `SaaS Overture Smoke` workflow). Done: non-DEBUG signer via `SAAS_FULFILMENT_KEYS_FILE`. Done: password reset with required sign-up email. Next: job auto-refresh, then deployment once the owner picks hosting and an SMTP sender.
+3. Done: job progress copy, 25-lead explanation and auto-refresh while queued/running.
+4. Done: Overture source adapter (`core.sources.OvertureSource`, live check via the manual `SaaS Overture Smoke` workflow). Done: non-DEBUG signer via `SAAS_FULFILMENT_KEYS_FILE`. Done: password reset with required sign-up email. Next: deployment packaging, then deploy once the owner picks hosting and an SMTP sender.
 5. Fold README/state corrections into code PRs. Do not replay merged mutations.

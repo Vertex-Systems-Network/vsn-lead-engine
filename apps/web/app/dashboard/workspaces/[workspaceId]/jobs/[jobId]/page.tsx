@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { backend } from "../../../../../../lib/backend";
 import { job, uuid } from "../../../../../../lib/contracts";
+import { AutoRefresh } from "../../../../../components/auto-refresh";
 import { State } from "../../../../../components/state";
 export default async function Detail({
   params,
@@ -55,8 +56,9 @@ export default async function Detail({
         {["queued", "running"].includes(j.status) ? (
           <p className="notice">
             {j.status === "queued"
-              ? "Queued for collection. Refresh this page to see progress."
-              : "Collecting leads. Refresh this page to see results."}
+              ? "Queued for collection. This page updates automatically."
+              : "Collecting leads. This page updates automatically."}
+            <AutoRefresh />
           </p>
         ) : null}
         {j.status === "failed" && j.result_count === 0 ? (

@@ -1,7 +1,8 @@
 {% extends "core/job_base.html" %}
 {% block title %}Job details{% endblock %}
+{% block head %}{% if job.status == "queued" or job.status == "running" %}<meta http-equiv="refresh" content="15">{% endif %}{% endblock %}
 {% block content %}<h1>{{ workspace.name }} job details</h1>
-<p>Job {{ job.id }}</p><p>Status: <strong>{{ job.status|capfirst }}</strong>. Revision: {{ job.revision }}.</p>
+<p>Job {{ job.id }}</p><p>Status: <strong>{{ job.status|capfirst }}</strong>. Revision: {{ job.revision }}.</p>{% if job.status == "queued" or job.status == "running" %}<p>This page refreshes every 15 seconds while the job is in progress.</p>{% endif %}
 <p>Recorded results: {{ job.result_count }}. Requested limits are not achieved counts. Collection, result downloads and retry controls are unavailable.</p>
 <dl><dt>Countries</dt><dd>{{ job.search.countries|join:", "|default:"Not recorded" }}</dd>
 <dt>Categories</dt><dd>{{ job.search.categories|join:", "|default:"Not recorded" }}</dd>

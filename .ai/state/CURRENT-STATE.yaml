@@ -128,7 +128,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Job page auto-refresh, then deployment packaging (container + worker schedule) pending owner hosting choice, then M8 admin. Production quota is not a current work item (owner direction).",
+  "exact_next_safe_action": "Deployment packaging (container image, worker schedule, settings checklist) ready for whichever host the owner picks; then M8 admin. Production quota is not a current work item (owner direction).",
   "last_reconciled_at": "2026-10-10",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
