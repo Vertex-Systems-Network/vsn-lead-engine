@@ -27,6 +27,33 @@ export function workspaces(v: unknown): v is Workspaces {
     )
   );
 }
+export const memberRoles = ["owner", "admin", "member", "viewer"] as const;
+export type Member = {
+  user_id: string;
+  role: (typeof memberRoles)[number];
+};
+export type Members = {
+  count: number;
+  next: string | null;
+  results: Member[];
+};
+export function members(v: unknown): v is Members {
+  return (
+    object(v) &&
+    count(v.count) &&
+    (v.next === null || typeof v.next === "string") &&
+    Array.isArray(v.results) &&
+    v.results.length <= 25 &&
+    v.results.every(
+      (m) =>
+        object(m) &&
+        uuid(m.user_id) &&
+        memberRoles.includes(m.role as Member["role"]),
+    ) &&
+    new Set(v.results.map((m: Member) => m.user_id)).size === v.results.length
+  );
+}
+
 export type Job = {
   id: string;
   workspace_id: string;
