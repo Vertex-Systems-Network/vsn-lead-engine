@@ -402,3 +402,18 @@ automation, a production loop, or a guarantee of due-date delivery.
 Operational promotion requires externally reviewed source rights, active
 entitlement/quotas, secure credentials, a long-running fenced scheduler,
 recovery/observability, explicit activation controls and release approval.
+
+## Single-job read-only budget headroom estimate
+
+The owner/admin daily-plan readiness API includes a `budget_snapshot` with
+settled usage, existing pending reservations, internal entitlement limits,
+one hypothetical job's requested leads/jobs/provider calls, and estimated
+headroom. The requested provider-call count is the sum of the current internal
+selected source policies only when the plan's normalized saved scope and all
+policy metadata checks pass. An active accounting period must be open and
+cover the current UTC instant. Missing entitlements, missing sources, expired
+periods, or invalid scope fail closed; no credential, source evidence or lead
+payload is exposed. The estimate is **not** a quota reservation, cannot
+authorize a provider, and does not forecast a 7-day catch-up batch; it is a
+momentary comparison for *one job*. Actual job enqueue must take fresh DB
+locks and revalidate entitlement, source rights, pending usage and capacity.

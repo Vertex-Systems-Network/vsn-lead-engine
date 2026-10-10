@@ -117,6 +117,7 @@ export const planReadinessCheckNames = [
   "entitlement_current",
   "explicit_source_selection",
   "internal_source_catalog_match",
+  "internal_quota_snapshot",
 ] as const;
 export const planReadinessExternalGates = [
   "current_usable_quota",
@@ -132,12 +133,51 @@ export type PlanReadiness = {
   advisory_only: true;
   status: "blocked" | "internal_catalog_match_only";
   checked_source_count: number;
+  budget_snapshot: {
+    status:
+      | "unavailable"
+      | "entitlement_unavailable"
+      | "accounting_window_unavailable"
+      | "advisory_single_job_fits"
+      | "advisory_single_job_exceeds";
+    advisory_only: true;
+    single_job_only: true;
+    accounting: "unavailable" | "period_development" | "cumulative_development";
+    counters: {
+      name: "leads" | "jobs" | "provider_calls";
+      requested: number;
+      settled: number;
+      reserved: number;
+      limit: number;
+      headroom: number;
+    }[];
+  };
   checks: {
     name: (typeof planReadinessCheckNames)[number];
     status: "pass" | "blocked";
   }[];
   unverified_execution_gates: string[];
 };
+function budgetCapacityRow(row: unknown, name: string): boolean {
+  if (!object(row)) return false;
+  const requested = row.requested;
+  const settled = row.settled;
+  const reserved = row.reserved;
+  const limit = row.limit;
+  const headroom = row.headroom;
+  return (
+    row.name === name &&
+    count(requested) &&
+    count(settled) &&
+    count(reserved) &&
+    count(limit) &&
+    count(headroom) &&
+    [requested, settled, reserved, limit, headroom].every(
+      (value) => value <= 2147483647,
+    ) &&
+    headroom === Math.max(0, limit - settled - reserved)
+  );
+}
 export function planReadiness(v: unknown): v is PlanReadiness {
   if (
     !object(v) ||
@@ -148,6 +188,21 @@ export function planReadiness(v: unknown): v is PlanReadiness {
     !["blocked", "internal_catalog_match_only"].includes(String(v.status)) ||
     !count(v.checked_source_count) ||
     v.checked_source_count > 12 ||
+    !object(v.budget_snapshot) ||
+    ![
+      "unavailable",
+      "entitlement_unavailable",
+      "accounting_window_unavailable",
+      "advisory_single_job_fits",
+      "advisory_single_job_exceeds",
+    ].includes(String(v.budget_snapshot.status)) ||
+    v.budget_snapshot.advisory_only !== true ||
+    v.budget_snapshot.single_job_only !== true ||
+    !["unavailable", "period_development", "cumulative_development"].includes(
+      String(v.budget_snapshot.accounting),
+    ) ||
+    !Array.isArray(v.budget_snapshot.counters) ||
+    ![0, 3].includes(v.budget_snapshot.counters.length) ||
     !Array.isArray(v.checks) ||
     v.checks.length !== planReadinessCheckNames.length ||
     !Array.isArray(v.unverified_execution_gates) ||
@@ -155,8 +210,16 @@ export function planReadiness(v: unknown): v is PlanReadiness {
   )
     return false;
   const checks = v.checks;
+  const capacity = v.budget_snapshot.counters;
   const externalGates = v.unverified_execution_gates;
   return (
+    (v.budget_snapshot.status === "unavailable"
+      ? capacity.length === 0
+      : capacity.length === 3) &&
+    ["leads", "jobs", "provider_calls"].every(
+      (name, index) =>
+        capacity.length === 0 || budgetCapacityRow(capacity[index], name),
+    ) &&
     planReadinessCheckNames.every((name) =>
       checks.some(
         (item: unknown) =>

@@ -39,7 +39,13 @@ class PlanReadinessTests(TestCase):
         )
         Membership.objects.create(workspace=self.workspace, user=self.creator, role="member")
         Membership.objects.create(workspace=self.workspace, user=self.viewer, role="viewer")
-        self.entitlement = Entitlement.objects.create(workspace=self.workspace, active=True)
+        self.entitlement = Entitlement.objects.create(
+            workspace=self.workspace,
+            active=True,
+            lead_limit=100,
+            job_limit=10,
+            provider_call_limit=10,
+        )
         self.plan, _ = create_daily_schedule(
             self.creator, self.workspace.id, SEARCH, "UTC", time(8), "policy-check"
         )
@@ -69,6 +75,15 @@ class PlanReadinessTests(TestCase):
         self.assertFalse(body["stored_enabled"])
         self.assertEqual(body["checked_source_count"], 1)
         self.assertTrue(all(check["status"] == "pass" for check in body["checks"]))
+        self.assertEqual(body["budget_snapshot"]["status"], "advisory_single_job_fits")
+        self.assertTrue(body["budget_snapshot"]["single_job_only"])
+        self.assertEqual(
+            [row["name"] for row in body["budget_snapshot"]["counters"]],
+            ["leads", "jobs", "provider_calls"],
+        )
+        self.assertEqual(body["budget_snapshot"]["counters"][0]["requested"], 100)
+        self.assertEqual(body["budget_snapshot"]["counters"][1]["requested"], 1)
+        self.assertEqual(body["budget_snapshot"]["counters"][2]["requested"], 1)
         self.assertIn("source_commercial_rights", body["unverified_execution_gates"])
         self.assertNotIn(b"synthetic evidence", result.content)
         self.assertNotIn(b"Synthetic bakery", result.content)
@@ -116,6 +131,65 @@ class PlanReadinessTests(TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertEqual(result.json()["status"], "blocked")
         self.assertNotIn(b"Private internal secret", result.content)
+
+    def test_reserved_usage_and_remaining_quota_block_single_job_preflight(self):
+        from .models import UsageCounter, UsageReservation
+
+        UsageCounter.objects.create(workspace=self.workspace, leads=12, jobs=2, provider_calls=1)
+        UsageReservation.objects.create(
+            workspace=self.workspace,
+            key="pending-test",
+            request_hash="f" * 64,
+            leads=5,
+            jobs=1,
+            provider_calls=2,
+        )
+        self.client.force_login(self.owner)
+        result = self.client.get(self.path)
+        self.assertEqual(result.status_code, 200)
+        budget = result.json()["budget_snapshot"]
+        self.assertEqual(budget["status"], "advisory_single_job_exceeds")
+        self.assertEqual(result.json()["status"], "blocked")
+        self.assertEqual(budget["counters"][0]["headroom"], 83)
+        self.assertEqual(budget["counters"][0]["reserved"], 5)
+        self.assertEqual(budget["counters"][1]["headroom"], 7)
+        self.assertEqual(budget["counters"][2]["headroom"], 7)
+        self.assertEqual(UsageReservation.objects.count(), 1)
+        self.assertFalse(Job.objects.exists())
+
+    def test_expired_accounting_window_blocks_capacity_even_when_limits_fit(self):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        from .models import UsageCounter, UsagePeriod
+
+        now = timezone.now()
+        period = UsagePeriod.objects.create(
+            workspace=self.workspace,
+            key="expired-window",
+            starts_at=now - timedelta(days=2),
+            ends_at=now - timedelta(days=1),
+        )
+        UsageCounter.objects.create(workspace=self.workspace, period=period)
+        self.client.force_login(self.owner)
+        data = self.client.get(self.path).json()
+        self.assertEqual(data["budget_snapshot"]["status"], "accounting_window_unavailable")
+        self.assertEqual(data["status"], "blocked")
+        self.assertFalse(Job.objects.exists())
+
+    def test_no_usable_entitlement_or_missing_catalog_has_no_capacity_claim(self):
+        self.entitlement.active = False
+        self.entitlement.save(update_fields=["active"])
+        self.client.force_login(self.owner)
+        self.assertEqual(
+            self.client.get(self.path).json()["budget_snapshot"]["status"], "unavailable"
+        )
+        self.entitlement.active = True
+        self.entitlement.save(update_fields=["active"])
+        self.source.delete()
+        self.assertEqual(self.client.get(self.path).json()["budget_snapshot"]["counters"], [])
+        self.assertFalse(Job.objects.exists())
 
     def test_foreign_anonymous_viewer_revoked_and_write_methods_denied(self):
         anonymous = self.client.get(self.path)

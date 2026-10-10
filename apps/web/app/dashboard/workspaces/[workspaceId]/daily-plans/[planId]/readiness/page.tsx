@@ -75,6 +75,44 @@ export default async function DailyPlanReadinessPage({
           </tbody>
         </table>
       </div>
+      <h2>Single-job usage headroom (read-only estimate)</h2>
+      <p className="notice">
+        {report.data.budget_snapshot.status.replaceAll("_", " ")}. The figures
+        apply to one hypothetical submitted job, not seven catch-up dates or
+        future recurring runs. No budget is reserved by this screen; other
+        concurrent jobs may consume the available allowance before submission.
+      </p>
+      {report.data.budget_snapshot.counters.length ? (
+        <div className="table-scroll">
+          <table>
+            <caption>Internal quota and pending reservation snapshot</caption>
+            <thead>
+              <tr>
+                <th scope="col">Resource</th>
+                <th scope="col">Requested</th>
+                <th scope="col">Settled</th>
+                <th scope="col">Pending</th>
+                <th scope="col">Limit</th>
+                <th scope="col">Estimated headroom</th>
+              </tr>
+            </thead>
+            <tbody>
+              {report.data.budget_snapshot.counters.map((item) => (
+                <tr key={item.name}>
+                  <th scope="row">{item.name.replaceAll("_", " ")}</th>
+                  <td>{item.requested}</td>
+                  <td>{item.settled}</td>
+                  <td>{item.reserved}</td>
+                  <td>{item.limit}</td>
+                  <td>{item.headroom}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p>Capacity not available for this configuration.</p>
+      )}
       <h2>Not verified — required before any execution</h2>
       <ul>
         {report.data.unverified_execution_gates.map((gate) => (

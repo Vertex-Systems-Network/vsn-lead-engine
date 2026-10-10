@@ -242,6 +242,8 @@ def main():
                 )
                 assert "Daily plan source readiness review" in readiness_page
                 assert "Internal checks blocked" in readiness_page
+                assert "Single-job usage headroom" in readiness_page
+                assert "Capacity not available for this configuration" in readiness_page
                 assert "Not verified" in readiness_page
                 assert "source commercial rights" in readiness_page
                 assert "Foreign private marker" not in readiness_page
