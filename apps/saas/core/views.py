@@ -101,6 +101,36 @@ class WorkspaceDetail(APIView):
 
 
 @method_decorator(never_cache, name="dispatch")
+class DailyPlanDetail(APIView):
+    """Current-member plan snapshot for review, with no mutation or scheduler."""
+
+    def get(self, request, workspace_id, plan_id):
+        from rest_framework.exceptions import ValidationError
+
+        from .models import DailySchedule
+
+        membership_for(request.user, workspace_id)
+        if request.query_params:
+            raise ValidationError("Daily plan detail does not accept query parameters.")
+        plan = get_object_or_404(DailySchedule, pk=plan_id, workspace_id=workspace_id)
+        serializer = SearchSerializer(data=plan.search)
+        if not serializer.is_valid():
+            raise ValidationError("Stored daily plan configuration requires reconciliation.")
+        return Response(
+            {
+                "id": str(plan.id),
+                "workspace_id": str(workspace_id),
+                "timezone": plan.timezone,
+                "local_time": plan.local_time.strftime("%H:%M"),
+                "enabled": plan.enabled,
+                "revision": plan.revision,
+                "created_at": plan.created_at.isoformat(),
+                "search": serializer.validated_data,
+            }
+        )
+
+
+@method_decorator(never_cache, name="dispatch")
 class DailyPlanList(APIView):
     """Read-only list; all membership and cursor checks run on the Django side."""
 
