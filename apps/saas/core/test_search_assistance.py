@@ -136,7 +136,7 @@ class OfflineSearchAssistanceTests(TestCase):
             response = self.request_preview(intent)
             self.assertEqual(response.status_code, 400)
             self.assertNotIn(intent, response.content.decode())
-            self.assertContains(response, "without links, phone numbers")
+            self.assertContains(response, "without links, phone numbers", status_code=400)
         self.assertFalse(Job.objects.exists())
 
     def test_untrusted_markup_is_never_reflected_and_does_not_expand_scope(self):
