@@ -85,6 +85,23 @@ def daily_plan_readiness(actor, workspace_id, plan_id):
                 ):
                     catalog_matches = False
     record("internal_source_catalog_match", catalog_matches)
+    from .daily_plan_budget import single_job_budget_snapshot, unavailable_budget_snapshot
+
+    if stored_ok and catalog_matches and current_entitlement:
+        provider_calls = sum(policy.max_provider_calls for policy in policies)
+        budget = (
+            single_job_budget_snapshot(
+                actor,
+                workspace_id,
+                result_limit=serializer.validated_data["result_limit"],
+                provider_calls=provider_calls,
+            )
+            if provider_calls <= 2147483647
+            else unavailable_budget_snapshot()
+        )
+    else:
+        budget = unavailable_budget_snapshot()
+    record("internal_quota_snapshot", budget["status"] == "advisory_single_job_fits")
     # Even passing catalog metadata cannot prove real capacity, legal rights,
     # price, deployed credentials, provider health, or safe auto-execution.
     return {
@@ -96,6 +113,7 @@ def daily_plan_readiness(actor, workspace_id, plan_id):
         if any(row["status"] == "blocked" for row in checks)
         else "internal_catalog_match_only",
         "checked_source_count": count,
+        "budget_snapshot": budget,
         "checks": checks,
         "unverified_execution_gates": [
             "current_usable_quota",
