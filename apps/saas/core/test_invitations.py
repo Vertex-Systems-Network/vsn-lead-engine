@@ -1,5 +1,6 @@
 """Existing-account invitations: scoped authorisation, one-use secrets, no email."""
 
+import hashlib
 from datetime import timedelta
 
 from django.core import mail
@@ -50,8 +51,11 @@ class WorkspaceInvitationTests(TestCase):
         self.assertContains(response, "Copy this code now")
         self.assertNotContains(response, "Foreign private invites")
         self.assertEqual(mail.outbox, [])
-        invitation = WorkspaceInvitation.objects.get()
-        return response.context["code"], invitation
+        code = response.context["code"]
+        invitation = WorkspaceInvitation.objects.get(
+            token_hash=hashlib.sha256(code.encode("ascii")).hexdigest()
+        )
+        return code, invitation
 
     def accept(self, actor, code):
         self.client.force_login(actor)
