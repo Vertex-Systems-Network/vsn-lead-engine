@@ -71,6 +71,7 @@ export function dueDiagnostics(v: unknown): v is DueDiagnostics {
     v.plans.length !== v.inspected
   )
     return false;
+  const executionGates = v.requires_execution_gates;
   if (
     ![
       "fresh_membership",
@@ -78,7 +79,7 @@ export function dueDiagnostics(v: unknown): v is DueDiagnostics {
       "source_rights",
       "provider_credentials",
       "operator_release",
-    ].every((gate) => v.requires_execution_gates.includes(gate))
+    ].every((gate) => executionGates.includes(gate))
   )
     return false;
   return (
