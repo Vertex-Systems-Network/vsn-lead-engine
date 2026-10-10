@@ -534,9 +534,12 @@ test("job summary uses a single exact session-only read and refuses query mutati
       });
       assert.equal(options.cache, "no-store");
       assert.equal(options.redirect, "manual");
-      return new Response('{"workspace_id":"' + id + '","total":0,"statuses":{}}', {
-        headers: {"content-type":"application/json"},
-      });
+      return new Response(
+        '{"workspace_id":"' + id + '","total":0,"statuses":{}}',
+        {
+          headers: { "content-type": "application/json" },
+        },
+      );
     },
   );
   assert.equal(response.kind, "ok");
@@ -546,13 +549,17 @@ test("job summary uses a single exact session-only read and refuses query mutati
     `${path}?target=https://evil.example`,
     `${path}../jobs/`,
   ]) {
-    await assert.rejects(readBackend("http://localhost:8000", invalid, session));
+    await assert.rejects(
+      readBackend("http://localhost:8000", invalid, session),
+    );
   }
   const anonymous = await readBackend(
     "http://localhost:8000",
     path,
     undefined,
-    () => { throw new Error("An anonymous summary must not reach Django"); },
+    () => {
+      throw new Error("An anonymous summary must not reach Django");
+    },
   );
   assert.equal(anonymous.kind, "signin");
 });
