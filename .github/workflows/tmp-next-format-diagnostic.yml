@@ -1,0 +1,22 @@
+name: Temporary Next Formatting Diagnostic
+on:
+  push:
+    branches:
+      - feat/saas-member-audit-history-20261010
+
+permissions:
+  contents: read
+
+jobs:
+  formatted-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Show pinned Prettier diff (no writes to repository)
+        shell: bash
+        run: |
+          cd apps/web
+          npm ci --ignore-scripts
+          file='app/dashboard/workspaces/[workspaceId]/member-audit/page.tsx'
+          ./node_modules/.bin/prettier "$file" > /tmp/vsn-audit-formatted.tsx
+          diff -u "$file" /tmp/vsn-audit-formatted.tsx || true
