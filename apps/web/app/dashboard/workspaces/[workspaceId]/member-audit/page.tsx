@@ -41,10 +41,10 @@ export default async function MemberAuditPage({
         {identity.data.timezone}
       </p>
       <p className="notice">
-        Read-only history of recorded role changes and membership removals.
-        Only current owners and admins may view this page. Events record UUIDs,
-        not email addresses or customer lead details; this screen cannot
-        invite, promote or remove anyone.
+        Read-only history of recorded role changes and membership removals. Only
+        current owners and admins may view this page. Events record UUIDs, not
+        email addresses or customer lead details; this screen cannot invite,
+        promote or remove anyone.
       </p>
       {report.data.results.length ? (
         <div className="table-scroll">
