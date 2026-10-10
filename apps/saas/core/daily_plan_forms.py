@@ -43,9 +43,7 @@ class DailyPlanForm(forms.Form):
         value = self.cleaned_data["plan_token"]
         try:
             token = signing.loads(value, salt=PLAN_TOKEN_SALT, max_age=3600)
-            if not isinstance(token, dict) or set(token) != {
-                "user", "workspace", "job", "key"
-            }:
+            if not isinstance(token, dict) or set(token) != {"user", "workspace", "job", "key"}:
                 raise ValueError
             if (
                 token["user"] != str(self.user.pk)
