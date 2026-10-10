@@ -293,6 +293,10 @@ def main():
                 # viewports, skip-link keyboard focus and FAQ interaction.
                 # Fail closed when Chrome is missing; never substitute HTML
                 # assertions for browser evidence or contact external sites.
+                # Use the real Django CSRF bootstrap route for the signed-in
+                # disposable test client. No token is forged or logged.
+                assert client.get("/accounts/start-sign-in/").status_code == 303
+                browser_csrf_cookie = client.cookies["csrftoken"].value
                 before_browser_jobs = Job.objects.filter(workspace=workspace).count()
                 before_browser_reservations = UsageReservation.objects.filter(
                     workspace=workspace
@@ -306,6 +310,7 @@ def main():
                     env={
                         **os.environ,
                         "VSN_BROWSER_SMOKE_SESSION": session,
+                        "VSN_BROWSER_SMOKE_CSRF": browser_csrf_cookie,
                         "VSN_BROWSER_SMOKE_OWN_WORKSPACE": str(workspace.id),
                         "VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE": str(other.id),
                         "VSN_BROWSER_SMOKE_OWN_JOB": str(saved[0].id),
