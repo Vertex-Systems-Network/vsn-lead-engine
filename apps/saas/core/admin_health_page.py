@@ -7,6 +7,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
 
 from .admin_health import operational_health
+from .services import membership_for
 
 
 @never_cache
@@ -17,8 +18,9 @@ def admin_operational_health_page(request, workspace_id):
     if request.GET:
         return HttpResponseBadRequest("Operations snapshot accepts no query parameters.")
     report = operational_health(request.user, workspace_id)
+    workspace = membership_for(request.user, workspace_id).workspace
     return render(
         request,
         "core/admin_operational_health.html",
-        {"workspace": request.user.membership_set.get(workspace_id=workspace_id).workspace, "report": report},
+        {"workspace": workspace, "report": report},
     )
