@@ -3,7 +3,6 @@
 from datetime import time
 from unittest.mock import patch
 
-from django.core import signing
 from django.http import Http404
 from django.test import Client, TestCase
 from rest_framework.exceptions import PermissionDenied
