@@ -30,7 +30,7 @@ and dedupe.
 <!-- ANPOS-CONTINUITY:BEGIN -->
 ### AI-Native continuity — verified development snapshot
 
-- Verified plan snapshot: **2026-10-08**. Latest inspected main: `e258d6cc` (PR #237); v3 batch acceptance, source finality, positive-result accounting, bounded internal pages, settled-state replay, signed no-effect evidence and pure all-source bounds are verified but disabled/quarantined. Durable all-source reconciliation, routes/export and external activation remain open.
+- Verified plan snapshot: **2026-10-08**. Latest inspected main: `a90b9098` (PR #238); v3 batch acceptance, source finality, positive-result accounting, bounded internal pages, settled-state replay, signed no-effect evidence and pure all-source bounds are verified but disabled/quarantined. Durable all-source reconciliation, routes/export and external activation remain open.
 - Runtime mode: `degraded_no_verified_supervisor`. Persistent multi-agent dispatch is **not active**; normal authenticated single-session development remains authorized. Repository instructions do **not** keep a chat or Codex session running after host termination.
 - Work units: **9 complete / 5 in progress / 1 blocked / 2 deferred / 4 not started (21 total)**. These are canonical `config/ai/project-state.json` work-unit states; the milestone percentages below are separate engineering estimates.
 - Next work unit: `WU-SAAS-FOUNDATION`. Safe frontier: explicit unknown/no-effect reconciliation and internal write-ahead before gated export/page routes; do not activate payments, providers, production collections or a customer launch without verified gates.
@@ -57,6 +57,7 @@ Snapshot: **2026-10-08 PKT**, reconciled through protected feature `main` commit
 Progress notes:
 - Owner-selected Next.js UI is recorded in [ADR-SAAS-002](docs/ai/ADR-SAAS-002-NEXT-FRONTEND-20261008.md); backend auth/tenant authority remains Django. Percentages describe implemented engineering slices; browser/customer/deployment/release limits remain open.
 - M0 is complete from repository audit evidence.
+- 2026-10-10 audit fixes (production collector, no milestone change): daily category-sheet appends now skip unique keys already on the tab so a retry after a timed-out-but-applied append cannot duplicate rows; Overpass city names are properly escaped in QL string literals; `.env.example` lists the real Google OAuth/R2 variables and no longer suggests a rejected public Overpass endpoint.
 - M1 remains desk research only; no external interviews or customer-demand validation are counted as complete.
 - M2 development sequencing/defaults are no longer blocked on technical owner confirmation; external market, pricing, provider-rights and launch decisions remain separate evidence/authorization gates.
 - M3 evidence: PR #141 added the stack-neutral system/threat-model baseline, PR #145 added versioned API/data contracts, and PR #150 added the responsive MVP UX interaction contract.
