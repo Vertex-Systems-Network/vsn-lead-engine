@@ -821,7 +821,7 @@ export function dailyOccurrenceHistory(v: unknown): v is DailyOccurrenceHistory 
     v.results.length > v.total ||
     (v.next !== null && (
       typeof v.next !== "string" ||
-      !/^\\d{4}-\\d{2}-\\d{2}$/.test(v.next)
+      !/^\d{4}-\d{2}-\d{2}$/.test(v.next)
     ))
   )
     return false;
@@ -831,7 +831,7 @@ export function dailyOccurrenceHistory(v: unknown): v is DailyOccurrenceHistory 
         object(r) &&
         uuid(r.id) &&
         typeof r.local_date === "string" &&
-        /^\\d{4}-\\d{2}-\\d{2}$/.test(r.local_date) &&
+        /^\d{4}-\d{2}-\d{2}$/.test(r.local_date) &&
         Number.isFinite(Date.parse(r.local_date)) &&
         typeof r.local_time === "string" &&
         /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(r.local_time) &&
