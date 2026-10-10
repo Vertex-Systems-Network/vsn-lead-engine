@@ -1,0 +1,34 @@
+name: Diagnostics Format Preview (Temporary)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/diagnostics-format-preview.yml"
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: "24.19.0"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: apps/web
+      - name: Print pinned formatted diagnostics files
+        run: |
+          cd apps/web
+          ./node_modules/.bin/prettier --write 'app/dashboard/workspaces/[workspaceId]/daily-diagnostics/page.tsx' lib/contracts.ts test/transport.test.mjs
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          for name in ("app/dashboard/workspaces/[workspaceId]/daily-diagnostics/page.tsx", "lib/contracts.ts", "test/transport.test.mjs"):
+              print(f"FORMATTED_FILE:{name}:{base64.b64encode(Path(name).read_bytes()).decode('ascii')}")
+          PY
