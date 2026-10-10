@@ -135,9 +135,7 @@ export default async function Workspace({
               <p>
                 <strong>{summary.data.statuses[state]}</strong> jobs
               </p>
-              <Link href={`?status=${state}`}>
-                View {state} jobs
-              </Link>
+              <Link href={`?status=${state}`}>View {state} jobs</Link>
             </article>
           ))}
         </div>
