@@ -200,7 +200,6 @@ class DailyPauseMaterializeRaceTests(TransactionTestCase):
             ThreadPoolExecutor(max_workers=2) as pool,
         ):
             paused, outcome = pool.map(run, ("pause", "materialize"))
-            paused, outcome = list((paused, outcome))
         self.assertTrue(paused)
         self.assertIn(outcome, (True, "fenced"))
         plan.refresh_from_db()
