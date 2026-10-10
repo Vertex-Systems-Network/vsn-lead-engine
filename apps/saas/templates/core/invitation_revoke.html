@@ -1,0 +1,31 @@
+{% extends "core/job_base.html" %}
+{% block title %}Revoke pending invitation{% endblock %}
+{% block content %}
+<h1>Revoke invitation — {{ workspace.name }}</h1>
+<p>Invited account: <code>{{ invitation.target.username }}</code>.
+Requested role: <strong>{{ invitation.role }}</strong>.</p>
+<p><strong>Warning:</strong> Revocation immediately invalidates this unused
+invitation code. It never removes an existing member, deletes an account,
+contacts a provider, cancels jobs, bills anyone or undoes an accepted invitation.
+The action is recorded in the workspace access audit history.</p>
+{% if revoked %}
+<section role="status"><h2>Pending invitation revoked</h2>
+<p>This one-time code can no longer be used. No member was removed.</p></section>
+{% elif stale and not form %}
+<div role="alert"><p>This invitation is no longer pending. Review the current list.</p></div>
+{% elif form %}
+<form method="post" action="{% url 'invitation-revoke-page' workspace.id invitation.id %}">
+{% csrf_token %}
+{{ form.confirmation_token }}
+{% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
+<div class="form-field">
+<label for="{{ form.confirm_revocation.id_for_label }}">
+{{ form.confirm_revocation }} I understand the unused invitation will be invalidated.
+</label>
+{% if form.confirm_revocation.errors %}<div role="alert">{{ form.confirm_revocation.errors }}</div>{% endif %}
+</div>
+<button type="submit">Confirm: revoke this invitation</button>
+</form>
+{% endif %}
+<p><a href="{% url 'invitations-pending-page' workspace.id %}">Back to pending invitations</a></p>
+{% endblock %}
