@@ -70,10 +70,9 @@ class DailyPlanListTests(TestCase):
         self.assertEqual(second.json()["total"], 27)
         self.assertEqual(len(second.json()["results"]), 2)
         self.assertIsNone(second.json()["next"])
-        ids = {row["id"] for row in payload["results"] + second.json()["results"]}
-        self.assertEqual(len(ids), 27)
-        enabled_flags = [row["enabled"] for row in payload["results"] + second.json()["results"]]
-        self.assertIn(True, enabled_flags)
+        all_rows = payload["results"] + second.json()["results"]
+        self.assertEqual(len({row["id"] for row in all_rows}), 27)
+        self.assertTrue(any(row["enabled"] for row in all_rows))
         self.assertNotIn(b"Foreign private plan", first.content)
         self.assertNotIn(b"Private bakery marker", first.content)
         self.assertEqual(DailySchedule.objects.count(), 28)
