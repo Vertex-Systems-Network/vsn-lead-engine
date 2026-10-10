@@ -5,6 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "VSN Lead Engine",
   description: "VSN Lead Engine development preview: tenant-scoped business search workflows.",
+  robots: { index: false, follow: false },
 };
 
 export default function Layout({
