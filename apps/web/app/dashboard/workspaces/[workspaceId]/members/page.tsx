@@ -46,8 +46,8 @@ export default async function MembersPage({
       <p className="muted">
         Owners and administrators can review current workspace roles. This view
         lists verified member roles. Role changes require a separate signed and
-        CSRF-protected confirmation. Invitations and removals are unavailable
-        from this dashboard.
+        CSRF-protected confirmation. Removals require a separate explicit
+        warning and confirmation. Invitations are not available.
       </p>
       {result.data.results.length > 0 ? (
         <div className="table-scroll">
@@ -74,6 +74,14 @@ export default async function MembersPage({
                       )}
                     >
                       Review role change
+                    </a>
+                    {" · "}
+                    <a
+                      href={backendLink(
+                        `/workspaces/${workspaceId}/members/${member.user_id}/remove/`,
+                      )}
+                    >
+                      Review removal
                     </a>
                   </td>
                 </tr>
