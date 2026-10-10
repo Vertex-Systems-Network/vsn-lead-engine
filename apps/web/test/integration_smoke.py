@@ -154,6 +154,22 @@ def main():
                 assert "no-store" in headers.get("Cache-Control", "")
                 page, _ = read(f"/dashboard/workspaces/{workspace.id}")
                 assert "Synthetic bakery" in page and "Next page" in page
+                members_page, _ = read(
+                    f"/dashboard/workspaces/{workspace.id}/members"
+                )
+                assert "Workspace members" in members_page
+                assert "Authorized workspace member roles" in members_page
+                assert str(user.id) in members_page and "owner" in members_page
+                assert "Foreign private marker" not in members_page
+                foreign_members, _ = read(
+                    f"/dashboard/workspaces/{other.id}/members"
+                )
+                assert str(foreign.id) not in foreign_members
+                assert "Foreign private marker" not in foreign_members
+                assert (
+                    "This workspace or job is unavailable" in foreign_members
+                    or "you do not have access" in foreign_members
+                )
                 assert (
                     "Cumulative development counters" in page
                     and "Settled and reserved usage" in page

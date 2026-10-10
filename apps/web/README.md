@@ -63,3 +63,17 @@ keyboard focus and reduced-motion styles are implemented but do **not** replace
 independent browser/WCAG, visual, performance, source-license and legal review.
 The disposable HTTP integration smoke asserts public access, safe status labels,
 no payment flow and absence of synthetic private tenant content.
+
+## Member visibility in the web dashboard
+
+The workspace overview links to `/dashboard/workspaces/<workspace-id>/members`.
+Only an authenticated owner or administrator may receive the existing Django
+member-list API data; viewers, ordinary members and foreign-workspace actors
+receive a generic denial. The Next route only performs a server-side GET,
+validates a bounded page and the explicit role vocabulary, rejects duplicates,
+and renders the returned UUIDs and roles in a labeled table. No names, email
+addresses or role mutations are forwarded through the Next server. Role changes,
+invitations and removals are **not** presented as operational Next features.
+The selected workspace stays in the route, and Next does not make a second
+authorization decision in place of Django. The HTTP smoke covers owner access,
+foreign denial and the current session transport.

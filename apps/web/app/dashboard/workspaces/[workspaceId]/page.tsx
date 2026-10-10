@@ -55,10 +55,14 @@ export default async function Workspace({
         <Link href={`/dashboard/workspaces/${workspaceId}/sources`}>
           Source configuration
         </Link>
+        <Link href={`/dashboard/workspaces/${workspaceId}/members`}>
+          Workspace members (admins)
+        </Link>
       </div>
       <p className="notice">
-        Drafts save your search preferences. Collection and exports are not yet
-        available.
+        Drafts save search preferences without collecting leads. Submitted jobs
+        require an eligible source, a current entitlement and a running worker.
+        Production SaaS service is not yet deployed.
       </p>
       <h2>Usage</h2>
       {counters.kind === "ok" && counters.data.workspace_id === workspaceId ? (
