@@ -91,9 +91,7 @@ class OfflineSearchAssistanceTests(TestCase):
         self.client.force_login(self.foreign_owner)
         self.assertEqual(self.client.get(self.path).status_code, 404)
         self.assertEqual(
-            self.client.get(
-                f"/workspaces/{self.foreign.id}/search-assistance/"
-            ).status_code,
+            self.client.get(f"/workspaces/{self.foreign.id}/search-assistance/").status_code,
             200,
         )
         self.client.force_login(self.member)
