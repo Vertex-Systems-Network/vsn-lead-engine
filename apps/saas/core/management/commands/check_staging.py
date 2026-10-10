@@ -5,6 +5,8 @@ reverse-proxy behavior, source coverage, SMTP delivery, backups or launch consen
 No credentials, hostnames, queries or exception messages are printed.
 """
 
+from urllib.parse import urlsplit
+
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
@@ -31,8 +33,12 @@ def configuration_issues(config):
         )
     ):
         issues.append("Require HTTPS, secure cookies and nosniff headers.")
-    if not config.WEB_DASHBOARD_URL:
-        issues.append("Configure SAAS_WEB_ORIGIN for the separate Next dashboard.")
+    dashboard = urlsplit(config.WEB_DASHBOARD_URL or "")
+    if dashboard.scheme != "https" or dashboard.hostname not in hosts:
+        issues.append(
+            "Route Django and Next through the same public HTTPS host; "
+            "set SAAS_WEB_ORIGIN to that shared origin."
+        )
     if config.DATABASES["default"]["ENGINE"] != "django.db.backends.postgresql":
         issues.append("Use PostgreSQL, not the disposable SQLite smoke database.")
     if (
