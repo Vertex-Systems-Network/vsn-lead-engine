@@ -68,7 +68,9 @@ class ConfirmMemberRemovalForm(forms.Form):
 
 
 @transaction.atomic
-def remove_member_confirmed(actor, workspace_id, target_user_id, *, expected_role, expected_audit_id):
+def remove_member_confirmed(
+    actor, workspace_id, target_user_id, *, expected_role, expected_audit_id
+):
     """Serialize and compare the reviewed state before audited member removal."""
     membership_for(actor, workspace_id)
     Workspace.objects.select_for_update().get(pk=workspace_id)
