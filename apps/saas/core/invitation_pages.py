@@ -69,7 +69,9 @@ def issue_invitation_page(request, workspace_id):
         except PermissionDenied:
             return HttpResponseForbidden("Workspace invitation is no longer authorized.")
         except InvitationUnavailable:
-            form.add_error(None, "Cannot issue this invitation. Check account and pending invitations.")
+            form.add_error(
+                None, "Cannot issue this invitation. Check account and pending invitations."
+            )
             status = 409
         else:
             form, status = None, 200
