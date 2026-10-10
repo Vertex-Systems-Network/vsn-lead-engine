@@ -99,7 +99,9 @@ def search_assistance_preview(intent):
             "model_invoked": False,
             "needs_user_review": True,
             "search": None,
-            "missing": ["Exclusions or negations require manual review. State only positive targets."],
+            "missing": [
+                "Exclusions or negations require manual review. State only positive targets."
+            ],
         }
     if UNSUPPORTED_GEO_PATTERN.search(intent):
         return {
