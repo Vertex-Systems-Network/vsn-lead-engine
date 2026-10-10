@@ -113,6 +113,20 @@ class DailyOccurrenceHistory(APIView):
 
 
 @method_decorator(never_cache, name="dispatch")
+class DailyPlanReadiness(APIView):
+    """Owner/admin-only internal catalog preview, never execution approval."""
+
+    def get(self, request, workspace_id, plan_id):
+        from rest_framework.exceptions import ValidationError
+
+        from .daily_plan_readiness import daily_plan_readiness
+
+        if request.query_params:
+            raise ValidationError("Daily plan readiness accepts no query parameters.")
+        return Response(daily_plan_readiness(request.user, workspace_id, plan_id))
+
+
+@method_decorator(never_cache, name="dispatch")
 class DailyPlanDetail(APIView):
     """Current-member plan snapshot for review, with no mutation or scheduler."""
 
