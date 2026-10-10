@@ -317,11 +317,23 @@ def main():
                         "VSN_BROWSER_SMOKE_OWN_WORKSPACE": str(workspace.id),
                         "VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE": str(other.id),
                         "VSN_BROWSER_SMOKE_OWN_JOB": str(saved[0].id),
+                        "VSN_BROWSER_SMOKE_DRAFT_POST_ORIGIN": backend,
                     },
                     check=True,
-                    timeout=140,
+                    timeout=165,
                 )
-                assert Job.objects.filter(workspace=workspace).count() == before_browser_jobs
+                created_by_browser = list(
+                    Job.objects.filter(workspace=workspace).exclude(
+                        id__in=[job.id for job in saved]
+                    )
+                )
+                assert len(created_by_browser) == 1
+                assert created_by_browser[0].status == "draft"
+                assert created_by_browser[0].search["categories"] == [
+                    "Synthetic browser-post salon"
+                ]
+                assert created_by_browser[0].search["countries"] == ["US", "CA"]
+                assert Job.objects.filter(workspace=workspace).count() == before_browser_jobs + 1
                 assert (
                     UsageReservation.objects.filter(workspace=workspace).count()
                     == before_browser_reservations
