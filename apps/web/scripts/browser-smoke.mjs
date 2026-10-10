@@ -397,7 +397,7 @@ async function run(origin) {
         let ready = false;
         for (let attempt = 0; attempt < 100; attempt++) {
           ready = await cdp.js(`(() => {
-            if (location.pathname !== ${JSON.stringify(path)}) return false;
+            if (location.pathname + location.search !== ${JSON.stringify(path)}) return false;
             if (document.readyState !== "complete") return false;
             const main = document.querySelector("main");
             if (!main) return false;
@@ -463,6 +463,54 @@ async function run(origin) {
         );
         assert.ok(authorizedContent.includes("Synthetic <workspace>"));
         assert.ok(authorizedContent.includes("Synthetic bakery"));
+        // Opening search forms and paginated views must never dispatch,
+        // reserve or create work. Assert native controls in a real browser.
+        await inspectPrivate(
+          `/dashboard/workspaces/${ownWorkspace}/search/new`,
+          "Create draft search",
+          ["Foreign private marker"],
+        );
+        const draftForm = await cdp.js(`(() => ({
+          form: !!document.querySelector('form.search-form[method="post"]'),
+          countries: [...document.querySelectorAll('input[name="countries"]')].map((x) => x.value),
+          categories: !!document.querySelector('textarea[name="categories"][required]'),
+          disabledPhone: !!document.querySelector('input[type="checkbox"][disabled][checked]'),
+          submit: !!document.querySelector('button[type="submit"]'),
+        }))()`);
+        assert.equal(draftForm.form, true, "Draft must have explicit POST form.");
+        assert.deepEqual(draftForm.countries, ["US", "CA"]);
+        assert.equal(draftForm.categories, true);
+        assert.equal(draftForm.disabledPhone, true);
+        assert.equal(draftForm.submit, true);
+
+        await inspectPrivate(
+          `/dashboard/workspaces/${ownWorkspace}?status=draft`,
+          "27 saved searches across all pages",
+          ["Foreign private marker"],
+        );
+        const filtered = await cdp.js(`(() => ({
+          selected: document.querySelector('select[name="status"]')?.value,
+          next: [...document.querySelectorAll('nav[aria-label="Search pages"] a')].some(
+            (a) => a.textContent.includes("Next page") && a.getAttribute("href").includes("status=draft")
+          ),
+        }))()`);
+        assert.equal(filtered.selected, "draft");
+        assert.equal(filtered.next, true, "Draft job pagination must retain its status filter.");
+
+        await inspectPrivate(
+          `/dashboard/workspaces/${ownWorkspace}/sources`,
+          "Source configuration",
+          ["Foreign private marker"],
+        );
+        await inspectPrivate(
+          `/dashboard/workspaces/${ownWorkspace}/daily-plans`,
+          "Saved daily plans",
+          ["Foreign private marker"],
+        );
+        const plans = await cdp.js('document.querySelector("main")?.textContent || ""');
+        assert.ok(plans.includes("27 stored daily plans across all pages"));
+        assert.ok(plans.includes("not running schedules"));
+
         await inspectPrivate(
           `/dashboard/workspaces/${ownWorkspace}/jobs/${ownJob}`,
           "Saved search",
@@ -473,6 +521,15 @@ async function run(origin) {
           "Information unavailable",
           ["Foreign private marker", "Synthetic <workspace>", "Synthetic bakery"],
         );
+        await inspectPrivate(
+          `/dashboard/workspaces/${foreignWorkspace}/search/new`,
+          "Information unavailable",
+          ["Foreign private marker", "Synthetic <workspace>", "Synthetic bakery"],
+        );
+        const foreignForm = await cdp.js(
+          '!!document.querySelector("main form.search-form")',
+        );
+        assert.equal(foreignForm, false, "Foreign workspace must never render a form.");
         await cdp.send("Network.deleteCookies", {
           name: "sessionid",
           url: target.origin,
@@ -489,7 +546,7 @@ async function run(origin) {
         );
       }
       console.log(
-        "PASS: 2 Chromium private viewport cases: anonymous denial, own workspace and job, foreign tenant denied, and post-logout denial",
+        "PASS: 2 Chromium private viewports: anonymous/foreign/cookie deletion deny access; own workspace/job, read-only draft form, status pagination, source catalog and daily plans",
       );
     }
     // Fail closed if an anonymous page initiates ANY remote HTTP(S) or WS(S)
