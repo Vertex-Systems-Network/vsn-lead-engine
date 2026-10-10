@@ -235,6 +235,21 @@ def main():
                 assert "Saved lead search preferences" in plan_detail
                 assert "Synthetic bakery" in plan_detail
                 assert "Enabled by a separate operator action" in plan_detail
+                occurrences_path = (
+                    f"/dashboard/workspaces/{workspace.id}/daily-plans/{plan_id}/occurrences"
+                )
+                assert f'href="{occurrences_path}"' in plan_detail
+                occurrence_page, occurrence_headers = read(occurrences_path)
+                assert "Daily plan occurrence history" in occurrence_page
+                assert "No recorded daily occurrences" in occurrence_page
+                assert "not a live scheduler" in occurrence_page
+                assert "Foreign private marker" not in occurrence_page
+                assert "no-store" in occurrence_headers.get("Cache-Control", "")
+                private_occurrences, _ = read(
+                    f"/dashboard/workspaces/{other.id}/daily-plans/{plan_id}/occurrences"
+                )
+                assert "Daily plan occurrence history" not in private_occurrences
+                assert "Foreign private marker" not in private_occurrences
                 pause_path = f"/workspaces/{workspace.id}/daily-plans/{plan_id}/pause/"
                 assert backend + pause_path in plan_detail
                 with urlopen(
