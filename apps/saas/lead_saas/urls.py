@@ -103,6 +103,10 @@ urlpatterns = [
     path("api/v1/workspaces/<uuid:workspace_id>/", views.WorkspaceDetail.as_view()),
     path("api/v1/workspaces/", views.WorkspaceList.as_view()),
     path(
+        "api/v1/workspaces/<uuid:workspace_id>/daily-plans/",
+        views.DailyPlanList.as_view(),
+    ),
+    path(
         "api/v1/workspaces/<uuid:workspace_id>/job-summary/",
         views.JobStatusSummary.as_view(),
     ),

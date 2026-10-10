@@ -9,7 +9,7 @@ import sys
 import tempfile
 import threading
 import time
-from datetime import timedelta
+from datetime import time as local_clock_time, timedelta
 from html.parser import HTMLParser
 from http.cookiejar import CookieJar
 from pathlib import Path
@@ -38,6 +38,7 @@ def main():
         django.setup()
         from core.jobs import CONTROLS, EVIDENCE
         from core.models import (
+            DailySchedule,
             Entitlement,
             Job,
             JobOutbox,
@@ -69,6 +70,27 @@ def main():
             create_draft(user, workspace.id, search.validated_data, f"http-smoke-{i}")[0]
             for i in range(27)
         ]
+        for number in range(27):
+            DailySchedule.objects.create(
+                workspace=workspace,
+                created_by=user,
+                key=f"http-plan-{number}",
+                timezone="America/Toronto",
+                local_time=local_clock_time(8, 15),
+                search=search.validated_data,
+                request_hash="a" * 64,
+                enabled=False,
+            )
+        DailySchedule.objects.create(
+            workspace=other,
+            created_by=foreign,
+            key="http-foreign-private-plan",
+            timezone="America/New_York",
+            local_time=local_clock_time(10, 0),
+            search=search.validated_data,
+            request_hash="b" * 64,
+            enabled=False,
+        )
         client = Client()
         client.force_login(user)
         session = client.cookies["sessionid"].value
@@ -160,6 +182,42 @@ def main():
                 assert 'href="?status=draft"' in page
                 assert 'href="?status=completed"' in page
                 assert "Active workspace:" in page
+                assert (
+                    f'href="/dashboard/workspaces/{workspace.id}/daily-plans"' in page
+                )
+                plans_page, plans_headers = read(
+                    f"/dashboard/workspaces/{workspace.id}/daily-plans"
+                )
+                assert "Saved daily plans" in plans_page
+                assert "stored daily plans across all pages" in plans_page
+                assert "Disabled" in plans_page
+                assert "America/Toronto" in plans_page
+                assert "Private bakery marker" not in plans_page
+                assert "Foreign private marker" not in plans_page
+                assert "no-store" in plans_headers.get("Cache-Control", "")
+                with urlopen(
+                    Request(
+                        backend + f"/api/v1/workspaces/{workspace.id}/daily-plans/",
+                        headers={"Cookie": f"sessionid={session}"},
+                    ),
+                    timeout=10,
+                ) as response:
+                    paged = json.loads(response.read().decode())
+                    assert response.status == 200
+                assert paged["total"] == 27
+                assert len(paged["results"]) == 25
+                assert paged["next"]
+                next_plans_page, _ = read(
+                    f"/dashboard/workspaces/{workspace.id}/daily-plans?after={paged['next']}"
+                )
+                assert "Saved daily plans" in next_plans_page
+                assert "First page" in next_plans_page
+                assert "Foreign private marker" not in next_plans_page
+                foreign_plans, _ = read(
+                    f"/dashboard/workspaces/{other.id}/daily-plans"
+                )
+                assert "Foreign private marker" not in foreign_plans
+                assert "Confidential" not in foreign_plans
                 preview_path = f"/workspaces/{workspace.id}/schedule-preview/"
                 assert backend + preview_path in page
                 preview_request = Request(

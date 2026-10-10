@@ -256,3 +256,15 @@ The route renders a receipt showing the actual plan state. Enabling and running
 a schedule needs separate reviewed user controls, durable scheduler fencing,
 entitlement/provider policy checks and release acceptance; do not conflate this
 page with active recurring collection.
+
+## Read-only daily plan review
+
+`GET /api/v1/workspaces/<uuid>/daily-plans/` returns a member-authorized,
+no-store view of stored daily plan IDs, local clock/timezone, actual enabled
+state, revision and creation time. `after=<uuid>` moves through at most 25
+records per page in stable ID order. The total counts only the current
+workspace. No saved search payload, lead identifiers, user email, source evidence
+or external work are exposed. Invalid/repeated cursor arguments are rejected;
+write methods are not implemented. Viewer, foreign tenant, membership revocation,
+empty results, multiple pages and mutation denial are covered in tests.
+Recurring plan activation and scheduled collection remain separate, gated work.

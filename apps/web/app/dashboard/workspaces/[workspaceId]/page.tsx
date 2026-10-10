@@ -71,6 +71,9 @@ export default async function Workspace({
         <Link href={`/dashboard/workspaces/${workspaceId}/members`}>
           Workspace members (admins)
         </Link>
+        <Link href={`/dashboard/workspaces/${workspaceId}/daily-plans`}>
+          Saved daily plans
+        </Link>
         <a href={backendLink(`/workspaces/${workspaceId}/schedule-preview/`)}>
           Daily time preview
         </a>
