@@ -60,15 +60,18 @@ def local_policy_defaults(code=SOURCE_CODE):
 
 
 class Command(BaseCommand):
-    help = "Create or refresh a dev source policy: local-fixture (default) or overture."
+    help = "Create or refresh a fulfilment source policy: local-fixture (dev) or overture."
 
     def add_arguments(self, parser):
         parser.add_argument("--source", choices=LOCAL_SOURCES, default=SOURCE_CODE)
 
     def handle(self, *args, **options):
-        if not settings.SAAS_LOCAL_FULFILMENT:
-            raise CommandError("seed_local_source requires SAAS_LOCAL_FULFILMENT=1.")
         code = options["source"]
+        if code not in settings.SAAS_FULFILMENT_SOURCES:
+            raise CommandError(
+                f"Source {code} is not enabled for fulfilment here; local-fixture needs "
+                "SAAS_LOCAL_FULFILMENT=1, overture also works with SAAS_FULFILMENT_KEYS_FILE."
+            )
         _, created = SourcePolicy.objects.update_or_create(
             code=code, defaults=local_policy_defaults(code)
         )

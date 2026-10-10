@@ -6,7 +6,7 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
-from .local_fulfilment import verifier_settings
+from .local_fulfilment import PRODUCTION_SOURCES, load_keys_file, verifier_maps, verifier_settings
 from .web_origin import dashboard_return
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -161,15 +161,24 @@ SAAS_BATCH_SETTLED_REPLAY_ENABLED = False
 SAAS_BATCH_PAGE_SIGNING_KEY = ""
 SAAS_BATCH_PAGE_READ_ENABLED = False
 
-# Dev-only end-to-end job fulfilment against the deterministic local fixture
-# source (manage.py run_jobs). Keys are derived from SECRET_KEY and registered
-# only for source "local-fixture"; production registries above stay empty.
+# Job fulfilment (manage.py run_jobs); see lead_saas/local_fulfilment.py. Off by
+# default, so the verifier registries above stay empty.
 SAAS_LOCAL_FULFILMENT = os.environ.get("SAAS_LOCAL_FULFILMENT", "0") == "1"
+SAAS_FULFILMENT_KEYS_FILE = os.environ.get("SAAS_FULFILMENT_KEYS_FILE", "")
 SAAS_LOCAL_SIGNER_KEYS = {}
+SAAS_FULFILMENT_SOURCES = ()
+if SAAS_LOCAL_FULFILMENT and SAAS_FULFILMENT_KEYS_FILE:
+    raise ImproperlyConfigured("Use SAAS_LOCAL_FULFILMENT or SAAS_FULFILMENT_KEYS_FILE, not both")
 if SAAS_LOCAL_FULFILMENT:
     if not DEBUG:
         raise ImproperlyConfigured("SAAS_LOCAL_FULFILMENT requires SAAS_DEBUG=1")
     globals().update(verifier_settings(SECRET_KEY))
+elif SAAS_FULFILMENT_KEYS_FILE:
+    try:
+        _fulfilment_keys = load_keys_file(SAAS_FULFILMENT_KEYS_FILE)
+    except (OSError, ValueError) as exc:
+        raise ImproperlyConfigured(f"SAAS_FULFILMENT_KEYS_FILE: {exc}") from None
+    globals().update(verifier_maps(_fulfilment_keys, PRODUCTION_SOURCES))
 
 # Self-service sign-up creates an account and an owned workspace. Public
 # registration is a launch decision: on by default only in debug, otherwise it
