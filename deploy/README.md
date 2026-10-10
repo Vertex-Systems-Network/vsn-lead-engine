@@ -62,3 +62,15 @@ The API `/health/` endpoint is an unauthenticated liveness marker;
 it does **not** prove Postgres access, worker/scheduler health or readiness.
 Fail closed on any real deployment acceptance gap. Pin and review Docker
 base-image digests before production release; tags alone are insufficient.
+
+## Daily scheduling operations gate
+
+Daily plans saved via the SaaS UI are disabled. The diagnostic-only command
+`python manage.py inspect_daily_plans --actor <actor-uuid> --workspace <workspace-uuid>`
+is a bounded owner/admin read. Its candidate output is not scheduling authority:
+there is no running recurrence service and no planned job dispatch. Before any
+future activation, implement/test explicit owner actions, provider/source rights,
+workspace quota reservations, fencing and idempotency across restarts, drift and
+DST recovery, staged load/rollback, observability, customer notification and
+production approval. No deployment, timer or external provider is triggered by
+this diagnostic.
