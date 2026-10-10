@@ -326,6 +326,21 @@ def main():
                 assert "Workspace members" in members_page
                 assert "Review member role change history" in members_page
                 assert "Review role change" in members_page
+                assert "Review removal" in members_page
+                removal_path = f"/workspaces/{workspace.id}/members/{user.id}/remove/"
+                assert backend + removal_path in members_page
+                with urlopen(
+                    Request(
+                        backend + removal_path,
+                        headers={"Cookie": f"sessionid={session}"},
+                    ),
+                    timeout=10,
+                ) as removal_form:
+                    removal_html = removal_form.read().decode()
+                    assert removal_form.status == 200
+                    assert "Confirm: remove member from this workspace" in removal_html
+                    assert "Foreign private marker" not in removal_html
+                assert MembershipAudit.objects.count() == 0
                 member_role_path = (
                     f"/workspaces/{workspace.id}/members/{user.id}/role/"
                 )
