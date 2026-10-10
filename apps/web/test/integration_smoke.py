@@ -240,6 +240,26 @@ def main():
                 )
                 assert "Synthetic bakery" not in private_detail
                 assert "Foreign private marker" not in private_detail
+                # Synthetic enabled plan solely for a no-write GET stop-link smoke.
+                # This does not activate any scheduler or provider in this test.
+                DailySchedule.objects.filter(pk=plan_id).update(enabled=True)
+                enabled_detail, _ = read(
+                    f"/dashboard/workspaces/{workspace.id}/daily-plans/{plan_id}"
+                )
+                stop_path = f"/workspaces/{workspace.id}/daily-plans/{plan_id}/stop/"
+                assert backend + stop_path in enabled_detail
+                with urlopen(
+                    Request(
+                        backend + stop_path,
+                        headers={"Cookie": f"sessionid={session}"},
+                    ),
+                    timeout=10,
+                ) as response:
+                    stop_html = response.read().decode()
+                    assert response.status == 200
+                    assert "Confirm stop of this daily plan" in stop_html
+                    assert 'name="stop_token"' in stop_html
+                    assert "does not cancel drafts" in stop_html
 
                 next_plans_page, _ = read(
                     f"/dashboard/workspaces/{workspace.id}/daily-plans?after={paged['next']}"
