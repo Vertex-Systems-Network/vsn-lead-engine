@@ -65,6 +65,9 @@ export default async function Workspace({
         >
           Create draft search
         </Link>
+        <a href={backendLink(`/workspaces/${workspaceId}/search-assistance/`)}>
+          Preview search setup suggestions (local rules)
+        </a>
         <Link href={`/dashboard/workspaces/${workspaceId}/sources`}>
           Source configuration
         </Link>
