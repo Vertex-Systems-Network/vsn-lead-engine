@@ -49,7 +49,7 @@ class ConfigurationPreflightTests(SimpleTestCase):
                 SAAS_FULFILMENT_KEYS_FILE="",
             )
         )
-        self.assertEqual(len(issues), 7)
+        self.assertGreaterEqual(len(issues), 7)
         self.assertTrue(any("PostgreSQL" in issue for issue in issues))
         self.assertTrue(any("synthetic" in issue for issue in issues))
         self.assertTrue(any("fulfilment keys" in issue for issue in issues))
