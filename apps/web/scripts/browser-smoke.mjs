@@ -465,7 +465,15 @@ async function run(origin) {
           if (await cdp.js(condition)) return;
           await delay(80);
         }
-        assert.fail(`Browser interaction did not reach expected state: ${description}`);
+        // Only route/heading metadata (never form body, cookies or user data)
+        // may enter CI failure diagnostics for these disposable fixtures.
+        const view = await cdp.js(`(() => ({
+          pathname: location.pathname,
+          queryKeys: [...new URLSearchParams(location.search).keys()],
+          h1: document.querySelector("main h1")?.textContent.trim() || null,
+          title: document.title,
+        }))()`);
+        assert.fail(`Browser interaction did not reach expected state: ${description}; view=${JSON.stringify(view)}`);
       }
 
       for (const width of [320, 1280]) {
