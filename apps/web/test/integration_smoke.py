@@ -28,6 +28,54 @@ os.environ.update(
 )
 
 
+PUBLIC_MARKETING_ROUTES = frozenset({
+    "/",
+    "/capabilities",
+    "/plans",
+    "/data-handling",
+    "/faq",
+})
+PUBLIC_NAVIGATION_DESTINATIONS = PUBLIC_MARKETING_ROUTES | {
+    "/dashboard",
+    "/account/sign-in",
+}
+
+
+class PublicMarketingContract(HTMLParser):
+    """Inspect *rendered* Next HTML; no browser, JS or WCAG claim."""
+
+    def __init__(self):
+        super().__init__()
+        self.main_elements = []
+        self.h1_count = 0
+        self.anchors = []
+        self.primary_nav = 0
+        self.detail_count = 0
+        self.summary_count = 0
+        self.ids = set()
+        self.duplicate_ids = set()
+
+    def handle_starttag(self, tag, attrs):
+        fields = dict(attrs)
+        element_id = fields.get("id")
+        if element_id:
+            if element_id in self.ids:
+                self.duplicate_ids.add(element_id)
+            self.ids.add(element_id)
+        if tag == "main":
+            self.main_elements.append(fields)
+        elif tag == "h1":
+            self.h1_count += 1
+        elif tag == "nav" and fields.get("aria-label") == "Primary navigation":
+            self.primary_nav += 1
+        elif tag == "details":
+            self.detail_count += 1
+        elif tag == "summary":
+            self.summary_count += 1
+        elif tag == "a":
+            self.anchors.append(fields.get("href"))
+
+
 def main():
     from django.conf import settings
 
@@ -163,6 +211,35 @@ def main():
                     assert 'href="/dashboard"' in public_html
                     assert 'name="robots"' in public_html
                     assert "noindex" in public_html
+                    document = PublicMarketingContract()
+                    document.feed(public_html)
+                    assert document.main_elements == [
+                        {"id": "main", "tabindex": "-1", "aria-label": "Main content"}
+                    ], (public_path, document.main_elements)
+                    assert document.h1_count == 1, public_path
+                    assert document.primary_nav == 1, public_path
+                    assert not document.duplicate_ids, (public_path, document.duplicate_ids)
+                    assert document.anchors.count("#main") == 1, public_path
+                    for href in document.anchors:
+                        assert isinstance(href, str) and href, (public_path, href)
+                        if href.startswith("#"):
+                            assert href[1:] in document.ids, (public_path, href)
+                        elif href.startswith("/"):
+                            assert href in PUBLIC_NAVIGATION_DESTINATIONS, (
+                                public_path,
+                                href,
+                            )
+                        else:
+                            raise AssertionError(
+                                f"Unexpected public marketing link on {public_path}"
+                            )
+                    if public_path == "/faq":
+                        assert document.detail_count == document.summary_count == 7
+                    else:
+                        assert document.detail_count == document.summary_count == 0
+                for destination in PUBLIC_NAVIGATION_DESTINATIONS:
+                    destination_html, _ = read(destination, False)
+                    assert '<main id="main"' in destination_html, destination
                 homepage, _ = read("/", False)
                 assert 'href="/account/sign-in"' in homepage
                 assert "No result" in homepage and "guaranteed" in homepage

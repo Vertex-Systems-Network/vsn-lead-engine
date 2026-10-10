@@ -32,7 +32,9 @@ export default function Layout({
           </nav>
           <span className="badge">Development</span>
         </header>
-        <main id="main">{children}</main>
+        <main id="main" tabIndex={-1} aria-label="Main content">
+          {children}
+        </main>
         <footer>
           US &amp; Canada · SaaS development preview · Public service not
           launched
