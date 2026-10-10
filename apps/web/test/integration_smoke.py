@@ -195,9 +195,15 @@ def main():
                 assert "Private bakery marker" not in plans_page
                 assert "Foreign private marker" not in plans_page
                 assert "no-store" in plans_headers.get("Cache-Control", "")
-                paged = client.get(
-                    f"/api/v1/workspaces/{workspace.id}/daily-plans/"
-                ).json()
+                with urlopen(
+                    Request(
+                        backend + f"/api/v1/workspaces/{workspace.id}/daily-plans/",
+                        headers={"Cookie": f"sessionid={session}"},
+                    ),
+                    timeout=10,
+                ) as response:
+                    paged = json.loads(response.read().decode())
+                    assert response.status == 200
                 assert paged["total"] == 27
                 assert len(paged["results"]) == 25
                 assert paged["next"]
