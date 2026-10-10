@@ -45,8 +45,9 @@ def due_plan_diagnostics(actor, workspace_id, *, now=None, limit=25, after=None)
     entitlement_current = entitlement is not None and entitlement.is_current
     creator_ids = {p.created_by_id for p in selected if p.enabled}
     creator_roles = dict(
-        Membership.objects.filter(workspace_id=workspace_id, user_id__in=creator_ids)
-        .values_list("user_id", "role")
+        Membership.objects.filter(workspace_id=workspace_id, user_id__in=creator_ids).values_list(
+            "user_id", "role"
+        )
     )
     materialized = set(
         ScheduleOccurrence.objects.filter(
@@ -68,8 +69,7 @@ def due_plan_diagnostics(actor, workspace_id, *, now=None, limit=25, after=None)
             if (
                 not serializer.is_valid()
                 or serializer.validated_data != plan.search
-                or fingerprint(plan.search, plan.timezone, plan.local_time)
-                != plan.request_hash
+                or fingerprint(plan.search, plan.timezone, plan.local_time) != plan.request_hash
                 or plan.revision < 1
             ):
                 raise ValueError("Invalid stored schedule snapshot")
@@ -91,15 +91,13 @@ def due_plan_diagnostics(actor, workspace_id, *, now=None, limit=25, after=None)
             local_date = today - timedelta(days=days_back)
             if (plan.id, local_date) in materialized:
                 continue
-            scheduled_for, _, resolution = resolve_daily(
-                plan.timezone, local_date, plan.local_time
-            )
+            scheduled_for, _, resolution = resolve_daily(plan.timezone, local_date, plan.local_time)
             if scheduled_for is None or scheduled_for <= instant_now:
-                candidates.append(
-                    {"local_date": local_date.isoformat(), "resolution": resolution}
-                )
+                candidates.append({"local_date": local_date.isoformat(), "resolution": resolution})
         entry.update(
-            status="candidate_due_requires_execution_gates" if candidates else "no_unmaterialized_due_day",
+            status="candidate_due_requires_execution_gates"
+            if candidates
+            else "no_unmaterialized_due_day",
             due_local_dates=candidates,
         )
         results.append(entry)
