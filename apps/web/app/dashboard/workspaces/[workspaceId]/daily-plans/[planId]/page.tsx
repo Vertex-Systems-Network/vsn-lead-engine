@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { backend } from "../../../../../../lib/backend";
+import { backend, backendLink } from "../../../../../../lib/backend";
 import {
   dailyPlanDetail,
   uuid,
@@ -87,6 +87,17 @@ export default async function DailyPlanDetailPage({
           <dd>{item.search.result_limit}</dd>
         </dl>
       </section>
+      {item.enabled ? (
+        <p>
+          <a
+            href={backendLink(
+              `/workspaces/${workspaceId}/daily-plans/${planId}/pause/`,
+            )}
+          >
+            Pause future daily occurrences (owner/admin confirmation)
+          </a>
+        </p>
+      ) : null}
       <p className="muted">
         These are saved requests, not verified provider availability, lead
         counts, source rights or a guarantee of results. No activation or edit
