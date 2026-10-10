@@ -50,8 +50,9 @@ export default async function DailyPlanReadinessPage({
         production credentials or provider availability.
       </p>
       <p>
-        Plan currently {report.data.stored_enabled ? "enabled in stored state" : "disabled"}.
-        {" "}Internal source policies checked: {report.data.checked_source_count}.
+        Plan currently{" "}
+        {report.data.stored_enabled ? "enabled in stored state" : "disabled"}.{" "}
+        Internal source policies checked: {report.data.checked_source_count}.
       </p>
       <div className="table-scroll">
         <table>
@@ -66,7 +67,9 @@ export default async function DailyPlanReadinessPage({
             {report.data.checks.map((item) => (
               <tr key={item.name}>
                 <th scope="row">{item.name.replaceAll("_", " ")}</th>
-                <td>{item.status === "pass" ? "Internal check passed" : "Blocked"}</td>
+                <td>
+                  {item.status === "pass" ? "Internal check passed" : "Blocked"}
+                </td>
               </tr>
             ))}
           </tbody>
