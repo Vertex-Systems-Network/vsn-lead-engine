@@ -367,10 +367,20 @@ async function run(origin) {
         }
       }
     }
+    // Snapshot the public-only request stream before authorized private flows.
+    // A synthetic form POST may use the separately verified local Django port.
+    const publicRequests = cdp.browserRequests.slice();
     // Disposable test-only Django session: no login to external services, no
     // real credentials, and never expose the cookie in arguments or logs.
     const privateSession = process.env.VSN_BROWSER_SMOKE_SESSION;
     const privateCsrf = process.env.VSN_BROWSER_SMOKE_CSRF;
+    const draftPostOrigin = process.env.VSN_BROWSER_SMOKE_DRAFT_POST_ORIGIN;
+    if (draftPostOrigin) {
+      const backend = new URL(draftPostOrigin);
+      assert.equal(backend.protocol, "http:");
+      assert.equal(backend.hostname, target.hostname);
+      assert.ok(backend.port && backend.pathname === "/" && !backend.search);
+    }
     const ownWorkspace = process.env.VSN_BROWSER_SMOKE_OWN_WORKSPACE;
     const foreignWorkspace = process.env.VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE;
     const ownJob = process.env.VSN_BROWSER_SMOKE_OWN_JOB;
@@ -608,6 +618,50 @@ async function run(origin) {
           "Saved search",
           ["Foreign private marker"],
         );
+        if (draftPostOrigin && width === 1280) {
+          await inspectPrivate(
+            `/dashboard/workspaces/${ownWorkspace}/search/new`,
+            "Create draft search",
+            ["Foreign private marker"],
+          );
+          const prepared = await cdp.js(`(() => {
+            const form = document.querySelector("form.search-form[method=post]");
+            const categories = form?.querySelector('textarea[name="categories"]');
+            const ca = form?.querySelector('input[name="countries"][value="CA"]');
+            const token = form?.querySelector('input[name="draft_token"]');
+            if (!form || !categories || !ca || !token?.value) return false;
+            categories.value = "Synthetic browser-post salon";
+            categories.dispatchEvent(new Event("input", {bubbles: true}));
+            ca.checked = true;
+            ca.dispatchEvent(new Event("change", {bubbles: true}));
+            return form.checkValidity() && ca.checked;
+          })()`);
+          assert.equal(prepared, true, "Synthetic draft form not ready for explicit save.");
+          await clickVisible('form.search-form button[type="submit"]');
+          await waitForInteraction(
+            `(() => {
+              const prefix = ${JSON.stringify(`/dashboard/workspaces/${ownWorkspace}/jobs/`)};
+              const path = location.pathname;
+              return path.startsWith(prefix)
+                && path.length === prefix.length + 36
+                && !!document.querySelector("main h1")
+                && document.querySelector("main h1").textContent.trim() === "Saved search"
+                && document.querySelector("main")?.textContent.includes("Synthetic browser-post salon");
+            })()`,
+            "Explicit synthetic draft POST must redirect to a saved draft detail",
+          );
+          const savedDraft = await cdp.js(`(() => ({
+            jobId: location.pathname.split("/").at(-1),
+            status: document.querySelector("main span.badge")?.textContent.trim(),
+            text: document.querySelector("main")?.textContent || "",
+          }))()`);
+          assert.ok(uuid.test(savedDraft.jobId));
+          assert.notEqual(savedDraft.jobId, ownJob);
+          assert.equal(savedDraft.status, "draft");
+          assert.ok(savedDraft.text.includes("Synthetic browser-post salon"));
+          assert.equal(savedDraft.text.includes("Foreign private marker"), false);
+          console.log("PASS: one explicit synthetic browser POST saved draft without submit/dispatch");
+        }
         await inspectPrivate(
           `/dashboard/workspaces/${foreignWorkspace}`,
           "Information unavailable",
@@ -643,11 +697,20 @@ async function run(origin) {
     }
     // Fail closed if an anonymous page initiates ANY remote HTTP(S) or WS(S)
     // request. Loopback-only Next static assets are the sole network authority.
-    const remote = cdp.browserRequests.filter((url) => {
+    const remotePublic = publicRequests.filter((url) => {
       if (!/^https?:|^wss?:/i.test(url)) return false;
       return new URL(url).origin !== target.origin;
     });
-    assert.deepEqual(remote, [], "Anonymous marketing must not contact external origins.");
+    assert.deepEqual(remotePublic, [], "Anonymous marketing must not contact external origins.");
+    const allowedOrigins = new Set([
+      target.origin,
+      ...(draftPostOrigin ? [new URL(draftPostOrigin).origin] : []),
+    ]);
+    const remotePrivate = cdp.browserRequests.filter((url) => {
+      if (!/^https?:|^wss?:/i.test(url)) return false;
+      return !allowedOrigins.has(new URL(url).origin);
+    });
+    assert.deepEqual(remotePrivate, [], "Private browser smoke contacted an unapproved origin.");
     console.log(
       `PASS: ${viewports.length * paths.length} Chromium page/viewport checks; skip-link keyboard, FAQ click/focus, reduced motion, no overflow, 44px navigation/actions, zero external requests and no private markers; ${contrastSamples} text-contrast samples >=4.5:1; max ${peakRequests} first-party requests, ${(peakBytes / 1024 / 1024).toFixed(2)} MiB transfer`,
     );
