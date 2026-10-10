@@ -8,10 +8,12 @@
     "max_same_error_retries": 3,
     "max_tool_retry_attempts": 4,
     "max_destructive_actions_without_reapproval": 1,
-    "token_budget": null,
+    "token_budget": 3000000,
     "model_cost_budget": null,
-    "ci_minutes_budget": null,
-    "cloud_cost_budget": null
+    "ci_minutes_budget": 2000,
+    "cloud_cost_budget": null,
+    "max_pull_requests_per_invocation": 6,
+    "max_consecutive_non_code_merges": 1
   },
   "policy": {
     "exponential_backoff_for_retryable_external_failures": true,
@@ -23,5 +25,13 @@
     "checkpoint_completion_is_not_a_stop_condition": true,
     "skip_blocked_units_and_continue_independent_safe_work": true
   },
-  "notes": "Null monetary/token values do not mean an invented unlimited budget. During an interactive workspace invocation, use the host-exposed remaining token/tool budget as the hard ceiling and continue across newly-unblocked authorized work until that ceiling, a circuit breaker, no-ready-work state, or genuine human/external authority gate is reached. Set explicit repository limits when a persistent cost-sensitive autonomous runtime is enabled."
+  "notes": "Token, CI-minute and PR limits are explicit ceilings, not targets. Monetary limits stay null until the owner sets a figure; until then no paid model, cloud or vendor spend may be started. Within an invocation, stop at the first of: these limits, the host-exposed budget, a circuit breaker, no ready work, or a genuine owner/external authority gate.",
+  "units": {
+    "token_budget": "model tokens per interactive invocation; stop and checkpoint when reached even if the host allows more",
+    "ci_minutes_budget": "GitHub Actions minutes per calendar month across all workflows",
+    "max_pull_requests_per_invocation": "merged or opened PRs per invocation before a checkpoint summary to the owner",
+    "max_consecutive_non_code_merges": "enforced by scripts/verify_product_progress.py in CI",
+    "model_cost_budget": "USD per month; null until the owner sets a figure",
+    "cloud_cost_budget": "USD per month; null until paid hosting is approved"
+  }
 }
