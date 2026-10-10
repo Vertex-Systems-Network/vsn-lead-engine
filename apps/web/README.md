@@ -211,3 +211,13 @@ The runtime contract rejects malformed counters and preserves the explicit
 single-job/advisory flags. This does not debit usage, reserve capacity,
 guarantee future allowance, activate a schedule, authorize paid services,
 enqueue jobs or certify live provider permissions.
+
+## Daily seven-day backlog estimate
+
+The authenticated plan-readiness screen separates the existing one-job headroom
+estimate from a bounded 7-local-day due-job catch-up estimate. The latter
+validates its own schema (at most 7 due candidates, 0–3 quota rows and known
+statuses), lists aggregate hypothetical leads/jobs/provider-call requests and
+shows zero runnable candidates for disabled plans. Already-recorded local days
+and DST skipped dates are not treated as new jobs. The page performs only GETs;
+there is no schedule activation, queue, payment, provider call or budget hold.

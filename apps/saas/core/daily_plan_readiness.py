@@ -85,6 +85,7 @@ def daily_plan_readiness(actor, workspace_id, plan_id):
                 ):
                     catalog_matches = False
     record("internal_source_catalog_match", catalog_matches)
+    from .daily_catchup_budget import catchup_budget_snapshot, unavailable_catchup
     from .daily_plan_budget import single_job_budget_snapshot, unavailable_budget_snapshot
 
     if stored_ok and catalog_matches and current_entitlement:
@@ -102,6 +103,11 @@ def daily_plan_readiness(actor, workspace_id, plan_id):
     else:
         budget = unavailable_budget_snapshot()
     record("internal_quota_snapshot", budget["status"] == "advisory_single_job_fits")
+    catchup = (
+        catchup_budget_snapshot(plan, budget)
+        if stored_ok and active_creator and catalog_matches and current_entitlement
+        else unavailable_catchup()
+    )
     # Even passing catalog metadata cannot prove real capacity, legal rights,
     # price, deployed credentials, provider health, or safe auto-execution.
     return {
@@ -114,6 +120,7 @@ def daily_plan_readiness(actor, workspace_id, plan_id):
         else "internal_catalog_match_only",
         "checked_source_count": count,
         "budget_snapshot": budget,
+        "catch_up_budget_snapshot": catchup,
         "checks": checks,
         "unverified_execution_gates": [
             "current_usable_quota",
