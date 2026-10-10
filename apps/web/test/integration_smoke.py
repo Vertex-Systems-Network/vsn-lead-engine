@@ -207,6 +207,22 @@ def main():
                 assert paged["total"] == 27
                 assert len(paged["results"]) == 25
                 assert paged["next"]
+                plan_id = paged["results"][0]["id"]
+                plan_detail, _ = read(
+                    f"/dashboard/workspaces/{workspace.id}/daily-plans/{plan_id}"
+                )
+                assert "Daily plan details" in plan_detail
+                assert "Saved lead search preferences" in plan_detail
+                assert "Synthetic bakery" in plan_detail
+                assert "Disabled" in plan_detail
+                assert "Foreign private marker" not in plan_detail
+                assert "No activation or edit" in plan_detail
+                private_detail, _ = read(
+                    f"/dashboard/workspaces/{other.id}/daily-plans/{plan_id}"
+                )
+                assert "Synthetic bakery" not in private_detail
+                assert "Foreign private marker" not in private_detail
+
                 next_plans_page, _ = read(
                     f"/dashboard/workspaces/{workspace.id}/daily-plans?after={paged['next']}"
                 )
