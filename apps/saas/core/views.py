@@ -182,6 +182,40 @@ class UsageDetail(APIView):
         return Response(usage_snapshot(request.user, workspace_id))
 
 
+@never_cache
+@login_required
+@require_GET
+def daily_time_preview_page(request, workspace_id):
+    """Member-only GET preview; no schedule, queued job or provider side effect."""
+    from .schedule_preview import DailyTimePreviewForm, upcoming_daily_preview
+
+    member = membership_for(request.user, workspace_id)
+    workspace = member.workspace
+    values = request.GET
+    supplied = bool(values)
+    if supplied and (
+        set(values) != {"timezone", "time"}
+        or any(len(values.getlist(key)) != 1 for key in values)
+    ):
+        return HttpResponseBadRequest("Supply only one timezone and one local time.")
+    form = DailyTimePreviewForm(
+        values if supplied else {"timezone": workspace.timezone, "time": "08:00"}
+    )
+    decisions = (
+        upcoming_daily_preview(
+            form.cleaned_data["timezone"], form.cleaned_data["time"]
+        )
+        if form.is_valid()
+        else []
+    )
+    return render(
+        request,
+        "core/daily_time_preview.html",
+        {"workspace": workspace, "form": form, "decisions": decisions},
+        status=200 if form.is_valid() else 400,
+    )
+
+
 @login_required
 @require_GET
 def usage_page(request, workspace_id):
