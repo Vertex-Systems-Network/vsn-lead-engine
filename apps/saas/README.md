@@ -367,3 +367,38 @@ provider credentials/health, operator release and production scheduler safety
 remain unverified even when internal fields match. It never enables plans,
 reserves usage, creates occurrences/jobs, dispatches providers or takes a
 payment. Tenant, role, policy corruption and no-write tests are required.
+
+## Bounded daily tick development harness (default read-only)
+
+A trusted operator can preview the same current-owner/admin workspace-scoped
+seven-local-day candidates with:
+
+```bash
+python manage.py tick_daily_plans --actor <owner-or-admin-uuid> --workspace <workspace-uuid> --limit 5
+```
+
+The command is **dry-run by default**, returns redacted JSON, pages at most five
+plans with `--after <next-uuid>`, and never changes a plan, schedule, job,
+usage or provider state without an explicit separate development-only gate.
+
+The strictly isolated test-fixture path accepts `--apply-dev` **only if** all
+three conditions are set in the trusted local runtime:
+`SAAS_DEBUG=1`, `SAAS_LOCAL_FULFILMENT=1`, and
+`SAAS_DAILY_DEV_APPLY=1`. The configured source registry must include
+`local-fixture`, and each candidate saved plan must request **only**
+`source_codes=["local-fixture"]`. No frontend can toggle this setting, and
+this command does not enable inactive plans. Test fixtures synthetically
+set enabled plans solely for verifying the scheduler boundary.
+
+Only the existing workspace-locking, membership/entitlement-revalidating,
+revision-fenced `materialize_daily` function may write an occurrence and
+**draft**. No job outbox, worker enqueue, collection, external provider call,
+usage reservation or billing is made. If a plan is paused, revoked, modified,
+or its entitlement expires between preview and write, that attempt is
+blocked and reports only a generic recheck status. Prior occurrences are
+not deleted. This is **not** a durable recurring scheduler, active customer
+automation, a production loop, or a guarantee of due-date delivery.
+
+Operational promotion requires externally reviewed source rights, active
+entitlement/quotas, secure credentials, a long-running fenced scheduler,
+recovery/observability, explicit activation controls and release approval.
