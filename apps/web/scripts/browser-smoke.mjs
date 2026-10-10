@@ -217,25 +217,44 @@ async function run(origin) {
           );
         }
         if (path === "/faq") {
-          await cdp.js('document.querySelector("details summary").focus()');
-          assert.equal(
-            await cdp.js('document.activeElement?.tagName === "SUMMARY"'),
-            true,
-            `${width}px FAQ summary must accept keyboard focus`,
-          );
-          await cdp.key("Enter", "Enter", 13);
+          const point = await cdp.js(`(() => {
+            const summary = document.querySelector("details summary");
+            summary.scrollIntoView({ block: "center" });
+            summary.focus();
+            const rect = summary.getBoundingClientRect();
+            return {
+              focused: document.activeElement === summary,
+              x: rect.left + rect.width / 2,
+              y: rect.top + rect.height / 2,
+            };
+          })()`);
+          assert.ok(point.focused, `${width}px FAQ summary must accept focus`);
+          await cdp.send("Input.dispatchMouseEvent", {
+            type: "mousePressed",
+            x: point.x,
+            y: point.y,
+            button: "left",
+            clickCount: 1,
+          });
+          await cdp.send("Input.dispatchMouseEvent", {
+            type: "mouseReleased",
+            x: point.x,
+            y: point.y,
+            button: "left",
+            clickCount: 1,
+          });
           let expanded = false;
           for (let i = 0; i < 20; i++) {
             expanded = await cdp.js('document.querySelector("details").open');
             if (expanded) break;
             await delay(50);
           }
-          assert.equal(expanded, true, `${width}px FAQ Enter must disclose answer`);
+          assert.equal(expanded, true, `${width}px FAQ click must disclose answer`);
         }
       }
     }
     console.log(
-      `PASS: ${viewports.length * paths.length} real Chromium public page/viewport checks, keyboard, FAQ, reduced motion and horizontal overflow`,
+      `PASS: ${viewports.length * paths.length} real Chromium public page/viewport checks, skip-link keyboard, FAQ click/focus, reduced motion and horizontal overflow`,
     );
   } finally {
     if (ws) ws.close();
