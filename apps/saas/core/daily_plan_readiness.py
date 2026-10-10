@@ -5,7 +5,7 @@ No plan, job, reservation or provider is ever changed or contacted here.
 """
 
 from django.http import Http404
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .jobs import CONTROLS, EVIDENCE, nonempty_mapping
 from .models import DailySchedule, Entitlement, Membership, SourcePolicy
@@ -37,7 +37,7 @@ def daily_plan_readiness(actor, workspace_id, plan_id):
                 plan.revision >= 1
                 and fingerprint(plan.search, plan.timezone, plan.local_time) == plan.request_hash
             )
-        except (ValueError, TypeError, AttributeError):
+        except (ValueError, TypeError, AttributeError, ValidationError):
             valid_clock = False
     stored_ok = record("stored_plan_snapshot", bool(valid_search and valid_clock))
 
