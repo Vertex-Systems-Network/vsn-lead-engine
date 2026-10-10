@@ -563,3 +563,48 @@ test("job summary uses a single exact session-only read and refuses query mutati
   );
   assert.equal(anonymous.kind, "signin");
 });
+
+test("daily plans list is exact, session-only and rejects arbitrary paths", async () => {
+  const id = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const cursor = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+  const root = `/api/v1/workspaces/${id}/daily-plans/`;
+  for (const path of [root, `${root}?after=${cursor}`]) {
+    const result = await readBackend(
+      "http://localhost:8000",
+      path,
+      session,
+      async (url, options) => {
+        assert.equal(url.pathname + url.search, path);
+        assert.deepEqual(options.headers, {
+          Accept: "application/json",
+          Cookie: `sessionid=${session}`,
+        });
+        assert.equal(options.cache, "no-store");
+        assert.equal(options.redirect, "manual");
+        return new Response(
+          `{"workspace_id":"${id}","total":0,"results":[],"next":null}`,
+          { headers: { "content-type": "application/json" } },
+        );
+      },
+    );
+    assert.equal(result.kind, "ok");
+  }
+  for (const bad of [
+    `${root}?page=1`,
+    `${root}?after=invalid`,
+    `${root}?after=${cursor}&status=disabled`,
+    `${root}../members/`,
+    `${root}${cursor}/`,
+  ]) {
+    await assert.rejects(readBackend("http://localhost:8000", bad, session));
+  }
+  const anonymous = await readBackend(
+    "http://localhost:8000",
+    root,
+    undefined,
+    () => {
+      throw new Error("Anonymous daily plan list reached the backend");
+    },
+  );
+  assert.equal(anonymous.kind, "signin");
+});
