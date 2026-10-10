@@ -352,3 +352,18 @@ secrets, usernames or entitlement data. A paused plan's previously created
 drafts remain visible: **pause stops future occurrences; it does not retroactively
 cancel or delete previous jobs**. Read access cannot materialize or dispatch any
 work; an empty history is not proof of an active or inactive production worker.
+
+## Read-only daily source readiness (not approval to execute)
+
+`GET /api/v1/workspaces/<uuid>/daily-plans/<uuid>/readiness/` is current
+workspace owner/admin only and does not accept filters, mutation verbs, or
+request payloads. It validates the stored plan fingerprint/clock and creator,
+checks current entitlement and compares explicit requested source codes with
+operator-maintained `SourcePolicy` flags, required evidence/control fields and
+scope capabilities **without** returning the confidential policy content.
+Its verdict is only `blocked` or `internal_catalog_match_only`; neither is
+permission to run. Current usable quota, commercial/legal source rights,
+provider credentials/health, operator release and production scheduler safety
+remain unverified even when internal fields match. It never enables plans,
+reserves usage, creates occurrences/jobs, dispatches providers or takes a
+payment. Tenant, role, policy corruption and no-write tests are required.

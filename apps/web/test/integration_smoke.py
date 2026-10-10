@@ -233,6 +233,25 @@ def main():
                 )
                 assert "Daily plan details" in plan_detail
                 assert "Saved lead search preferences" in plan_detail
+                assert (
+                    f'href="/dashboard/workspaces/{workspace.id}/daily-plans/{plan_id}/readiness"'
+                    in plan_detail
+                )
+                readiness_page, readiness_headers = read(
+                    f"/dashboard/workspaces/{workspace.id}/daily-plans/{plan_id}/readiness"
+                )
+                assert "Daily plan source readiness review" in readiness_page
+                assert "Internal checks blocked" in readiness_page
+                assert "Not verified" in readiness_page
+                assert "source commercial rights" in readiness_page
+                assert "Foreign private marker" not in readiness_page
+                assert "Synthetic bakery" not in readiness_page
+                assert "no-store" in readiness_headers.get("Cache-Control", "")
+                foreign_readiness, _ = read(
+                    f"/dashboard/workspaces/{other.id}/daily-plans/{plan_id}/readiness"
+                )
+                assert "Daily plan source readiness review" not in foreign_readiness
+                assert "Foreign private marker" not in foreign_readiness
                 assert "Synthetic bakery" in plan_detail
                 assert "Enabled by a separate operator action" in plan_detail
                 occurrences_path = (

@@ -120,6 +120,10 @@ urlpatterns = [
         views.DailyPlanDetail.as_view(),
     ),
     path(
+        "api/v1/workspaces/<uuid:workspace_id>/daily-plans/<uuid:plan_id>/readiness/",
+        views.DailyPlanReadiness.as_view(),
+    ),
+    path(
         "api/v1/workspaces/<uuid:workspace_id>/daily-plans/<uuid:plan_id>/occurrences/",
         views.DailyOccurrenceHistory.as_view(),
     ),

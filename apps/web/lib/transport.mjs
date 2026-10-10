@@ -36,6 +36,8 @@ const dailyDiagnosticsPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/daily-diagnostics\/(?:\?after=[0-9a-f-]{36})?$/;
 const dailyOccurrencePath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/daily-plans\/[0-9a-f-]{36}\/occurrences\/(?:\?before=[0-9]{4}-[0-9]{2}-[0-9]{2})?$/;
+const dailyPlanReadinessPath =
+  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/daily-plans\/[0-9a-f-]{36}\/readiness\/$/;
 const dailyPlanDetailPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/daily-plans\/[0-9a-f-]{36}\/$/;
 const dailyPlansPath =
@@ -63,6 +65,7 @@ export async function readBackend(
     !jobSummaryPath.test(path) &&
     !dailyDiagnosticsPath.test(path) &&
     !dailyPlansPath.test(path) &&
+    !dailyPlanReadinessPath.test(path) &&
     !dailyPlanDetailPath.test(path) &&
     !dailyOccurrencePath.test(path) &&
     !membersPath.test(path) &&

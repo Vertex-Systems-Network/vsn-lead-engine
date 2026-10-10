@@ -111,6 +111,69 @@ export function dueDiagnostics(v: unknown): v is DueDiagnostics {
   );
 }
 
+export const planReadinessCheckNames = [
+  "stored_plan_snapshot",
+  "creator_membership",
+  "entitlement_current",
+  "explicit_source_selection",
+  "internal_source_catalog_match",
+] as const;
+export const planReadinessExternalGates = [
+  "current_usable_quota",
+  "source_commercial_rights",
+  "provider_credentials_and_health",
+  "scheduler_fencing_and_observability",
+  "operator_release_and_deployment",
+] as const;
+export type PlanReadiness = {
+  workspace_id: string;
+  plan_id: string;
+  stored_enabled: boolean;
+  advisory_only: true;
+  status: "blocked" | "internal_catalog_match_only";
+  checked_source_count: number;
+  checks: {
+    name: (typeof planReadinessCheckNames)[number];
+    status: "pass" | "blocked";
+  }[];
+  unverified_execution_gates: string[];
+};
+export function planReadiness(v: unknown): v is PlanReadiness {
+  if (
+    !object(v) ||
+    !uuid(v.workspace_id) ||
+    !uuid(v.plan_id) ||
+    typeof v.stored_enabled !== "boolean" ||
+    v.advisory_only !== true ||
+    !["blocked", "internal_catalog_match_only"].includes(String(v.status)) ||
+    !count(v.checked_source_count) ||
+    v.checked_source_count > 12 ||
+    !Array.isArray(v.checks) ||
+    v.checks.length !== planReadinessCheckNames.length ||
+    !Array.isArray(v.unverified_execution_gates) ||
+    v.unverified_execution_gates.length !== planReadinessExternalGates.length
+  )
+    return false;
+  const checks = v.checks;
+  const externalGates = v.unverified_execution_gates;
+  return (
+    planReadinessCheckNames.every((name) =>
+      checks.some(
+        (item: unknown) =>
+          object(item) &&
+          item.name === name &&
+          ["pass", "blocked"].includes(String(item.status)),
+      ),
+    ) &&
+    new Set(checks.map((item: unknown) => (object(item) ? item.name : null)))
+      .size === planReadinessCheckNames.length &&
+    planReadinessExternalGates.every((name) => externalGates.includes(name)) &&
+    new Set(externalGates).size === planReadinessExternalGates.length &&
+    (v.status === "blocked") ===
+      checks.some((item: unknown) => object(item) && item.status === "blocked")
+  );
+}
+
 export type DailyPlan = {
   id: string;
   timezone: string;
