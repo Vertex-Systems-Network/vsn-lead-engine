@@ -10,6 +10,7 @@ from core.form_context import (
     SubmitFormContext,
 )
 from core.invitation_pages import issue_invitation_page, redeem_invitation_page
+from core.invitation_revocation_pages import pending_invitations_page, revoke_invitation_page
 from core.login_security import ProtectedLoginView
 from core.member_removal_page import member_removal_page
 from core.member_role_page import member_role_change_page
@@ -45,6 +46,16 @@ urlpatterns = [
         "workspaces/<uuid:workspace_id>/invitations/new/",
         issue_invitation_page,
         name="invitation-issue-page",
+    ),
+    path(
+        "workspaces/<uuid:workspace_id>/invitations/",
+        pending_invitations_page,
+        name="invitations-pending-page",
+    ),
+    path(
+        "workspaces/<uuid:workspace_id>/invitations/<uuid:invitation_id>/revoke/",
+        revoke_invitation_page,
+        name="invitation-revoke-page",
     ),
     path("api/v1/account/sign-in-form/", sign_in_form),
     path("accounts/login/", ProtectedLoginView.as_view()),
