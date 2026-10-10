@@ -194,17 +194,14 @@ def daily_time_preview_page(request, workspace_id):
     values = request.GET
     supplied = bool(values)
     if supplied and (
-        set(values) != {"timezone", "time"}
-        or any(len(values.getlist(key)) != 1 for key in values)
+        set(values) != {"timezone", "time"} or any(len(values.getlist(key)) != 1 for key in values)
     ):
         return HttpResponseBadRequest("Supply only one timezone and one local time.")
     form = DailyTimePreviewForm(
         values if supplied else {"timezone": workspace.timezone, "time": "08:00"}
     )
     decisions = (
-        upcoming_daily_preview(
-            form.cleaned_data["timezone"], form.cleaned_data["time"]
-        )
+        upcoming_daily_preview(form.cleaned_data["timezone"], form.cleaned_data["time"])
         if form.is_valid()
         else []
     )
