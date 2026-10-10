@@ -165,8 +165,8 @@ export function planReadiness(v: unknown): v is PlanReadiness {
           ["pass", "blocked"].includes(String(item.status)),
       ),
     ) &&
-    new Set(checks.map((item: unknown) => (object(item) ? item.name : null))).size ===
-      planReadinessCheckNames.length &&
+    new Set(checks.map((item: unknown) => (object(item) ? item.name : null)))
+      .size === planReadinessCheckNames.length &&
     planReadinessExternalGates.every((name) => externalGates.includes(name)) &&
     new Set(externalGates).size === planReadinessExternalGates.length &&
     (v.status === "blocked") ===
