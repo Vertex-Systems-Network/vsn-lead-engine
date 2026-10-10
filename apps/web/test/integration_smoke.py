@@ -154,6 +154,10 @@ def main():
                 assert "no-store" in headers.get("Cache-Control", "")
                 page, _ = read(f"/dashboard/workspaces/{workspace.id}")
                 assert "Synthetic bakery" in page and "Next page" in page
+                assert "Job status summary" in page
+                assert "27 saved searches across all pages" in page
+                assert "View draft jobs" in page
+                assert "View completed jobs" in page
                 assert "Active workspace:" in page
                 assert "Synthetic &lt;workspace&gt;" in page
                 members_page, _ = read(
