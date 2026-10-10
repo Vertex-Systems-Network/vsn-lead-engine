@@ -79,9 +79,7 @@ class DailyPlanPauseTests(TestCase):
         self.assertIn("no-store", page["Cache-Control"])
         self.assertContains(page, "already disabled")
         self.assertNotContains(page, "Confirm: pause future daily occurrences")
-        original, changed = pause_daily_schedule(
-            self.owner, self.workspace.id, self.plan.id, 1
-        )
+        original, changed = pause_daily_schedule(self.owner, self.workspace.id, self.plan.id, 1)
         self.assertFalse(changed)
         self.assertEqual(original.revision, 1)
         self.assertFalse(Job.objects.exists())
@@ -142,9 +140,7 @@ class DailyPlanPauseTests(TestCase):
         self.client.force_login(self.owner)
         raw = {
             "expected_revision": "1",
-            "pause_token": issue_pause_token(
-                self.owner, self.workspace.id, self.plan.id, 1
-            ),
+            "pause_token": issue_pause_token(self.owner, self.workspace.id, self.plan.id, 1),
         }
         self.assertEqual(self.client.post(self.path, raw).status_code, 403)
         payload = self.payload()
@@ -152,9 +148,7 @@ class DailyPlanPauseTests(TestCase):
             {"enabled": "true"},
             {"pause_token": "forged"},
             {"expected_revision": "2"},
-            {"pause_token": issue_pause_token(
-                self.admin, self.workspace.id, self.plan.id, 1
-            )},
+            {"pause_token": issue_pause_token(self.admin, self.workspace.id, self.plan.id, 1)},
         ):
             with self.subTest(extra=extra):
                 status = self.client.post(self.path, {**payload, **extra}).status_code
