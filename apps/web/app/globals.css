@@ -581,6 +581,13 @@ footer {
   }
   .marketing-art-flow {
     font-size: 0.67rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .marketing-art-flow span:nth-child(odd) {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
   }
   .marketing-art-flow span:nth-child(odd) {
     padding: 7px 6px;
