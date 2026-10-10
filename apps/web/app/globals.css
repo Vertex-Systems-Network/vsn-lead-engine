@@ -35,6 +35,9 @@ a {
   text-underline-offset: 4px;
 }
 .brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   text-decoration: none;
   font-size: 1.2rem;
   font-weight: 800;
@@ -211,6 +214,9 @@ footer {
   gap: 8px 18px;
 }
 .site-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: 0.92rem;
   font-weight: 650;
   white-space: nowrap;

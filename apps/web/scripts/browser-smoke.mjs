@@ -187,6 +187,12 @@ async function run(origin) {
             titleCount: document.querySelectorAll("main h1").length,
             skipValid: !!skip && main.id === "main" && main.tabIndex === -1,
             navCount: nav ? nav.querySelectorAll("a").length : 0,
+            touchTargets: [...document.querySelectorAll(
+              "header .brand, header .site-nav a, .marketing-actions a"
+            )].filter((node) => node.getClientRects().length > 0).map((node) => {
+              const rect = node.getBoundingClientRect();
+              return { label: node.textContent.trim(), width: rect.width, height: rect.height };
+            }),
             faqCount: document.querySelectorAll("details > summary").length,
             noindex: !!document.querySelector('meta[name="robots"][content*="noindex"]'),
             linkMotion: link ? getComputedStyle(link).transitionDuration : "none",
@@ -265,11 +271,11 @@ async function run(origin) {
         peakRequests = Math.max(peakRequests, quality.requests);
         contrastSamples += quality.samples.length;
         assert.ok(
-          quality.bytes <= 4 * 1024 * 1024,
+          quality.bytes <= 1 * 1024 * 1024,
           `Page-weight regression ${path} ${width}px: ${quality.bytes} bytes`,
         );
         assert.ok(
-          quality.requests <= 100,
+          quality.requests <= 60,
           `First-party request regression ${path} ${width}px: ${quality.requests} requests`,
         );
         assert.ok(quality.samples.length >= 2, `Missing readability samples: ${path}`);
@@ -286,6 +292,13 @@ async function run(origin) {
         assert.equal(measured.titleCount, 1, `${path} ${width}px headings`);
         assert.ok(measured.skipValid, `${path} ${width}px skip target`);
         assert.ok(measured.navCount >= 5, `${path} ${width}px navigation`);
+        assert.ok(measured.touchTargets.length >= 7, `${path} ${width}px touch targets`);
+        for (const target of measured.touchTargets) {
+          assert.ok(
+            target.width >= 24 && target.height >= 44,
+            `Undersized navigation or marketing action ${path} ${width}px: ${JSON.stringify(target)}`,
+          );
+        }
         assert.equal(
           measured.faqCount,
           path === "/faq" ? 7 : 0,
@@ -362,7 +375,7 @@ async function run(origin) {
     });
     assert.deepEqual(remote, [], "Anonymous marketing must not contact external origins.");
     console.log(
-      `PASS: ${viewports.length * paths.length} Chromium page/viewport checks; skip-link keyboard, FAQ click/focus, reduced motion, no overflow, zero external requests and no private markers; ${contrastSamples} text-contrast samples >=4.5:1; max ${peakRequests} first-party requests, ${(peakBytes / 1024 / 1024).toFixed(2)} MiB transfer`,
+      `PASS: ${viewports.length * paths.length} Chromium page/viewport checks; skip-link keyboard, FAQ click/focus, reduced motion, no overflow, 44px navigation/actions, zero external requests and no private markers; ${contrastSamples} text-contrast samples >=4.5:1; max ${peakRequests} first-party requests, ${(peakBytes / 1024 / 1024).toFixed(2)} MiB transfer`,
     );
   } finally {
     if (ws) ws.close();
