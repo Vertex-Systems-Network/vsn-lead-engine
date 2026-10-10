@@ -162,3 +162,15 @@ with no leakage of another workspace's plan IDs, source-search payload or
 credentials. The UI explains that due candidates are **not** a runnable schedule,
 no change/activation controls exist, and source rights, quotas, credentials,
 operator release and actual deployment still need independent authorization.
+
+## Pause future daily plan occurrences
+
+When the **server** reports an enabled plan, its native Next detail screen links
+to the fixed-origin Django pause-only confirmation. The Django action is
+CSRF-protected, signed to current owner/admin identity and revision, and can
+only change `enabled` to false. No direct Next mutation API is exposed. A
+read-only plan or an ordinary member/viewer never gains permission by seeing a
+link. Existing created jobs are not cancelled by this operation; the page
+explicitly discloses that limit. Real Django/Next HTTP, owner/admin, foreign,
+revocation, stale revision and PostgreSQL scheduler-race regressions cover the
+feature. This is a **safety stop**, not recurring collection activation.

@@ -1,0 +1,33 @@
+{% extends "core/job_base.html" %}
+{% block title %}Pause daily plan{% endblock %}
+{% block content %}
+<h1>Pause daily plan — {{ workspace.name }}</h1>
+<p>Plan ID: <code>{{ plan.id }}</code></p>
+<p>Current stored state:
+<strong>{% if plan.enabled %}Enabled{% else %}Disabled{% endif %}</strong>
+(revision {{ plan.revision }}).</p>
+<p><strong>Pause is one-way here.</strong> It only prevents future, not-yet-materialized
+daily occurrences from being created. Existing saved drafts, queued/running jobs,
+completed exports, usage reservations and previous occurrences are <strong>not</strong>
+cancelled or erased by this action.</p>
+{% if receipt %}
+<section role="status" aria-label="Pause receipt">
+  <h2>Plan is disabled</h2>
+  <p>The current plan is disabled. No schedule or provider action was started
+  by this confirmation.</p>
+</section>
+{% elif form %}
+<form action="{% url 'pause-daily-plan-page' workspace.id plan.id %}" method="post">
+  {% csrf_token %}
+  {{ form.expected_revision.as_hidden }}
+  {{ form.pause_token }}
+  {% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
+  {% if form.expected_revision.errors %}<div role="alert">{{ form.expected_revision.errors }}</div>{% endif %}
+  {% if form.pause_token.errors %}<div role="alert">{{ form.pause_token.errors }}</div>{% endif %}
+  <button type="submit">Confirm: pause future daily occurrences</button>
+</form>
+{% else %}
+<p>This plan is already disabled. No pause action is available.</p>
+{% endif %}
+<p><a href="/dashboard/workspaces/{{ workspace.id }}/daily-plans/{{ plan.id }}">Return to saved plan details</a></p>
+{% endblock %}

@@ -318,3 +318,21 @@ DST resolution, an explicit `advisory_only` field and a list of execution gates.
 No plan is enabled, materialized or dispatched by this endpoint. HTTP and
 PostgreSQL tenant/mutation tests cover the authorization boundary; it does not
 replace scheduler fencing, source and entitlement acceptance or deployment.
+
+## Owner/admin one-way daily plan pause (no activation)
+
+An enabled plan (such as one changed by a separate operator) can be **disabled**
+from `/workspaces/<uuid>/daily-plans/<plan-id>/pause/` using an explicit
+CSRF-protected browser confirmation. The form is bound to the authenticated
+actor/workspace/plan and a one-hour signed expected revision. Django refetches
+current owner/admin rights while holding the workspace/plan locks. A successful
+pause increments the revision and writes only `enabled=False` and `revision`.
+A stale form fails with HTTP 409. Disabled plans cannot be enabled by this
+endpoint. An inactive entitlement is not grounds to refuse an emergency stop.
+The lock ordering matches internal daily materialization, with PostgreSQL race
+tests proving that no new occurrence can materialize *after* a successful pause.
+One due draft may still be created if materialization completed first; existing
+drafts, queued jobs, reservations, completed results and previous occurrences
+are **not cancelled or erased** by pausing. A separate cancellation or retention
+workflow is required for those. No automatic scheduler, provider, recurring
+job dispatch, payment or production activation has been introduced.
