@@ -162,3 +162,13 @@ with no leakage of another workspace's plan IDs, source-search payload or
 credentials. The UI explains that due candidates are **not** a runnable schedule,
 no change/activation controls exist, and source rights, quotas, credentials,
 operator release and actual deployment still need independent authorization.
+
+## Emergency stop confirmation link
+
+For a plan whose backend state is actually enabled, the Next plan-detail page
+shows a **Review stop confirmation (owner/admin)** link to an authenticated,
+CSRF-protected Django form on the fixed trusted public origin. This is not a
+Next write proxy; Django rechecks the actor's current role, exact plan,
+revision and signed one-hour form token before disabling future materialization.
+A disabled plan shows no stop link. This action does not stop already-created
+jobs or reverse completed work and cannot activate any plan or collection.
