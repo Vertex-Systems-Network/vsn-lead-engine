@@ -56,9 +56,7 @@ class InvitationRevocationPageTests(TestCase):
         claim = self.review()
         self.assertEqual(MembershipAudit.objects.count(), 0)
         self.assertEqual(self.client.post(self.revoke_path, claim).status_code, 200)
-        self.assertIsNotNone(
-            WorkspaceInvitation.objects.get(pk=self.invitation.pk).revoked_at
-        )
+        self.assertIsNotNone(WorkspaceInvitation.objects.get(pk=self.invitation.pk).revoked_at)
         self.assertFalse(
             Membership.objects.filter(workspace=self.workspace, user=self.target).exists()
         )
@@ -139,9 +137,7 @@ class InvitationRevocationPageTests(TestCase):
         )
         claim = self.review()
         self.assertEqual(
-            self.client.post(
-                self.revoke_path, {**claim, "confirm_revocation": ""}
-            ).status_code,
+            self.client.post(self.revoke_path, {**claim, "confirm_revocation": ""}).status_code,
             400,
         )
         self.assertEqual(
