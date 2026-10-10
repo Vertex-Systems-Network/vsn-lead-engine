@@ -24,9 +24,7 @@ class AdminOperationalHealthTests(TestCase):
         self.viewer = User.objects.create_user(username="health-admin-viewer")
         self.foreign = User.objects.create_user(username="health-foreign-owner")
         self.target = User.objects.create_user(username="health-pending-target")
-        self.workspace = create_workspace(
-            self.owner, {"name": "Private health", "timezone": "UTC"}
-        )
+        self.workspace = create_workspace(self.owner, {"name": "Private health", "timezone": "UTC"})
         self.foreign_workspace = create_workspace(
             self.foreign, {"name": "Foreign confidential marker", "timezone": "UTC"}
         )
@@ -98,12 +96,12 @@ class AdminOperationalHealthTests(TestCase):
             self.assertContains(page, "read-only")
             report = page.context["report"]
             self.assertTrue(report["advisory_only"])
-            self.assertEqual(report["member_roles"], {
-                "owner": 1, "admin": 1, "member": 0, "viewer": 1
-            })
-            self.assertEqual(report["invitations"], {
-                "pending": 1, "accepted": 0, "revoked": 0, "expired": 0
-            })
+            self.assertEqual(
+                report["member_roles"], {"owner": 1, "admin": 1, "member": 0, "viewer": 1}
+            )
+            self.assertEqual(
+                report["invitations"], {"pending": 1, "accepted": 0, "revoked": 0, "expired": 0}
+            )
             self.assertEqual(report["jobs"]["queued"], 1)
             self.assertEqual(report["jobs"]["failed"], 0)
             self.assertEqual(report["outboxes"]["pending"], 1)
@@ -143,9 +141,7 @@ class AdminOperationalHealthTests(TestCase):
         self.client.force_login(self.foreign)
         self.assertEqual(self.client.get(self.path).status_code, 404)
         self.assertEqual(
-            self.client.get(
-                f"/workspaces/{self.foreign_workspace.id}/admin/health/"
-            ).status_code,
+            self.client.get(f"/workspaces/{self.foreign_workspace.id}/admin/health/").status_code,
             200,
         )
         self.client.force_login(self.admin)
