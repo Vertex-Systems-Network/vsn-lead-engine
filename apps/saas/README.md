@@ -180,6 +180,15 @@ Readonly `billing_status --actor <current-admin-uuid> --workspace <workspace-uui
 Pure `core.batch_manifest` v3 proof validation has separate empty source/registry authorities and no endpoint/consumer/ORM/network. It preserves v2 intake behavior. See ADR-SAAS-003 for the next durable accounting/pagination gates; synthetic proof shape is not qualification, R2 commit truth or provider permission.
 
 
+## Scoped workspace identity read
+
+`GET /api/v1/workspaces/<uuid>/` returns a limited WorkspaceSerializer record
+only for a currently authenticated member. It is no-store and supports no POST,
+PATCH or DELETE. Anonymous/foreign/revoked actor tests verify denial without
+revealing the workspace name. Frontend access is through the fixed trusted
+server-side GET transport, never a client-supplied target or authorization
+substitute. No administrative workspace edit endpoint is activated.
+
 ## Staging readiness (no deployment performed)
 
 The read-only `check_staging` management command is a **fail-closed preflight**,
