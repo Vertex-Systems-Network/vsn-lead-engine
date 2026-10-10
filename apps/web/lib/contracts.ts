@@ -226,6 +226,7 @@ function catchUpBudgetCapacity(v: unknown): boolean {
   )
     return false;
   const rows = v.counters;
+  const dueJobs = v.due_job_candidates as number;
   const noEstimate = v.status === "disabled" || v.status === "unavailable";
   const noCapacityClaim =
     noEstimate ||
@@ -260,11 +261,11 @@ function catchUpBudgetCapacity(v: unknown): boolean {
     (noCapacityClaim ||
       v.affordable_due_job_candidates ===
         Math.min(
-          v.due_job_candidates,
+          dueJobs,
           ...rows.map((row: Record<string, number>) => {
-            const perJob = row.requested / (v.due_job_candidates || 1);
+            const perJob = row.requested / (dueJobs || 1);
             return perJob === 0
-              ? v.due_job_candidates
+              ? dueJobs
               : Math.floor(row.headroom / perJob);
           }),
         )) &&
