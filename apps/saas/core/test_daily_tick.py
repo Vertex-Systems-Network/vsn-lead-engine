@@ -45,9 +45,7 @@ class DailyTickTests(TestCase):
         self.owner = User.objects.create_user(username="tick-owner")
         self.viewer = User.objects.create_user(username="tick-viewer")
         self.other = User.objects.create_user(username="tick-other")
-        self.workspace = create_workspace(
-            self.owner, {"name": "Private tick", "timezone": "UTC"}
-        )
+        self.workspace = create_workspace(self.owner, {"name": "Private tick", "timezone": "UTC"})
         self.foreign = create_workspace(
             self.other, {"name": "Foreign hidden tick", "timezone": "UTC"}
         )
@@ -92,8 +90,9 @@ class DailyTickTests(TestCase):
     def test_synthetic_enabled_preview_is_still_read_only_and_redacted(self):
         DailySchedule.objects.filter(pk=self.plan.id).update(enabled=True)
         report = self.tick()
-        self.assertEqual(report["plans"][0]["diagnostic_status"],
-                         "candidate_due_requires_execution_gates")
+        self.assertEqual(
+            report["plans"][0]["diagnostic_status"], "candidate_due_requires_execution_gates"
+        )
         self.assertEqual(report["considered_dates"], 7)
         self.assertEqual(report["created_drafts"], 0)
         self.assertEqual(report["plans"][0]["candidate_dates"][-1], "2026-11-01")
@@ -142,8 +141,7 @@ class DailyTickTests(TestCase):
 
     def test_non_fixture_never_writes_even_when_dev_gate_is_set(self):
         other, _ = create_daily_schedule(
-            self.owner, self.workspace.id,
-            NON_FIXTURE_SEARCH, "UTC", time(8), "actual-source-scope"
+            self.owner, self.workspace.id, NON_FIXTURE_SEARCH, "UTC", time(8), "actual-source-scope"
         )
         DailySchedule.objects.filter(pk=other.id).update(enabled=True)
         with self.allow_fixture(), patch.dict(os.environ, {"SAAS_DAILY_DEV_APPLY": "1"}):
@@ -190,8 +188,7 @@ class DailyTickTests(TestCase):
     def test_bounded_paging_and_nonmutating_operator_command(self):
         for i in range(7):
             create_daily_schedule(
-                self.owner, self.workspace.id,
-                FIXTURE_SEARCH, "UTC", time(8), f"extra-{i}"
+                self.owner, self.workspace.id, FIXTURE_SEARCH, "UTC", time(8), f"extra-{i}"
             )
         first = self.tick(limit=5)
         self.assertEqual(first["total_plans"], 8)
