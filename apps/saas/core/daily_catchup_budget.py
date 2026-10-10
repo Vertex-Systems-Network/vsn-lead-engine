@@ -63,8 +63,7 @@ def catchup_budget_snapshot(plan, single_budget, *, now=None):
             due_jobs += 1
 
     capacity = [
-        {**row, "requested": row["requested"] * due_jobs}
-        for row in single_budget["counters"]
+        {**row, "requested": row["requested"] * due_jobs} for row in single_budget["counters"]
     ]
     if single_budget["status"] in ("entitlement_unavailable", "accounting_window_unavailable"):
         status = single_budget["status"]
