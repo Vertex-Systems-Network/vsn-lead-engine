@@ -86,3 +86,17 @@ invitations and removals are **not** presented as operational Next features.
 The selected workspace stays in the route, and Next does not make a second
 authorization decision in place of Django. The HTTP smoke covers owner access,
 foreign denial and the current session transport.
+
+## All-page job state counts
+
+The workspace overview reads `GET /api/v1/workspaces/<uuid>/job-summary/`
+through the same server-only session transport as the authorized job list. The
+backend groups every job belonging to that workspace (not only the first 25
+results) by the eight existing job states. It returns no lead payload, personal
+contact data, pricing or cross-tenant totals. Each state card links to the
+already-protected status-filtered saved-search list; the contract verifies the
+exact workspace UUID, status vocabulary, count integers and summed total.
+Draft/job counts do **not** represent collected or accepted leads. The endpoint
+has no client-selectable filters or mutating methods. PostgreSQL tests cover
+viewer/owner membership, revocation, anonymous and foreign denial and all-page
+counts; disposable Next/Django HTTP checks cover the visible count and links.
