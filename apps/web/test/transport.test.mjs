@@ -693,7 +693,9 @@ test("daily diagnostics path is a fixed authenticated read-only URL", async () =
     "http://localhost:8000",
     root,
     undefined,
-    () => { throw Error("Anonymous diagnostics cannot reach Django"); },
+    () => {
+      throw Error("Anonymous diagnostics cannot reach Django");
+    },
   );
   assert.equal(anonymous.kind, "signin");
 });
