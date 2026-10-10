@@ -276,3 +276,8 @@ footer {
   .marketing-primary, .marketing-secondary { transition: none; }
   .marketing-primary:hover, .marketing-secondary:hover { transform: none; }
 }
+
+@media (max-width: 720px) {
+  header { flex-wrap: wrap; gap: 12px; }
+  .site-nav { order: 3; width: 100%; }
+}
