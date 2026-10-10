@@ -65,13 +65,17 @@ def tick_daily_plans(actor, workspace_id, *, limit=5, after=None, apply_dev=Fals
         if apply_dev and candidate_dates:
             # This is an advisory read; materialize_daily obtains fresh workspace,
             # membership, schedule/revision and entitlement locks for every date.
-            plan = DailySchedule.objects.filter(
-                pk=item["id"], workspace_id=workspace_id
-            ).only("search").first()
+            plan = (
+                DailySchedule.objects.filter(pk=item["id"], workspace_id=workspace_id)
+                .only("search")
+                .first()
+            )
             if plan is None:
                 record["result"] = "recheck_blocked"
                 blocked += 1
-            elif plan.search.get("source_codes") != ["local-fixture"]:
+            elif not isinstance(plan.search, dict) or plan.search.get("source_codes") != [
+                "local-fixture"
+            ]:
                 record["result"] = "non_fixture_source_blocked"
                 blocked += 1
             else:
