@@ -34,7 +34,6 @@ class Membership(models.Model):
         ]
 
 
-
 class WorkspaceInvitation(models.Model):
     """Existing-account invite secret is stored only as a SHA-256 digest."""
 
@@ -46,9 +45,7 @@ class WorkspaceInvitation(models.Model):
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="issued_invitations"
     )
-    role = models.CharField(
-        max_length=8, choices=[(r, r) for r in ("admin", "member", "viewer")]
-    )
+    role = models.CharField(max_length=8, choices=[(r, r) for r in ("admin", "member", "viewer")])
     token_hash = models.CharField(max_length=64, unique=True)
     expires_at = models.DateTimeField()
     accepted_at = models.DateTimeField(null=True)
