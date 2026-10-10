@@ -77,9 +77,12 @@ class DailyPlanPageTests(TestCase):
     def test_csrf_field_tampering_and_foreign_token_rejected(self):
         self.client.force_login(self.owner)
         # A cross-site POST without a CSRF cookie/token cannot create a plan.
-        self.assertEqual(self.client.post(self.path, {
-            "timezone": "UTC", "time": "08:00", "plan_token": "forged"
-        }).status_code, 403)
+        self.assertEqual(
+            self.client.post(
+                self.path, {"timezone": "UTC", "time": "08:00", "plan_token": "forged"}
+            ).status_code,
+            403,
+        )
         payload = self.form()
         for changes in (
             {"plan_token": "forged"},
