@@ -148,3 +148,17 @@ Current workspace identity and plan identity must match the route before
 rendering. The screen offers no edit, enable, source dispatch or billing action.
 The rendered values are saved preferences, not verified provider coverage,
 accepted results, or an active recurring schedule.
+
+## Owner/admin daily due diagnostics
+
+The workspace overview links to
+`/dashboard/workspaces/<uuid>/daily-diagnostics` for a read-only snapshot of
+stored daily plans. Current Django workspace membership requires owner or admin
+for the underlying `/api/v1/workspaces/<uuid>/daily-diagnostics/` API. The Next
+server transport allows only this exact read and an optional UUID cursor;
+returned plan entries, gate names, timestamps, dates and status vocabulary are
+bounded at runtime. Viewers and foreign members get a generic denied state,
+with no leakage of another workspace's plan IDs, source-search payload or
+credentials. The UI explains that due candidates are **not** a runnable schedule,
+no change/activation controls exist, and source rights, quotas, credentials,
+operator release and actual deployment still need independent authorization.
