@@ -27,6 +27,7 @@ export default function Layout({
             <Link href="/capabilities">Capabilities</Link>
             <Link href="/plans">Plans</Link>
             <Link href="/data-handling">Data handling</Link>
+            <Link href="/faq">FAQ</Link>
             <Link href="/dashboard">Dashboard</Link>
           </nav>
           <span className="badge">Development</span>

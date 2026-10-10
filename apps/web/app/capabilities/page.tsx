@@ -16,6 +16,10 @@ const implemented = [
     "Choose search scope, submit eligible manual jobs and track their state; creating a draft never dispatches work.",
   ],
   [
+    "Offline search setup preview",
+    "Fixed local rules, 50 synthetic safety cases and a signed human-review handoff exist in development. This is not LLM output and never automatically saves or runs a job.",
+  ],
+  [
     "First source adapter",
     "A bounded Overture Maps Places source implementation with a verified smoke run. This is not a commercial source-rights certification.",
   ],
@@ -34,8 +38,8 @@ const roadmap = [
     "Provider contracts, source economics, subscription prices and live payment processing are not enabled.",
   ],
   [
-    "AI-assisted setup",
-    "Bounded search guidance remains planned, with privacy, evaluation and spending gates.",
+    "Model-backed AI setup",
+    "A genuine AI provider/model is not active. Its data privacy, request budget, evaluation and consent gates remain open.",
   ],
   [
     "Desktop and mobile",

@@ -154,6 +154,7 @@ def main():
                     ("/capabilities", "Functionality with its real development status."),
                     ("/plans", "Subscriptions are not yet on sale."),
                     ("/data-handling", "Source rights and access controls before volume."),
+                    ("/faq", "Frequently asked questions"),
                 ):
                     public_html, _ = read(public_path, False)
                     assert expected in public_html
@@ -168,6 +169,17 @@ def main():
                 capabilities_page, _ = read("/capabilities", False)
                 assert "Implemented in development" in capabilities_page
                 assert "Planned / unverified" in capabilities_page
+                faq_page, _ = read("/faq", False)
+                assert faq_page.count("<details") == 7
+                assert faq_page.count("<summary") == 7
+                assert "No public customer launch" in faq_page
+                assert "fixed local rules" in faq_page
+                assert "No automatic outreach" in faq_page
+                assert "No. Pricing, included credits" in faq_page
+                assert 'href="/faq"' in homepage
+                assert "Model-backed AI setup" in homepage
+                assert "Offline search setup preview" in capabilities_page
+                assert "A genuine AI provider/model is not active" in capabilities_page
                 plans_page, _ = read("/plans", False)
                 assert "no checkout" in plans_page
                 assert "Price and limits: not published" in plans_page

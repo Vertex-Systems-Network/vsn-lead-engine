@@ -512,6 +512,37 @@ footer {
   margin-top: 22px;
   font-size: 0.86rem;
 }
+.faq-list {
+  display: grid;
+  gap: 12px;
+  max-width: 920px;
+}
+.faq-list details {
+  border: 1px solid #c8d9e6;
+  background: #fff;
+  border-radius: 14px;
+  padding: 0 20px;
+}
+.faq-list summary {
+  cursor: pointer;
+  font-weight: 750;
+  padding: 21px 8px;
+  color: #123c5c;
+}
+.faq-list summary:focus-visible {
+  outline: 3px solid #12568d;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.faq-list details[open] {
+  border-color: #8fb2ca;
+}
+.faq-list details p {
+  line-height: 1.7;
+  padding: 0 8px 20px;
+  margin: 0;
+  color: #3f566b;
+}
 @media (max-width: 900px) {
   .marketing-hero,
   .marketing-split {
