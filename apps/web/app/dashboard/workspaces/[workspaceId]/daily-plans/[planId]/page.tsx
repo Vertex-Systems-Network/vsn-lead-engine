@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { backend } from "../../../../../../lib/backend";
-import { dailyPlanDetail, uuid, workspace } from "../../../../../../lib/contracts";
+import {
+  dailyPlanDetail,
+  uuid,
+  workspace,
+} from "../../../../../../lib/contracts";
 import { State } from "../../../../../components/state";
 
 export default async function DailyPlanDetailPage({
@@ -47,7 +51,9 @@ export default async function DailyPlanDetailPage({
         <h2>Saved local time</h2>
         <dl>
           <dt>Plan ID</dt>
-          <dd><code>{item.id}</code></dd>
+          <dd>
+            <code>{item.id}</code>
+          </dd>
           <dt>Local time</dt>
           <dd>{item.local_time}</dd>
           <dt>Timezone</dt>
