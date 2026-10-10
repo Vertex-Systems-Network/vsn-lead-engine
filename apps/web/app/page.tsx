@@ -161,10 +161,11 @@ export default function Home() {
           </article>
           <article className="marketing-card">
             <span className="marketing-tag">Planned</span>
-            <h3>AI-assisted setup</h3>
+            <h3>Model-backed AI setup</h3>
             <p>
-              Bounded guidance for preparing searches, with user review before
-              execution.
+              Real AI integration still requires provider, privacy, budget and
+              evaluation approvals. A separate fixed-rules preview already
+              exists in development and requires manual draft review.
             </p>
           </article>
           <article className="marketing-card">
@@ -188,8 +189,8 @@ export default function Home() {
           <Link className="marketing-primary" href="/plans">
             Plans and availability
           </Link>
-          <Link className="marketing-secondary" href="/data-handling">
-            Data handling
+          <Link className="marketing-secondary" href="/faq">
+            Frequently asked questions
           </Link>
         </div>
       </section>
