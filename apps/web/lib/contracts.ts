@@ -29,6 +29,53 @@ export function workspaces(v: unknown): v is Workspaces {
     v.results.every(workspace)
   );
 }
+export type DailyPlan = {
+  id: string;
+  timezone: string;
+  local_time: string;
+  enabled: boolean;
+  revision: number;
+  created_at: string;
+};
+export type DailyPlans = {
+  workspace_id: string;
+  total: number;
+  results: DailyPlan[];
+  next: string | null;
+};
+export function dailyPlans(v: unknown): v is DailyPlans {
+  if (
+    !object(v) ||
+    !uuid(v.workspace_id) ||
+    !count(v.total) ||
+    (v.next !== null && !uuid(v.next)) ||
+    !Array.isArray(v.results) ||
+    v.results.length > 25 ||
+    v.results.length > v.total
+  )
+    return false;
+  return (
+    new Set(
+      v.results.map((row: unknown) => (object(row) ? row.id : null)),
+    ).size === v.results.length &&
+    v.results.every(
+      (row: unknown) =>
+        object(row) &&
+        uuid(row.id) &&
+        typeof row.timezone === "string" &&
+        row.timezone.length > 0 &&
+        row.timezone.length <= 64 &&
+        typeof row.local_time === "string" &&
+        /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(row.local_time) &&
+        typeof row.enabled === "boolean" &&
+        count(row.revision) &&
+        row.revision >= 1 &&
+        typeof row.created_at === "string" &&
+        Number.isFinite(Date.parse(row.created_at)),
+    )
+  );
+}
+
 export const memberRoles = ["owner", "admin", "member", "viewer"] as const;
 export type Member = {
   user_id: string;
