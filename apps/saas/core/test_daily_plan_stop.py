@@ -55,7 +55,9 @@ class DailyPlanStopTests(TestCase):
         self.assertFalse(changed)
         self.assertEqual(retry.revision, 2)
         with self.assertRaises(RevisionConflict):
-            materialize_daily(self.owner, self.workspace.id, self.plan.id, self.plan.created_at.date(), 1)
+            materialize_daily(
+                self.owner, self.workspace.id, self.plan.id, self.plan.created_at.date(), 1
+            )
         self.assertFalse(Job.objects.exists())
         self.assertFalse(ScheduleOccurrence.objects.exists())
 
