@@ -38,7 +38,7 @@ class NativeAccountTests(TestCase):
         self.assertEqual(response.url, "http://localhost:3000/account/sign-in")
         self.assertIn("csrftoken", response.cookies)
         response = self.client.get("/api/v1/account/sign-in-form/")
-        self.assertEqual(set(response.json()), {"kind", "csrf_token"})
+        self.assertEqual(set(response.json()), {"kind", "csrf_token", "signup_enabled"})
         self.assertEqual(response.json()["kind"], "sign-in")
         self.assertEqual(len(response.json()["csrf_token"]), 64)
         self.assertIn("private", response["Cache-Control"])

@@ -65,6 +65,12 @@ class ProtectedLoginView(LoginView):
             return response
         return super().post(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            "signup_enabled": settings.SAAS_SIGNUP_ENABLED,
+        }
+
     def form_invalid(self, form):
         if native_login(self.request):
             return HttpResponseRedirect(sign_in_return("invalid"), status=303)
