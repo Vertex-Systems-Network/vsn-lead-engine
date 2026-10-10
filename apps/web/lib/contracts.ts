@@ -133,6 +133,28 @@ export type PlanReadiness = {
   advisory_only: true;
   status: "blocked" | "internal_catalog_match_only";
   checked_source_count: number;
+  catch_up_budget_snapshot: {
+    status:
+      | "unavailable"
+      | "disabled"
+      | "entitlement_unavailable"
+      | "accounting_window_unavailable"
+      | "no_due_job_candidates"
+      | "advisory_batch_fits"
+      | "advisory_batch_exceeds";
+    advisory_only: true;
+    max_local_days: 7;
+    due_job_candidates: number;
+    skipped_day_candidates: number;
+    counters: {
+      name: "leads" | "jobs" | "provider_calls";
+      requested: number;
+      settled: number;
+      reserved: number;
+      limit: number;
+      headroom: number;
+    }[];
+  };
   budget_snapshot: {
     status:
       | "unavailable"
@@ -178,6 +200,57 @@ function budgetCapacityRow(row: unknown, name: string): boolean {
     headroom === Math.max(0, limit - settled - reserved)
   );
 }
+function catchUpBudgetCapacity(v: unknown): boolean {
+  if (
+    !object(v) ||
+    ![
+      "unavailable",
+      "disabled",
+      "entitlement_unavailable",
+      "accounting_window_unavailable",
+      "no_due_job_candidates",
+      "advisory_batch_fits",
+      "advisory_batch_exceeds",
+    ].includes(String(v.status)) ||
+    v.advisory_only !== true ||
+    v.max_local_days !== 7 ||
+    !count(v.due_job_candidates) ||
+    v.due_job_candidates > 7 ||
+    !count(v.skipped_day_candidates) ||
+    v.skipped_day_candidates > 7 ||
+    v.due_job_candidates + v.skipped_day_candidates > 7 ||
+    !Array.isArray(v.counters) ||
+    ![0, 3].includes(v.counters.length)
+  )
+    return false;
+  const rows = v.counters;
+  const noEstimate = v.status === "disabled" || v.status === "unavailable";
+  if (noEstimate)
+    return (
+      rows.length === 0 &&
+      v.due_job_candidates === 0 &&
+      v.skipped_day_candidates === 0
+    );
+  return (
+    rows.length === 3 &&
+    ["leads", "jobs", "provider_calls"].every((name, index) =>
+      budgetCapacityRow(rows[index], name),
+    ) &&
+    rows[1].requested === v.due_job_candidates &&
+    (v.status !== "no_due_job_candidates" || v.due_job_candidates === 0) &&
+    (v.status !== "advisory_batch_fits" || (
+      v.due_job_candidates > 0 && rows.every(
+        (r: unknown) => object(r) && Number(r.requested) <= Number(r.headroom),
+      )
+    )) &&
+    (v.status !== "advisory_batch_exceeds" || (
+      v.due_job_candidates > 0 && rows.some(
+        (r: unknown) => object(r) && Number(r.requested) > Number(r.headroom),
+      )
+    ))
+  );
+}
+
 export function planReadiness(v: unknown): v is PlanReadiness {
   if (
     !object(v) ||
@@ -188,6 +261,7 @@ export function planReadiness(v: unknown): v is PlanReadiness {
     !["blocked", "internal_catalog_match_only"].includes(String(v.status)) ||
     !count(v.checked_source_count) ||
     v.checked_source_count > 12 ||
+    !catchUpBudgetCapacity(v.catch_up_budget_snapshot) ||
     !object(v.budget_snapshot) ||
     ![
       "unavailable",
