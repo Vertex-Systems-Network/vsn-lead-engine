@@ -2,7 +2,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from rest_framework import serializers
 
-from .models import Job, Membership, Workspace
+from .models import Job, Membership, MembershipAudit, Workspace
 
 
 class WorkspaceSerializer(serializers.ModelSerializer):
@@ -77,6 +77,23 @@ class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
         fields = ["user_id", "role"]
+        read_only_fields = fields
+
+
+class MembershipAuditSerializer(serializers.ModelSerializer):
+    actor_user_id = serializers.UUIDField(source="actor_id", read_only=True)
+
+    class Meta:
+        model = MembershipAudit
+        fields = [
+            "id",
+            "actor_user_id",
+            "target_user_id",
+            "action",
+            "previous_role",
+            "new_role",
+            "created_at",
+        ]
         read_only_fields = fields
 
 
