@@ -123,3 +123,16 @@ local time. The backend enforces exact actor/job binding, idempotency and
 `enabled=False`, with no recurrence or source dispatch. Real Next/Django HTTP
 checks exercise the link and form; authorization and replay have PostgreSQL
 regressions. No UI action here activates scheduling.
+
+## Saved daily plans listing
+
+The authenticated Next workspace route `/dashboard/workspaces/<uuid>/daily-plans`
+shows a read-only table of persisted daily schedule plans and their actual
+`enabled` state. The Django API `GET /api/v1/workspaces/<uuid>/daily-plans/`
+requires current membership, returns minimal fields only, uses a stable bounded
+25-row UUID continuation, and refuses unsupported query arguments or writes.
+It never reveals plan search contents or lead/contact data. All roles can review
+plans they are authorized to see, but none can activate or mutate them through
+this page. A record marked enabled may only have been changed by a separate
+operator pathway; a visible state is not evidence that a hosted recurring worker
+is operating. No automatic collection, source request, or payment is activated.
