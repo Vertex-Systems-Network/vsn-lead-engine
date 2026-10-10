@@ -466,6 +466,52 @@ export function members(v: unknown): v is Members {
   );
 }
 
+export type MemberAudit = {
+  id: number;
+  actor_user_id: string;
+  target_user_id: string;
+  action: "role_changed" | "removed";
+  previous_role: (typeof memberRoles)[number];
+  new_role: (typeof memberRoles)[number] | "";
+  created_at: string;
+};
+export type MemberAudits = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: MemberAudit[];
+};
+export function memberAudits(v: unknown): v is MemberAudits {
+  if (
+    !object(v) ||
+    !count(v.count) ||
+    (v.next !== null && typeof v.next !== "string") ||
+    (v.previous !== null && typeof v.previous !== "string") ||
+    !Array.isArray(v.results) ||
+    v.results.length > 25
+  )
+    return false;
+  const rows = v.results;
+  return (
+    rows.every(
+      (record: unknown) =>
+        object(record) &&
+        count(record.id) &&
+        record.id > 0 &&
+        uuid(record.actor_user_id) &&
+        uuid(record.target_user_id) &&
+        ["role_changed", "removed"].includes(String(record.action)) &&
+        memberRoles.includes(record.previous_role as Member["role"]) &&
+        (record.action === "removed"
+          ? record.new_role === ""
+          : memberRoles.includes(record.new_role as Member["role"])) &&
+        typeof record.created_at === "string" &&
+        Number.isFinite(Date.parse(record.created_at)),
+    ) &&
+    new Set(rows.map((record: MemberAudit) => record.id)).size === rows.length
+  );
+}
+
 export type Job = {
   id: string;
   workspace_id: string;
