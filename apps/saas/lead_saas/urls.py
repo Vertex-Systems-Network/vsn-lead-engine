@@ -54,6 +54,10 @@ urlpatterns = [
     path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("api/v1/workspaces/<uuid:workspace_id>/members/", views.MemberList.as_view()),
     path(
+        "api/v1/workspaces/<uuid:workspace_id>/member-audit/",
+        views.MemberAuditList.as_view(),
+    ),
+    path(
         "api/v1/workspaces/<uuid:workspace_id>/members/<uuid:user_id>/",
         views.MemberDetail.as_view(),
     ),

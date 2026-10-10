@@ -9,18 +9,21 @@ export default async function MembersPage({
   searchParams,
 }: {
   params: Promise<{ workspaceId: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ offset?: string }>;
 }) {
-  const [{ workspaceId }, { page }] = await Promise.all([params, searchParams]);
+  const [{ workspaceId }, { offset }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   if (!uuid(workspaceId)) notFound();
 
   const current =
-    typeof page === "string" && /^[1-9][0-9]{0,5}$/.test(page)
-      ? Number(page)
-      : 1;
+    typeof offset === "string" && /^(0|[1-9][0-9]{0,5})$/.test(offset)
+      ? Number(offset)
+      : 0;
   const [result, identity] = await Promise.all([
     backend(
-      `/api/v1/workspaces/${workspaceId}/members/?page=${current}`,
+      `/api/v1/workspaces/${workspaceId}/members/?offset=${current}`,
       members,
     ),
     backend(`/api/v1/workspaces/${workspaceId}/`, workspace),
@@ -71,13 +74,20 @@ export default async function MembersPage({
         <p>No members appear on this page.</p>
       )}
       <nav aria-label="Member pages" className="pagination">
-        {current > 1 ? (
-          <Link href={`?page=${current - 1}`}>Previous page</Link>
+        {current > 0 ? (
+          <Link href={`?offset=${Math.max(0, current - 25)}`}>
+            Previous page
+          </Link>
         ) : null}
         {result.data.next ? (
-          <Link href={`?page=${current + 1}`}>Next page</Link>
+          <Link href={`?offset=${current + 25}`}>Next page</Link>
         ) : null}
       </nav>
+      <p>
+        <Link href={`/dashboard/workspaces/${workspaceId}/member-audit`}>
+          Review member role change history →
+        </Link>
+      </p>
       <p className="muted">
         Server permissions are checked on every request. A link or a visible
         member identifier never grants access to another workspace.

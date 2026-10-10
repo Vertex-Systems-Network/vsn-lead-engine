@@ -17,9 +17,10 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Job, Membership, Workspace
+from .models import Job, Membership, MembershipAudit, Workspace
 from .serializers import (
     JobSerializer,
+    MembershipAuditSerializer,
     MembershipRoleSerializer,
     MembershipSerializer,
     SearchSerializer,
@@ -245,6 +246,25 @@ class MemberList(generics.ListAPIView):
             raise PermissionDenied("This role cannot manage members.")
         return Membership.objects.filter(workspace_id=self.kwargs["workspace_id"]).order_by(
             "user_id"
+        )
+
+
+@method_decorator(never_cache, name="dispatch")
+class MemberAuditList(generics.ListAPIView):
+    """Owner/admin-only, paginated historical membership changes. GET-only."""
+
+    serializer_class = MembershipAuditSerializer
+
+    def get_queryset(self):
+        from rest_framework.exceptions import PermissionDenied, ValidationError
+
+        member = membership_for(self.request.user, self.kwargs["workspace_id"])
+        if member.role not in {"owner", "admin"}:
+            raise PermissionDenied("Only workspace owners and admins can review access history.")
+        if set(self.request.query_params) - {"offset"}:
+            raise ValidationError("Member audit only accepts offset pagination.")
+        return MembershipAudit.objects.filter(workspace_id=self.kwargs["workspace_id"]).order_by(
+            "-created_at", "-id"
         )
 
 

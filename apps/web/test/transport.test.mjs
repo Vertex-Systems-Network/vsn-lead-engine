@@ -444,7 +444,7 @@ test("workspace members list is session-only, bounded and read-only", async () =
     "a".repeat(12);
   for (const path of [
     `/api/v1/workspaces/${id}/members/`,
-    `/api/v1/workspaces/${id}/members/?page=2`,
+    `/api/v1/workspaces/${id}/members/?offset=25`,
   ]) {
     const result = await readBackend(
       "http://localhost:8000",
@@ -465,8 +465,9 @@ test("workspace members list is session-only, bounded and read-only", async () =
   }
   for (const path of [
     `/api/v1/workspaces/${id}/members/?page=0`,
-    `/api/v1/workspaces/${id}/members/?page=-1`,
-    `/api/v1/workspaces/${id}/members/?page=1&extra=1`,
+    `/api/v1/workspaces/${id}/members/?offset=-1`,
+    `/api/v1/workspaces/${id}/members/?offset=1&limit=500`,
+    `/api/v1/workspaces/${id}/members/?offset=1&extra=1`,
     `/api/v1/workspaces/${id}/members/?after=${id}`,
     `/api/v1/workspaces/${id}/members/${id}/`,
   ]) {
