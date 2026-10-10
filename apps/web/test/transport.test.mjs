@@ -625,9 +625,12 @@ test("daily plan detail allows exact session GET and refuses activation or query
       });
       assert.equal(options.cache, "no-store");
       assert.equal(options.redirect, "manual");
-      return new Response('{"id":"' + planId + '","workspace_id":"' + workspaceId + '"}', {
-        headers: { "content-type": "application/json" },
-      });
+      return new Response(
+        '{"id":"' + planId + '","workspace_id":"' + workspaceId + '"}',
+        {
+          headers: { "content-type": "application/json" },
+        },
+      );
     },
   );
   assert.equal(result.kind, "ok");
@@ -637,7 +640,9 @@ test("daily plan detail allows exact session GET and refuses activation or query
     `${path}../`,
     `/api/v1/workspaces/${workspaceId}/daily-plans/${planId}/activate/`,
   ]) {
-    await assert.rejects(readBackend("http://localhost:8000", invalid, session));
+    await assert.rejects(
+      readBackend("http://localhost:8000", invalid, session),
+    );
   }
   const anonymous = await readBackend(
     "http://localhost:8000",
