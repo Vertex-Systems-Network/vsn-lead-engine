@@ -113,6 +113,41 @@ export default async function DailyPlanReadinessPage({
       ) : (
         <p>Capacity not available for this configuration.</p>
       )}
+      <h2>Seven-local-day catch-up allowance (read-only estimate)</h2>
+      <p className="notice">
+        Status: {report.data.catch_up_budget_snapshot.status.replaceAll("_", " ")}.
+        Potential due-job drafts: {report.data.catch_up_budget_snapshot.due_job_candidates}
+        {" "}within at most seven local calendar dates. Skipped civil dates:
+        {" "}{report.data.catch_up_budget_snapshot.skipped_day_candidates}.
+        This is a hypothetical combined allowance estimate, not a job reservation
+        or a running scheduler. Disabled plans have no runnable due candidates,
+        and already-recorded days are excluded.
+      </p>
+      {report.data.catch_up_budget_snapshot.counters.length ? (
+        <div className="table-scroll">
+          <table>
+            <caption>Aggregate hypothetical backlog quota comparison</caption>
+            <thead>
+              <tr>
+                <th scope="col">Resource</th>
+                <th scope="col">All due jobs requested</th>
+                <th scope="col">Current estimated headroom</th>
+              </tr>
+            </thead>
+            <tbody>
+              {report.data.catch_up_budget_snapshot.counters.map((row) => (
+                <tr key={row.name}>
+                  <th scope="row">{row.name.replaceAll("_", " ")}</th>
+                  <td>{row.requested}</td>
+                  <td>{row.headroom}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p>Catch-up allowance unavailable or plan disabled.</p>
+      )}
       <h2>Not verified — required before any execution</h2>
       <ul>
         {report.data.unverified_execution_gates.map((gate) => (
