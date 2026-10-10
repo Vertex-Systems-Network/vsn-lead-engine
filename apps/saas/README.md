@@ -45,11 +45,12 @@ Drafts never enqueue, reserve usage, dispatch source calls, collect data, export
 
 `manage.py run_jobs` fulfils queued jobs: it claims the pre-dispatch lease, records the write-ahead operation, asks the source adapter for leads, drops anything already accepted in the workspace, and settles through the existing candidate review and dual-attested acceptance services. A search that finds nothing new ends with a no-effect receipt that releases the reservation; an adapter error leaves the operation `unknown` with the reservation held.
 
-Today the only adapter is the synthetic `local-fixture` source, and its attestations come from an in-process signer whose keys are derived from `SAAS_SECRET_KEY`. Both exist only with `SAAS_LOCAL_FULFILMENT=1`, which refuses to start unless `SAAS_DEBUG=1`. Production verifier registries stay empty, so outside this mode `run_jobs` refuses to run.
+Two adapters exist: the synthetic `local-fixture` source and `overture`, which serves real Overture Maps Places through the production collector's query code. The Overture worker needs `pip install --require-hashes -r requirements-runtime.txt` (duckdb) and outbound access to the Overture STAC catalog and public S3 release; the manual **SaaS Overture Smoke** workflow (`apps/saas/overture_smoke.py`) checks a real job end to end. Attestations come from an in-process signer whose keys are derived from `SAAS_SECRET_KEY`, registered only for these two sources and only with `SAAS_LOCAL_FULFILMENT=1`, which refuses to start unless `SAAS_DEBUG=1`. Production verifier registries stay empty, so outside this mode `run_jobs` refuses to run.
 
 ```sh
 export SAAS_DEBUG=1 SAAS_LOCAL_FULFILMENT=1
-python apps/saas/manage.py seed_local_source
+python apps/saas/manage.py seed_local_source                    # synthetic fixture
+python apps/saas/manage.py seed_local_source --source overture  # real Overture Places
 python apps/saas/manage.py run_jobs --limit 25
 ```
 

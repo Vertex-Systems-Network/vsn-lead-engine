@@ -154,7 +154,16 @@ def fulfil_outbox(outbox_id):
         policy = SourcePolicy.objects.get(pk=operation.source_code)
         entitlement = Entitlement.objects.get(workspace_id=job.workspace_id)
         cap = min(MAX_BATCH, job.search["result_limit"], entitlement.lead_limit)
-        leads = adapter.fetch(job.search, cap)
+        known = set(
+            AcceptedFingerprint.objects.filter(workspace_id=job.workspace_id).values_list(
+                "token", flat=True
+            )
+        )
+        leads = adapter.fetch(
+            job.search,
+            cap,
+            is_new=lambda lead: not known.intersection(_tokens(operation.source_code, lead)),
+        )
         selected = select_records(operation, policy, job.search, leads, cap)
         identity = _identity(operation)
         now = int(timezone.now().timestamp())

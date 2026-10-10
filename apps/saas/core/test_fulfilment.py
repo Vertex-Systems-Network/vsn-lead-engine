@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
-from lead_saas.local_fulfilment import SOURCE_CODE, verifier_settings
+from lead_saas.local_fulfilment import LOCAL_SOURCES, SOURCE_CODE, verifier_settings
 
 from .fulfilment import fulfil_outbox, run_pending
 from .jobs import enqueue_job
@@ -152,7 +152,7 @@ class ProductionGateTests(TestCase):
                 importlib.reload(module)
         importlib.reload(module)
 
-    def test_local_keys_attest_only_the_fixture_source(self):
+    def test_local_keys_attest_only_the_dev_sources(self):
         maps = verifier_settings("synthetic-fulfilment-test-secret")
         keys = list(maps["SAAS_LOCAL_SIGNER_KEYS"].values())
         self.assertEqual(len(set(keys)), 4)
@@ -162,5 +162,5 @@ class ProductionGateTests(TestCase):
             "SAAS_ACCEPTANCE_VERIFIERS",
             "SAAS_RECEIPT_VERIFIERS",
         ):
-            self.assertEqual(set(maps[name]), {SOURCE_CODE})
+            self.assertEqual(set(maps[name]), set(LOCAL_SOURCES))
         self.assertIsNone(maps["SAAS_DEDUPE_VERIFIERS"].get("other/namespace"))
