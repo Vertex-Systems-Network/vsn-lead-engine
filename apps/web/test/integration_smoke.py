@@ -293,6 +293,13 @@ def main():
                 # viewports, skip-link keyboard focus and FAQ interaction.
                 # Fail closed when Chrome is missing; never substitute HTML
                 # assertions for browser evidence or contact external sites.
+                before_browser_jobs = Job.objects.filter(workspace=workspace).count()
+                before_browser_reservations = UsageReservation.objects.filter(
+                    workspace=workspace
+                ).count()
+                before_browser_outboxes = JobOutbox.objects.filter(
+                    job__workspace=workspace
+                ).count()
                 subprocess.run(
                     ["node", "scripts/browser-smoke.mjs", origin],
                     cwd=ROOT / "web",
@@ -305,6 +312,15 @@ def main():
                     },
                     check=True,
                     timeout=140,
+                )
+                assert Job.objects.filter(workspace=workspace).count() == before_browser_jobs
+                assert (
+                    UsageReservation.objects.filter(workspace=workspace).count()
+                    == before_browser_reservations
+                )
+                assert (
+                    JobOutbox.objects.filter(job__workspace=workspace).count()
+                    == before_browser_outboxes
                 )
                 anonymous, _ = read("/dashboard", False)
                 assert "Sign in to see your workspaces" in anonymous
