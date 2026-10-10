@@ -289,6 +289,16 @@ def main():
                 plans_page, _ = read("/plans", False)
                 assert "no checkout" in plans_page
                 assert "Price and limits: not published" in plans_page
+                # Real local Chromium: anonymous browser navigation, four
+                # viewports, skip-link keyboard focus and FAQ interaction.
+                # Fail closed when Chrome is missing; never substitute HTML
+                # assertions for browser evidence or contact external sites.
+                subprocess.run(
+                    ["node", "scripts/browser-smoke.mjs", origin],
+                    cwd=ROOT / "web",
+                    check=True,
+                    timeout=110,
+                )
                 anonymous, _ = read("/dashboard", False)
                 assert "Sign in to see your workspaces" in anonymous
                 dashboard, headers = read("/dashboard")
