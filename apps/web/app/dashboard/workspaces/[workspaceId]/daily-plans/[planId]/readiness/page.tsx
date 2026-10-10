@@ -29,8 +29,10 @@ export default async function DailyPlanReadinessPage({
   )
     return <State kind="unavailable" />;
   const passed = report.data.status === "internal_catalog_match_only";
-  const affordable = report.data.catch_up_budget_snapshot.affordable_due_job_candidates;
-  const deferred = report.data.catch_up_budget_snapshot.deferred_due_job_candidates;
+  const affordable =
+    report.data.catch_up_budget_snapshot.affordable_due_job_candidates;
+  const deferred =
+    report.data.catch_up_budget_snapshot.deferred_due_job_candidates;
   return (
     <>
       <Link href={`/dashboard/workspaces/${workspaceId}/daily-plans/${planId}`}>
