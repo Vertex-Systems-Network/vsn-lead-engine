@@ -272,7 +272,8 @@ def daily_plan_stop_page(request, workspace_id, plan_id):
             },
         )
         return render(
-            request, "core/daily_plan_stop.html",
+            request,
+            "core/daily_plan_stop.html",
             {"workspace": membership.workspace, "plan": plan, "form": form, "done": False},
         )
     expected = {"csrfmiddlewaretoken", "stop_token"}
@@ -285,7 +286,8 @@ def daily_plan_stop_page(request, workspace_id, plan_id):
     )
     if not form.is_valid():
         return render(
-            request, "core/daily_plan_stop.html",
+            request,
+            "core/daily_plan_stop.html",
             {"workspace": membership.workspace, "plan": plan, "form": form, "done": False},
             status=400,
         )
@@ -296,15 +298,23 @@ def daily_plan_stop_page(request, workspace_id, plan_id):
     except RevisionConflict:
         form.add_error(None, "The plan changed. Open a new confirmation to stop it.")
         return render(
-            request, "core/daily_plan_stop.html",
+            request,
+            "core/daily_plan_stop.html",
             {"workspace": membership.workspace, "plan": plan, "form": form, "done": False},
             status=409,
         )
     except (ValidationError, PermissionDenied):
         return HttpResponseForbidden("Daily plan stop is no longer authorized.")
     return render(
-        request, "core/daily_plan_stop.html",
-        {"workspace": membership.workspace, "plan": plan, "form": form, "done": True, "changed": changed},
+        request,
+        "core/daily_plan_stop.html",
+        {
+            "workspace": membership.workspace,
+            "plan": plan,
+            "form": form,
+            "done": True,
+            "changed": changed,
+        },
     )
 
 
