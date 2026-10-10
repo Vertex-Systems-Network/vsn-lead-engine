@@ -7,7 +7,6 @@ All actual changes are made through the existing transactional role service.
 from django import forms
 from django.core import signing
 from django.db import transaction
-from django.http import Http404
 from rest_framework.exceptions import PermissionDenied
 
 from .models import MembershipAudit, Workspace
