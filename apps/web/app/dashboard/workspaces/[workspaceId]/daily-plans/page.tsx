@@ -36,7 +36,7 @@ export default async function DailyPlansPage({
       <p className="notice">
         These are stored plans, not running schedules. No automatic collection,
         recurring dispatch, provider requests or billing are activated from this
-        screen. A plan's enabled flag reflects server state, not a control here.
+        screen. A plan&apos;s enabled flag reflects server state, not a control here.
       </p>
       <p>{plans.data.total} stored daily plans across all pages.</p>
       {plans.data.results.length ? (
