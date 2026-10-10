@@ -80,7 +80,8 @@ class ConfigurationPreflightTests(SimpleTestCase):
         output = StringIO()
         with (
             patch(
-                "core.management.commands.check_staging.configuration_issues", return_value=[]
+                "core.management.commands.check_staging.configuration_issues",
+                return_value=[],
             ),
             patch("core.management.commands.check_staging.database_issues", return_value=[]),
         ):
