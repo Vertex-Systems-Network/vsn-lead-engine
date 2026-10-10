@@ -146,6 +146,8 @@ export type PlanReadiness = {
     max_local_days: 7;
     due_job_candidates: number;
     skipped_day_candidates: number;
+    affordable_due_job_candidates: number | null;
+    deferred_due_job_candidates: number | null;
     counters: {
       name: "leads" | "jobs" | "provider_calls";
       requested: number;
@@ -225,6 +227,24 @@ function catchUpBudgetCapacity(v: unknown): boolean {
     return false;
   const rows = v.counters;
   const noEstimate = v.status === "disabled" || v.status === "unavailable";
+  const noCapacityClaim =
+    noEstimate ||
+    v.status === "entitlement_unavailable" ||
+    v.status === "accounting_window_unavailable";
+  if (noCapacityClaim) {
+    if (
+      v.affordable_due_job_candidates !== null ||
+      v.deferred_due_job_candidates !== null
+    )
+      return false;
+  } else if (
+    !count(v.affordable_due_job_candidates) ||
+    !count(v.deferred_due_job_candidates) ||
+    v.affordable_due_job_candidates + v.deferred_due_job_candidates !==
+      v.due_job_candidates
+  ) {
+    return false;
+  }
   if (noEstimate)
     return (
       rows.length === 0 &&
@@ -237,6 +257,17 @@ function catchUpBudgetCapacity(v: unknown): boolean {
       budgetCapacityRow(rows[index], name),
     ) &&
     rows[1].requested === v.due_job_candidates &&
+    (noCapacityClaim ||
+      v.affordable_due_job_candidates ===
+        Math.min(
+          v.due_job_candidates,
+          ...rows.map((row: Record<string, number>) => {
+            const perJob = row.requested / (v.due_job_candidates || 1);
+            return perJob === 0
+              ? v.due_job_candidates
+              : Math.floor(row.headroom / perJob);
+          }),
+        )) &&
     (v.status !== "no_due_job_candidates" || v.due_job_candidates === 0) &&
     (v.status !== "advisory_batch_fits" ||
       (v.due_job_candidates > 0 &&
