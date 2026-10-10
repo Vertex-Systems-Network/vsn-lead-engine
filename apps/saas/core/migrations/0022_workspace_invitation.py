@@ -8,10 +8,14 @@ from django.db import migrations, models
 
 
 def refuse_invitation_evidence_loss(apps, schema_editor):
-    if apps.get_model("core", "WorkspaceInvitation").objects.using(
-        schema_editor.connection.alias
-    ).exists():
-        raise RuntimeError("Invitation records exist; rollback requires an evidence preservation plan.")
+    if (
+        apps.get_model("core", "WorkspaceInvitation")
+        .objects.using(schema_editor.connection.alias)
+        .exists()
+    ):
+        raise RuntimeError(
+            "Invitation records exist; rollback requires an evidence preservation plan."
+        )
 
 
 class Migration(migrations.Migration):
