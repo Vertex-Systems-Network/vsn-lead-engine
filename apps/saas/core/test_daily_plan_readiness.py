@@ -213,16 +213,17 @@ class PlanReadinessTests(TestCase):
 
         from django.utils import timezone
 
-        from .models import UsagePeriod
+        from .models import UsageCounter, UsagePeriod
 
         DailySchedule.objects.filter(pk=self.plan.pk).update(enabled=True)
         now = timezone.now()
-        UsagePeriod.objects.create(
+        period = UsagePeriod.objects.create(
             workspace=self.workspace,
             key="closed-catchup-window",
             starts_at=now - timedelta(days=2),
             ends_at=now - timedelta(days=1),
         )
+        UsageCounter.objects.create(workspace=self.workspace, period=period)
         self.client.force_login(self.owner)
         at = datetime(2026, 11, 1, 16, tzinfo=UTC)
         with patch(
