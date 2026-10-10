@@ -77,11 +77,7 @@ def catchup_budget_snapshot(plan, single_budget, *, now=None):
         "advisory_single_job_exceeds",
     ):
         per_job = single_budget["counters"]
-        ceilings = [
-            row["headroom"] // row["requested"]
-            for row in per_job
-            if row["requested"] > 0
-        ]
+        ceilings = [row["headroom"] // row["requested"] for row in per_job if row["requested"] > 0]
         affordable = min([due_jobs, *ceilings])
         deferred = due_jobs - affordable
     if single_budget["status"] in ("entitlement_unavailable", "accounting_window_unavailable"):
