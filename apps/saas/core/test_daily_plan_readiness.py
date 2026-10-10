@@ -43,9 +43,7 @@ class PlanReadinessTests(TestCase):
         self.plan, _ = create_daily_schedule(
             self.creator, self.workspace.id, SEARCH, "UTC", time(8), "policy-check"
         )
-        self.path = (
-            f"/api/v1/workspaces/{self.workspace.id}/daily-plans/{self.plan.id}/readiness/"
-        )
+        self.path = f"/api/v1/workspaces/{self.workspace.id}/daily-plans/{self.plan.id}/readiness/"
         self.source = SourcePolicy.objects.create(
             code="synthetic-preview",
             version=1,
@@ -87,8 +85,12 @@ class PlanReadinessTests(TestCase):
         blocked = self.client.get(self.path).json()
         self.assertEqual(blocked["status"], "blocked")
         self.assertEqual(
-            next(check["status"] for check in blocked["checks"]
-                 if check["name"] == "internal_source_catalog_match"), "blocked"
+            next(
+                check["status"]
+                for check in blocked["checks"]
+                if check["name"] == "internal_source_catalog_match"
+            ),
+            "blocked",
         )
         self.source.enabled = True
         self.source.fields = []
@@ -104,13 +106,9 @@ class PlanReadinessTests(TestCase):
         self.assertEqual(self.client.get(self.path).json()["status"], "blocked")
         self.entitlement.active = True
         self.entitlement.save(update_fields=["active"])
-        Membership.objects.filter(workspace=self.workspace, user=self.creator).update(
-            role="viewer"
-        )
+        Membership.objects.filter(workspace=self.workspace, user=self.creator).update(role="viewer")
         self.assertEqual(self.client.get(self.path).json()["status"], "blocked")
-        Membership.objects.filter(workspace=self.workspace, user=self.creator).update(
-            role="member"
-        )
+        Membership.objects.filter(workspace=self.workspace, user=self.creator).update(role="member")
         DailySchedule.objects.filter(pk=self.plan.id).update(
             search={"categories": ["Private internal secret"], "extra": 1}
         )
