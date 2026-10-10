@@ -1,12 +1,13 @@
-"""Short-lived, state-bound confirmation for pre-dispatch cancellation only."""
+"""Short-lived, state-bound confirmations for pre-dispatch cancel and submit."""
 
 from django import forms
 from django.core import signing
 
 TOKEN_SALT = "saas.pending-cancellation.v1"
+SUBMIT_SALT = "saas.job-submission.v1"
 
 
-def cancellation_token(user, workspace_id, job):
+def cancellation_token(user, workspace_id, job, salt=TOKEN_SALT):
     return signing.dumps(
         {
             "user": str(user.pk),
@@ -14,11 +15,16 @@ def cancellation_token(user, workspace_id, job):
             "job": str(job.pk),
             "revision": job.revision,
         },
-        salt=TOKEN_SALT,
+        salt=salt,
     )
 
 
+def submission_token(user, workspace_id, job):
+    return cancellation_token(user, workspace_id, job, salt=SUBMIT_SALT)
+
+
 class PendingCancellationForm(forms.Form):
+    salt = TOKEN_SALT
     confirmation = forms.CharField(max_length=1024, widget=forms.HiddenInput)
 
     def __init__(self, *args, user, workspace_id, job_id, **kwargs):
@@ -29,7 +35,7 @@ class PendingCancellationForm(forms.Form):
     def clean_confirmation(self):
         value = self.cleaned_data["confirmation"]
         try:
-            token = signing.loads(value, salt=TOKEN_SALT, max_age=600)
+            token = signing.loads(value, salt=self.salt, max_age=600)
             if not isinstance(token, dict) or set(token) != {
                 "user",
                 "workspace",
@@ -52,3 +58,9 @@ class PendingCancellationForm(forms.Form):
                 "Invalid or expired confirmation. Review the job again."
             ) from None
         return value
+
+
+class JobSubmissionForm(PendingCancellationForm):
+    """Same revision-bound confirmation, under a separate salt so tokens never cross."""
+
+    salt = SUBMIT_SALT

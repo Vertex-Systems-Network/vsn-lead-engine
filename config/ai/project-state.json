@@ -18,7 +18,7 @@
     "needs_removal": 0
   },
   "outstanding_updates": [
-    "Owner direction: finish the SaaS platform first; production quota is not a current work item. v3 batch-evidence modules stay frozen. Done: run_jobs worker fulfils queued v2 jobs end to end against the dev-only local fixture source. Next: customer submit button, sign-up and starter entitlement, job progress UI, then a real source adapter and a non-DEBUG signer.",
+    "Owner direction: finish the SaaS platform first; production quota is not a current work item. v3 batch-evidence modules stay frozen. Done: run_jobs worker (dev-only local fixture source) and customer Submit job flow. Next: sign-up with automatic workspace and starter entitlement, then a real source adapter and a non-DEBUG signer, then richer job progress.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
   ],

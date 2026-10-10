@@ -15,7 +15,7 @@
 
 ## Not Verified
 
-- Jobs are now fulfilled by `manage.py run_jobs`, but only against the synthetic `local-fixture` source with the DEBUG-only local signer; there is no customer submit button, sign-up or real source yet.
+- Jobs are now fulfilled by `manage.py run_jobs`, but only against the synthetic `local-fixture` source with the DEBUG-only local signer; customers can now submit drafts, but there is no sign-up or real source yet.
 - Latest retained production quota is 6,855 / 12,000 on 2026-10-04; no newer observation and no root cause recorded for the shortfall.
 - Live payments, signup/recovery, browser/WCAG, privacy/source rights, deployment and launch remain open external or later gates.
 - Distributed runtime/Supervisor identity unverified; no work after an invocation ends is claimed.
@@ -30,7 +30,7 @@
 
 Owner direction (2026-10-10): finish the SaaS platform first; do not work on the production collector quota.
 
-1. Customer submit: a job-page button and Django form view that calls `enqueue_job` with the expected revision.
+1. Done: customer Submit job button/view (`/workspaces/<id>/jobs/<job>/submit/`).
 2. Sign-up page, automatic workspace and a starter entitlement (dev/staging), so a new customer can run a job without billing.
 3. Job progress UI (queued → running → completed/failed) and a 25-lead-per-job explanation.
 4. Real source adapter (collector Overture) and a non-DEBUG signer process to replace the dev-only local signer.

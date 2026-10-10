@@ -30,7 +30,7 @@ function filteredResultPath(path, suffix) {
   );
 }
 const formPath =
-  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/(?:cancel-form|export-form)\/)$/;
+  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/(?:cancel-form|submit-form|export-form)\/)$/;
 export async function readBackend(
   origin,
   path,

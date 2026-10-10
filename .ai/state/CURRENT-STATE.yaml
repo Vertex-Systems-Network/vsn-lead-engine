@@ -128,7 +128,7 @@
     "continuous_ready_frontier_until_runtime_budget_exhaustion": true,
     "checkpoint_is_not_stop_condition": true
   },
-  "exact_next_safe_action": "Customer submit (enqueue) view and button, then sign-up with starter entitlement and job progress UI; then a real source adapter. Production quota is not a current work item (owner direction).",
+  "exact_next_safe_action": "Sign-up with automatic workspace and starter entitlement; then a real source adapter and non-DEBUG signer. Production quota is not a current work item (owner direction).",
   "last_reconciled_at": "2026-10-10",
   "technical_autonomy": {
     "status": "active_standing_owner_delegation",
