@@ -11,6 +11,7 @@ from core.form_context import (
 )
 from core.login_security import ProtectedLoginView
 from core.member_role_page import member_role_change_page
+from core.member_removal_page import member_removal_page
 from core.password_reset import urlpatterns as password_reset_urls
 from core.signup import sign_up_page
 from django.contrib.auth import views as auth_views
@@ -58,6 +59,11 @@ urlpatterns = [
         "workspaces/<uuid:workspace_id>/members/<uuid:target_user_id>/role/",
         member_role_change_page,
         name="member-role-change-page",
+    ),
+    path(
+        "workspaces/<uuid:workspace_id>/members/<uuid:target_user_id>/remove/",
+        member_removal_page,
+        name="member-removal-page",
     ),
     path(
         "api/v1/workspaces/<uuid:workspace_id>/member-audit/",
