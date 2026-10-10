@@ -11,7 +11,10 @@ export default async function DailyPlansPage({
   params: Promise<{ workspaceId: string }>;
   searchParams: Promise<{ after?: string }>;
 }) {
-  const [{ workspaceId }, { after }] = await Promise.all([params, searchParams]);
+  const [{ workspaceId }, { after }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   if (!uuid(workspaceId) || (after !== undefined && !uuid(after))) notFound();
   const base = `/api/v1/workspaces/${workspaceId}/`;
   const [plans, identity] = await Promise.all([
@@ -20,7 +23,10 @@ export default async function DailyPlansPage({
   ]);
   if (plans.kind !== "ok") return <State kind={plans.kind} />;
   if (identity.kind !== "ok") return <State kind={identity.kind} />;
-  if (plans.data.workspace_id !== workspaceId || identity.data.id !== workspaceId)
+  if (
+    plans.data.workspace_id !== workspaceId ||
+    identity.data.id !== workspaceId
+  )
     return <State kind="unavailable" />;
   return (
     <>
@@ -36,7 +42,8 @@ export default async function DailyPlansPage({
       <p className="notice">
         These are stored plans, not running schedules. No automatic collection,
         recurring dispatch, provider requests or billing are activated from this
-        screen. A plan&apos;s enabled flag reflects server state, not a control here.
+        screen. A plan&apos;s enabled flag reflects server state, not a control
+        here.
       </p>
       <p>{plans.data.total} stored daily plans across all pages.</p>
       {plans.data.results.length ? (
@@ -55,7 +62,9 @@ export default async function DailyPlansPage({
             <tbody>
               {plans.data.results.map((plan) => (
                 <tr key={plan.id}>
-                  <th scope="row"><code>{plan.id}</code></th>
+                  <th scope="row">
+                    <code>{plan.id}</code>
+                  </th>
                   <td>{plan.local_time}</td>
                   <td>{plan.timezone}</td>
                   <td>
