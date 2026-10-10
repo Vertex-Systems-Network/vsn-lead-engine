@@ -104,17 +104,21 @@ def redeem_invitation_page(request):
     ):
         return HttpResponseBadRequest("Unsupported invitation acceptance fields.")
     form = RedeemInvitationForm(request.POST)
-    accepted, status = None, 400
+    accepted, status, error = None, 400, None
     if form.is_valid():
         try:
             accepted = redeem_invitation(request.user, form.cleaned_data["code"])
         except InvitationUnavailable:
-            form.add_error(None, "Invitation unavailable, expired, already used, or for another account.")
+            error = "Invitation unavailable, expired, already used, or for another account."
         else:
             form, status = None, 200
+    if accepted is None:
+        # Do not echo a submitted bearer secret into the returned HTML or browser DOM.
+        form = RedeemInvitationForm()
+        error = error or "Enter a valid private invitation code."
     return private_render(
         request,
         "core/invitation_redeem.html",
-        {"form": form, "accepted": accepted},
+        {"form": form, "accepted": accepted, "error": error},
         status=status,
     )
