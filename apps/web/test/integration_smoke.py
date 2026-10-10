@@ -43,6 +43,7 @@ def main():
             Job,
             JobOutbox,
             Membership,
+            MembershipAudit,
             SourcePolicy,
             UsageReservation,
             User,
@@ -323,6 +324,34 @@ def main():
                     f"/dashboard/workspaces/{workspace.id}/members"
                 )
                 assert "Workspace members" in members_page
+                assert "Review member role change history" in members_page
+                audit_page, audit_headers = read(
+                    f"/dashboard/workspaces/{workspace.id}/member-audit"
+                )
+                assert "Membership change audit history" in audit_page
+                assert "No membership changes are recorded" in audit_page
+                assert "Synthetic &lt;workspace&gt;" in audit_page
+                assert "Foreign private marker" not in audit_page
+                assert "no-store" in audit_headers.get("Cache-Control", "")
+                audit_event = MembershipAudit.objects.create(
+                    workspace=workspace,
+                    actor=user,
+                    target_user_id=user.id,
+                    action="role_changed",
+                    previous_role="admin",
+                    new_role="owner",
+                )
+                populated_audit, _ = read(
+                    f"/dashboard/workspaces/{workspace.id}/member-audit"
+                )
+                assert str(user.id) in populated_audit
+                assert "role changed" in populated_audit
+                assert str(audit_event.id) not in populated_audit
+                foreign_audit, _ = read(
+                    f"/dashboard/workspaces/{other.id}/member-audit"
+                )
+                assert "Membership change audit history" not in foreign_audit
+                assert "Foreign private marker" not in foreign_audit
                 assert "Authorized workspace member roles" in members_page
                 assert "Active workspace:" in members_page
                 assert "Synthetic &lt;workspace&gt;" in members_page
