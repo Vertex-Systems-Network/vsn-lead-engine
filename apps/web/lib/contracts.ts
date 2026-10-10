@@ -93,7 +93,7 @@ export function dueDiagnostics(v: unknown): v is DueDiagnostics {
           (date: unknown) =>
             object(date) &&
             typeof date.local_date === "string" &&
-            /^\\d{4}-\\d{2}-\\d{2}$/.test(date.local_date) &&
+            /^\d{4}-\d{2}-\d{2}$/.test(date.local_date) &&
             ["normal", "gap_forward", "ambiguous_earlier", "skipped_day"].includes(
               String(date.resolution),
             ),
