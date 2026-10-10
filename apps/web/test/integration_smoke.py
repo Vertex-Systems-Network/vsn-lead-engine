@@ -244,6 +244,7 @@ def main():
                 assert "Internal checks blocked" in readiness_page
                 assert "Single-job usage headroom" in readiness_page
                 assert "Seven-local-day catch-up allowance" in readiness_page
+                assert "Affordable catch-up estimate unavailable" in readiness_page
                 assert "Catch-up allowance unavailable or plan disabled" in readiness_page
                 assert "Capacity not available for this configuration" in readiness_page
                 assert "Not verified" in readiness_page
