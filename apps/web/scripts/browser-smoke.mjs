@@ -473,8 +473,42 @@ async function run(origin) {
           queryKeys: [...new URLSearchParams(location.search).keys()],
           h1: document.querySelector("main h1")?.textContent.trim() || null,
           title: document.title,
+          stateKind: [
+            "Your session has expired or you do not have access.",
+            "This workspace or job is unavailable.",
+            "We could not load this information. Please try again.",
+          ].find((message) => document.querySelector("main")?.textContent.includes(message)) || null,
         }))()`);
-        assert.fail(`Browser interaction did not reach expected state: ${description}; view=${JSON.stringify(view)}`);
+        let backendProbe = null;
+        if (draftPostOrigin && description.includes("Explicit synthetic draft POST")) {
+          const currentId = view.pathname.split("/").at(-1);
+          if (uuid.test(currentId || "")) {
+            try {
+              const probe = await fetch(
+                new URL(`/api/v1/workspaces/${ownWorkspace}/jobs/${currentId}/`, draftPostOrigin),
+                { headers: { Accept: "application/json", Cookie: `sessionid=${privateSession}` }, redirect: "manual" },
+              );
+              backendProbe = {
+                status: probe.status,
+                contentType: probe.headers.get("content-type")?.split(";")[0],
+              };
+              if (probe.ok) {
+                const record = await probe.json();
+                backendProbe.shape = {
+                  id: typeof record.id,
+                  search: Array.isArray(record.search?.categories),
+                  status: record.status,
+                  revision: record.revision,
+                  resultCount: record.result_count,
+                  date: typeof record.created_at,
+                };
+              }
+            } catch {
+              backendProbe = { status: "unavailable" };
+            }
+          }
+        }
+        assert.fail(`Browser interaction did not reach expected state: ${description}; view=${JSON.stringify(view)}; backendProbe=${JSON.stringify(backendProbe)}`);
       }
 
       for (const width of [320, 1280]) {
