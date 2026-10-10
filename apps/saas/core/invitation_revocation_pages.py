@@ -41,7 +41,11 @@ def pending_invitations_page(request, workspace_id):
     return private_render(
         request,
         "core/invitations_pending.html",
-        {"workspace": membership.workspace, "pending": pending, "can_revoke_admin": membership.role == "owner"},
+        {
+            "workspace": membership.workspace,
+            "pending": pending,
+            "can_revoke_admin": membership.role == "owner",
+        },
     )
 
 
@@ -52,9 +56,7 @@ def revoke_invitation_page(request, workspace_id, invitation_id):
     membership = membership_for(request.user, workspace_id)
     if membership.role not in {"owner", "admin"}:
         return HttpResponseForbidden("Only owners/admins may revoke invitations.")
-    invitation = get_object_or_404(
-        WorkspaceInvitation, workspace_id=workspace_id, pk=invitation_id
-    )
+    invitation = get_object_or_404(WorkspaceInvitation, workspace_id=workspace_id, pk=invitation_id)
     if membership.role != "owner" and invitation.role == "admin":
         return HttpResponseForbidden("Only owners may revoke administrator invitations.")
     if request.method == "GET":
@@ -68,7 +70,12 @@ def revoke_invitation_page(request, workspace_id, invitation_id):
             return private_render(
                 request,
                 "core/invitation_revoke.html",
-                {"workspace": membership.workspace, "invitation": invitation, "form": None, "stale": True},
+                {
+                    "workspace": membership.workspace,
+                    "invitation": invitation,
+                    "form": None,
+                    "stale": True,
+                },
                 status=409,
             )
         form = RevokeInvitationForm(
@@ -76,15 +83,18 @@ def revoke_invitation_page(request, workspace_id, invitation_id):
             workspace_id=workspace_id,
             invitation=invitation,
             initial={
-                "confirmation_token": review_revoke_token(
-                    request.user, workspace_id, invitation
-                ),
+                "confirmation_token": review_revoke_token(request.user, workspace_id, invitation),
             },
         )
         return private_render(
             request,
             "core/invitation_revoke.html",
-            {"workspace": membership.workspace, "invitation": invitation, "form": form, "stale": False},
+            {
+                "workspace": membership.workspace,
+                "invitation": invitation,
+                "form": form,
+                "stale": False,
+            },
         )
     expected = {"csrfmiddlewaretoken", "confirmation_token", "confirm_revocation"}
     if set(request.POST) != expected or any(
