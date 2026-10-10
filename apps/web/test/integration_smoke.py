@@ -170,7 +170,7 @@ def main():
                     assert response.status == 200
                     assert "Next three local-day decisions" in preview_page
                     assert "does not save a schedule" in preview_page
-                    assert "America/Toronto" not in preview_page  # Workspace uses UTC in this smoke
+                    assert 'value="UTC"' in preview_page
                     assert "No automatic scheduling" in preview_page
                 assert "Synthetic &lt;workspace&gt;" in page
                 members_page, _ = read(
