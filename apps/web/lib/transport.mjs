@@ -29,6 +29,8 @@ function filteredResultPath(path, suffix) {
     (query === undefined || resultFilterQuery.test(query))
   );
 }
+const membersPath =
+  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/members\/(?:\?page=[1-9][0-9]{0,5})?$/;
 const formPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/(?:cancel-form|submit-form|export-form)\/)$/;
 export async function readBackend(
@@ -46,6 +48,7 @@ export async function readBackend(
     path === "/api/v1/account/sign-out-form/";
   if (
     !form &&
+    !membersPath.test(path) &&
     !filteredJobsPath.test(path) &&
     !/^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/[0-9a-f-]{36}\/export-receipts\/(?:\?after=[A-Za-z0-9_:%-]{1,1200})?$/.test(
       path,
