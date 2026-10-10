@@ -15,6 +15,7 @@ from core.login_security import ProtectedLoginView
 from core.member_removal_page import member_removal_page
 from core.member_role_page import member_role_change_page
 from core.password_reset import urlpatterns as password_reset_urls
+from core.search_assistance_page import search_assistance_page
 from core.signup import sign_up_page
 from django.contrib.auth import views as auth_views
 from django.urls import path
@@ -56,6 +57,11 @@ urlpatterns = [
         "workspaces/<uuid:workspace_id>/invitations/<uuid:invitation_id>/revoke/",
         revoke_invitation_page,
         name="invitation-revoke-page",
+    ),
+    path(
+        "workspaces/<uuid:workspace_id>/search-assistance/",
+        search_assistance_page,
+        name="search-assistance-page",
     ),
     path("api/v1/account/sign-in-form/", sign_in_form),
     path("accounts/login/", ProtectedLoginView.as_view()),
