@@ -1,0 +1,28 @@
+{% extends "core/job_base.html" %}
+{% block title %}Accept workspace invitation{% endblock %}
+{% block content %}
+<h1>Accept a workspace invitation</h1>
+<p>Sign in using the exact existing account your workspace administrator invited.
+Paste the one-time code supplied by that administrator. Never put invitation
+codes into URLs. A successful acceptance immediately grants workspace access;
+it does not enable source collection, subscriptions or payments.</p>
+{% if accepted %}
+<section role="status" aria-label="Invitation accepted">
+<h2>Workspace invitation accepted</h2>
+<p>Workspace ID: <code>{{ accepted.workspace_id }}</code>. Your role:
+<strong>{{ accepted.role }}</strong>. This one-time code is now invalid.</p>
+<p><a href="/dashboard/workspaces/{{ accepted.workspace_id }}">Open your workspace</a></p>
+</section>
+{% elif form %}
+<form method="post" action="{% url 'invitation-redeem-page' %}">
+{% csrf_token %}
+{% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
+<div class="form-field">
+<label for="{{ form.code.id_for_label }}">Private invitation code</label>
+{{ form.code }}
+{% if form.code.errors %}<div role="alert">{{ form.code.errors }}</div>{% endif %}
+</div>
+<button type="submit">Accept invitation for my signed-in account</button>
+</form>
+{% endif %}
+{% endblock %}
