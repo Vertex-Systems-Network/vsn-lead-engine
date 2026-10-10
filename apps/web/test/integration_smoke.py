@@ -325,6 +325,23 @@ def main():
                 )
                 assert "Workspace members" in members_page
                 assert "Review member role change history" in members_page
+                assert "Review role change" in members_page
+                member_role_path = (
+                    f"/workspaces/{workspace.id}/members/{user.id}/role/"
+                )
+                assert backend + member_role_path in members_page
+                with urlopen(
+                    Request(
+                        backend + member_role_path,
+                        headers={"Cookie": f"sessionid={session}"},
+                    ),
+                    timeout=10,
+                ) as member_form:
+                    member_html = member_form.read().decode()
+                    assert member_form.status == 200
+                    assert "Confirm member role change" in member_html
+                    assert "Foreign private marker" not in member_html
+                assert MembershipAudit.objects.count() == 0
                 audit_page, audit_headers = read(
                     f"/dashboard/workspaces/{workspace.id}/member-audit"
                 )
