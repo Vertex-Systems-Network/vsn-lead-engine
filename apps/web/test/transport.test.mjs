@@ -432,8 +432,16 @@ test("receipt history is readonly and forwards session only on exact bounded pat
 });
 
 test("workspace members list is session-only, bounded and read-only", async () => {
-  const id = "a".repeat(8) + "-" + "a".repeat(4) + "-" + "a".repeat(4) +
-    "-" + "a".repeat(4) + "-" + "a".repeat(12);
+  const id =
+    "a".repeat(8) +
+    "-" +
+    "a".repeat(4) +
+    "-" +
+    "a".repeat(4) +
+    "-" +
+    "a".repeat(4) +
+    "-" +
+    "a".repeat(12);
   for (const path of [
     `/api/v1/workspaces/${id}/members/`,
     `/api/v1/workspaces/${id}/members/?page=2`,
