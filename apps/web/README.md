@@ -45,3 +45,21 @@ ESLint 9 is pinned because the current React/a11y plugin peer ranges do not acce
 Native draft validation uses a bounded five-minute session handoff with the original signed retry identity, preserved inputs and field/error summary. Invalid authority or oversized inputs retain the Django fallback. Native `/account/sign-out` confirms CSRF-protected Django POST logout. Native login and cancellation-error screens remain open. See `docs/ai/SAAS-NEXT-VALIDATION-SIGNOUT-REVIEW-20261008.md` for session retention and acceptance limits.
 
 Native Next sign-in uses explicit browser CSRF bootstrap and direct Django POST with generic fixed failure/limited notices. Native cancellation errors show current job state and require fresh review without issuing confirmation. Frontend origin is opt-in; standalone handlers retain their fallback. See `docs/ai/SAAS-NATIVE-LOGIN-CANCEL-REVIEW-20261008.md` for security, compatibility and acceptance limits.
+
+## Public development preview
+
+The Next root route `/` is a public marketing overview rather than an automatic
+redirect into a private dashboard. Anonymous pages `/capabilities`, `/plans`
+and `/data-handling` distinguish implemented development features from planned
+or externally gated work. The plans page has no pricing/checkout and the data
+handling page is expressly **not** a legally reviewed privacy policy. The app's
+default metadata is `noindex,nofollow` until a separate public launch decision.
+The dashboard still resolves tenant membership through Django, not marketing
+navigation visibility.
+
+The introductory workflow illustration is CSS and text only; no real business
+records, metrics or unlicensed stock photographs are included. Mobile reflow,
+keyboard focus and reduced-motion styles are implemented but do **not** replace
+independent browser/WCAG, visual, performance, source-license and legal review.
+The disposable HTTP integration smoke asserts public access, safe status labels,
+no payment flow and absence of synthetic private tenant content.

@@ -10,14 +10,15 @@
     "total_work_units": 21,
     "complete": 9,
     "ready": 0,
-    "in_progress": 5,
+    "in_progress": 6,
     "blocked": 1,
     "deferred": 2,
-    "not_started": 4,
+    "not_started": 3,
     "needs_update": 0,
     "needs_removal": 0
   },
   "outstanding_updates": [
+    "Public SaaS marketing started: Next.js home, capabilities, unpriced plan concepts and data-handling overview added under WU-SAAS-MARKETING. Public launch, visual/WCAG certification and provider/legal claims remain unverified.",
     "Owner direction: finish the SaaS platform first; production quota is not a current work item. v3 batch-evidence modules stay frozen. Done: run_jobs worker, Overture source (live-verified), production fulfilment signer, customer Submit job, sign-up with email, password reset, job auto-refresh. Job pages auto-refresh. Next: deployment packaging (needs owner hosting choice + SMTP sender), then M8 admin.",
     "Replace ESLint 9/plugin compatibility limitation before production; verify browser/accessibility when a usable browser runtime is available.",
     "Complete broader multi-batch lead workflow and external rights/customer/privacy/deployment/launch evidence."
