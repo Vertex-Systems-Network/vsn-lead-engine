@@ -20,6 +20,7 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 ## Implemented surface
 
 - `/health/`: liveness and explicit disabled provider dispatch; no credentials/database details.
+- `/accounts/sign-up/`: self-service account creation (rate-limited with the login buckets); creates an owned workspace and, when `SAAS_STARTER_ENTITLEMENT` is set, a starter allowance. On by default only with `SAAS_DEBUG=1`; production needs `SAAS_SIGNUP_ENABLED=1`.
 - `/accounts/login/`, `/accounts/logout/`: Django same-origin sessions; CSRF-protected forms and POST logout.
 - `/`: authenticated workspace overview, with links to read-only workspace usage.
 - `/workspaces/{workspace_id}/sources/`: bounded read-only application policy configuration, without rights/availability claims.
@@ -38,7 +39,7 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 
 Draft creation requires an `Idempotency-Key` header. Search JSON accepts countries (US/CA), categories, statuses, required_fields, source_codes and result_limit (1–1000). Unknown fields fail validation. Phone qualification is always included. A key replays the normalized original request; changing its payload returns 409. Membership and write role are rechecked inside the transaction. A workspace row lock and unique tenant/key constraint serialize concurrent duplicate creates.
 
-Drafts never enqueue, reserve usage, dispatch source calls, collect data, export, schedule or charge. Source codes and statuses in drafts are requested preferences, not verified capabilities. Internal entitlement/source policy enforcement and atomic usage/outbox services now exist; bounded pre-dispatch leases and current-gate rechecks exist, while external execution/idempotency/recovery contracts are required before any consumer is enabled. Public registration, member invitations, source activation and billing remain unavailable. Existing member role changes and removal are available to authorized owners/admins, with role-only audit records committed in the same transaction. Users are created locally by the management command for development testing only.
+Drafts never enqueue, reserve usage, dispatch source calls, collect data, export, schedule or charge. Source codes and statuses in drafts are requested preferences, not verified capabilities. Internal entitlement/source policy enforcement and atomic usage/outbox services now exist; bounded pre-dispatch leases and current-gate rechecks exist, while external execution/idempotency/recovery contracts are required before any consumer is enabled. Self-service sign-up exists (see `/accounts/sign-up/`); member invitations, real source activation and billing remain unavailable. Existing member role changes and removal are available to authorized owners/admins, with role-only audit records committed in the same transaction. Users are created locally by the management command for development testing only.
 
 ## Local end-to-end job fulfilment (development only)
 
@@ -52,7 +53,7 @@ python apps/saas/manage.py seed_local_source
 python apps/saas/manage.py run_jobs --limit 25
 ```
 
-One job holds at most 25 accepted leads (the v2 batch bound). A workspace still needs an active entitlement; customers queue jobs with **Submit job**. Sign-up is the next slice.
+One job holds at most 25 accepted leads (the v2 batch bound). New sign-ups get a starter allowance in debug (`SAAS_STARTER_ENTITLEMENT`, default `100,10,10,10` = leads, jobs, source calls, exports), so the full flow is sign-up → draft → **Submit job** → `run_jobs` → results/CSV.
 
 ## Security and recovery
 

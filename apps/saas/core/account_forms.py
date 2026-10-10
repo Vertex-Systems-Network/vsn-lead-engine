@@ -38,4 +38,6 @@ def sign_in_form(request):
         token = form_csrf(request)
     except PermissionDenied:
         return HttpResponseForbidden("Start sign-in to prepare this browser.")
-    return JsonResponse({"kind": "sign-in", "csrf_token": token})
+    return JsonResponse(
+        {"kind": "sign-in", "csrf_token": token, "signup_enabled": settings.SAAS_SIGNUP_ENABLED}
+    )

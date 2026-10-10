@@ -553,6 +553,32 @@ def main():
                 retained_history, _ = read(history_path)
                 assert export_receipt in retained_history and "50123" not in retained_history
                 assert UsageCounter.objects.get(workspace=result_fixture.workspace).exports == 2
+                # Self-service sign-up through the native Next form (debug default: on,
+                # with a starter allowance so the new workspace can submit jobs).
+                signup_page, signup_form = native_form("/account/sign-up")
+                signup_action = "/accounts/sign-up/"
+                assert "Create account" in signup_page
+                assert signup_form.action == backend + signup_action
+                bad = {**signup_form.hidden, "username": "native-signup", "password1": "x"}
+                code, _, bad_signup = account(signup_action, {**bad, "password2": "y"}, origin)
+                assert code == 303
+                assert bad_signup["Location"] == origin + "/account/sign-up?notice=invalid"
+                assert not User.objects.filter(username="native-signup").exists()
+                secret = "native-signup-passphrase-7731"
+                good = {
+                    **signup_form.hidden,
+                    "username": "native-signup",
+                    "workspace_name": "Native signup workspace",
+                    "password1": secret,
+                    "password2": secret,
+                }
+                code, _, signed_up = account(signup_action, good, origin)
+                assert code == 303 and signed_up["Location"] == origin + "/dashboard"
+                new_workspace = Membership.objects.get(user__username="native-signup").workspace
+                assert Entitlement.objects.get(workspace=new_workspace).is_current
+                signed_in_dashboard, _ = native_form("/dashboard")
+                assert "Native signup workspace" in signed_in_dashboard
+                assert "Synthetic &lt;workspace&gt;" not in signed_in_dashboard
                 active_session = next(cookie.value for cookie in jar if cookie.name == "sessionid")
                 form, csrf = native_form("/account/sign-out")
                 assert "End your session" in form and "Keep working" in form
@@ -577,7 +603,7 @@ def main():
                 ) as response:
                     assert "Synthetic &lt;workspace&gt;" not in response.read().decode()
                 print(
-                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, native submit/replay, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, country/category/source result filters and native selected-row export preview/confirmation/empty/outside-filter denial/subset-only/conflict and readonly redacted receipt-history/no-charge/retained-after-erasure flows and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
+                    "PASS: Next/Django HTTP workspace, usage/window, jobs/detail, tenant denial, real CSRF login/return/logout, native login/bootstrap/failure/budget/rotation, cancellation error review, native submit/replay, native sign-up, draft validation/correction/replay/conflict, sign-out, role/tenant/cancel and bounded source configuration/status-filter pagination and dual-attested results/viewer/revocation/expiry/XSS and CSRF CSV export/replay/viewer denial, country/category/source result filters and native selected-row export preview/confirmation/empty/outside-filter denial/subset-only/conflict and readonly redacted receipt-history/no-charge/retained-after-erasure flows and payload erasure/tombstone flows, old-session rejection, anonymous isolation and no-store checks (disposable SQLite)"
                 )
             finally:
                 os.killpg(process.pid, signal.SIGTERM)

@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Create account — VSN Lead Engine</title></head>
+<body><main><h1>Create account</h1><p>Your account gets its own workspace for saved searches and leads.</p>
+{% if limited %}<p role="alert">Too many attempts. Please try again in 15 minutes.</p>{% endif %}
+<form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit">Create account</button></form>
+<p><a href="/accounts/login/">Already have an account? Sign in</a></p>
+</main></body></html>

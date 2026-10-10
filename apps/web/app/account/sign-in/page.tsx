@@ -53,6 +53,11 @@ export default async function SignIn({
           <button className="button" type="submit">
             Sign in
           </button>
+          {result.data.signup_enabled ? (
+            <p>
+              New here? <Link href="/account/sign-up">Create an account</Link>
+            </p>
+          ) : null}
         </form>
       ) : (
         <section className="card">

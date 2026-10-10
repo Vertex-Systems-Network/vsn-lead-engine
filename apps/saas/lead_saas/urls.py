@@ -10,6 +10,7 @@ from core.form_context import (
     SubmitFormContext,
 )
 from core.login_security import ProtectedLoginView
+from core.signup import sign_up_page
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
@@ -34,6 +35,7 @@ urlpatterns = [
     path("health/", views.health),
     path("", views.overview),
     path("accounts/start-sign-in/", start_sign_in),
+    path("accounts/sign-up/", sign_up_page, name="sign-up-page"),
     path("api/v1/account/sign-in-form/", sign_in_form),
     path("accounts/login/", ProtectedLoginView.as_view()),
     path("accounts/check-session/", views.check_session_page, name="check-session-page"),

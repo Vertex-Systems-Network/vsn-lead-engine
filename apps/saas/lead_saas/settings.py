@@ -170,3 +170,24 @@ if SAAS_LOCAL_FULFILMENT:
     if not DEBUG:
         raise ImproperlyConfigured("SAAS_LOCAL_FULFILMENT requires SAAS_DEBUG=1")
     globals().update(verifier_settings(SECRET_KEY))
+
+# Self-service sign-up creates an account and an owned workspace. Public
+# registration is a launch decision: on by default only in debug, otherwise it
+# needs SAAS_SIGNUP_ENABLED=1.
+SAAS_SIGNUP_ENABLED = DEBUG or os.environ.get("SAAS_SIGNUP_ENABLED", "0") == "1"
+# Optional free allowance for new workspaces ("leads,jobs,calls,exports"); empty
+# means none, so production customers need a billing-granted entitlement.
+_starter = os.environ.get("SAAS_STARTER_ENTITLEMENT", "100,10,10,10" if DEBUG else "")
+SAAS_STARTER_ENTITLEMENT = {}
+if _starter:
+    try:
+        _values = [int(part) for part in _starter.split(",")]
+    except ValueError:
+        _values = []
+    if len(_values) != 4 or any(not 0 <= value <= 100000 for value in _values):
+        raise ImproperlyConfigured("SAAS_STARTER_ENTITLEMENT must be four integers 0-100000")
+    SAAS_STARTER_ENTITLEMENT = dict(
+        zip(
+            ("lead_limit", "job_limit", "provider_call_limit", "export_limit"), _values, strict=True
+        )
+    )
