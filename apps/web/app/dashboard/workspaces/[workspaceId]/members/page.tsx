@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { backend } from "../../../../../../lib/backend";
-import { members, uuid } from "../../../../../../lib/contracts";
-import { State } from "../../../../../components/state";
+import { backend } from "../../../../../lib/backend";
+import { members, uuid } from "../../../../../lib/contracts";
+import { State } from "../../../../components/state";
 
 export default async function MembersPage({
   params,
