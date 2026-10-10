@@ -745,3 +745,42 @@ test("occurrence history is exact session-only read with local-date cursor", asy
   );
   assert.equal(anonymous.kind, "signin");
 });
+
+test("daily source readiness is session-only at exact plan path", async () => {
+  const ws = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const plan = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+  const path = `/api/v1/workspaces/${ws}/daily-plans/${plan}/readiness/`;
+  const result = await readBackend(
+    "http://localhost:8000",
+    path,
+    session,
+    async (url, options) => {
+      assert.equal(url.pathname + url.search, path);
+      assert.equal(options.headers.Cookie, `sessionid=${session}`);
+      assert.equal(options.cache, "no-store");
+      assert.equal(options.redirect, "manual");
+      return new Response(
+        `{"workspace_id":"${ws}","plan_id":"${plan}","advisory_only":true}`,
+        { headers: { "content-type": "application/json" } },
+      );
+    },
+  );
+  assert.equal(result.kind, "ok");
+  for (const candidate of [
+    `${path}?activate=true`,
+    `${path}?source=all`,
+    `${path}run/`,
+    `${path}../`,
+  ]) {
+    await assert.rejects(readBackend("http://localhost:8000", candidate, session));
+  }
+  const anonymous = await readBackend(
+    "http://localhost:8000",
+    path,
+    undefined,
+    () => {
+      throw Error("Anonymous source readiness must not reach Django");
+    },
+  );
+  assert.equal(anonymous.kind, "signin");
+});
