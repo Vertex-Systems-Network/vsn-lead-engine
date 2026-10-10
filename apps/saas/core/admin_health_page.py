@@ -1,7 +1,7 @@
 """Read-only owner/admin operational health page with no provider secrets."""
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
@@ -17,8 +17,11 @@ def admin_operational_health_page(request, workspace_id):
     # No query filters; every aggregate uses the authoritative URL tenant scope.
     if request.GET:
         return HttpResponseBadRequest("Operations snapshot accepts no query parameters.")
+    current = membership_for(request.user, workspace_id)
+    if current.role not in {"owner", "admin"}:
+        return HttpResponseForbidden("Only owners and administrators can review operations.")
     report = operational_health(request.user, workspace_id)
-    workspace = membership_for(request.user, workspace_id).workspace
+    workspace = current.workspace
     return render(
         request,
         "core/admin_operational_health.html",
