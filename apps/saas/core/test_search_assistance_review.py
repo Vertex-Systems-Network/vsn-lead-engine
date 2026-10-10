@@ -61,9 +61,7 @@ class ReviewedSuggestionHandoffTests(TestCase):
         self.assertIn("no-store", review["Cache-Control"])
         self.assertContains(review, "No draft has been created")
         self.assertContains(review, "Save reviewed draft")
-        self.assertContains(
-            review, f'action="{self.draft_path}"'
-        )
+        self.assertContains(review, f'action="{self.draft_path}"')
         form = review.context["form"]
         self.assertEqual(form.initial["countries"], ["CA", "US"])
         self.assertEqual(form.initial["categories"], "salon\nspa")
@@ -98,7 +96,9 @@ class ReviewedSuggestionHandoffTests(TestCase):
     def test_expired_tampered_and_foreign_actor_review_fail_closed(self):
         response = self.preview()
         token = response.context["review_token"]
-        self.assertEqual(self.handoff(token[:-1] + ("x" if token[-1] != "x" else "y")).status_code, 400)
+        self.assertEqual(
+            self.handoff(token[:-1] + ("x" if token[-1] != "x" else "y")).status_code, 400
+        )
         self.assertEqual(self.handoff(token, actor=self.member).status_code, 400)
         with patch("django.core.signing.time.time", return_value=0):
             expired = self.preview().context["review_token"]
@@ -115,15 +115,27 @@ class ReviewedSuggestionHandoffTests(TestCase):
     def test_viewer_foreign_revoked_and_unsupported_methods(self):
         token = self.preview().context["review_token"]
         self.client.force_login(self.viewer)
-        self.assertEqual(self.client.post(
-            self.review_path,
-            {"csrfmiddlewaretoken": self.client.cookies["csrftoken"].value, "review_token": token},
-        ).status_code, 403)
+        self.assertEqual(
+            self.client.post(
+                self.review_path,
+                {
+                    "csrfmiddlewaretoken": self.client.cookies["csrftoken"].value,
+                    "review_token": token,
+                },
+            ).status_code,
+            403,
+        )
         self.client.force_login(self.foreign_owner)
-        self.assertEqual(self.client.post(
-            self.review_path,
-            {"csrfmiddlewaretoken": self.client.cookies["csrftoken"].value, "review_token": token},
-        ).status_code, 404)
+        self.assertEqual(
+            self.client.post(
+                self.review_path,
+                {
+                    "csrfmiddlewaretoken": self.client.cookies["csrftoken"].value,
+                    "review_token": token,
+                },
+            ).status_code,
+            404,
+        )
         self.client.force_login(self.owner)
         Membership.objects.filter(workspace=self.workspace, user=self.owner).delete()
         self.assertEqual(self.handoff(token).status_code, 404)
@@ -140,12 +152,14 @@ class ReviewedSuggestionHandoffTests(TestCase):
             self.client.post(
                 self.review_path + "?intent=US",
                 {"csrfmiddlewaretoken": csrf, "review_token": token},
-            ).status_code, 400
+            ).status_code,
+            400,
         )
         self.assertEqual(
             self.client.post(
                 self.review_path,
                 {"csrfmiddlewaretoken": csrf, "review_token": token, "execute": "yes"},
-            ).status_code, 400
+            ).status_code,
+            400,
         )
         self.assertFalse(Job.objects.exists())
