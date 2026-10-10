@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from .models import UsagePeriod
-from .usage import COUNTERS, amounts
+from .usage import amounts
 from .usage_snapshot import usage_snapshot
 
 CAPACITY_ORDER = ("leads", "jobs", "provider_calls")
