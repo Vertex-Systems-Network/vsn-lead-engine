@@ -238,16 +238,17 @@ function catchUpBudgetCapacity(v: unknown): boolean {
     ) &&
     rows[1].requested === v.due_job_candidates &&
     (v.status !== "no_due_job_candidates" || v.due_job_candidates === 0) &&
-    (v.status !== "advisory_batch_fits" || (
-      v.due_job_candidates > 0 && rows.every(
-        (r: unknown) => object(r) && Number(r.requested) <= Number(r.headroom),
-      )
-    )) &&
-    (v.status !== "advisory_batch_exceeds" || (
-      v.due_job_candidates > 0 && rows.some(
-        (r: unknown) => object(r) && Number(r.requested) > Number(r.headroom),
-      )
-    ))
+    (v.status !== "advisory_batch_fits" ||
+      (v.due_job_candidates > 0 &&
+        rows.every(
+          (r: unknown) =>
+            object(r) && Number(r.requested) <= Number(r.headroom),
+        ))) &&
+    (v.status !== "advisory_batch_exceeds" ||
+      (v.due_job_candidates > 0 &&
+        rows.some(
+          (r: unknown) => object(r) && Number(r.requested) > Number(r.headroom),
+        )))
   );
 }
 
