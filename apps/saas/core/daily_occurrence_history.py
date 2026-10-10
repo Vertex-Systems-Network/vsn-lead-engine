@@ -26,9 +26,7 @@ def daily_occurrences_page(actor, workspace_id, plan_id, params):
             raise ValidationError({"before": "Invalid local-date history cursor."}) from None
         if before.isoformat() != raw:
             raise ValidationError({"before": "Use YYYY-MM-DD for the local-date cursor."})
-    scoped = ScheduleOccurrence.objects.filter(
-        schedule_id=plan_id, workspace_id=workspace_id
-    )
+    scoped = ScheduleOccurrence.objects.filter(schedule_id=plan_id, workspace_id=workspace_id)
     total = scoped.count()
     if before is not None:
         scoped = scoped.filter(local_date__lt=before)
