@@ -82,9 +82,7 @@ class WorkspaceInvitationTests(TestCase):
         self.assertEqual(audit.target_user_id, self.recipient.pk)
         self.assertEqual(audit.actor_id, self.recipient.pk)
         self.assertEqual(audit.new_role, "member")
-        self.assertIsNotNone(
-            WorkspaceInvitation.objects.get(pk=invitation.pk).accepted_at
-        )
+        self.assertIsNotNone(WorkspaceInvitation.objects.get(pk=invitation.pk).accepted_at)
         self.assertEqual(self.accept(self.recipient, code).status_code, 400)
         self.assertEqual(MembershipAudit.objects.count(), 1)
 
@@ -96,9 +94,7 @@ class WorkspaceInvitationTests(TestCase):
         )
         self.client.force_login(self.foreign_owner)
         self.assertEqual(self.client.get(self.issue_path).status_code, 404)
-        self.assertEqual(
-            self.client.get(self.accept_path + "?code=" + code).status_code, 400
-        )
+        self.assertEqual(self.client.get(self.accept_path + "?code=" + code).status_code, 400)
         self.assertNotIn(code, self.client.get(self.accept_path).content.decode())
         self.assertEqual(self.accept(self.recipient, code).status_code, 200)
         self.assertEqual(MembershipAudit.objects.count(), 1)
@@ -203,7 +199,5 @@ class WorkspaceInvitationTests(TestCase):
             body = self.issue_form(username=user.username)
             self.assertEqual(self.client.post(self.issue_path, body).status_code, 200)
         self.assertEqual(WorkspaceInvitation.objects.count(), 10)
-        self.assertEqual(
-            self.client.post(self.issue_path, self.issue_form()).status_code, 409
-        )
+        self.assertEqual(self.client.post(self.issue_path, self.issue_form()).status_code, 409)
         self.assertEqual(WorkspaceInvitation.objects.count(), 10)
