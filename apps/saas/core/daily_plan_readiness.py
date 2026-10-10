@@ -23,6 +23,7 @@ def daily_plan_readiness(actor, workspace_id, plan_id):
         raise Http404("Workspace resource not found.")
 
     checks = []
+
     def record(name, passed):
         checks.append({"name": name, "status": "pass" if passed else "blocked"})
         return passed
@@ -91,7 +92,8 @@ def daily_plan_readiness(actor, workspace_id, plan_id):
         "plan_id": str(plan.id),
         "stored_enabled": plan.enabled,
         "advisory_only": True,
-        "status": "blocked" if any(row["status"] == "blocked" for row in checks)
+        "status": "blocked"
+        if any(row["status"] == "blocked" for row in checks)
         else "internal_catalog_match_only",
         "checked_source_count": count,
         "checks": checks,
