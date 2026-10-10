@@ -184,6 +184,75 @@ class UsageDetail(APIView):
 
 @never_cache
 @login_required
+@require_http_methods(["GET", "POST"])
+def daily_plan_page(request, workspace_id, job_id):
+    """Create only an inactive schedule plan from the saved draft's server-side scope."""
+    from rest_framework.exceptions import PermissionDenied, ValidationError
+
+    from .daily_plan_forms import DailyPlanForm, new_daily_plan_token
+    from .schedules import create_daily_schedule
+    from .services import IdempotencyConflict
+
+    membership = membership_for(request.user, workspace_id)
+    if membership.role not in {"owner", "admin", "member"}:
+        return HttpResponseForbidden("This role cannot save daily plans.")
+    workspace = membership.workspace
+    job = get_object_or_404(Job, pk=job_id, workspace_id=workspace_id, status="draft")
+    if request.method == "GET":
+        if request.GET:
+            return HttpResponseBadRequest("Daily plan form does not accept query parameters.")
+        form = DailyPlanForm(
+            user=request.user,
+            workspace_id=workspace_id,
+            job_id=job_id,
+            initial={
+                "timezone": workspace.timezone,
+                "time": "08:00",
+                "plan_token": new_daily_plan_token(request.user, workspace_id, job_id),
+            },
+        )
+        return render(
+            request,
+            "core/daily_plan.html",
+            {"workspace": workspace, "job": job, "form": form, "plan": None},
+        )
+    expected = {"csrfmiddlewaretoken", "timezone", "time", "plan_token"}
+    if set(request.POST) != expected or any(
+        len(request.POST.getlist(key)) != 1 for key in request.POST
+    ):
+        return HttpResponseBadRequest("Unsupported daily plan form fields.")
+    form = DailyPlanForm(request.POST, user=request.user, workspace_id=workspace_id, job_id=job_id)
+    plan = None
+    response_status = 400
+    if form.is_valid():
+        try:
+            plan, created = create_daily_schedule(
+                request.user,
+                workspace_id,
+                job.search,
+                form.cleaned_data["timezone"],
+                form.cleaned_data["time"],
+                form.key,
+            )
+        except IdempotencyConflict:
+            form.add_error(None, "This plan key was already used for different settings.")
+            response_status = 409
+        except ValidationError:
+            form.add_error(None, "The saved search needs fresh validation before scheduling.")
+        except PermissionDenied:
+            return HttpResponseForbidden("Daily plan permission is no longer available.")
+        else:
+            response_status = 201 if created else 200
+    return render(
+        request,
+        "core/daily_plan.html",
+        {"workspace": workspace, "job": job, "form": form, "plan": plan},
+        status=response_status,
+    )
+
+
+@never_cache
+@login_required
 @require_GET
 def daily_time_preview_page(request, workspace_id):
     """Member-only GET preview; no schedule, queued job or provider side effect."""

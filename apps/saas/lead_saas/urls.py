@@ -58,6 +58,11 @@ urlpatterns = [
         views.MemberDetail.as_view(),
     ),
     path(
+        "workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/daily-plan/",
+        views.daily_plan_page,
+        name="daily-plan-page",
+    ),
+    path(
         "workspaces/<uuid:workspace_id>/schedule-preview/",
         views.daily_time_preview_page,
         name="daily-time-preview-page",

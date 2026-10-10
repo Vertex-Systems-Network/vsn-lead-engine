@@ -215,6 +215,20 @@ def main():
                 assert "Rollover waits for unresolved reservations" in period_page
                 detail, _ = read(f"/dashboard/workspaces/{workspace.id}/jobs/{saved[0].id}")
                 assert "Saved search" in detail and "Review cancellation" in detail
+                plan_path = f"/workspaces/{workspace.id}/jobs/{saved[0].id}/daily-plan/"
+                assert backend + plan_path in detail
+                with urlopen(
+                    Request(
+                        backend + plan_path,
+                        headers={"Cookie": f"sessionid={session}"},
+                    ),
+                    timeout=10,
+                ) as response:
+                    inactive_plan_form = response.read().decode()
+                    assert response.status == 200
+                    assert "Save a disabled daily plan" in inactive_plan_form
+                    assert 'name="plan_token"' in inactive_plan_form
+                    assert "Newly saved plans are disabled" in inactive_plan_form
                 denied, _ = read(f"/dashboard/workspaces/{other.id}")
                 assert "Foreign private marker" not in denied
                 assert (
