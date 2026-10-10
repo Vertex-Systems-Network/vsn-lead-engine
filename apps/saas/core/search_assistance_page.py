@@ -7,6 +7,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods
 
 from .search_assistance import SearchAssistForm, search_assistance_preview
+from .search_assistance_review import review_token_for
 from .services import membership_for
 
 
@@ -45,6 +46,9 @@ def search_assistance_page(request, workspace_id):
             "workspace": current.workspace,
             "form": SearchAssistForm(),
             "preview": preview,
+            "review_token": review_token_for(request.user, workspace_id, preview["search"])
+            if preview and preview["search"]
+            else None,
             "error": error,
         },
         status=status,
