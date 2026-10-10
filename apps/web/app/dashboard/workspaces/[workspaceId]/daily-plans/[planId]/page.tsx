@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { backend } from "../../../../../../lib/backend";
+import { backend, backendLink } from "../../../../../../lib/backend";
 import {
   dailyPlanDetail,
   uuid,
@@ -70,6 +70,17 @@ export default async function DailyPlanDetailPage({
           <dd>{new Date(item.created_at).toISOString()}</dd>
         </dl>
       </section>
+      {item.enabled ? (
+        <p>
+          <a
+            href={backendLink(
+              `/workspaces/${workspaceId}/daily-plans/${planId}/stop/`,
+            )}
+          >
+            Review stop confirmation (owner/admin)
+          </a>
+        </p>
+      ) : null}
       <section className="card">
         <h2>Saved lead search preferences</h2>
         <dl>
