@@ -136,5 +136,7 @@ class MemberRemovalPageTests(TestCase):
         change_membership(self.owner, self.workspace.id, self.member.id, role="viewer")
         change_membership(self.owner, self.workspace.id, self.member.id, role="member")
         self.assertEqual(self.client.post(self.path, claim).status_code, 409)
-        self.assertTrue(Membership.objects.filter(workspace=self.workspace, user=self.member).exists())
+        self.assertTrue(
+            Membership.objects.filter(workspace=self.workspace, user=self.member).exists()
+        )
         self.assertEqual(MembershipAudit.objects.count(), 2)
