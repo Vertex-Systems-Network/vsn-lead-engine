@@ -809,7 +809,9 @@ export type DailyOccurrenceHistory = {
   next: string | null;
   advisory_only: true;
 };
-export function dailyOccurrenceHistory(v: unknown): v is DailyOccurrenceHistory {
+export function dailyOccurrenceHistory(
+  v: unknown,
+): v is DailyOccurrenceHistory {
   if (
     !object(v) ||
     !uuid(v.workspace_id) ||
@@ -819,10 +821,8 @@ export function dailyOccurrenceHistory(v: unknown): v is DailyOccurrenceHistory 
     !Array.isArray(v.results) ||
     v.results.length > 25 ||
     v.results.length > v.total ||
-    (v.next !== null && (
-      typeof v.next !== "string" ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(v.next)
-    ))
+    (v.next !== null &&
+      (typeof v.next !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(v.next)))
   )
     return false;
   if (
@@ -840,9 +840,12 @@ export function dailyOccurrenceHistory(v: unknown): v is DailyOccurrenceHistory 
         r.timezone.length <= 64 &&
         count(r.schedule_revision) &&
         r.schedule_revision >= 1 &&
-        ["normal", "gap_forward", "ambiguous_earlier", "skipped_day"].includes(String(r.resolution)) &&
+        ["normal", "gap_forward", "ambiguous_earlier", "skipped_day"].includes(
+          String(r.resolution),
+        ) &&
         (r.scheduled_for === null ||
-          (typeof r.scheduled_for === "string" && Number.isFinite(Date.parse(r.scheduled_for)))) &&
+          (typeof r.scheduled_for === "string" &&
+            Number.isFinite(Date.parse(r.scheduled_for)))) &&
         (r.job_id === null || uuid(r.job_id)) &&
         (r.job_status === null || jobState(r.job_status)) &&
         (r.job_id === null ? r.job_status === null : r.job_status !== null) &&
