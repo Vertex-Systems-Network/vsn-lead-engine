@@ -133,7 +133,7 @@ class OfflineSearchAssistanceTests(TestCase):
             "US salons api_key=FAKEKEY123456",
             "Canada spas sk-proj-aaaaaaaaaaaaaaaaaaaa",
             "USA restaurants Bearer fakerandomtoken123456",
-            "US salons\\u200b and spas",
+            "US salons\u200b and spas",
             "bad control \x00 Canada salons",
         ]
         for intent in examples:
