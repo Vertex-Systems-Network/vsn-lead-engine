@@ -224,3 +224,18 @@ the Next service with explicit HTTPS backend/public origins.
 
 No hosting vendor, public domain, SMTP account or production rollout is
 provisioned by this change.
+
+## Authenticated daily-time DST preview (no automation)
+
+The read-only HTML route `/workspaces/<uuid>/schedule-preview/` uses current
+workspace membership and the existing `core.schedules.resolve_daily` DST policy.
+An IANA timezone and HH:MM input show the next three local-day decisions with
+actual UTC instants/offsets and gap/ambiguous resolutions. A missing spring clock
+time advances to the first valid local minute on the same date; repeated autumn
+time uses the earlier UTC instant. A skipped entire civil day is shown as a
+no-run decision. The GET form and view cannot create or activate `DailySchedule`
+records, `ScheduleOccurrence` records or jobs; they do not reserve usage or call
+providers. Read-only review is available to workspace viewers as well as owners.
+The action to save, enable and operate a daily customer schedule is deliberately
+**not** available; it requires separate role, entitlement, recheck, dispatcher,
+audit and deployment acceptance. This preview is not recurring collection.
