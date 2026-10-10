@@ -1,0 +1,37 @@
+{% extends "core/job_base.html" %}
+{% block title %}Workspace operational health{% endblock %}
+{% block content %}
+<h1>Workspace operational health — {{ workspace.name }}</h1>
+<p>For authorized owners and administrators only. This is a <strong>read-only
+development snapshot</strong>, not live provider availability, certified security,
+source-rights approval, SLA evidence or proof that a worker or scheduler is enabled.
+Counts may change across queries while another request modifies data. No buttons on
+this page change jobs, members, invitations, quotas or payments.</p>
+<section aria-labelledby="roles"><h2 id="roles">Workspace member roles</h2>
+<dl>{% for role, count in report.member_roles.items %}
+<dt>{{ role }}</dt><dd>{{ count }}</dd>
+{% endfor %}</dl></section>
+<section aria-labelledby="invites"><h2 id="invites">Invitation lifecycle counts</h2>
+<dl>{% for state, count in report.invitations.items %}
+<dt>{{ state }}</dt><dd>{{ count }}</dd>
+{% endfor %}</dl>
+<p>Only unused pending codes can be revoked from the
+<a href="{% url 'invitations-pending-page' workspace.id %}">pending invitation review</a>.
+No invitation code or recipient identifier appears here.</p></section>
+<section aria-labelledby="jobs"><h2 id="jobs">Saved job states</h2>
+<dl>{% for state, count in report.jobs.items %}
+<dt>{{ state }}</dt><dd>{{ count }}</dd>
+{% endfor %}</dl></section>
+<section aria-labelledby="outboxes"><h2 id="outboxes">Internal job intents</h2>
+<dl>{% for state, count in report.outboxes.items %}
+<dt>{{ state }}</dt><dd>{{ count }}</dd>
+{% endfor %}
+<dt>Pending intents past expiry</dt><dd>{{ report.expired_pending_outboxes }}</dd>
+<dt>Dispatch outcome recorded as unknown</dt><dd>{{ report.unknown_dispatch_operations }}</dd>
+<dt>Outstanding reserved usage intents</dt><dd>{{ report.reserved_usage_intents }}</dd>
+</dl>
+<p>These numbers are diagnostics, not instructions to retry, release, settle or
+reconcile unknown external outcomes. Any operational action still requires
+its existing independent authorization and transaction safety checks.</p></section>
+<p><a href="/dashboard/workspaces/{{ workspace.id }}">Back to workspace overview</a></p>
+{% endblock %}
