@@ -16,7 +16,14 @@ MAX_INTENT_LENGTH = 280
 
 # All patterns and output labels are trusted code, never user-configurable prompts.
 COUNTRY_PATTERNS = (
-    ("US", re.compile(r"\b(?:united states(?: of america)?|usa|u\.s\.|us)\b", re.I)),
+    (
+        "US",
+        re.compile(
+            r"\b(?:united states(?: of america)?|usa)\b"
+            r"|(?<![A-Za-z])(?-i:US|U\.S\.)(?![A-Za-z])",
+            re.I,
+        ),
+    ),
     ("CA", re.compile(r"\bcanada\b", re.I)),
 )
 CATEGORY_PATTERNS = (
@@ -35,6 +42,21 @@ CATEGORY_PATTERNS = (
     ("accountant", re.compile(r"\baccountants?\b", re.I)),
     ("law firm", re.compile(r"\blaw firms?\b", re.I)),
     ("plumber", re.compile(r"\bplumbers?\b", re.I)),
+)
+
+
+# The preview cannot safely represent a negative/excluded category/country.
+# It must abstain rather than silently include an unwanted target. Likewise
+# do not drop unsupported countries from a mixed-market request.
+EXCLUSION_PATTERN = re.compile(
+    r"\b(?:no|not|without|exclude|excluding|except|avoid|skip|omit|ignore|"
+    r"neither|never|don't|doesn't|do not)\b",
+    re.I,
+)
+UNSUPPORTED_GEO_PATTERN = re.compile(
+    r"\b(?:united kingdom|uk|england|scotland|pakistan|uae|united arab emirates|"
+    r"india|australia|germany|france|mexico|brazil|spain|europe|eu)\b",
+    re.I,
 )
 
 
@@ -69,6 +91,27 @@ def search_assistance_preview(intent):
     """Fixed-pattern allowlist extraction; no probabilistic completion or auto-action."""
     if not isinstance(intent, str) or not (4 <= len(intent) <= MAX_INTENT_LENGTH):
         raise ValueError("Invalid preview intent length.")
+    # Conservative abstention is an explicit safety feature, not AI inference.
+    if EXCLUSION_PATTERN.search(intent):
+        return {
+            "mode": "rules_only_no_model",
+            "status": "needs_details",
+            "model_invoked": False,
+            "needs_user_review": True,
+            "search": None,
+            "missing": [
+                "Exclusions or negations require manual review. State only positive targets."
+            ],
+        }
+    if UNSUPPORTED_GEO_PATTERN.search(intent):
+        return {
+            "mode": "rules_only_no_model",
+            "status": "needs_details",
+            "model_invoked": False,
+            "needs_user_review": True,
+            "search": None,
+            "missing": ["Only US and Canada are supported. Remove unsupported countries."],
+        }
     countries = [code for code, pattern in COUNTRY_PATTERNS if pattern.search(intent)]
     categories = [label for label, pattern in CATEGORY_PATTERNS if pattern.search(intent)]
     missing = []
