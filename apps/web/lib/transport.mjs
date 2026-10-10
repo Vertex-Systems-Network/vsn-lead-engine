@@ -29,8 +29,7 @@ function filteredResultPath(path, suffix) {
     (query === undefined || resultFilterQuery.test(query))
   );
 }
-const workspaceDetailPath =
-  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/$/;
+const workspaceDetailPath = /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/$/;
 const membersPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/members\/(?:\?page=[1-9][0-9]{0,5})?$/;
 const formPath =
