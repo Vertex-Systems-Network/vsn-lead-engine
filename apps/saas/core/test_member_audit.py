@@ -87,7 +87,6 @@ class MemberAuditHistoryTests(TestCase):
         self.assertIsNone(second["next"])
         self.assertIsNotNone(second["previous"])
         self.assertFalse(
-            {row["id"] for row in first["results"]}
-            & {row["id"] for row in second["results"]}
+            {row["id"] for row in first["results"]} & {row["id"] for row in second["results"]}
         )
         self.assertEqual(MembershipAudit.objects.count(), 29)
