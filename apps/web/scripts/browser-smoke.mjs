@@ -205,8 +205,8 @@ async function run(origin) {
             (sum, item) => sum + item.transferSize, 0
           );
           const parseColor = (color) => {
-            if (!/^rgba?\(/.test(color)) return null;
-            const matches = color.match(/[\d.]+/g);
+            if (!/^rgba?\\(/.test(color)) return null;
+            const matches = color.match(/[\\d.]+/g);
             if (!matches || matches.length < 3) return null;
             const values = matches.map(Number);
             return {
