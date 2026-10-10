@@ -10,8 +10,8 @@ from core.form_context import (
     SubmitFormContext,
 )
 from core.login_security import ProtectedLoginView
-from core.member_role_page import member_role_change_page
 from core.member_removal_page import member_removal_page
+from core.member_role_page import member_role_change_page
 from core.password_reset import urlpatterns as password_reset_urls
 from core.signup import sign_up_page
 from django.contrib.auth import views as auth_views
