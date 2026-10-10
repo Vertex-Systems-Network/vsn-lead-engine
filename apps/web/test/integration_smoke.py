@@ -135,6 +135,8 @@ def main():
                     assert "Foreign private marker" not in public_html
                     assert "Synthetic &lt;workspace&gt;" not in public_html
                     assert 'href="/dashboard"' in public_html
+                    assert 'name="robots"' in public_html
+                    assert "noindex" in public_html
                 homepage, _ = read("/", False)
                 assert 'href="/account/sign-in"' in homepage
                 assert "No result" in homepage and "guaranteed" in homepage
