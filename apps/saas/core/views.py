@@ -131,6 +131,28 @@ class DailyPlanDetail(APIView):
 
 
 @method_decorator(never_cache, name="dispatch")
+class DailyPlanDiagnostics(APIView):
+    """Owner/admin-only, no-store and explicitly non-mutating due-candidate view."""
+
+    def get(self, request, workspace_id):
+        from rest_framework.exceptions import ValidationError
+
+        from .daily_due_diagnostics import due_plan_diagnostics
+
+        if set(request.query_params) - {"after"} or any(
+            len(request.query_params.getlist(key)) != 1 for key in request.query_params
+        ):
+            raise ValidationError("Unsupported or repeated diagnostics parameter.")
+        return Response(
+            due_plan_diagnostics(
+                request.user,
+                workspace_id,
+                after=request.query_params.get("after"),
+            )
+        )
+
+
+@method_decorator(never_cache, name="dispatch")
 class DailyPlanList(APIView):
     """Read-only list; all membership and cursor checks run on the Django side."""
 

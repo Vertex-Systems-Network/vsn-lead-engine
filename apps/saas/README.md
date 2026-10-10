@@ -306,3 +306,15 @@ local-calendar-date catch-up limit as internal `materialize_daily`; dates alread
 materialized are omitted. Clock changes between inspection and future execution
 require all gates to be freshly checked. Do not automate this command as a
 substitute for a fenced, consented scheduler.
+
+## Owner/admin HTTP due-candidate preview
+
+`GET /api/v1/workspaces/<uuid>/daily-diagnostics/` wraps the same read-only
+diagnostic as the `inspect_daily_plans` command for an authenticated owner/admin.
+It accepts no query except a single optional `after=<uuid>` cursor and returns
+up to 25 plans; a viewer receives 403 and a foreign workspace 404. The service
+returns redacted plan IDs/revisions/statuses and at most seven local dates with
+DST resolution, an explicit `advisory_only` field and a list of execution gates.
+No plan is enabled, materialized or dispatched by this endpoint. HTTP and
+PostgreSQL tenant/mutation tests cover the authorization boundary; it does not
+replace scheduler fencing, source and entitlement acceptance or deployment.

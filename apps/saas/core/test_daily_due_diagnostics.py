@@ -126,6 +126,33 @@ class DailyDueDiagnosticTests(TestCase):
             )
         self.assertFalse(Job.objects.exists())
 
+    def test_member_scoped_http_diagnostics_and_fail_closed_queries(self):
+        path = f"/api/v1/workspaces/{self.workspace.id}/daily-diagnostics/"
+        anon = self.client.get(path)
+        self.assertIn(anon.status_code, (401, 403))
+        self.assertNotIn(b"Private due plan workspace", anon.content)
+        self.client.force_login(self.viewer)
+        self.assertEqual(self.client.get(path).status_code, 403)
+        self.client.force_login(self.other)
+        self.assertEqual(self.client.get(path).status_code, 404)
+        self.client.force_login(self.owner)
+        good = self.client.get(path)
+        self.assertEqual(good.status_code, 200)
+        self.assertIn("no-store", good["Cache-Control"])
+        report = good.json()
+        self.assertTrue(report["advisory_only"])
+        self.assertEqual(report["total_plans"], 1)
+        self.assertEqual(report["plans"][0]["status"], "disabled")
+        self.assertEqual(report["requires_execution_gates"][-1], "operator_release")
+        for suffix in ("?after=malformed", "?limit=99", "?activate=1", "?after=1&after=2"):
+            with self.subTest(suffix=suffix):
+                self.assertEqual(self.client.get(path + suffix).status_code, 400)
+        for verb in ("post", "put", "patch", "delete"):
+            with self.subTest(verb=verb):
+                self.assertEqual(getattr(self.client, verb)(path).status_code, 405)
+        self.assertFalse(Job.objects.exists())
+        self.assertFalse(ScheduleOccurrence.objects.exists())
+
     def test_bounded_25_row_pages_and_operator_command(self):
         for number in range(28):
             DailySchedule.objects.create(
