@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { backend } from "../../../../lib/backend";
+import { backend, backendLink } from "../../../../lib/backend";
 import {
   jobs,
   usage,
@@ -71,6 +71,9 @@ export default async function Workspace({
         <Link href={`/dashboard/workspaces/${workspaceId}/members`}>
           Workspace members (admins)
         </Link>
+        <a href={backendLink(`/workspaces/${workspaceId}/schedule-preview/`)}>
+          Daily time preview
+        </a>
       </div>
       <p className="notice">
         Drafts save search preferences without collecting leads. Submitted jobs

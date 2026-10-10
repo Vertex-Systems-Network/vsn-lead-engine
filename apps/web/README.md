@@ -100,3 +100,14 @@ Draft/job counts do **not** represent collected or accepted leads. The endpoint
 has no client-selectable filters or mutating methods. PostgreSQL tests cover
 viewer/owner membership, revocation, anonymous and foreign denial and all-page
 counts; disposable Next/Django HTTP checks cover the visible count and links.
+
+## Daily local-time preview
+
+Workspace overview has a normal link to Django's member-scoped
+`/workspaces/<uuid>/schedule-preview/` (through the fixed trusted
+`SAAS_PUBLIC_ORIGIN`). It is deliberately a read-only Django GET page, not a
+Next browser-origin write proxy. Users can inspect the next three possible
+daily execution decisions for an IANA timezone and local time, including DST
+folds/gaps, but cannot create, activate or dispatch a recurring schedule.
+Django authorization, validation and calendar tests plus real Next-to-Django
+HTTP link coverage are required; automatic scheduling is a later milestone.

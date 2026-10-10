@@ -160,6 +160,18 @@ def main():
                 assert 'href="?status=draft"' in page
                 assert 'href="?status=completed"' in page
                 assert "Active workspace:" in page
+                preview_path = f"/workspaces/{workspace.id}/schedule-preview/"
+                assert backend + preview_path in page
+                preview_request = Request(
+                    backend + preview_path, headers={"Cookie": f"sessionid={session}"}
+                )
+                with urlopen(preview_request, timeout=10) as response:
+                    preview_page = response.read().decode()
+                    assert response.status == 200
+                    assert "Next three local-day decisions" in preview_page
+                    assert "does not save a schedule" in preview_page
+                    assert 'value="UTC"' in preview_page
+                    assert "No automatic scheduling" in preview_page
                 assert "Synthetic &lt;workspace&gt;" in page
                 members_page, _ = read(
                     f"/dashboard/workspaces/{workspace.id}/members"
