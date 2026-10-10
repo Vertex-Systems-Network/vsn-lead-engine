@@ -157,8 +157,8 @@ def main():
                 assert "Job status summary" in page
                 assert "saved searches across all pages" in page
                 assert ">27" in page
-                assert "View draft jobs" in page
-                assert "View completed jobs" in page
+                assert 'href="?status=draft"' in page
+                assert 'href="?status=completed"' in page
                 assert "Active workspace:" in page
                 assert "Synthetic &lt;workspace&gt;" in page
                 members_page, _ = read(
