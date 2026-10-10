@@ -114,7 +114,7 @@ class PlanReadinessTests(TestCase):
         self.client.force_login(self.owner)
         now = datetime(2026, 11, 1, 16, tzinfo=UTC)
         with patch(
-            "core.daily_plan_readiness.catchup_budget_snapshot",
+            "core.daily_catchup_budget.catchup_budget_snapshot",
             side_effect=lambda plan, budget: catchup_budget_snapshot(plan, budget, now=now),
         ):
             report = self.client.get(self.path).json()
@@ -154,7 +154,7 @@ class PlanReadinessTests(TestCase):
         self.client.force_login(self.owner)
         now = datetime(2026, 11, 1, 7, 30, tzinfo=UTC)
         with patch(
-            "core.daily_plan_readiness.catchup_budget_snapshot",
+            "core.daily_catchup_budget.catchup_budget_snapshot",
             side_effect=lambda plan, budget: catchup_budget_snapshot(plan, budget, now=now),
         ):
             report = self.client.get(self.path).json()
