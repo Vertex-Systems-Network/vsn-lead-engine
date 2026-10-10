@@ -104,6 +104,7 @@ async function run(origin) {
         "--headless=new",
         "--no-sandbox",
         "--disable-gpu",
+        "--disable-dev-shm-usage",
         "--no-first-run",
         "--no-default-browser-check",
         "--disable-extensions",
@@ -116,8 +117,8 @@ async function run(origin) {
       { stdio: "ignore" },
     );
     let port;
-    for (let i = 0; i < 100; i++) {
-      if (chrome.exitCode !== null)
+    for (let i = 0; i < 250; i++) {
+      if (chrome.exitCode !== null || chrome.signalCode !== null)
         throw Error(`Browser exited before startup (${chrome.exitCode}).`);
       try {
         const active = (
