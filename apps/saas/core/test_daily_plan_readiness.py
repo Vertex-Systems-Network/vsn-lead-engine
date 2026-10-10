@@ -102,6 +102,8 @@ class PlanReadinessTests(TestCase):
         self.assertTrue(forecast["advisory_only"])
         self.assertEqual(forecast["max_local_days"], 7)
         self.assertEqual(forecast["due_job_candidates"], 0)
+        self.assertIsNone(forecast["affordable_due_job_candidates"])
+        self.assertIsNone(forecast["deferred_due_job_candidates"])
         self.assertEqual(forecast["counters"], [])
         self.assertFalse(Job.objects.exists())
         self.assertFalse(ScheduleOccurrence.objects.exists())
@@ -123,6 +125,8 @@ class PlanReadinessTests(TestCase):
         catchup = report["catch_up_budget_snapshot"]
         self.assertEqual(catchup["status"], "advisory_batch_exceeds")
         self.assertEqual(catchup["due_job_candidates"], 7)
+        self.assertEqual(catchup["affordable_due_job_candidates"], 1)
+        self.assertEqual(catchup["deferred_due_job_candidates"], 6)
         self.assertEqual(catchup["skipped_day_candidates"], 0)
         self.assertEqual(
             [row["requested"] for row in catchup["counters"]],
@@ -160,10 +164,78 @@ class PlanReadinessTests(TestCase):
             report = self.client.get(self.path).json()
         catchup = report["catch_up_budget_snapshot"]
         self.assertEqual(catchup["due_job_candidates"], 5)
+        self.assertEqual(catchup["affordable_due_job_candidates"], 1)
+        self.assertEqual(catchup["deferred_due_job_candidates"], 4)
         self.assertEqual(catchup["status"], "advisory_batch_exceeds")
         self.assertEqual(catchup["counters"][0]["requested"], 500)
         self.assertEqual(Job.objects.count(), 0)
         self.assertEqual(ScheduleOccurrence.objects.count(), 1)
+
+    def test_partial_catchup_uses_all_resources_and_never_reserves(self):
+        from datetime import UTC, datetime
+        from unittest.mock import patch
+
+        from .models import UsageCounter, UsageReservation
+
+        DailySchedule.objects.filter(pk=self.plan.pk).update(enabled=True)
+        # Leads fit 4 jobs, pending/settled jobs fit 2, provider calls fit 3.
+        self.entitlement.lead_limit = 500
+        self.entitlement.job_limit = 4
+        self.entitlement.provider_call_limit = 4
+        self.entitlement.save(update_fields=["lead_limit", "job_limit", "provider_call_limit"])
+        UsageCounter.objects.create(workspace=self.workspace, jobs=1)
+        UsageReservation.objects.create(
+            workspace=self.workspace,
+            key="pending-partial-forecast",
+            request_hash="e" * 64,
+            leads=100,
+            jobs=1,
+            provider_calls=1,
+        )
+        self.client.force_login(self.owner)
+        now = datetime(2026, 11, 1, 16, tzinfo=UTC)
+        with patch(
+            "core.daily_catchup_budget.catchup_budget_snapshot",
+            side_effect=lambda plan, budget: catchup_budget_snapshot(plan, budget, now=now),
+        ):
+            snapshot = self.client.get(self.path).json()["catch_up_budget_snapshot"]
+        self.assertEqual(snapshot["due_job_candidates"], 7)
+        self.assertEqual(snapshot["affordable_due_job_candidates"], 2)
+        self.assertEqual(snapshot["deferred_due_job_candidates"], 5)
+        self.assertEqual(snapshot["status"], "advisory_batch_exceeds")
+        self.assertEqual(UsageReservation.objects.count(), 1)
+        self.assertFalse(Job.objects.exists())
+        self.assertFalse(ScheduleOccurrence.objects.exists())
+
+    def test_expired_window_never_claims_positive_affordable_capacity(self):
+        from datetime import UTC, datetime, timedelta
+        from unittest.mock import patch
+
+        from django.utils import timezone
+
+        from .models import UsageCounter, UsagePeriod
+
+        DailySchedule.objects.filter(pk=self.plan.pk).update(enabled=True)
+        now = timezone.now()
+        period = UsagePeriod.objects.create(
+            workspace=self.workspace,
+            key="closed-catchup-window",
+            starts_at=now - timedelta(days=2),
+            ends_at=now - timedelta(days=1),
+        )
+        UsageCounter.objects.create(workspace=self.workspace, period=period)
+        self.client.force_login(self.owner)
+        at = datetime(2026, 11, 1, 16, tzinfo=UTC)
+        with patch(
+            "core.daily_catchup_budget.catchup_budget_snapshot",
+            side_effect=lambda plan, budget: catchup_budget_snapshot(plan, budget, now=at),
+        ):
+            data = self.client.get(self.path).json()["catch_up_budget_snapshot"]
+        self.assertEqual(data["status"], "accounting_window_unavailable")
+        self.assertIsNone(data["affordable_due_job_candidates"])
+        self.assertIsNone(data["deferred_due_job_candidates"])
+        self.assertFalse(Job.objects.exists())
+        self.assertFalse(ScheduleOccurrence.objects.exists())
 
     def test_missing_source_or_bad_policy_is_blocked(self):
         self.client.force_login(self.owner)

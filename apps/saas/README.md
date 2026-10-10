@@ -269,6 +269,10 @@ write methods are not implemented. Viewer, foreign tenant, membership revocation
 empty results, multiple pages and mutation denial are covered in tests.
 Recurring plan activation and scheduled collection remain separate, gated work.
 
+## Read-only partial catch-up allowance (2026-10-10)
+
+The daily plan owner/admin source readiness API and Next report show `affordable_due_job_candidates` and `deferred_due_job_candidates` for the seven-day hypothetical backlog. This is an intersection of leads, jobs and provider-call headroom after settled and pending usage; no ordered dates are selected, no budget is reserved and no work is activated. Disabled plans and unusable entitlements/accounting periods return `null`, never false approval. Existing external legal/source/credentials/release gates remain unverified.
+
 ## Daily plan search-scope review
 
 `GET /api/v1/workspaces/<uuid>/daily-plans/<plan-id>/` returns a current-member,

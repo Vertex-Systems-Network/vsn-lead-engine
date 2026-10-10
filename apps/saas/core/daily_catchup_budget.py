@@ -23,6 +23,8 @@ def unavailable_catchup(status="unavailable"):
         "max_local_days": MAX_LOCAL_DAYS,
         "due_job_candidates": 0,
         "skipped_day_candidates": 0,
+        "affordable_due_job_candidates": None,
+        "deferred_due_job_candidates": None,
         "counters": [],
     }
 
@@ -65,6 +67,19 @@ def catchup_budget_snapshot(plan, single_budget, *, now=None):
     capacity = [
         {**row, "requested": row["requested"] * due_jobs} for row in single_budget["counters"]
     ]
+    # Simultaneous hypothetical resource intersection, NOT an ordered
+    # selection or guaranteed execution. Zero-cost dimensions do not constrain.
+    # An invalid entitlement/window cannot imply available job capacity.
+    affordable = None
+    deferred = None
+    if single_budget["status"] in (
+        "advisory_single_job_fits",
+        "advisory_single_job_exceeds",
+    ):
+        per_job = single_budget["counters"]
+        ceilings = [row["headroom"] // row["requested"] for row in per_job if row["requested"] > 0]
+        affordable = min([due_jobs, *ceilings])
+        deferred = due_jobs - affordable
     if single_budget["status"] in ("entitlement_unavailable", "accounting_window_unavailable"):
         status = single_budget["status"]
     elif due_jobs == 0:
@@ -79,5 +94,7 @@ def catchup_budget_snapshot(plan, single_budget, *, now=None):
         "max_local_days": MAX_LOCAL_DAYS,
         "due_job_candidates": due_jobs,
         "skipped_day_candidates": skipped_days,
+        "affordable_due_job_candidates": affordable,
+        "deferred_due_job_candidates": deferred,
         "counters": capacity,
     }
