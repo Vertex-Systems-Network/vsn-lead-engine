@@ -29,6 +29,79 @@ export function workspaces(v: unknown): v is Workspaces {
     v.results.every(workspace)
   );
 }
+export const dueDiagnosticStatuses = [
+  "disabled",
+  "invalid_configuration",
+  "creator_not_authorized",
+  "entitlement_not_current",
+  "candidate_due_requires_execution_gates",
+  "no_unmaterialized_due_day",
+] as const;
+export type DueDiagnostic = {
+  id: string;
+  enabled: boolean;
+  revision: number;
+  status: (typeof dueDiagnosticStatuses)[number];
+  due_local_dates: { local_date: string; resolution: string }[];
+};
+export type DueDiagnostics = {
+  workspace_id: string;
+  as_of_utc: string;
+  total_plans: number;
+  inspected: number;
+  next: string | null;
+  advisory_only: true;
+  requires_execution_gates: string[];
+  plans: DueDiagnostic[];
+};
+export function dueDiagnostics(v: unknown): v is DueDiagnostics {
+  if (
+    !object(v) ||
+    !uuid(v.workspace_id) ||
+    typeof v.as_of_utc !== "string" ||
+    !Number.isFinite(Date.parse(v.as_of_utc)) ||
+    !count(v.total_plans) ||
+    !count(v.inspected) ||
+    v.inspected > 25 ||
+    v.inspected > v.total_plans ||
+    (v.next !== null && !uuid(v.next)) ||
+    v.advisory_only !== true ||
+    !Array.isArray(v.requires_execution_gates) ||
+    !Array.isArray(v.plans) ||
+    v.plans.length !== v.inspected
+  )
+    return false;
+  if (
+    !["fresh_membership", "entitlement_capacity", "source_rights", "provider_credentials", "operator_release"].every(
+      (gate) => v.requires_execution_gates.includes(gate),
+    )
+  )
+    return false;
+  return (
+    new Set(v.plans.map((p: unknown) => (object(p) ? p.id : null))).size === v.plans.length &&
+    v.plans.every(
+      (p: unknown) =>
+        object(p) &&
+        uuid(p.id) &&
+        typeof p.enabled === "boolean" &&
+        count(p.revision) &&
+        p.revision >= 1 &&
+        dueDiagnosticStatuses.some((s) => s === p.status) &&
+        Array.isArray(p.due_local_dates) &&
+        p.due_local_dates.length <= 7 &&
+        p.due_local_dates.every(
+          (date: unknown) =>
+            object(date) &&
+            typeof date.local_date === "string" &&
+            /^\\d{4}-\\d{2}-\\d{2}$/.test(date.local_date) &&
+            ["normal", "gap_forward", "ambiguous_earlier", "skipped_day"].includes(
+              String(date.resolution),
+            ),
+        ),
+    )
+  );
+}
+
 export type DailyPlan = {
   id: string;
   timezone: string;
