@@ -14,6 +14,14 @@ from .serializers import SearchSerializer
 REVIEW_SALT = "saas.local-assist-review.v1"
 ALLOWED_CATEGORIES = {name for name, _ in CATEGORY_PATTERNS}
 REVIEW_MAX_AGE_SECONDS = 600
+REVIEW_SCOPE_FIELDS = {
+    "countries",
+    "categories",
+    "statuses",
+    "required_fields",
+    "source_codes",
+    "result_limit",
+}
 
 
 def review_token_for(user, workspace_id, search):
@@ -40,14 +48,7 @@ def reviewed_draft_form(user, workspace_id, token):
         or claim["workspace"] != str(workspace_id)
         or claim["purpose"] != "review_only"
         or not isinstance(claim["scope"], dict)
-        or set(claim["scope"]) != {
-            "countries",
-            "categories",
-            "statuses",
-            "required_fields",
-            "source_codes",
-            "result_limit",
-        }
+        or set(claim["scope"]) != REVIEW_SCOPE_FIELDS
     ):
         raise forms.ValidationError("Suggestion does not belong to this account and workspace.")
     requested = claim["scope"]
