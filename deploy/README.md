@@ -74,3 +74,15 @@ workspace quota reservations, fencing and idempotency across restarts, drift and
 DST recovery, staged load/rollback, observability, customer notification and
 production approval. No deployment, timer or external provider is triggered by
 this diagnostic.
+
+## Development-only daily tick boundary
+
+`python manage.py tick_daily_plans` is a bounded, read-only diagnostic by
+default. The `--apply-dev` fixture-only draft path is **unavailable** in
+any non-debug deployment and additionally requires synthetic local
+fulfilment and `SAAS_DAILY_DEV_APPLY=1`. It must not be installed as a
+production cron, Kubernetes CronJob, worker, watchdog or customer timer.
+It does not dispatch work, create paid usage, activate inactive daily plans
+or connect to external sources. Production automated scheduling needs a
+separate approved implementation with durable DB fencing, recoverability,
+operator gates, rights, quotas, audit logs and telemetry.
