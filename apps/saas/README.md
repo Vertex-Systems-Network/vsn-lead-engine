@@ -445,3 +445,7 @@ Authorized workspace owners and admins can review recorded membership role chang
 ## M8 confirmed member role changes (2026-10-10)
 
 Existing workspace owners and admins can open `/workspaces/<workspace-uuid>/members/<user-uuid>/role/` from the Next member list and explicitly confirm a new role. Django requires session login, CSRF, a one-hour actor/workspace/target/previous-role/audit-state-bound confirmation, and current authorization inside the workspace row lock. Stale/replayed claims fail with a 409; administrators cannot change owners or promote to owner; the final owner cannot be demoted. The established transactional role service appends a member audit record. GET and invalid requests never mutate. No email invitation, user removal, external identity integration, provider contact, billing or deployment is activated.
+
+## M8 explicit workspace member removal (2026-10-10)
+
+Current workspace owners/admins may review `/workspaces/<workspace-uuid>/members/<user-uuid>/remove/` from the native member list. A successful POST requires session+CSRF, a user-checked acknowledgment, an actor/tenant/target/prior-role/audit-event-bound HMAC confirmation no older than ten minutes, and fresh role + history validation under the workspace lock. Last-owner and admin/owner restrictions are enforced by the existing membership service; the operation records a `removed` audit entry. The user account, lead data, saved jobs and subscriptions are not deleted. GET is strictly read-only, and no automatic removal or external activity is enabled.
