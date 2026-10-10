@@ -36,7 +36,10 @@ class DailyPlanStopForm(forms.Form):
         try:
             token = signing.loads(value, salt=STOP_TOKEN_SALT, max_age=3600)
             if not isinstance(token, dict) or set(token) != {
-                "actor", "workspace", "plan", "revision"
+                "actor",
+                "workspace",
+                "plan",
+                "revision",
             }:
                 raise ValueError
             if (
@@ -47,7 +50,14 @@ class DailyPlanStopForm(forms.Form):
             ):
                 raise ValueError
             self.expected_revision = revision(token["revision"])
-        except (signing.BadSignature, ValueError, TypeError, KeyError, AttributeError, ValidationError):
+        except (
+            signing.BadSignature,
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            ValidationError,
+        ):
             raise forms.ValidationError(
                 "This stop request is invalid or expired. Open a fresh confirmation."
             ) from None
