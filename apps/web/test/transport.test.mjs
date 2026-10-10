@@ -608,3 +608,44 @@ test("daily plans list is exact, session-only and rejects arbitrary paths", asyn
   );
   assert.equal(anonymous.kind, "signin");
 });
+
+test("daily plan detail allows exact session GET and refuses activation or query paths", async () => {
+  const workspaceId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const planId = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+  const path = `/api/v1/workspaces/${workspaceId}/daily-plans/${planId}/`;
+  const result = await readBackend(
+    "http://localhost:8000",
+    path,
+    session,
+    async (url, options) => {
+      assert.equal(url.pathname, path);
+      assert.deepEqual(options.headers, {
+        Accept: "application/json",
+        Cookie: `sessionid=${session}`,
+      });
+      assert.equal(options.cache, "no-store");
+      assert.equal(options.redirect, "manual");
+      return new Response('{"id":"' + planId + '","workspace_id":"' + workspaceId + '"}', {
+        headers: { "content-type": "application/json" },
+      });
+    },
+  );
+  assert.equal(result.kind, "ok");
+  for (const invalid of [
+    `${path}?activate=1`,
+    `${path}?fields=secret`,
+    `${path}../`,
+    `/api/v1/workspaces/${workspaceId}/daily-plans/${planId}/activate/`,
+  ]) {
+    await assert.rejects(readBackend("http://localhost:8000", invalid, session));
+  }
+  const anonymous = await readBackend(
+    "http://localhost:8000",
+    path,
+    undefined,
+    () => {
+      throw Error("Anonymous plan-detail lookup must not reach Django");
+    },
+  );
+  assert.equal(anonymous.kind, "signin");
+});
