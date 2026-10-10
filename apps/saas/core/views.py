@@ -101,6 +101,20 @@ class WorkspaceDetail(APIView):
 
 
 @method_decorator(never_cache, name="dispatch")
+class JobStatusSummary(APIView):
+    """All-state totals for a single currently authorized workspace."""
+
+    def get(self, request, workspace_id):
+        from rest_framework.exceptions import ValidationError
+
+        from .job_status_summary import job_status_snapshot
+
+        if request.query_params:
+            raise ValidationError("Job summary does not accept query parameters.")
+        return Response(job_status_snapshot(request.user, workspace_id))
+
+
+@method_decorator(never_cache, name="dispatch")
 class JobList(APIView):
     def get(self, request, workspace_id):
         membership_for(request.user, workspace_id)

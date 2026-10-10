@@ -92,6 +92,10 @@ urlpatterns = [
     path("api/v1/workspaces/<uuid:workspace_id>/sources/", views.SourceList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/", views.WorkspaceDetail.as_view()),
     path("api/v1/workspaces/", views.WorkspaceList.as_view()),
+    path(
+        "api/v1/workspaces/<uuid:workspace_id>/job-summary/",
+        views.JobStatusSummary.as_view(),
+    ),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/", views.JobList.as_view()),
     path("api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/", views.JobDetail.as_view()),
 ] + password_reset_urls
