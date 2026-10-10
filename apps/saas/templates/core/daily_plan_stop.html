@@ -1,0 +1,33 @@
+{% extends "core/job_base.html" %}
+{% block title %}Stop daily plan{% endblock %}
+{% block content %}
+<h1>Stop daily plan — {{ workspace.name }}</h1>
+<p>Plan ID: <code>{{ plan.id }}</code></p>
+<p>Current state:
+<strong>{% if plan.enabled %}Enabled{% else %}Disabled{% endif %}</strong>.
+Current revision: {{ plan.revision }}.</p>
+<p><strong>Important:</strong> Stopping a plan prevents new local-day materialization only.
+It does not cancel drafts, queued or running jobs, reverse completed collections,
+revoke a provider request already in progress or reverse charges. No plan is
+activated through this page.</p>
+{% if done %}
+<section role="status" aria-label="Daily plan stop confirmation">
+  <h2>Daily plan disabled</h2>
+  <p>Current revision: {{ plan.revision }}. No future daily occurrence can be
+  materialized while this plan remains disabled. Existing jobs must be reviewed
+  separately.</p>
+  <p><a href="{% url 'daily-plan-stop-page' workspace.id plan.id %}">Review current status</a></p>
+</section>
+{% elif plan.enabled %}
+<form method="post" action="{% url 'daily-plan-stop-page' workspace.id plan.id %}">
+  {% csrf_token %}
+  {{ form.stop_token }}
+  {% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
+  {% if form.stop_token.errors %}<div role="alert">{{ form.stop_token.errors }}</div>{% endif %}
+  <button type="submit">Confirm stop of this daily plan</button>
+</form>
+{% else %}
+<p>This plan is already disabled. No further stop action is necessary.</p>
+{% endif %}
+<p><a href="{% url 'daily-time-preview-page' workspace.id %}">Review local time preview</a></p>
+{% endblock %}
