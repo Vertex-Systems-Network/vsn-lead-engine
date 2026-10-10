@@ -47,7 +47,12 @@ export default async function MembersPage({
         Owners and administrators can review current workspace roles. This view
         lists verified member roles. Role changes require a separate signed and
         CSRF-protected confirmation. Removals require a separate explicit
-        warning and confirmation. Invitations are not available.
+        warning and confirmation. Existing-account invitations use a separate private one-time code and explicit acceptance; no messages are sent automatically.
+      </p>
+      <p>
+        <a href={backendLink(`/workspaces/${workspaceId}/invitations/new/`)}>
+          Invite an existing user with a private one-time code →
+        </a>
       </p>
       {result.data.results.length > 0 ? (
         <div className="table-scroll">
