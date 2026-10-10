@@ -130,6 +130,10 @@ class OfflineSearchAssistanceTests(TestCase):
             "Find US salons at +971 55 813 4857",
             "Visit https://example.com for US salons",
             "US salons" + "x" * 300,
+            "US salons api_key=FAKEKEY123456",
+            "Canada spas sk-proj-aaaaaaaaaaaaaaaaaaaa",
+            "USA restaurants Bearer fakerandomtoken123456",
+            "US salons\\u200b and spas",
             "bad control \x00 Canada salons",
         ]
         for intent in examples:
