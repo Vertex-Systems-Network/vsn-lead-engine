@@ -4,7 +4,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "VSN Lead Engine",
-  description: "VSN Lead Engine development preview: tenant-scoped business search workflows.",
+  description:
+    "VSN Lead Engine development preview: tenant-scoped business search workflows.",
   robots: { index: false, follow: false },
 };
 
@@ -14,9 +15,13 @@ export default function Layout({
   return (
     <html lang="en">
       <body>
-        <a className="skip" href="#main">Skip to content</a>
+        <a className="skip" href="#main">
+          Skip to content
+        </a>
         <header>
-          <Link href="/" className="brand">VSN <span>Lead Engine</span></Link>
+          <Link href="/" className="brand">
+            VSN <span>Lead Engine</span>
+          </Link>
           <nav className="site-nav" aria-label="Primary navigation">
             <Link href="/">Home</Link>
             <Link href="/capabilities">Capabilities</Link>
@@ -27,7 +32,10 @@ export default function Layout({
           <span className="badge">Development</span>
         </header>
         <main id="main">{children}</main>
-        <footer>US &amp; Canada · SaaS development preview · Public service not launched</footer>
+        <footer>
+          US &amp; Canada · SaaS development preview · Public service not
+          launched
+        </footer>
       </body>
     </html>
   );
