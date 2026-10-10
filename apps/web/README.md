@@ -188,3 +188,16 @@ Neither viewing history nor pausing a plan erases those jobs or starts a worker.
 The PostgreSQL tests cover actual materialization-and-pause visibility, a
 29-day keyset history, foreign/revoked/anonymous access, unsupported fields and
 write refusal; disposable Django/Next HTTP checks cover the page and tenant denial.
+
+## Daily plan internal source readiness
+
+The saved-plan detail links to
+`/dashboard/workspaces/<workspace-id>/daily-plans/<plan-id>/readiness`.
+Next uses the trusted server-only session for a fixed, exact Django GET path,
+strictly validates blocked/internal-catalog-only status, five check names and
+all independent unverified execution gates, then renders a human-readable
+review. Django limits this snapshot to current workspace owners/admins;
+viewers and foreign members receive generic denial without plan leakage.
+This is deliberately a read-only diagnostic, not a live source-coverage,
+commercial rights, credentials, quota or scheduler approval. No activate/submit
+button is exposed. Disposable Django/Next HTTP tests cover the navigation.
