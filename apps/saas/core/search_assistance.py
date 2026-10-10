@@ -24,7 +24,10 @@ CATEGORY_PATTERNS = (
     ("salon", re.compile(r"\bsalons?\b", re.I)),
     ("car dealer", re.compile(r"\b(?:car dealers?|car dealerships?)\b", re.I)),
     ("motorcycle dealer", re.compile(r"\b(?:motorcycle|motorbike)\s+(?:dealers?|shops?)\b", re.I)),
-    ("insurance agency", re.compile(r"\b(?:insurance agencies|insurance agency|insurance agents?)\b", re.I)),
+    (
+        "insurance agency",
+        re.compile(r"\b(?:insurance agencies|insurance agency|insurance agents?)\b", re.I),
+    ),
     ("dentist", re.compile(r"\b(?:dentists?|dental clinics?)\b", re.I)),
     ("restaurant", re.compile(r"\brestaurants?\b", re.I)),
     ("cleaning service", re.compile(r"\bcleaning services?\b", re.I)),
