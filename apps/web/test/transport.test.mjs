@@ -739,7 +739,9 @@ test("occurrence history is exact session-only read with local-date cursor", asy
     "http://localhost:8000",
     root,
     undefined,
-    () => { throw new Error("Anonymous occurrence history must not reach Django"); },
+    () => {
+      throw new Error("Anonymous occurrence history must not reach Django");
+    },
   );
   assert.equal(anonymous.kind, "signin");
 });
