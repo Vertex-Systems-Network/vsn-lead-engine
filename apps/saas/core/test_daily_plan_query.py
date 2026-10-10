@@ -38,12 +38,15 @@ class DailyPlanListTests(TestCase):
         self.client.force_login(self.owner)
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
-            "workspace_id": str(self.workspace.id),
-            "total": 0,
-            "results": [],
-            "next": None,
-        })
+        self.assertEqual(
+            response.json(),
+            {
+                "workspace_id": str(self.workspace.id),
+                "total": 0,
+                "results": [],
+                "next": None,
+            },
+        )
         self.assertIn("no-store", response["Cache-Control"])
 
     def test_all_pages_stable_cursor_and_minimal_fields_for_viewer(self):
@@ -57,21 +60,20 @@ class DailyPlanListTests(TestCase):
         self.assertEqual(payload["total"], 27)
         self.assertEqual(len(payload["results"]), 25)
         self.assertIsNotNone(payload["next"])
-        self.assertEqual(set(payload["results"][0]), {
-            "id", "timezone", "local_time", "enabled", "revision", "created_at"
-        })
-        self.assertTrue(any(row["enabled"] for row in payload["results"]) or
-                        any(row["enabled"] for row in
-                            self.client.get(self.path + "?after=" + payload["next"]).json()["results"]))
+        self.assertEqual(
+            set(payload["results"][0]),
+            {"id", "timezone", "local_time", "enabled", "revision", "created_at"},
+        )
         self.assertTrue(all(row["local_time"] == "08:15" for row in payload["results"]))
         second = self.client.get(self.path + "?after=" + payload["next"])
         self.assertEqual(second.status_code, 200)
         self.assertEqual(second.json()["total"], 27)
         self.assertEqual(len(second.json()["results"]), 2)
         self.assertIsNone(second.json()["next"])
-        self.assertEqual(len({
-            row["id"] for row in payload["results"] + second.json()["results"]
-        }), 27)
+        ids = {row["id"] for row in payload["results"] + second.json()["results"]}
+        self.assertEqual(len(ids), 27)
+        enabled_flags = [row["enabled"] for row in payload["results"] + second.json()["results"]]
+        self.assertIn(True, enabled_flags)
         self.assertNotIn(b"Foreign private plan", first.content)
         self.assertNotIn(b"Private bakery marker", first.content)
         self.assertEqual(DailySchedule.objects.count(), 28)
@@ -94,8 +96,12 @@ class DailyPlanListTests(TestCase):
 
     def test_repeated_invalid_or_extra_cursors_and_mutations_refused(self):
         self.client.force_login(self.owner)
-        for suffix in ("?status=disabled", "?after=not-uuid", "?page=2",
-                       "?after=00000000-0000-0000-0000-000000000000&after=00000000-0000-0000-0000-000000000000"):
+        for suffix in (
+            "?status=disabled",
+            "?after=not-uuid",
+            "?page=2",
+            "?after=00000000-0000-0000-0000-000000000000&after=00000000-0000-0000-0000-000000000000",
+        ):
             with self.subTest(suffix=suffix):
                 self.assertEqual(self.client.get(self.path + suffix).status_code, 400)
         for verb in ("post", "put", "patch", "delete"):
