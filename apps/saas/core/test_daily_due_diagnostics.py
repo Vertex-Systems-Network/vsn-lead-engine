@@ -29,9 +29,7 @@ class DailyDueDiagnosticTests(TestCase):
         self.workspace = create_workspace(
             self.owner, {"name": "Private due plan workspace", "timezone": "UTC"}
         )
-        self.foreign = create_workspace(
-            self.other, {"name": "Foreign due plan", "timezone": "UTC"}
-        )
+        self.foreign = create_workspace(self.other, {"name": "Foreign due plan", "timezone": "UTC"})
         Membership.objects.create(workspace=self.workspace, user=self.creator, role="member")
         Membership.objects.create(workspace=self.workspace, user=self.viewer, role="viewer")
         self.entitlement = Entitlement.objects.create(
@@ -47,9 +45,7 @@ class DailyDueDiagnosticTests(TestCase):
         )
 
     def inspect(self, **kwargs):
-        return due_plan_diagnostics(
-            self.owner, self.workspace.id, now=CLOCK, **kwargs
-        )
+        return due_plan_diagnostics(self.owner, self.workspace.id, now=CLOCK, **kwargs)
 
     def test_disabled_plan_is_inert_and_diagnostic_does_not_write(self):
         report = self.inspect()
@@ -68,11 +64,12 @@ class DailyDueDiagnosticTests(TestCase):
         before = self.inspect()
         plan = before["plans"][0]
         self.assertEqual(plan["status"], "candidate_due_requires_execution_gates")
-        self.assertTrue(any(
-            row["local_date"] == "2026-11-01" and
-            row["resolution"] == "ambiguous_earlier"
-            for row in plan["due_local_dates"]
-        ))
+        self.assertTrue(
+            any(
+                row["local_date"] == "2026-11-01" and row["resolution"] == "ambiguous_earlier"
+                for row in plan["due_local_dates"]
+            )
+        )
         self.assertIn("source_rights", before["requires_execution_gates"])
         self.assertIn("operator_release", before["requires_execution_gates"])
         self.assertNotIn("Synthetic diagnostics only", json.dumps(before))
@@ -80,13 +77,13 @@ class DailyDueDiagnosticTests(TestCase):
         self.assertFalse(ScheduleOccurrence.objects.exists())
         # Internal fixture materializes one date; inspector must not recreate it.
         with patch("core.schedules.timezone.now", return_value=CLOCK):
-            materialize_daily(self.owner, self.workspace.id, self.schedule.id,
-                              CLOCK.date(), 1)
+            materialize_daily(self.owner, self.workspace.id, self.schedule.id, CLOCK.date(), 1)
         snapshot = self.inspect()
-        self.assertFalse(any(
-            row["local_date"] == "2026-11-01"
-            for row in snapshot["plans"][0]["due_local_dates"]
-        ))
+        self.assertFalse(
+            any(
+                row["local_date"] == "2026-11-01" for row in snapshot["plans"][0]["due_local_dates"]
+            )
+        )
         self.assertEqual(Job.objects.count(), 1)
         self.assertEqual(ScheduleOccurrence.objects.count(), 1)
 
@@ -97,13 +94,9 @@ class DailyDueDiagnosticTests(TestCase):
         self.assertEqual(self.inspect()["plans"][0]["status"], "entitlement_not_current")
         self.entitlement.active = True
         self.entitlement.save(update_fields=["active"])
-        Membership.objects.filter(workspace=self.workspace, user=self.creator).update(
-            role="viewer"
-        )
+        Membership.objects.filter(workspace=self.workspace, user=self.creator).update(role="viewer")
         self.assertEqual(self.inspect()["plans"][0]["status"], "creator_not_authorized")
-        Membership.objects.filter(workspace=self.workspace, user=self.creator).update(
-            role="member"
-        )
+        Membership.objects.filter(workspace=self.workspace, user=self.creator).update(role="member")
         DailySchedule.objects.filter(pk=self.schedule.id).update(
             search={"categories": ["Private corrupted secret"], "extra": 1}
         )
@@ -129,8 +122,7 @@ class DailyDueDiagnosticTests(TestCase):
             self.inspect(after="not-a-uuid")
         with self.assertRaises(ValidationError):
             due_plan_diagnostics(
-                self.owner, self.workspace.id,
-                now=datetime(2026, 11, 1, 16), limit=3
+                self.owner, self.workspace.id, now=datetime(2026, 11, 1, 16), limit=3
             )
         self.assertFalse(Job.objects.exists())
 
@@ -152,14 +144,15 @@ class DailyDueDiagnosticTests(TestCase):
         second = self.inspect(after=first["next"])
         self.assertEqual(second["inspected"], 4)
         self.assertIsNone(second["next"])
-        self.assertEqual(len({
-            p["id"] for p in first["plans"] + second["plans"]
-        }), 29)
+        self.assertEqual(len({p["id"] for p in first["plans"] + second["plans"]}), 29)
         output = StringIO()
         with patch("core.daily_due_diagnostics.timezone.now", return_value=CLOCK):
             call_command(
-                "inspect_daily_plans", actor=str(self.owner.pk),
-                workspace=str(self.workspace.id), limit=2, stdout=output
+                "inspect_daily_plans",
+                actor=str(self.owner.pk),
+                workspace=str(self.workspace.id),
+                limit=2,
+                stdout=output,
             )
         payload = json.loads(output.getvalue())
         self.assertEqual(payload["inspected"], 2)
@@ -167,8 +160,10 @@ class DailyDueDiagnosticTests(TestCase):
         self.assertTrue(payload["advisory_only"])
         with self.assertRaises(CommandError):
             call_command(
-                "inspect_daily_plans", actor=str(self.viewer.pk),
-                workspace=str(self.workspace.id), stdout=StringIO()
+                "inspect_daily_plans",
+                actor=str(self.viewer.pk),
+                workspace=str(self.workspace.id),
+                stdout=StringIO(),
             )
         self.assertFalse(Job.objects.exists())
         self.assertFalse(ScheduleOccurrence.objects.exists())
