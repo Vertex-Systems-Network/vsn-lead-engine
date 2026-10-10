@@ -261,8 +261,8 @@ class MemberAuditList(generics.ListAPIView):
         member = membership_for(self.request.user, self.kwargs["workspace_id"])
         if member.role not in {"owner", "admin"}:
             raise PermissionDenied("Only workspace owners and admins can review access history.")
-        if set(self.request.query_params) - {"page"}:
-            raise ValidationError("Member audit only accepts pagination.")
+        if set(self.request.query_params) - {"offset"}:
+            raise ValidationError("Member audit only accepts offset pagination.")
         return MembershipAudit.objects.filter(
             workspace_id=self.kwargs["workspace_id"]
         ).order_by("-created_at", "-id")
