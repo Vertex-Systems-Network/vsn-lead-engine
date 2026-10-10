@@ -33,8 +33,15 @@ phone required and no selected source or business-status filter.</p>
 <dt>Source preference</dt><dd>None selected — verify availability separately</dd>
 <dt>Business status preference</dt><dd>None selected</dd>
 </dl>
-<p><strong>Next action:</strong> Open the regular draft form and explicitly
-review/edit these values yourself. This preview is not applied automatically.</p>
+<p><strong>Next action:</strong> Explicitly review these options in the
+existing editable draft form. Nothing is saved until you press Save draft there.</p>
+{% if review_token %}
+<form method="post" action="{% url 'search-assistance-review-page' workspace.id %}">
+{% csrf_token %}
+<input type="hidden" name="review_token" value="{{ review_token }}">
+<button type="submit">Review suggested options in a draft form (no save)</button>
+</form>
+{% endif %}
 {% else %}
 <div role="status">
 <h2>More detail required</h2>
