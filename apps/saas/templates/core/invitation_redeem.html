@@ -16,7 +16,7 @@ it does not enable source collection, subscriptions or payments.</p>
 {% elif form %}
 <form method="post" action="{% url 'invitation-redeem-page' %}">
 {% csrf_token %}
-{% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
+{% if error %}<div role="alert">{{ error }}</div>{% endif %}
 <div class="form-field">
 <label for="{{ form.code.id_for_label }}">Private invitation code</label>
 {{ form.code }}
