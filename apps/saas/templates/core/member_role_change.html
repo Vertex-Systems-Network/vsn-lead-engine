@@ -1,0 +1,32 @@
+{% extends "core/job_base.html" %}
+{% block title %}Change member role{% endblock %}
+{% block content %}
+<h1>Change workspace member role — {{ workspace.name }}</h1>
+<p>Target member: <code>{{ target.user_id }}</code>.</p>
+<p>Stored role: <strong>{{ target.role }}</strong>.</p>
+<p><strong>Access change warning:</strong> A confirmed change takes effect immediately on server-side
+permission checks. Owners can change ownership; administrators cannot promote anyone to owner
+or change an owner. The last owner cannot be demoted. This form does not invite or remove users,
+send emails, collect leads, contact providers or start billing.</p>
+{% if changed %}
+<section role="status" aria-label="Membership role change receipt">
+<h2>Member role changed</h2>
+<p>Member <code>{{ target.user_id }}</code> now has role <strong>{{ target.role }}</strong>.
+The change has been recorded in the workspace membership audit history.</p>
+</section>
+{% elif form %}
+<form method="post" action="{% url 'member-role-change-page' workspace.id target.user_id %}">
+{% csrf_token %}
+{{ form.confirmation_token }}
+{% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
+{% if form.confirmation_token.errors %}<div role="alert">{{ form.confirmation_token.errors }}</div>{% endif %}
+<div class="form-field">
+<label for="{{ form.new_role.id_for_label }}">New member role</label>
+{{ form.new_role }}
+{% if form.new_role.errors %}<div role="alert">{{ form.new_role.errors }}</div>{% endif %}
+</div>
+<button type="submit">Confirm member role change</button>
+</form>
+{% endif %}
+<p><a href="/dashboard/workspaces/{{ workspace.id }}/members">Return to workspace members</a></p>
+{% endblock %}
