@@ -5,7 +5,15 @@ from datetime import time
 from django.test import TestCase
 
 from .jobs import CONTROLS, EVIDENCE
-from .models import DailySchedule, Entitlement, Job, Membership, ScheduleOccurrence, SourcePolicy, User
+from .models import (
+    DailySchedule,
+    Entitlement,
+    Job,
+    Membership,
+    ScheduleOccurrence,
+    SourcePolicy,
+    User,
+)
 from .schedules import create_daily_schedule
 from .services import create_workspace
 
