@@ -234,7 +234,7 @@ For every fresh development session, `continue`, resume, or timeout recovery:
 
 ### Product-first priority (stop-loss)
 
-The quarantined v3 batch-evidence modules (`apps/saas/core/batch_*.py` and their tests) are frozen: no new or modified files there, deletions only, enforced by `scripts/verify_product_progress.py` in CI. Select work in this order: (1) red CI or production collector shortfall against the 12,000/day target, (2) the customer job-fulfilment path (draft → dispatch to the existing collector → accepted results → CSV export) running end to end in staging, (3) M8 admin and M9 launch readiness, (4) everything else. Governance, evidence and protocol work is only in scope when it unblocks one of the first three.
+The quarantined v3 batch-evidence modules (`apps/saas/core/batch_*.py` and their tests) are frozen: no new or modified files there, deletions only, enforced by `scripts/verify_product_progress.py` in CI. Select work in this order (owner direction 2026-10-10: finish the SaaS platform first; the production collector's daily quota is not a current work item): (1) red CI, (2) the customer SaaS path (sign-up → workspace → draft → submit → fulfilment via `manage.py run_jobs` → accepted results → CSV export) running end to end, then a real source adapter in place of the local fixture, (3) M8 admin and M9 launch readiness, (4) everything else. Governance, evidence and protocol work is only in scope when it unblocks one of the first three.
 
 ### Workspace invocation vs. distributed Supervisor
 

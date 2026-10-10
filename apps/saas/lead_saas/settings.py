@@ -6,6 +6,7 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
+from .local_fulfilment import verifier_settings
 from .web_origin import dashboard_return
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -159,3 +160,13 @@ SAAS_BATCH_SETTLED_REPLAY_ENABLED = False
 # It does not turn on a result route or weaken current-rights checks.
 SAAS_BATCH_PAGE_SIGNING_KEY = ""
 SAAS_BATCH_PAGE_READ_ENABLED = False
+
+# Dev-only end-to-end job fulfilment against the deterministic local fixture
+# source (manage.py run_jobs). Keys are derived from SECRET_KEY and registered
+# only for source "local-fixture"; production registries above stay empty.
+SAAS_LOCAL_FULFILMENT = os.environ.get("SAAS_LOCAL_FULFILMENT", "0") == "1"
+SAAS_LOCAL_SIGNER_KEYS = {}
+if SAAS_LOCAL_FULFILMENT:
+    if not DEBUG:
+        raise ImproperlyConfigured("SAAS_LOCAL_FULFILMENT requires SAAS_DEBUG=1")
+    globals().update(verifier_settings(SECRET_KEY))
