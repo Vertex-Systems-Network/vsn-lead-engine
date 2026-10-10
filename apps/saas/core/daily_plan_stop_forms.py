@@ -2,6 +2,7 @@
 
 from django import forms
 from django.core import signing
+from rest_framework.exceptions import ValidationError
 
 from .jobs import revision
 
@@ -46,7 +47,7 @@ class DailyPlanStopForm(forms.Form):
             ):
                 raise ValueError
             self.expected_revision = revision(token["revision"])
-        except (signing.BadSignature, ValueError, TypeError, KeyError, AttributeError):
+        except (signing.BadSignature, ValueError, TypeError, KeyError, AttributeError, ValidationError):
             raise forms.ValidationError(
                 "This stop request is invalid or expired. Open a fresh confirmation."
             ) from None
