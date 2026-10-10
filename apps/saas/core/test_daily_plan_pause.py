@@ -154,7 +154,15 @@ class DailyPlanPauseTests(TestCase):
                 status = self.client.post(self.path, {**payload, **extra}).status_code
                 self.assertEqual(status, 400)
         self.assertEqual(self.client.get(self.path + "?enabled=true").status_code, 400)
-        self.assertEqual(self.client.put(self.path).status_code, 405)
+        self.assertEqual(
+            self.client.put(
+                self.path,
+                data={},
+                content_type="application/json",
+                HTTP_X_CSRFTOKEN=payload["csrfmiddlewaretoken"],
+            ).status_code,
+            405,
+        )
         DailySchedule.objects.filter(pk=self.plan.id).update(revision=2)
         self.assertEqual(self.client.post(self.path, payload).status_code, 409)
         self.plan.refresh_from_db()
