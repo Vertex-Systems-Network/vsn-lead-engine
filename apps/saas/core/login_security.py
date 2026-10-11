@@ -22,18 +22,27 @@ def fingerprint(scope, value):
 
 
 @transaction.atomic
-def allow_login(username, remote_addr, *, now=None):
+def allow_login(username, remote_addr, *, now=None, bucket_scope="login"):
     """Bound failed/successful attempts without disclosing account existence.
 
     Only the connection address is trusted; forwarded headers cannot pick a
     fresh bucket. Counts are not reset on success. PostgreSQL serializes all
     increments; SQLite remains a local smoke mode only.
     """
+    if bucket_scope not in {"login", "password-change"}:
+        raise ValueError("Unsupported credential-attempt bucket scope")
+    # Preserve historical login/signup/reset fingerprints, while isolating
+    # authenticated password changes so they cannot exhaust login/signup's
+    # shared IP budget during a normal cross-flow browser journey.
+    prefix = "" if bucket_scope == "login" else "password-change:"
     now = now or timezone.now()
     LoginBucket.objects.filter(started_at__lt=now - RETENTION).delete()
     keys = [
-        (fingerprint("ip", remote_addr), IP_LIMIT),
-        (fingerprint("account", normalize("NFKC", username).strip().casefold()), ACCOUNT_LIMIT),
+        (fingerprint(prefix + "ip", remote_addr), IP_LIMIT),
+        (
+            fingerprint(prefix + "account", normalize("NFKC", username).strip().casefold()),
+            ACCOUNT_LIMIT,
+        ),
     ]
     allowed = True
     for key, limit in sorted(keys):
