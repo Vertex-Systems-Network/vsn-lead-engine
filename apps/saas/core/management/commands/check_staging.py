@@ -12,7 +12,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 from django.db.migrations.executor import MigrationExecutor
 
-
 HOSTNAME_PATTERN = re.compile(
     r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?"
     r"(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+"
