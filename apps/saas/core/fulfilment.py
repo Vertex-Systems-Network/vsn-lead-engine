@@ -15,13 +15,22 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Count, Exists, F, OuterRef, Q
 from django.utils import timezone
 
 from .accepted_results import accept_results
-from .attempts import claim_pre_dispatch
+from .attempts import MAX_ATTEMPTS, claim_pre_dispatch
 from .candidate_events import record_candidate_review
 from .dispatch import begin_dispatch, mark_outcome_unknown
-from .models import AcceptedFingerprint, Entitlement, JobOutbox, Membership, SourcePolicy
+from .models import (
+    AcceptedFingerprint,
+    DispatchOperation,
+    Entitlement,
+    JobAttempt,
+    JobOutbox,
+    Membership,
+    SourcePolicy,
+)
 from .receipts import reconcile_receipt
 from .sources import adapter_for
 
@@ -237,20 +246,55 @@ def fulfil_outbox(outbox_id):
         )
         return "completed"
     except Exception:
-        logger.exception("Fulfilment of job %s failed; outcome left unknown.", job.id)
+        logger.warning("Fulfilment outcome is unknown; authorized review is required.")
         mark_outcome_unknown(actor, job.workspace_id, operation.id)
         return "unknown"
 
 
+def dispatch_candidate_outboxes(*, at):
+    """Read-only pre-selection, never substitute for locked dispatch preflight.
+
+    Expired or uncertain pending rows can remain in the table until operator
+    review. Do not let them repeatedly consume a bounded worker batch. A
+    live lease also needs to expire before the claimant can be retried.
+    """
+    return (
+        JobOutbox.objects.filter(
+            status="pending",
+            job__status="queued",
+            job__revision__lt=2147483647,
+            result_protocol=2,
+            reservation__status="reserved",
+            reservation__workspace_id=F("job__workspace_id"),
+        )
+        .filter(Q(expires_at__isnull=True) | Q(expires_at__gt=at))
+        .filter(
+            ~Exists(DispatchOperation.objects.filter(outbox_id=OuterRef("pk"))),
+            ~Exists(
+                JobAttempt.objects.filter(outbox_id=OuterRef("pk"), status__in=("started", "done"))
+            ),
+            ~Exists(
+                JobAttempt.objects.filter(
+                    outbox_id=OuterRef("pk"), status="leased", expires_at__gt=at
+                )
+            ),
+        )
+        .annotate(attempt_total=Count("attempts"))
+        .filter(attempt_total__lt=MAX_ATTEMPTS)
+    )
+
+
 def run_pending(limit=25):
-    """Fulfil up to ``limit`` oldest queued v2 intents; returns outcome counts."""
+    """Fulfil up to ``limit`` oldest safely preselectable v2 intents."""
     _keys()
     limit = max(1, min(int(limit), 100))
     counts = {"completed": 0, "empty": 0, "unknown": 0, "skipped": 0, "conflict": 0}
+    # A second authoritative check (claim_pre_dispatch / begin_dispatch)
+    # remains mandatory inside the workspace-serialized transaction.
     ids = (
-        JobOutbox.objects.filter(status="pending", job__status="queued", result_protocol=2)
-        .order_by("created_at")[:limit]
-        .values_list("id", flat=True)
+        dispatch_candidate_outboxes(at=timezone.now())
+        .order_by("created_at", "id")
+        .values_list("id", flat=True)[:limit]
     )
     for outbox_id in list(ids):
         try:
@@ -258,6 +302,6 @@ def run_pending(limit=25):
         except Exception:
             # Lease/preflight refusals (expired intent, inactive entitlement, changed
             # policy) leave the intent pending for normal expiry; nothing was started.
-            logger.warning("Job intent %s was not dispatched.", outbox_id, exc_info=True)
+            logger.warning("A queued intent was rejected by the bounded pre-dispatch gates.")
             counts["conflict"] += 1
     return counts

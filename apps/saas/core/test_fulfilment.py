@@ -1,5 +1,6 @@
 import importlib
 import os
+from datetime import timedelta
 from io import StringIO
 from unittest.mock import patch
 
@@ -8,6 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from lead_saas.local_fulfilment import LOCAL_SOURCES, SOURCE_CODE, verifier_settings
 
 from .fulfilment import fulfil_outbox, run_pending
@@ -18,6 +20,7 @@ from .models import (
     DispatchOperation,
     Entitlement,
     Job,
+    JobAttempt,
     JobOutbox,
     UsageReservation,
     User,
@@ -114,11 +117,30 @@ class FulfilmentTests(TestCase):
 
     def test_adapter_failure_leaves_outcome_unknown_and_reservation_held(self):
         job = queued_job(self.user, self.workspace)
-        with patch("core.sources.FixtureSource.fetch", side_effect=RuntimeError("boom")):
+        injected = "api-token=should-never-appear-in-logs"
+        with (
+            patch("core.sources.FixtureSource.fetch", side_effect=RuntimeError(injected)),
+            self.assertLogs("core.fulfilment", level="WARNING") as captured,
+        ):
             self.assertEqual(run_pending()["unknown"], 1)
+        self.assertNotIn(injected, " ".join(captured.output))
         self.assertEqual(DispatchOperation.objects.get(job=job).status, "unknown")
         self.assertEqual(UsageReservation.objects.get(jobs=1).status, "reserved")
         self.assertFalse(AcceptedResult.objects.exists())
+
+    def test_preflight_exceptions_do_not_echo_adapter_secrets_or_identifiers(self):
+        job = queued_job(self.user, self.workspace)
+        injected = "authorization-header=private-test-marker"
+        with (
+            patch("core.fulfilment.claim_pre_dispatch", side_effect=RuntimeError(injected)),
+            self.assertLogs("core.fulfilment", level="WARNING") as captured,
+        ):
+            self.assertEqual(run_pending(limit=1)["conflict"], 1)
+        logs = " ".join(captured.output)
+        self.assertNotIn(injected, logs)
+        self.assertNotIn(str(job.pk), logs)
+        self.assertEqual(JobOutbox.objects.get(job=job).status, "pending")
+        self.assertFalse(DispatchOperation.objects.filter(job=job).exists())
 
     def test_inactive_entitlement_is_refused_before_dispatch(self):
         job = queued_job(self.user, self.workspace)
@@ -126,6 +148,90 @@ class FulfilmentTests(TestCase):
         self.assertEqual(run_pending()["conflict"], 1)
         self.assertFalse(DispatchOperation.objects.filter(job=job).exists())
         self.assertEqual(JobOutbox.objects.get(job=job).status, "pending")
+
+    def test_expired_and_retained_possible_effect_rows_do_not_starve_fulfilment(self):
+        expired = queued_job(self.user, self.workspace)
+        uncertain = queued_job(self.user, self.workspace)
+        eligible = queued_job(self.user, self.workspace)
+        expired_outbox = JobOutbox.objects.get(job=expired)
+        uncertain_outbox = JobOutbox.objects.get(job=uncertain)
+        JobOutbox.objects.filter(pk=expired_outbox.pk).update(
+            expires_at=timezone.now() - timedelta(seconds=1)
+        )
+        attempt = JobAttempt.objects.create(
+            outbox=uncertain_outbox,
+            number=1,
+            job_revision=uncertain.revision,
+            status="started",
+            expires_at=timezone.now() - timedelta(seconds=1),
+        )
+        operation = DispatchOperation.objects.create(
+            workspace=self.workspace,
+            job=uncertain,
+            outbox=uncertain_outbox,
+            attempt=attempt,
+            source_code=SOURCE_CODE,
+            request_hash=uncertain.request_hash,
+            policy_version=1,
+            policy_fingerprint="a" * 64,
+            call_limit=1,
+            status="unknown",
+            unknown_at=timezone.now(),
+        )
+
+        result = run_pending(limit=1)
+        self.assertEqual(
+            result, {"completed": 1, "empty": 0, "unknown": 0, "skipped": 0, "conflict": 0}
+        )
+        eligible.refresh_from_db()
+        expired.refresh_from_db()
+        uncertain.refresh_from_db()
+        expired_outbox.refresh_from_db()
+        uncertain_outbox.refresh_from_db()
+        self.assertEqual(eligible.status, "completed")
+        self.assertEqual(expired.status, "queued")
+        self.assertEqual(uncertain.status, "queued")
+        self.assertEqual(expired_outbox.status, "pending")
+        self.assertEqual(uncertain_outbox.status, "pending")
+        self.assertTrue(DispatchOperation.objects.filter(pk=operation.pk).exists())
+        self.assertEqual(expired_outbox.reservation.status, "reserved")
+        self.assertEqual(uncertain_outbox.reservation.status, "reserved")
+        self.assertEqual(AcceptedResult.objects.filter(job=eligible).count(), 10)
+
+    def test_live_leases_and_exhausted_attempts_do_not_starve_safe_job(self):
+        leased = queued_job(self.user, self.workspace)
+        exhausted = queued_job(self.user, self.workspace)
+        eligible = queued_job(self.user, self.workspace)
+        now = timezone.now()
+        leased_outbox = JobOutbox.objects.get(job=leased)
+        exhausted_outbox = JobOutbox.objects.get(job=exhausted)
+        lease = JobAttempt.objects.create(
+            outbox=leased_outbox,
+            number=1,
+            job_revision=leased.revision,
+            status="leased",
+            expires_at=now + timedelta(seconds=45),
+        )
+        for number in (1, 2, 3):
+            JobAttempt.objects.create(
+                outbox=exhausted_outbox,
+                number=number,
+                job_revision=exhausted.revision,
+                status="expired",
+                expires_at=now - timedelta(seconds=number),
+            )
+
+        result = run_pending(limit=1)
+        self.assertEqual(result["completed"], 1)
+        self.assertEqual(result["conflict"], 0)
+        eligible.refresh_from_db()
+        self.assertEqual(eligible.status, "completed")
+        self.assertEqual(JobAttempt.objects.filter(outbox=leased_outbox).count(), 1)
+        self.assertEqual(JobAttempt.objects.filter(outbox=exhausted_outbox).count(), 3)
+        self.assertEqual(leased_outbox.reservation.status, "reserved")
+        self.assertEqual(exhausted_outbox.reservation.status, "reserved")
+        lease.refresh_from_db()
+        self.assertEqual(lease.status, "leased")
 
     def test_jobs_for_sources_without_an_adapter_are_skipped(self):
         job = queued_job(self.user, self.workspace)
