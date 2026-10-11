@@ -383,7 +383,7 @@ def main():
                 assert "Synthetic bakery" in page and "Next page" in page
                 assert "Job status summary" in page
                 assert "saved searches across all pages" in page
-                assert ">27" in page
+                assert f">{before_browser_jobs + 1}" in page
                 assert 'href="?status=draft"' in page
                 assert 'href="?status=completed"' in page
                 assert "Active workspace:" in page
