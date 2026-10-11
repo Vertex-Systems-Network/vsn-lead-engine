@@ -3,11 +3,23 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils import timezone
 
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    class Meta:
+        constraints = [
+            # Password resets must never select multiple active email identities.
+            # Blank email stays allowed for test/operator-created legacy users.
+            models.UniqueConstraint(
+                Lower("email"),
+                condition=~models.Q(email=""),
+                name="saas_user_email_ci_unique",
+            ),
+        ]
 
 
 class Workspace(models.Model):
