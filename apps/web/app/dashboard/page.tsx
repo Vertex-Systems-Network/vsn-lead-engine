@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { backend } from "../../lib/backend";
+import { backend, backendLink } from "../../lib/backend";
 import { workspaces } from "../../lib/contracts";
 import { State } from "../components/state";
 export default async function Dashboard({
@@ -20,9 +20,12 @@ export default async function Dashboard({
   return (
     <>
       <p className="eyebrow">Your operations</p>
-      <Link href="/account/sign-out" prefetch={false}>
-        Sign out
-      </Link>
+      <nav aria-label="Account" className="account-actions">
+        <a href={backendLink("/accounts/password-change/")}>Change password</a>
+        <Link href="/account/sign-out" prefetch={false}>
+          Sign out
+        </Link>
+      </nav>
       <h1>Workspaces</h1>
       <p className="muted">
         Open a workspace to review saved searches and usage.
