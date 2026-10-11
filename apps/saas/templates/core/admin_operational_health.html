@@ -22,6 +22,14 @@ No invitation code or recipient identifier appears here.</p></section>
 <dl>{% for state, count in report.jobs.items %}
 <dt>{{ state }}</dt><dd>{{ count }}</dd>
 {% endfor %}</dl></section>
+<section aria-labelledby="lease-attempts"><h2 id="lease-attempts">Pre-dispatch lease attempts</h2>
+<dl>{% for state, count in report.pre_dispatch_attempts.items %}
+<dt>{{ state }}</dt><dd>{{ count }}</dd>
+{% endfor %}
+<dt>Leases past expiry, still recorded as leased</dt>
+<dd>{{ report.expired_leased_attempts }}</dd></dl>
+<p>Observational only; this report never renews leases, retries jobs, releases
+reservations or starts provider dispatch.</p></section>
 <section aria-labelledby="outboxes"><h2 id="outboxes">Internal job intents</h2>
 <dl>{% for state, count in report.outboxes.items %}
 <dt>{{ state }}</dt><dd>{{ count }}</dd>

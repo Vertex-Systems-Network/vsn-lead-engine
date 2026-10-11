@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from .models import (
     Job,
+    JobAttempt,
     JobOutbox,
     Membership,
     MembershipAudit,
@@ -175,6 +176,83 @@ class AdminOperationalHealthTests(TestCase):
         self.assertEqual(self.client.get(api_path).json()["jobs"]["queued"], 0)
         self.assertFalse(Job.objects.exists())
 
+    def test_pre_dispatch_lease_counts_stay_tenant_scoped_and_read_only(self):
+        job = self.seed()
+        outbox = JobOutbox.objects.get(job=job)
+        now = timezone.now()
+        active = JobAttempt.objects.create(
+            outbox=outbox,
+            number=1,
+            job_revision=0,
+            status="leased",
+            expires_at=now + timedelta(minutes=2),
+        )
+        JobAttempt.objects.create(
+            outbox=outbox,
+            number=2,
+            job_revision=0,
+            status="expired",
+            expires_at=now - timedelta(minutes=1),
+        )
+        JobAttempt.objects.create(
+            outbox=outbox,
+            number=3,
+            job_revision=0,
+            status="done",
+            expires_at=now - timedelta(minutes=1),
+        )
+        foreign_job = Job.objects.get(workspace=self.foreign_workspace)
+        foreign_reservation = UsageReservation.objects.create(
+            workspace=self.foreign_workspace,
+            key="foreign-secret-lease-reservation",
+            request_hash="b" * 64,
+            leads=1,
+            jobs=1,
+            status="reserved",
+        )
+        foreign_outbox = JobOutbox.objects.create(
+            job=foreign_job,
+            reservation=foreign_reservation,
+            submitted_by=self.foreign,
+            submitted_revision=0,
+            source_snapshot=[],
+            status="pending",
+        )
+        foreign_attempt = JobAttempt.objects.create(
+            outbox=foreign_outbox,
+            number=1,
+            job_revision=0,
+            status="cancelled",
+            expires_at=now - timedelta(minutes=1),
+        )
+        snapshot_api = f"/api/v1/workspaces/{self.workspace.id}/admin/health/"
+        for actor in (self.owner, self.admin):
+            self.client.force_login(actor)
+            response = self.client.get(snapshot_api)
+            self.assertEqual(response.status_code, 200)
+            report = response.json()
+            self.assertEqual(
+                report["pre_dispatch_attempts"],
+                {"leased": 1, "expired": 1, "cancelled": 0, "started": 0, "done": 1},
+            )
+            self.assertEqual(report["expired_leased_attempts"], 0)
+            self.assertNotIn(str(active.token), response.content.decode())
+            self.assertNotIn(str(foreign_attempt.pk), response.content.decode())
+            self.assertNotIn("foreign-secret-lease-reservation", response.content.decode())
+            page = self.client.get(self.path)
+            self.assertContains(page, "Pre-dispatch lease attempts")
+            self.assertContains(page, "Leases past expiry, still recorded as leased")
+
+        JobAttempt.objects.filter(pk=active.pk).update(expires_at=now - timedelta(seconds=1))
+        self.client.force_login(self.owner)
+        response = self.client.get(snapshot_api)
+        self.assertEqual(response.json()["expired_leased_attempts"], 1)
+        self.assertEqual(response.json()["pre_dispatch_attempts"]["leased"], 1)
+        self.assertEqual(JobAttempt.objects.count(), 4)
+        self.assertEqual(JobOutbox.objects.count(), 2)
+        self.assertEqual(UsageReservation.objects.count(), 2)
+        self.assertEqual(MembershipAudit.objects.count(), 0)
+
     def test_no_invites_or_jobs_stays_explicit_zero(self):
         self.client.force_login(self.owner)
         report = self.client.get(self.path).context["report"]
@@ -183,6 +261,8 @@ class AdminOperationalHealthTests(TestCase):
         self.assertEqual(sum(report["invitations"].values()), 0)
         self.assertEqual(report["expired_pending_outboxes"], 0)
         self.assertEqual(report["unknown_dispatch_operations"], 0)
+        self.assertEqual(sum(report["pre_dispatch_attempts"].values()), 0)
+        self.assertEqual(report["expired_leased_attempts"], 0)
 
     def test_viewer_foreign_revoked_and_anonymous_are_denied(self):
         self.seed()
