@@ -92,7 +92,5 @@ class UndeliverablePasswordResetTests(TestCase):
             check=True,
             timeout=15,
         )
-        self.assertEqual(
-            result.stdout.strip(), "django.core.mail.backends.dummy.EmailBackend"
-        )
+        self.assertEqual(result.stdout.strip(), "django.core.mail.backends.dummy.EmailBackend")
         self.assertEqual(result.stderr, "")
