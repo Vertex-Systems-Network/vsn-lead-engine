@@ -60,9 +60,7 @@ def expire_pending_intents(*, limit=100):
         .filter(
             ~Exists(DispatchOperation.objects.filter(outbox_id=OuterRef("pk"))),
             ~Exists(
-                JobAttempt.objects.filter(
-                    outbox_id=OuterRef("pk"), status__in=("started", "done")
-                )
+                JobAttempt.objects.filter(outbox_id=OuterRef("pk"), status__in=("started", "done"))
             ),
         )
         .order_by("expires_at", "id")
