@@ -478,6 +478,7 @@ def main():
                 health_page, health_headers = read(health_path)
                 assert "Workspace operational health" in health_page
                 assert "Pending intents past expiry" in health_page
+                assert "Expired intents eligible for safety recheck" in health_page
                 assert "Pending intents with retained dispatch evidence" in health_page
                 assert "Unknown dispatch outcomes" in health_page
                 assert "Outstanding reserved usage intents" in health_page
