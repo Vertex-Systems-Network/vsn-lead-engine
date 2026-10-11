@@ -872,3 +872,42 @@ test("operational health is an exact, cookie-only, no-store admin read", async (
     "signin",
   );
 });
+
+test("pending invitation review permits one exact authenticated read-only path", async () => {
+  const ws = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const path = `/api/v1/workspaces/${ws}/invitations/pending/`;
+  const result = await readBackend(
+    "http://localhost:8000",
+    path,
+    session,
+    async (url, options) => {
+      assert.equal(url.pathname + url.search, path);
+      assert.deepEqual(options.headers, {
+        Accept: "application/json",
+        Cookie: `sessionid=${session}`,
+      });
+      assert.equal(options.cache, "no-store");
+      assert.equal(options.redirect, "manual");
+      return new Response(`{"workspace_id":"${ws}","read_only":true,"limit":10,"results":[]}`, {
+        headers: { "content-type": "application/json" },
+      });
+    },
+  );
+  assert.equal(result.kind, "ok");
+  for (const candidate of [
+    `${path}?token=private`,
+    `${path}?all=true`,
+    `${path}issue/`,
+    `${path}../`,
+  ]) {
+    await assert.rejects(readBackend("http://localhost:8000", candidate, session));
+  }
+  assert.equal(
+    (
+      await readBackend("http://localhost:8000", path, undefined, () => {
+        throw Error("anonymous invitation review must never reach backend");
+      })
+    ).kind,
+    "signin",
+  );
+});
