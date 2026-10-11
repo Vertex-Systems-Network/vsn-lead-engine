@@ -98,7 +98,9 @@ class SignUpTests(TestCase):
             with self.subTest(native=native):
                 competing_username = "competing-native" if native else "competing-browser"
 
-                def register_after_competitor(form):
+                def register_after_competitor(
+                    form, *, competing_username=competing_username, email=email
+                ):
                     User.objects.create_user(
                         username=competing_username,
                         email=email.upper(),
