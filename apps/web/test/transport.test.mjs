@@ -820,16 +820,17 @@ test("backend retries one 5xx but never retries denied, missing, or persistent f
         const status = statuses[calls++];
         return new Response(status === 200 ? "{}" : "unavailable", {
           status,
-          headers: { "content-type": status === 200 ? "application/json" : "text/plain" },
+          headers: {
+            "content-type": status === 200 ? "application/json" : "text/plain",
+          },
         });
       },
     );
     assert.equal(calls, statuses.length);
-    assert.equal(
-      result.kind,
-      statuses[0] === 403 ? "denied" :
-        statuses[0] === 404 ? "missing" :
-        statuses.at(-1) === 200 ? "ok" : "unavailable",
-    );
+    let expected = "unavailable";
+    if (statuses[0] === 403) expected = "denied";
+    else if (statuses[0] === 404) expected = "missing";
+    else if (statuses.at(-1) === 200) expected = "ok";
+    assert.equal(result.kind, expected);
   }
 });
