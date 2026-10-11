@@ -310,29 +310,37 @@ def main():
                 try:
                     subprocess.run(
                         ["node", "scripts/browser-smoke.mjs", origin],
-                    cwd=ROOT / "web",
-                    env={
-                        **os.environ,
-                        "VSN_BROWSER_SMOKE_SESSION": session,
-                        "VSN_BROWSER_SMOKE_CSRF": browser_csrf_cookie,
-                        "VSN_BROWSER_SMOKE_OWN_WORKSPACE": str(workspace.id),
-                        "VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE": str(other.id),
-                        "VSN_BROWSER_SMOKE_OWN_JOB": str(saved[0].id),
-                        "VSN_BROWSER_SMOKE_DRAFT_POST_ORIGIN": backend,
-                    },
-                    check=True,
+                        cwd=ROOT / "web",
+                        env={
+                            **os.environ,
+                            "VSN_BROWSER_SMOKE_SESSION": session,
+                            "VSN_BROWSER_SMOKE_CSRF": browser_csrf_cookie,
+                            "VSN_BROWSER_SMOKE_OWN_WORKSPACE": str(workspace.id),
+                            "VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE": str(other.id),
+                            "VSN_BROWSER_SMOKE_OWN_JOB": str(saved[0].id),
+                            "VSN_BROWSER_SMOKE_DRAFT_POST_ORIGIN": backend,
+                        },
+                        check=True,
                         timeout=175,
                     )
                 except subprocess.CalledProcessError:
                     # Only coarse internal failure labels from disposable Next;
                     # never echo private cookies, response payloads or form data.
-                    log_lines = (Path(directory) / "next.log").read_text(errors="replace").splitlines()
+                    log_lines = (
+                        (Path(directory) / "next.log")
+                        .read_text(errors="replace")
+                        .splitlines()
+                    )
                     markers = [
                         line.split("VSN_HTTP_SMOKE_DIAG:", 1)[1].split()[0]
                         for line in log_lines
                         if "VSN_HTTP_SMOKE_DIAG:" in line
                     ]
-                    print("Synthetic Next read failure classes:", markers[-12:], file=sys.stderr)
+                    print(
+                        "Synthetic Next read failure classes:",
+                        markers[-12:],
+                        file=sys.stderr,
+                    )
                     raise
                 created_by_browser = list(
                     Job.objects.filter(workspace=workspace).exclude(
