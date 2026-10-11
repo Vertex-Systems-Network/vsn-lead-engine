@@ -46,6 +46,8 @@ const dailyPlansPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/daily-plans\/(?:\?after=[0-9a-f-]{36})?$/;
 const membersPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/members\/(?:\?offset=(?:0|[1-9][0-9]{0,5}))?$/;
+const pendingInvitationsPath =
+  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/invitations\/pending\/$/;
 const memberAuditPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/member-audit\/(?:\?offset=(?:0|[1-9][0-9]{0,5}))?$/;
 const formPath =
@@ -83,6 +85,7 @@ export async function readBackend(
     !dailyPlanDetailPath.test(path) &&
     !dailyOccurrencePath.test(path) &&
     !membersPath.test(path) &&
+    !pendingInvitationsPath.test(path) &&
     !memberAuditPath.test(path) &&
     !filteredJobsPath.test(path) &&
     !/^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/jobs\/[0-9a-f-]{36}\/export-receipts\/(?:\?after=[A-Za-z0-9_:%-]{1,1200})?$/.test(

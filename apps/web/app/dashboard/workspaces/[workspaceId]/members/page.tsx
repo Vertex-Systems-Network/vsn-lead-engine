@@ -58,9 +58,9 @@ export default async function MembersPage({
         </a>
       </p>
       <p>
-        <a href={backendLink(`/workspaces/${workspaceId}/invitations/`)}>
-          Review and revoke pending invitations →
-        </a>
+        <Link href={`/dashboard/workspaces/${workspaceId}/invitations`}>
+          Review pending invitations →
+        </Link>
       </p>
       {result.data.results.length > 0 ? (
         <div className="table-scroll">

@@ -34,6 +34,50 @@ def health(request):
 
 
 @method_decorator(never_cache, name="dispatch")
+class PendingInvitationList(APIView):
+    """Bounded, read-only current invitations for this workspace's owners/admins."""
+
+    def get(self, request, workspace_id):
+        from django.utils import timezone
+        from rest_framework.exceptions import PermissionDenied, ValidationError
+
+        from .models import WorkspaceInvitation
+
+        membership = membership_for(request.user, workspace_id)
+        if membership.role not in {"owner", "admin"}:
+            raise PermissionDenied("Only owners and administrators may review invitations.")
+        if request.query_params:
+            raise ValidationError("Pending invitations accept no query parameters.")
+        invitations = (
+            WorkspaceInvitation.objects.filter(
+                workspace_id=workspace_id,
+                accepted_at__isnull=True,
+                revoked_at__isnull=True,
+                expires_at__gt=timezone.now(),
+            )
+            .select_related("target")
+            .order_by("created_at", "id")[:10]
+        )
+        return Response(
+            {
+                "workspace_id": str(workspace_id),
+                "read_only": True,
+                "limit": 10,
+                "results": [
+                    {
+                        "id": str(invitation.pk),
+                        "target_username": invitation.target.username,
+                        "role": invitation.role,
+                        "expires_at": invitation.expires_at.isoformat(),
+                        "can_revoke": (membership.role == "owner" or invitation.role != "admin"),
+                    }
+                    for invitation in invitations
+                ],
+            }
+        )
+
+
+@method_decorator(never_cache, name="dispatch")
 class OperationalHealth(APIView):
     """Current owner/admin-only observational counts, never mutation or recovery."""
 

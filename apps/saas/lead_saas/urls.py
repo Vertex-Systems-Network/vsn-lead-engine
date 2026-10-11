@@ -43,6 +43,11 @@ urlpatterns = [
         views.ResultList.as_view(),
     ),
     path(
+        "api/v1/workspaces/<uuid:workspace_id>/invitations/pending/",
+        views.PendingInvitationList.as_view(),
+        name="pending-invitations-api",
+    ),
+    path(
         "api/v1/workspaces/<uuid:workspace_id>/admin/health/",
         views.OperationalHealth.as_view(),
         name="operational-health-api",
