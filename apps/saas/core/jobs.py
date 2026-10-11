@@ -179,11 +179,7 @@ def cancel_pending_job(user, workspace_id, job_id, expected_revision):
         raise RevisionConflict()
     outbox = JobOutbox.objects.select_for_update().filter(job=job).first()
     if job.status == "queued":
-        if (
-            outbox is None
-            or outbox.status != "pending"
-            or has_possible_effect_evidence(outbox)
-        ):
+        if outbox is None or outbox.status != "pending" or has_possible_effect_evidence(outbox):
             raise RevisionConflict()
         reservation = UsageReservation.objects.select_for_update().get(
             pk=outbox.reservation_id, workspace_id=workspace_id
