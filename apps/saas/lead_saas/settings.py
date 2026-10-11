@@ -206,8 +206,12 @@ if _starter:
 # Outgoing email (password reset). Debug prints to the console; otherwise SMTP
 # settings come from the deployment environment.
 DEFAULT_FROM_EMAIL = os.environ.get("SAAS_FROM_EMAIL", "no-reply@localhost")
-if DEBUG or not os.environ.get("SAAS_EMAIL_HOST"):
+# A non-debug instance without SMTP must never print bearer reset links to logs.
+# Drop undeliverable mail instead; the staging preflight requires real SMTP.
+if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+elif not os.environ.get("SAAS_EMAIL_HOST"):
+    EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
 else:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = os.environ["SAAS_EMAIL_HOST"]
