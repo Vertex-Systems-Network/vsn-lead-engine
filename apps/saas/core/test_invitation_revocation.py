@@ -45,6 +45,74 @@ class InvitationRevocationPageTests(TestCase):
             "confirm_revocation": "on",
         }
 
+    def test_native_json_review_is_bounded_redacted_and_role_scoped(self):
+        path = f"/api/v1/workspaces/{self.workspace.id}/invitations/pending/"
+        for actor in (self.owner, self.admin):
+            self.client.force_login(actor)
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("no-store", response["Cache-Control"])
+            self.assertEqual(response["Content-Type"], "application/json")
+            data = response.json()
+            self.assertEqual(data["workspace_id"], str(self.workspace.id))
+            self.assertEqual(data["limit"], 10)
+            self.assertTrue(data["read_only"])
+            self.assertEqual(
+                data["results"],
+                [
+                    {
+                        "id": str(self.invitation.pk),
+                        "target_username": self.target.username,
+                        "role": "member",
+                        "expires_at": self.invitation.expires_at.isoformat(),
+                        "can_revoke": True,
+                    }
+                ],
+            )
+            self.assertNotIn(self.code, response.content.decode())
+            self.assertNotIn(self.invitation.token_hash, response.content.decode())
+            self.assertNotIn("created_by", response.content.decode())
+        self.assertEqual(MembershipAudit.objects.count(), 0)
+        self.assertEqual(WorkspaceInvitation.objects.count(), 1)
+
+    def test_native_review_admin_cannot_revoke_admin_role_and_stale_is_hidden(self):
+        path = f"/api/v1/workspaces/{self.workspace.id}/invitations/pending/"
+        admin_target = User.objects.create_user(username="invite-admin-only-target")
+        admin_invitation, _ = issue_invitation(
+            self.owner, self.workspace.id, admin_target.username, "admin"
+        )
+        self.client.force_login(self.admin)
+        results = self.client.get(path).json()["results"]
+        admin_result = next(row for row in results if row["id"] == str(admin_invitation.pk))
+        self.assertFalse(admin_result["can_revoke"])
+        self.client.force_login(self.owner)
+        owner_results = self.client.get(path).json()["results"]
+        owner_result = next(row for row in owner_results if row["id"] == str(admin_invitation.pk))
+        self.assertTrue(owner_result["can_revoke"])
+        WorkspaceInvitation.objects.filter(pk=self.invitation.pk).update(
+            expires_at=timezone.now() - timedelta(seconds=1)
+        )
+        self.assertEqual(len(self.client.get(path).json()["results"]), 1)
+        WorkspaceInvitation.objects.filter(pk=admin_invitation.pk).update(
+            revoked_at=timezone.now()
+        )
+        self.assertEqual(self.client.get(path).json()["results"], [])
+
+    def test_native_review_rejects_foreign_viewer_anonymous_queries_and_writes(self):
+        path = f"/api/v1/workspaces/{self.workspace.id}/invitations/pending/"
+        self.assertIn(self.client.get(path).status_code, (401, 403))
+        self.client.force_login(self.viewer)
+        self.assertEqual(self.client.get(path).status_code, 403)
+        self.client.force_login(self.foreign_owner)
+        self.assertEqual(self.client.get(path).status_code, 404)
+        self.client.force_login(self.owner)
+        self.assertEqual(self.client.get(path + "?all=true").status_code, 400)
+        self.assertEqual(self.client.get(path + "?after=anything").status_code, 400)
+        self.assertEqual(self.client.post(path, {}).status_code, 405)
+        self.assertEqual(self.client.patch(path, {}).status_code, 405)
+        self.assertEqual(self.client.delete(path).status_code, 405)
+        self.assertIsNone(WorkspaceInvitation.objects.get().revoked_at)
+
     def test_owner_revokes_unused_code_once_without_member_mutation(self):
         self.client.force_login(self.owner)
         pending = self.client.get(self.list_path)
