@@ -69,9 +69,7 @@ class PendingInvitationList(APIView):
                         "target_username": invitation.target.username,
                         "role": invitation.role,
                         "expires_at": invitation.expires_at.isoformat(),
-                        "can_revoke": (
-                            membership.role == "owner" or invitation.role != "admin"
-                        ),
+                        "can_revoke": (membership.role == "owner" or invitation.role != "admin"),
                     }
                     for invitation in invitations
                 ],
