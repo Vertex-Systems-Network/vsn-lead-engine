@@ -4,7 +4,7 @@ Counts are observational snapshots, not a lock-consistent deployment or
 provider-rights certification. No source, job, membership or usage mutation.
 """
 
-from django.db.models import Count, Q
+from django.db.models import Count, Exists, OuterRef, Q
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
 
@@ -69,6 +69,12 @@ def operational_health(actor, workspace_id):
     )
     outboxes = JobOutbox.objects.filter(job__workspace_id=workspace_id)
     attempts = JobAttempt.objects.filter(outbox__job__workspace_id=workspace_id)
+    unsafe_pending = outboxes.filter(status="pending").annotate(
+        recorded_operation=Exists(DispatchOperation.objects.filter(outbox_id=OuterRef("pk"))),
+        started_attempt=Exists(
+            JobAttempt.objects.filter(outbox_id=OuterRef("pk"), status__in=("started", "done"))
+        ),
+    )
     return {
         "workspace_id": str(workspace_id),
         "member_roles": role_counts,
@@ -77,6 +83,9 @@ def operational_health(actor, workspace_id):
         "outboxes": status_counts(outboxes, OUTBOX_STATES),
         "pre_dispatch_attempts": status_counts(attempts, ATTEMPT_STATES),
         "expired_leased_attempts": attempts.filter(status="leased", expires_at__lte=now).count(),
+        "pending_possible_effect_intents": unsafe_pending.filter(
+            Q(recorded_operation=True) | Q(started_attempt=True)
+        ).count(),
         "expired_pending_outboxes": outboxes.filter(
             status="pending", expires_at__isnull=False, expires_at__lte=now
         ).count(),
