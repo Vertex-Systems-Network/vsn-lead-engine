@@ -70,9 +70,7 @@ class ConfigurationPreflightTests(SimpleTestCase):
             ["https://saas.staging.example", "https://another.example"],
         ):
             with self.subTest(origins=origins):
-                issues = configuration_issues(
-                    secure_config(CSRF_TRUSTED_ORIGINS=origins)
-                )
+                issues = configuration_issues(secure_config(CSRF_TRUSTED_ORIGINS=origins))
                 self.assertEqual(
                     issues, ["Trust only the exact shared HTTPS origin for browser CSRF."]
                 )
