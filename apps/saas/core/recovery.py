@@ -1,11 +1,12 @@
 """Trusted bounded cleanup of exclusively pre-dispatch intents; no background loop."""
 
 from django.db import transaction
+from django.db.models import Exists, F, OuterRef
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
 from .jobs import has_possible_effect_evidence
-from .models import Job, JobAttempt, JobOutbox, UsageReservation, Workspace
+from .models import DispatchOperation, Job, JobAttempt, JobOutbox, UsageReservation, Workspace
 
 
 @transaction.atomic
@@ -41,15 +42,26 @@ def expire_one(intent_id):
 
 
 def expire_pending_intents(*, limit=100):
-    """Internal operator service. Each intent commits independently and can be replayed."""
+    """Expire up to `limit` safe candidates, not blocked possible-effect rows."""
     if type(limit) is not int or not 1 <= limit <= 100:
         raise ValidationError("Cleanup batch must contain 1–100 intents.")
+    # Never let non-releasable legacy/restore rows consume the entire bounded
+    # candidate window on every invocation. The final workspace-serialized
+    # expire_one() check remains authoritative against concurrent changes.
     ids = list(
         JobOutbox.objects.filter(
             status="pending",
             job__status="queued",
+            job__revision__lt=2147483647,
             reservation__status="reserved",
+            reservation__workspace_id=F("job__workspace_id"),
             expires_at__lte=timezone.now(),
+        )
+        .filter(
+            ~Exists(DispatchOperation.objects.filter(outbox_id=OuterRef("pk"))),
+            ~Exists(
+                JobAttempt.objects.filter(outbox_id=OuterRef("pk"), status__in=("started", "done"))
+            ),
         )
         .order_by("expires_at", "id")
         .values_list("id", flat=True)[:limit]
