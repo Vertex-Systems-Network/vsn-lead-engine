@@ -316,8 +316,10 @@ def main():
                 import re
 
                 settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
-                User.objects.filter(pk=user.pk).update(
-                    email="fixture-recovery@synthetic.invalid"
+                recovery_user = User.objects.create_user(
+                    username="synthetic-browser-recovery",
+                    email="fixture-recovery@synthetic.invalid",
+                    password="disposable-http-password",
                 )
                 reset_requested = client.post(
                     "/accounts/password-reset/",
@@ -379,9 +381,9 @@ def main():
                         file=sys.stderr,
                     )
                     raise
-                user.refresh_from_db()
-                assert user.check_password("Synthetic-browser-new-passphrase-9911")
-                assert not user.check_password("disposable-http-password")
+                recovery_user.refresh_from_db()
+                assert recovery_user.check_password("Synthetic-browser-new-passphrase-9911")
+                assert not recovery_user.check_password("disposable-http-password")
                 # A non-existent email must not produce a second message.
                 assert len(mail.outbox) == 1
                 created_by_browser = list(
