@@ -307,8 +307,9 @@ def main():
                 before_browser_outboxes = JobOutbox.objects.filter(
                     job__workspace=workspace
                 ).count()
-                subprocess.run(
-                    ["node", "scripts/browser-smoke.mjs", origin],
+                try:
+                    subprocess.run(
+                        ["node", "scripts/browser-smoke.mjs", origin],
                     cwd=ROOT / "web",
                     env={
                         **os.environ,
@@ -320,8 +321,19 @@ def main():
                         "VSN_BROWSER_SMOKE_DRAFT_POST_ORIGIN": backend,
                     },
                     check=True,
-                    timeout=175,
-                )
+                        timeout=175,
+                    )
+                except subprocess.CalledProcessError:
+                    # Only coarse internal failure labels from disposable Next;
+                    # never echo private cookies, response payloads or form data.
+                    log_lines = (Path(directory) / "next.log").read_text(errors="replace").splitlines()
+                    markers = [
+                        line.split("VSN_HTTP_SMOKE_DIAG:", 1)[1].split()[0]
+                        for line in log_lines
+                        if "VSN_HTTP_SMOKE_DIAG:" in line
+                    ]
+                    print("Synthetic Next read failure classes:", markers[-12:], file=sys.stderr)
+                    raise
                 created_by_browser = list(
                     Job.objects.filter(workspace=workspace).exclude(
                         id__in=[job.id for job in saved]
