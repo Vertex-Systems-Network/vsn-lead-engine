@@ -309,6 +309,10 @@ def main():
                     == 303
                 )
                 browser_csrf_cookie = client.cookies["csrftoken"].value
+                before_browser_users = User.objects.count()
+                before_browser_workspaces = Workspace.objects.count()
+                before_browser_memberships = Membership.objects.count()
+                before_browser_entitlements = Entitlement.objects.count()
                 before_browser_jobs = Job.objects.filter(workspace=workspace).count()
                 before_browser_reservations = UsageReservation.objects.filter(
                     workspace=workspace
@@ -363,6 +367,26 @@ def main():
                 ]
                 assert created_by_browser[0].search["countries"] == ["CA", "US"]
                 assert Job.objects.filter(workspace=workspace).count() == before_browser_jobs + 1
+                # The same Chromium run submits exactly one synthetic signup.
+                # Session cookie isolation and first dashboard are checked in-browser.
+                assert User.objects.count() == before_browser_users + 1
+                assert Workspace.objects.count() == before_browser_workspaces + 1
+                assert Membership.objects.count() == before_browser_memberships + 1
+                assert Entitlement.objects.count() == before_browser_entitlements + 1
+                browser_user = User.objects.get(username="synthetic-browser-account")
+                assert browser_user.email == "browser-account@synthetic.invalid"
+                browser_membership = Membership.objects.get(user=browser_user)
+                assert browser_membership.role == "owner"
+                assert browser_membership.workspace.name == "Synthetic signup workspace"
+                starter = Entitlement.objects.get(workspace=browser_membership.workspace)
+                assert starter.is_current
+                assert not Job.objects.filter(workspace=browser_membership.workspace).exists()
+                assert not UsageReservation.objects.filter(
+                    workspace=browser_membership.workspace
+                ).exists()
+                assert not JobOutbox.objects.filter(
+                    job__workspace=browser_membership.workspace
+                ).exists()
                 assert (
                     UsageReservation.objects.filter(workspace=workspace).count()
                     == before_browser_reservations
