@@ -20,6 +20,7 @@ The local-only `SAAS_SQLITE_SMOKE=1` option requires debug mode and runs basic t
 ## Implemented surface
 
 - `/health/`: liveness and explicit disabled provider dispatch; no credentials/database details.
+- `/internal/readiness/`: **disabled by default**. Only when `SAAS_INTERNAL_READINESS_ENABLED=1` and a verified private reverse-proxy ingress denies public requests, a GET performs one read-only PostgreSQL `SELECT 1` and reports only `{"status":"ready"}` (200) or `{"status":"unavailable"}` (503). No credentials, SQL exceptions, migration or provider state are exposed. Do not enable the route directly on a public listener; this is **not** launch or full operational readiness certification.
 - `/accounts/sign-up/`: self-service account creation (rate-limited with the login buckets); creates an owned workspace and, when `SAAS_STARTER_ENTITLEMENT` is set, a starter allowance. On by default only with `SAAS_DEBUG=1`; production needs `SAAS_SIGNUP_ENABLED=1`.
 - `/accounts/password-reset/`: email reset link (Django one-time, 1-hour tokens); same response for unknown addresses; rate-limited per address and IP. Console email in debug; set `SAAS_EMAIL_HOST`, `SAAS_EMAIL_PORT`, `SAAS_EMAIL_USER`, `SAAS_EMAIL_PASSWORD` and `SAAS_FROM_EMAIL` for SMTP.
 - `/accounts/login/`, `/accounts/logout/`: Django same-origin sessions; CSRF-protected forms and POST logout.
