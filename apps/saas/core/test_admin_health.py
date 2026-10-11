@@ -136,7 +136,9 @@ class AdminOperationalHealthTests(TestCase):
             report = response.json()
             self.assertEqual(report["workspace_id"], str(self.workspace.id))
             self.assertTrue(report["advisory_only"])
-            self.assertEqual(report["member_roles"], {"owner": 1, "admin": 1, "member": 0, "viewer": 1})
+            self.assertEqual(
+                report["member_roles"], {"owner": 1, "admin": 1, "member": 0, "viewer": 1}
+            )
             self.assertEqual(report["invitations"]["pending"], 1)
             self.assertEqual(report["jobs"]["queued"], 1)
             self.assertEqual(report["jobs"]["failed"], 0)
