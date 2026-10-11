@@ -466,6 +466,49 @@ export function members(v: unknown): v is Members {
   );
 }
 
+export type PendingInvitation = {
+  id: string;
+  target_username: string;
+  role: "admin" | "member" | "viewer";
+  expires_at: string;
+  can_revoke: boolean;
+};
+export type PendingInvitations = {
+  workspace_id: string;
+  read_only: true;
+  limit: 10;
+  results: PendingInvitation[];
+};
+export function pendingInvitations(v: unknown): v is PendingInvitations {
+  if (
+    !object(v) ||
+    Object.keys(v).length !== 4 ||
+    !uuid(v.workspace_id) ||
+    v.read_only !== true ||
+    v.limit !== 10 ||
+    !Array.isArray(v.results) ||
+    v.results.length > 10
+  )
+    return false;
+  return (
+    new Set(v.results.map((item: unknown) => (object(item) ? item.id : null)))
+      .size === v.results.length &&
+    v.results.every(
+      (item: unknown) =>
+        object(item) &&
+        Object.keys(item).length === 5 &&
+        uuid(item.id) &&
+        typeof item.target_username === "string" &&
+        item.target_username.length >= 1 &&
+        item.target_username.length <= 150 &&
+        ["admin", "member", "viewer"].includes(String(item.role)) &&
+        typeof item.expires_at === "string" &&
+        Number.isFinite(Date.parse(item.expires_at)) &&
+        typeof item.can_revoke === "boolean",
+    )
+  );
+}
+
 export type MemberAudit = {
   id: number;
   actor_user_id: string;
