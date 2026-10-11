@@ -406,6 +406,8 @@ def main():
                 assert Entitlement.objects.count() == before_browser_entitlements + 1
                 browser_user = User.objects.get(username="synthetic-browser-account")
                 assert browser_user.email == "browser-account@synthetic.invalid"
+                assert browser_user.check_password("Synthetic-browser-updated-passphrase-1179")
+                assert not browser_user.check_password("Field#river75-polar%evergreen")
                 browser_membership = Membership.objects.get(user=browser_user)
                 assert browser_membership.role == "owner"
                 assert browser_membership.workspace.name == "Synthetic signup workspace"
