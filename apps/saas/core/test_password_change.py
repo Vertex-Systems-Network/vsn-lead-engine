@@ -108,7 +108,12 @@ class PasswordChangeTests(TestCase):
         self.assertFalse(LoginBucket.objects.exists())
 
     def test_change_invalidates_existing_email_reset_token(self):
-        response = self.browser.post("/accounts/password-reset/", {"email": self.user.email})
+        self.browser.get("/accounts/password-reset/")
+        response = self.browser.post(
+            "/accounts/password-reset/",
+            {"email": self.user.email},
+            HTTP_X_CSRFTOKEN=self.browser.cookies["csrftoken"].value,
+        )
         self.assertRedirects(response, "/accounts/password-reset/sent/")
         self.assertEqual(len(mail.outbox), 1)
         link = re.search(r"https?://[^/\s]+(/accounts/reset/\S+/)", mail.outbox[0].body).group(1)
