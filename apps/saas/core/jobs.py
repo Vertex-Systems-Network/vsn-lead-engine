@@ -9,7 +9,15 @@ from django.http import Http404
 from django.utils import timezone
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
-from .models import DispatchOperation, Entitlement, Job, JobAttempt, JobOutbox, SourcePolicy, UsageReservation
+from .models import (
+    DispatchOperation,
+    Entitlement,
+    Job,
+    JobAttempt,
+    JobOutbox,
+    SourcePolicy,
+    UsageReservation,
+)
 from .serializers import SearchSerializer
 from .usage import _release_locked, lock_workspace, reserve_usage
 
