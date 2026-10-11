@@ -41,28 +41,36 @@ def expire_one(intent_id):
     return True
 
 
+def eligible_expired_pending_outboxes(*, at):
+    """Read-only candidate query; no guarantee a row will still qualify later.
+
+    Shared by the bounded operator cleanup and owner/admin health snapshot.
+    Never include an intent with durable possible-effect evidence, a foreign
+    reservation or a revision that cannot be advanced safely.
+    """
+    return JobOutbox.objects.filter(
+        status="pending",
+        job__status="queued",
+        job__revision__lt=2147483647,
+        reservation__status="reserved",
+        reservation__workspace_id=F("job__workspace_id"),
+        expires_at__lte=at,
+    ).filter(
+        ~Exists(DispatchOperation.objects.filter(outbox_id=OuterRef("pk"))),
+        ~Exists(
+            JobAttempt.objects.filter(outbox_id=OuterRef("pk"), status__in=("started", "done"))
+        ),
+    )
+
+
 def expire_pending_intents(*, limit=100):
     """Expire up to `limit` safe candidates, not blocked possible-effect rows."""
     if type(limit) is not int or not 1 <= limit <= 100:
         raise ValidationError("Cleanup batch must contain 1–100 intents.")
-    # Never let non-releasable legacy/restore rows consume the entire bounded
-    # candidate window on every invocation. The final workspace-serialized
-    # expire_one() check remains authoritative against concurrent changes.
+    # Candidate selection is advisory; expire_one() rechecks under the
+    # workspace lock, so races cannot make an unsafe refund permissible.
     ids = list(
-        JobOutbox.objects.filter(
-            status="pending",
-            job__status="queued",
-            job__revision__lt=2147483647,
-            reservation__status="reserved",
-            reservation__workspace_id=F("job__workspace_id"),
-            expires_at__lte=timezone.now(),
-        )
-        .filter(
-            ~Exists(DispatchOperation.objects.filter(outbox_id=OuterRef("pk"))),
-            ~Exists(
-                JobAttempt.objects.filter(outbox_id=OuterRef("pk"), status__in=("started", "done"))
-            ),
-        )
+        eligible_expired_pending_outboxes(at=timezone.now())
         .order_by("expires_at", "id")
         .values_list("id", flat=True)[:limit]
     )
