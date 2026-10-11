@@ -361,7 +361,7 @@ def main():
                 assert created_by_browser[0].search["categories"] == [
                     "Synthetic browser-post salon"
                 ]
-                assert created_by_browser[0].search["countries"] == ["US", "CA"]
+                assert created_by_browser[0].search["countries"] == ["CA", "US"]
                 assert Job.objects.filter(workspace=workspace).count() == before_browser_jobs + 1
                 assert (
                     UsageReservation.objects.filter(workspace=workspace).count()
