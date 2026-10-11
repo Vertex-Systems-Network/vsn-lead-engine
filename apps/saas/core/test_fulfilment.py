@@ -22,6 +22,7 @@ from .models import (
     Job,
     JobAttempt,
     JobOutbox,
+    Membership,
     UsageReservation,
     User,
 )
@@ -141,6 +142,37 @@ class FulfilmentTests(TestCase):
         self.assertNotIn(str(job.pk), logs)
         self.assertEqual(JobOutbox.objects.get(job=job).status, "pending")
         self.assertFalse(DispatchOperation.objects.filter(job=job).exists())
+
+    def test_inactive_owner_falls_back_to_active_authorized_admin(self):
+        administrator = User.objects.create_user(username="fulfil-active-admin")
+        Membership.objects.create(workspace=self.workspace, user=administrator, role="admin")
+        job = queued_job(administrator, self.workspace)
+        self.user.is_active = False
+        self.user.save(update_fields=["is_active"])
+
+        result = run_pending(limit=1)
+        self.assertEqual(result["completed"], 1)
+        self.assertEqual(result["conflict"], 0)
+        job.refresh_from_db()
+        self.assertEqual((job.status, job.result_count), ("completed", 10))
+        self.assertEqual(JobOutbox.objects.get(job=job).reservation.status, "settled")
+        self.assertEqual(AcceptedResult.objects.filter(job=job).count(), 10)
+
+    def test_no_active_privileged_member_fails_closed_before_dispatch(self):
+        viewer = User.objects.create_user(username="fulfil-active-viewer")
+        Membership.objects.create(workspace=self.workspace, user=viewer, role="viewer")
+        job = queued_job(self.user, self.workspace)
+        self.user.is_active = False
+        self.user.save(update_fields=["is_active"])
+        with self.assertLogs("core.fulfilment", level="WARNING") as logged:
+            result = run_pending(limit=1)
+        self.assertEqual(result["conflict"], 1)
+        self.assertNotIn(str(job.pk), " ".join(logged.output))
+        self.assertFalse(DispatchOperation.objects.filter(job=job).exists())
+        self.assertFalse(JobAttempt.objects.filter(outbox__job=job).exists())
+        self.assertEqual(JobOutbox.objects.get(job=job).reservation.status, "reserved")
+        job.refresh_from_db()
+        self.assertEqual(job.status, "queued")
 
     def test_inactive_entitlement_is_refused_before_dispatch(self):
         job = queued_job(self.user, self.workspace)
