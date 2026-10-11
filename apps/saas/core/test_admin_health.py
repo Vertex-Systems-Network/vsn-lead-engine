@@ -243,9 +243,7 @@ class AdminOperationalHealthTests(TestCase):
             self.assertContains(page, "Pre-dispatch lease attempts")
             self.assertContains(page, "Leases past expiry, still recorded as leased")
 
-        JobAttempt.objects.filter(pk=active.pk).update(
-            expires_at=now - timedelta(seconds=1)
-        )
+        JobAttempt.objects.filter(pk=active.pk).update(expires_at=now - timedelta(seconds=1))
         self.client.force_login(self.owner)
         response = self.client.get(snapshot_api)
         self.assertEqual(response.json()["expired_leased_attempts"], 1)
