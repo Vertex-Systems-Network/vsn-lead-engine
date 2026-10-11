@@ -48,6 +48,7 @@ const memberAuditPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/member-audit\/(?:\?offset=(?:0|[1-9][0-9]{0,5}))?$/;
 const formPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/(?:cancel-form|submit-form|export-form)\/)$/;
+/** @returns {{ kind: "unavailable" }} */
 function unavailable(reason) {
   // Only local disposable HTTP smoke may expose a coarse reason, never URLs,
   // headers, cookies, response bodies, user records or provider data.
