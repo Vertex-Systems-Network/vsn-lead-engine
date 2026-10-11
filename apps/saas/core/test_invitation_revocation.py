@@ -108,9 +108,11 @@ class InvitationRevocationPageTests(TestCase):
         self.client.force_login(self.owner)
         self.assertEqual(self.client.get(path + "?all=true").status_code, 400)
         self.assertEqual(self.client.get(path + "?after=anything").status_code, 400)
-        self.assertEqual(self.client.post(path, {}).status_code, 405)
-        self.assertEqual(self.client.patch(path, {}).status_code, 405)
-        self.assertEqual(self.client.delete(path).status_code, 405)
+        no_csrf_client = Client()
+        no_csrf_client.force_login(self.owner)
+        self.assertEqual(no_csrf_client.post(path, {}).status_code, 405)
+        self.assertEqual(no_csrf_client.patch(path, {}).status_code, 405)
+        self.assertEqual(no_csrf_client.delete(path).status_code, 405)
         self.assertIsNone(WorkspaceInvitation.objects.get().revoked_at)
 
     def test_owner_revokes_unused_code_once_without_member_mutation(self):
