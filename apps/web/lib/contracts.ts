@@ -754,6 +754,13 @@ export const invitationHealthStates = [
   "revoked",
   "expired",
 ] as const;
+export const preDispatchAttemptStates = [
+  "leased",
+  "expired",
+  "cancelled",
+  "started",
+  "done",
+] as const;
 export const operationalOutboxStates = [
   "pending",
   "cancelled",
@@ -788,6 +795,8 @@ export type OperationalHealth = {
   invitations: Record<(typeof invitationHealthStates)[number], number>;
   jobs: Record<(typeof jobStates)[number], number>;
   outboxes: Record<(typeof operationalOutboxStates)[number], number>;
+  pre_dispatch_attempts: Record<(typeof preDispatchAttemptStates)[number], number>;
+  expired_leased_attempts: number;
   expired_pending_outboxes: number;
   unknown_dispatch_operations: number;
   reserved_usage_intents: number;
@@ -802,6 +811,11 @@ export function operationalHealth(v: unknown): v is OperationalHealth {
     exactCountMap(v.invitations, invitationHealthStates) &&
     exactCountMap(v.jobs, jobStates) &&
     exactCountMap(v.outboxes, operationalOutboxStates) &&
+    exactCountMap(v.pre_dispatch_attempts, preDispatchAttemptStates) &&
+    count(v.expired_leased_attempts) &&
+    v.expired_leased_attempts <= 2147483647 &&
+    (v.pre_dispatch_attempts as OperationalHealth["pre_dispatch_attempts"]).leased >=
+      v.expired_leased_attempts &&
     count(v.expired_pending_outboxes) &&
     count(v.unknown_dispatch_operations) &&
     count(v.reserved_usage_intents) &&
