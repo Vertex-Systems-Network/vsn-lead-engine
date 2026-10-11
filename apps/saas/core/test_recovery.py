@@ -151,9 +151,7 @@ class RecoveryTests(TestCase):
             status="unknown",
             unknown_at=now - timedelta(days=3),
         )
-        JobOutbox.objects.filter(pk=self.intent.pk).update(
-            expires_at=now - timedelta(days=3)
-        )
+        JobOutbox.objects.filter(pk=self.intent.pk).update(expires_at=now - timedelta(days=3))
         blocked_job, _ = create_draft(
             self.user, self.workspace.id, self.job.search, "blocked-started"
         )
@@ -166,12 +164,8 @@ class RecoveryTests(TestCase):
             status="done",
             expires_at=now - timedelta(days=2),
         )
-        JobOutbox.objects.filter(pk=blocked_outbox.pk).update(
-            expires_at=now - timedelta(days=2)
-        )
-        safe_job, _ = create_draft(
-            self.user, self.workspace.id, self.job.search, "releasable"
-        )
+        JobOutbox.objects.filter(pk=blocked_outbox.pk).update(expires_at=now - timedelta(days=2))
+        safe_job, _ = create_draft(self.user, self.workspace.id, self.job.search, "releasable")
         enqueue_job(self.user, self.workspace.id, safe_job.pk, 0)
         safe_outbox = JobOutbox.objects.get(job=safe_job)
         safe_lease = JobAttempt.objects.create(
@@ -181,9 +175,7 @@ class RecoveryTests(TestCase):
             status="leased",
             expires_at=now - timedelta(days=1),
         )
-        JobOutbox.objects.filter(pk=safe_outbox.pk).update(
-            expires_at=now - timedelta(days=1)
-        )
+        JobOutbox.objects.filter(pk=safe_outbox.pk).update(expires_at=now - timedelta(days=1))
 
         self.assertEqual(expire_pending_intents(limit=1), {"examined": 1, "expired": 1})
         self.assertEqual(expire_pending_intents(limit=1), {"examined": 0, "expired": 0})
