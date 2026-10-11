@@ -238,7 +238,6 @@ class AdminOperationalHealthTests(TestCase):
                 {"leased": 1, "expired": 1, "cancelled": 0, "started": 0, "done": 1},
             )
             self.assertEqual(report["expired_leased_attempts"], 0)
-        self.assertEqual(report["pending_possible_effect_intents"], 0)
             self.assertEqual(report["pending_possible_effect_intents"], 1)
             self.assertNotIn(str(active.token), response.content.decode())
             self.assertNotIn(str(foreign_attempt.pk), response.content.decode())
@@ -342,6 +341,7 @@ class AdminOperationalHealthTests(TestCase):
         self.assertEqual(report["unknown_dispatch_operations"], 0)
         self.assertEqual(sum(report["pre_dispatch_attempts"].values()), 0)
         self.assertEqual(report["expired_leased_attempts"], 0)
+        self.assertEqual(report["pending_possible_effect_intents"], 0)
 
     def test_viewer_foreign_revoked_and_anonymous_are_denied(self):
         self.seed()
