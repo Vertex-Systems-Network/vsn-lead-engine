@@ -45,7 +45,9 @@ these services and this PR never creates or connects to them.
   `SAAS_PUBLIC_ORIGIN` as explicit, trusted origins. The existing
   server transport requires HTTPS for remote origins. Both frontend and
   backend must appear on the **same public HTTPS hostname** so host-only
-  cookies work, with path-based proxy routing. Do not assume arbitrary
+  cookies work, with path-based proxy routing. The read-only `check_staging`
+  guard also requires Django's `CSRF_TRUSTED_ORIGINS` to equal exactly that
+  single shared HTTPS origin (no wildcards or additional hosts). Do not assume arbitrary
   `X-Forwarded-Proto` is trusted: Django currently requires a separately
   reviewed proxy/TLS termination integration before staging can accept
   remote traffic.

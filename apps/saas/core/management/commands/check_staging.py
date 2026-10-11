@@ -34,11 +34,27 @@ def configuration_issues(config):
     ):
         issues.append("Require HTTPS, secure cookies and nosniff headers.")
     dashboard = urlsplit(config.WEB_DASHBOARD_URL or "")
-    if dashboard.scheme != "https" or dashboard.hostname not in hosts:
+    dashboard_valid = (
+        dashboard.scheme == "https"
+        and dashboard.hostname in hosts
+        and dashboard.username is None
+        and dashboard.password is None
+        and dashboard.path == "/dashboard"
+        and not dashboard.query
+        and not dashboard.fragment
+    )
+    if not dashboard_valid:
         issues.append(
             "Route Django and Next through the same public HTTPS host; "
             "set SAAS_WEB_ORIGIN to that shared origin."
         )
+    else:
+        # Public form POSTs require the identical HTTPS origin. Never allow
+        # broad suffix/wildcard trust or unrelated browser origins at staging.
+        expected_origin = f"https://{dashboard.netloc}"
+        trusted = getattr(config, "CSRF_TRUSTED_ORIGINS", None)
+        if not isinstance(trusted, (list, tuple)) or list(trusted) != [expected_origin]:
+            issues.append("Trust only the exact shared HTTPS origin for browser CSRF.")
     if config.DATABASES["default"]["ENGINE"] != "django.db.backends.postgresql":
         issues.append("Use PostgreSQL, not the disposable SQLite smoke database.")
     if (
