@@ -148,7 +148,8 @@ export async function readBackend(
     } catch (error) {
       if (attempt === 1) {
         const kind = error instanceof Error ? error.name : "Unknown";
-        return unavailable(["TimeoutError", "AbortError", "TypeError", "SyntaxError"].includes(kind) ? kind : "Other");
+        const safe = ["TimeoutError", "AbortError", "TypeError", "SyntaxError"];
+        return unavailable(safe.includes(kind) ? kind : "Other");
       }
     }
   }
