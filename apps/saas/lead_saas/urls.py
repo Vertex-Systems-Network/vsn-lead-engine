@@ -42,6 +42,7 @@ urlpatterns = [
         views.ResultList.as_view(),
     ),
     path("health/", views.health),
+    path("internal/readiness/", internal_readiness, name="internal-readiness"),
     path("", views.overview),
     path("accounts/start-sign-in/", start_sign_in),
     path("accounts/sign-up/", sign_up_page, name="sign-up-page"),
