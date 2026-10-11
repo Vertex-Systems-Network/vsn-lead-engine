@@ -125,9 +125,7 @@ class PasswordChangeTests(TestCase):
         self.assertEqual(response["Retry-After"], str(int(WINDOW.total_seconds())))
         self.assertIn("no-store", response["Cache-Control"])
         self.assertIn("private", response["Cache-Control"])
-        self.assertNotContains(
-            response, "secret-must-not-be-reflected", status_code=429
-        )
+        self.assertNotContains(response, "secret-must-not-be-reflected", status_code=429)
         self.assertEqual(self.browser.session.session_key, old)
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password(OLD))
