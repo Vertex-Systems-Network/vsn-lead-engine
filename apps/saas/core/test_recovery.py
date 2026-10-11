@@ -13,7 +13,7 @@ from rest_framework.exceptions import ValidationError
 
 from .attempts import check_pre_dispatch, claim_pre_dispatch
 from .jobs import RevisionConflict, cancel_pending_job, enqueue_job
-from .models import DispatchOperation, Job, JobAttempt, JobOutbox, Membership, UsageCounter
+from .models import DispatchOperation, Entitlement, Job, JobAttempt, JobOutbox, Membership, UsageCounter
 from .recovery import expire_one, expire_pending_intents
 from .services import create_draft
 from .test_jobs import fixture
@@ -130,6 +130,11 @@ class RecoveryTests(TestCase):
 
     def test_blocked_possible_effect_rows_cannot_starve_safe_expiry_batches(self):
         """Two older unsafe rows must not hide a later eligible row at limit=1."""
+        # The shared two-job fixture limit is too small for this three-job
+        # synthetic queue; enlarge only this disposable test entitlement.
+        Entitlement.objects.filter(workspace=self.workspace).update(
+            lead_limit=40, job_limit=3, provider_call_limit=6
+        )
         now = timezone.now()
         first_attempt = JobAttempt.objects.create(
             outbox=self.intent,
