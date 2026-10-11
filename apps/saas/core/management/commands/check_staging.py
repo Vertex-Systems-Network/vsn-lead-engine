@@ -53,7 +53,7 @@ def configuration_issues(config):
         # broad suffix/wildcard trust or unrelated browser origins at staging.
         expected_origin = f"https://{dashboard.netloc}"
         trusted = getattr(config, "CSRF_TRUSTED_ORIGINS", None)
-        if not isinstance(trusted, (list, tuple)) or trusted != [expected_origin]:
+        if not isinstance(trusted, (list, tuple)) or list(trusted) != [expected_origin]:
             issues.append("Trust only the exact shared HTTPS origin for browser CSRF.")
     if config.DATABASES["default"]["ENGINE"] != "django.db.backends.postgresql":
         issues.append("Use PostgreSQL, not the disposable SQLite smoke database.")
