@@ -877,6 +877,66 @@ async function run(origin) {
             "Information unavailable",
             ["Synthetic signup workspace", "Foreign private marker", "Synthetic bakery"],
           );
+          // The browser exercises a real authenticated password-change POST
+          // after a rejected wrong-current-password attempt.
+          await inspectPrivate("/dashboard", "Synthetic signup workspace", [
+            "Foreign private marker", "Synthetic bakery",
+          ]);
+          const changeLink = await cdp.js(`document.querySelector('main a[href$="/accounts/password-change/"]')?.href || null`);
+          assert.equal(changeLink, new URL("/accounts/password-change/", draftPostOrigin).href);
+          const beforeChange = (await cdp.send("Network.getCookies", {
+            urls: [target.origin, draftPostOrigin],
+          })).cookies.find((cookie) => cookie.name === "sessionid")?.value;
+          assert.ok(beforeChange, "Fixture browser must hold its own session.");
+          await clickVisible('main a[href$="/accounts/password-change/"]');
+          await waitForInteraction(
+            '(() => location.pathname === "/accounts/password-change/" && document.querySelector("main h1")?.textContent === "Change your password")()',
+            "Account link must open the CSRF-protected password form",
+          );
+          async function fillPasswordChange(current) {
+            return cdp.js(`(() => {
+              const form = document.querySelector("main form[method=post]");
+              if (!form?.elements.namedItem("csrfmiddlewaretoken")?.value) return false;
+              for (const [name, value] of Object.entries({
+                old_password: ${JSON.stringify(current)},
+                new_password1: "Synthetic-browser-updated-passphrase-1179",
+                new_password2: "Synthetic-browser-updated-passphrase-1179",
+              })) {
+                const field = form.elements.namedItem(name);
+                if (!field) return false;
+                field.value = value;
+                field.dispatchEvent(new Event("input", {bubbles: true}));
+              }
+              return form.checkValidity();
+            })()`);
+          }
+          assert.equal(await fillPasswordChange("wrong-current-passphrase"), true);
+          await clickVisible('main form[method="post"] button[type="submit"]');
+          await waitForInteraction(
+            '(() => location.pathname === "/accounts/password-change/" && document.querySelector("main")?.textContent.includes("Your old password was entered incorrectly"))()',
+            "Wrong current password must be rejected",
+          );
+          assert.equal(await fillPasswordChange("Field#river75-polar%evergreen"), true);
+          await clickVisible('main form[method="post"] button[type="submit"]');
+          await waitForInteraction(
+            '(() => location.pathname === "/accounts/password-change/done/" && document.querySelector("main h1")?.textContent === "Password updated")()',
+            "New password must be saved through Django",
+          );
+          const afterChange = (await cdp.send("Network.getCookies", {
+            urls: [target.origin, draftPostOrigin],
+          })).cookies.find((cookie) => cookie.name === "sessionid")?.value;
+          assert.ok(afterChange && afterChange !== beforeChange,
+            "Password change must rotate and retain the active browser session.");
+          await clickVisible('main a[href$="/dashboard"]');
+          await waitForInteraction(
+            '(() => location.pathname === "/dashboard" && document.querySelector("main")?.textContent.includes("Synthetic signup workspace"))()',
+            "Password change must preserve the active account workspace",
+          );
+          await inspectPrivate("/dashboard/workspaces/" + ownWorkspace,
+            "Information unavailable",
+            ["Synthetic signup workspace", "Foreign private marker", "Synthetic bakery"],
+          );
+          console.log("PASS: browser change-password wrong-current rejection, successful update, session rotation and tenant isolation");
           await inspectPrivate("/account/sign-out", "End your session", [
             "Foreign private marker", "Synthetic bakery",
           ]);
