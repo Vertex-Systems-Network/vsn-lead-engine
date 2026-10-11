@@ -180,7 +180,9 @@ class FulfilmentTests(TestCase):
         )
 
         result = run_pending(limit=1)
-        self.assertEqual(result, {"completed": 1, "empty": 0, "unknown": 0, "skipped": 0, "conflict": 0})
+        self.assertEqual(
+            result, {"completed": 1, "empty": 0, "unknown": 0, "skipped": 0, "conflict": 0}
+        )
         eligible.refresh_from_db()
         expired.refresh_from_db()
         uncertain.refresh_from_db()
