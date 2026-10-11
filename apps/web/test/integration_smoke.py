@@ -96,6 +96,7 @@ def main():
             SourcePolicy,
             UsageReservation,
             User,
+            Workspace,
         )
         from core.periods import advance_period
         from core.serializers import SearchSerializer
