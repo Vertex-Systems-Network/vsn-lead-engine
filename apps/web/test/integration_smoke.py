@@ -448,6 +448,22 @@ def main():
                 assert (
                     f'href="/dashboard/workspaces/{workspace.id}/daily-plans"' in page
                 )
+                health_path = f"/dashboard/workspaces/{workspace.id}/admin-health"
+                assert f'href="{health_path}"' in page
+                health_page, health_headers = read(health_path)
+                assert "Workspace operational health" in health_page
+                assert "Pending intents past expiry" in health_page
+                assert "Unknown dispatch outcomes" in health_page
+                assert "Outstanding reserved usage intents" in health_page
+                assert "read-only, advisory snapshot" in health_page.lower()
+                assert "Foreign private marker" not in health_page
+                assert "Private bakery marker" not in health_page
+                assert "no-store" in health_headers.get("Cache-Control", "")
+                foreign_health, _ = read(
+                    f"/dashboard/workspaces/{other.id}/admin-health"
+                )
+                assert "Workspace operational health" not in foreign_health
+                assert "Foreign private marker" not in foreign_health
                 plans_page, plans_headers = read(
                     f"/dashboard/workspaces/{workspace.id}/daily-plans"
                 )
