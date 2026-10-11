@@ -26,7 +26,10 @@ export default async function OperationalHealthPage({
   ]);
   if (snapshot.kind !== "ok") return <State kind={snapshot.kind} />;
   if (identity.kind !== "ok") return <State kind={identity.kind} />;
-  if (snapshot.data.workspace_id !== workspaceId || identity.data.id !== workspaceId)
+  if (
+    snapshot.data.workspace_id !== workspaceId ||
+    identity.data.id !== workspaceId
+  )
     return <State kind="unavailable" />;
 
   const report = snapshot.data;
