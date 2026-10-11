@@ -310,6 +310,30 @@ def main():
                     == 303
                 )
                 browser_csrf_cookie = client.cookies["csrftoken"].value
+                # Exercise a real disposable password-reset email; never use
+                # a configured SMTP backend or a customer account in CI.
+                from django.core import mail
+                import re
+
+                settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+                recovery_user = User.objects.create_user(
+                    username="synthetic-browser-recovery",
+                    email="fixture-recovery@synthetic.invalid",
+                    password="disposable-http-password",
+                )
+                reset_requested = client.post(
+                    "/accounts/password-reset/",
+                    {"email": "fixture-recovery@synthetic.invalid"},
+                    HTTP_HOST=f"localhost:{server.server_port}",
+                )
+                assert reset_requested.status_code == 302
+                assert len(mail.outbox) == 1
+                reset_urls = re.findall(
+                    rf"http://localhost:{server.server_port}/accounts/reset/[^\s]+",
+                    mail.outbox[0].body,
+                )
+                assert len(reset_urls) == 1
+                reset_url = reset_urls[0]
                 before_browser_users = User.objects.count()
                 before_browser_workspaces = Workspace.objects.count()
                 before_browser_memberships = Membership.objects.count()
@@ -333,6 +357,7 @@ def main():
                             "VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE": str(other.id),
                             "VSN_BROWSER_SMOKE_OWN_JOB": str(saved[0].id),
                             "VSN_BROWSER_SMOKE_DRAFT_POST_ORIGIN": backend,
+                            "VSN_BROWSER_SMOKE_RESET_LINK": reset_url,
                         },
                         check=True,
                         timeout=175,
@@ -356,6 +381,11 @@ def main():
                         file=sys.stderr,
                     )
                     raise
+                recovery_user.refresh_from_db()
+                assert recovery_user.check_password("Synthetic-browser-new-passphrase-9911")
+                assert not recovery_user.check_password("disposable-http-password")
+                # A non-existent email must not produce a second message.
+                assert len(mail.outbox) == 1
                 created_by_browser = list(
                     Job.objects.filter(workspace=workspace).exclude(
                         id__in=[job.id for job in saved]

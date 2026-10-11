@@ -380,6 +380,16 @@ async function run(origin) {
       assert.equal(posted.hostname, target.hostname);
       assert.ok(posted.port && posted.pathname === "/" && !posted.search && !posted.hash);
     }
+    const resetLink = process.env.VSN_BROWSER_SMOKE_RESET_LINK;
+    if (resetLink) {
+      assert.ok(draftPostOrigin, "Recovery fixture requires disposable Django.");
+      const link = new URL(resetLink);
+      assert.equal(link.protocol, "http:");
+      assert.equal(link.origin, new URL(draftPostOrigin).origin);
+      assert.match(link.pathname, /^\/accounts\/reset\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\/$/);
+      assert.equal(link.search, "");
+      assert.equal(link.hash, "");
+    }
     const ownWorkspace = process.env.VSN_BROWSER_SMOKE_OWN_WORKSPACE;
     const foreignWorkspace = process.env.VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE;
     const ownJob = process.env.VSN_BROWSER_SMOKE_OWN_JOB;
@@ -752,6 +762,64 @@ async function run(origin) {
           "Synthetic bakery",
         ]);
         console.log("PASS: real Chromium signup POST -> new isolated workspace -> logout denial");
+        if (resetLink) {
+          // Real Next link, Django recovery form and a single-use token taken
+          // from a synthetic local email. No production mail or credentials.
+          await cdp.send("Page.navigate", {
+            url: new URL("/accounts/start-sign-in/", draftPostOrigin).href,
+          });
+          await waitForInteraction(
+            '(() => location.pathname === "/account/sign-in" && !!document.querySelector(\'main a[href*="/accounts/password-reset/"]\'))()',
+            "Native sign-in must expose password recovery",
+          );
+          await clickVisible('main a[href*="/accounts/password-reset/"]');
+          await waitForInteraction(
+            '(() => location.pathname === "/accounts/password-reset/" && document.querySelector("main h1")?.textContent === "Reset your password")()',
+            "Recovery link must reach the Django reset form",
+          );
+          const unknownReady = await cdp.js(`(() => {
+            const form = document.querySelector("main form[method=post]");
+            const email = form?.elements.namedItem("email");
+            if (!email || !form?.elements.namedItem("csrfmiddlewaretoken")?.value) return false;
+            email.value = "unknown-recovery@synthetic.invalid";
+            email.dispatchEvent(new Event("input", {bubbles: true}));
+            return form.checkValidity();
+          })()`);
+          assert.equal(unknownReady, true, "CSRF-protected email form must validate.");
+          await clickVisible('main form button[type="submit"]');
+          await waitForInteraction(
+            '(() => location.pathname === "/accounts/password-reset/sent/" && !!document.querySelector("main h1"))()',
+            "Unknown email must get the same generic sent confirmation",
+          );
+          await cdp.send("Page.navigate", {url: resetLink});
+          await waitForInteraction(
+            '(() => location.pathname.endsWith("/set-password/") && document.querySelector("main h1")?.textContent === "Choose a new password")()',
+            "Local email token must open one-use password form",
+          );
+          const ready = await cdp.js(`(() => {
+            const form = document.querySelector("main form[method=post]");
+            if (!form?.elements.namedItem("csrfmiddlewaretoken")?.value) return false;
+            for (const name of ["new_password1", "new_password2"]) {
+              const input = form.elements.namedItem(name);
+              if (!input) return false;
+              input.value = "Synthetic-browser-new-passphrase-9911";
+              input.dispatchEvent(new Event("input", {bubbles: true}));
+            }
+            return form.checkValidity();
+          })()`);
+          assert.equal(ready, true, "New-password form must validate.");
+          await clickVisible('main form button[type="submit"]');
+          await waitForInteraction(
+            '(() => location.pathname === "/accounts/reset/done/" && document.querySelector("main h1")?.textContent === "Password updated")()',
+            "Reset POST must complete",
+          );
+          await cdp.send("Page.navigate", {url: resetLink});
+          await waitForInteraction(
+            '(() => document.querySelector("main h1")?.textContent === "Link expired")()',
+            "Used reset token must not open another form",
+          );
+          console.log("PASS: browser recovery link, generic response, email token redemption and replay rejection");
+        }
       }
 
       console.log(
