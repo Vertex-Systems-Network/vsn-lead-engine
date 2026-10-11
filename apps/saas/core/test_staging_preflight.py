@@ -103,6 +103,12 @@ class ConfigurationPreflightTests(SimpleTestCase):
         )
         self.assertEqual(len(issues), 2)
 
+    def test_non_debug_discard_backend_cannot_pass_staging_preflight(self):
+        issues = configuration_issues(
+            secure_config(EMAIL_BACKEND="django.core.mail.backends.dummy.EmailBackend")
+        )
+        self.assertEqual(issues, ["Configure a real SMTP sender for password recovery."])
+
     def test_configuration_failure_never_queries_database(self):
         with (
             patch(
