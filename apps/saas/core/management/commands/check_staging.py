@@ -5,34 +5,43 @@ reverse-proxy behavior, source coverage, SMTP delivery, backups or launch consen
 No credentials, hostnames, queries or exception messages are printed.
 """
 
+import re
+
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 from django.db.migrations.executor import MigrationExecutor
 
 
+HOSTNAME_PATTERN = re.compile(
+    r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?"
+    r"(?:\\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+"
+)
+
+
 def configuration_issues(config):
     """Return public, secret-free reasons a staging environment is not ready."""
     issues = []
-    hosts = {str(host).strip().lower() for host in config.ALLOWED_HOSTS}
-    unsafe_hosts = {"", "*", "localhost", "127.0.0.1", "[::1]", "::1"}
+    allowed_hosts = getattr(config, "ALLOWED_HOSTS", None)
+    host = (
+        allowed_hosts[0]
+        if isinstance(allowed_hosts, (list, tuple)) and len(allowed_hosts) == 1
+        else None
+    )
+    # A URL string built from an invalid Django ALLOWED_HOSTS entry is not
+    # evidence of an actual DNS hostname. Do not normalize whitespace/case
+    # away: the configured value itself must be canonical and unambiguous.
+    valid_host = (
+        isinstance(host, str)
+        and len(host) <= 253
+        and HOSTNAME_PATTERN.fullmatch(host) is not None
+        and any(char in "abcdefghijklmnopqrstuvwxyz" for char in host.rsplit(".", 1)[-1])
+    )
     if config.DEBUG:
         issues.append("Disable SAAS_DEBUG before staging.")
     if len(config.SECRET_KEY) < 50:
         issues.append("Configure a strong, independently generated SAAS_SECRET_KEY.")
-    # Both browser apps are served through one trusted staging HTTPS host. A
-    # second host, dotted suffix, wildcard or port in Django's host allowlist
-    # could expose account/session routes via an unintended proxy vhost.
-    if (
-        len(config.ALLOWED_HOSTS) != 1
-        or len(hosts) != 1
-        or any(
-            host in unsafe_hosts
-            or host.startswith(".")
-            or any(char in "*/:" or char.isspace() for char in host)
-            for host in hosts
-        )
-    ):
+    if not valid_host:
         issues.append("Set SAAS_ALLOWED_HOSTS to one exact non-local staging hostname.")
     if not all(
         (
@@ -47,7 +56,7 @@ def configuration_issues(config):
     # A literal match rejects malformed URLs, alternate encodings/case,
     # credentials, explicit ports, extra path elements and query/fragment.
     dashboard = config.WEB_DASHBOARD_URL or ""
-    expected_origin = f"https://{next(iter(hosts))}" if len(hosts) == 1 else None
+    expected_origin = f"https://{host}" if valid_host else None
     dashboard_valid = (
         isinstance(dashboard, str)
         and expected_origin is not None
