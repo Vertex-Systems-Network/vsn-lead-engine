@@ -12,6 +12,7 @@ from .job_query import JOB_STATES
 from .models import (
     DispatchOperation,
     Job,
+    JobAttempt,
     JobOutbox,
     Membership,
     UsageReservation,
@@ -21,6 +22,7 @@ from .services import membership_for
 
 ROLES = ("owner", "admin", "member", "viewer")
 OUTBOX_STATES = ("pending", "cancelled", "started", "done")
+ATTEMPT_STATES = ("leased", "expired", "cancelled", "started", "done")
 
 
 def status_counts(query, statuses):
@@ -66,12 +68,17 @@ def operational_health(actor, workspace_id):
         ),
     )
     outboxes = JobOutbox.objects.filter(job__workspace_id=workspace_id)
+    attempts = JobAttempt.objects.filter(outbox__job__workspace_id=workspace_id)
     return {
         "workspace_id": str(workspace_id),
         "member_roles": role_counts,
         "invitations": invite_counts,
         "jobs": status_counts(Job.objects.filter(workspace_id=workspace_id), JOB_STATES),
         "outboxes": status_counts(outboxes, OUTBOX_STATES),
+        "pre_dispatch_attempts": status_counts(attempts, ATTEMPT_STATES),
+        "expired_leased_attempts": attempts.filter(
+            status="leased", expires_at__lte=now
+        ).count(),
         "expired_pending_outboxes": outboxes.filter(
             status="pending", expires_at__isnull=False, expires_at__lte=now
         ).count(),
