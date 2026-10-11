@@ -31,6 +31,8 @@ function filteredResultPath(path, suffix) {
 }
 const workspaceDetailPath = /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/$/;
 const jobSummaryPath = /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/job-summary\/$/;
+const operationalHealthPath =
+  /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/admin\/health\/$/;
 
 const dailyDiagnosticsPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/daily-diagnostics\/(?:\?after=[0-9a-f-]{36})?$/;
@@ -74,6 +76,7 @@ export async function readBackend(
     !form &&
     !workspaceDetailPath.test(path) &&
     !jobSummaryPath.test(path) &&
+    !operationalHealthPath.test(path) &&
     !dailyDiagnosticsPath.test(path) &&
     !dailyPlansPath.test(path) &&
     !dailyPlanReadinessPath.test(path) &&
