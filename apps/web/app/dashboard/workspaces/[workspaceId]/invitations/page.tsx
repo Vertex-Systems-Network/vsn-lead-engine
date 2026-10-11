@@ -40,11 +40,10 @@ export default async function PendingInvitationsPage({
         {identity.data.timezone}
       </p>
       <p className="notice">
-        Read-only review of up to ten current, unaccepted invitations. Invitations
-        are for existing accounts only; no email, SMS or automatic delivery occurs.
-        Recipient codes are displayed once at issuance and are never available
-        from this page. Inviting or revoking requires a separate Django form
-        with CSRF protection and an explicit confirmation.
+        Review up to ten pending invitations for existing accounts. No email,
+        SMS or automatic delivery occurs. Codes appear only once at issuance
+        and are never available on this page. Inviting or revoking requires a
+        separate CSRF-protected Django confirmation.
       </p>
       <p>
         <a href={backendLink(`/workspaces/${workspaceId}/invitations/new/`)}>
