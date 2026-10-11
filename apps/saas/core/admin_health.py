@@ -76,9 +76,7 @@ def operational_health(actor, workspace_id):
         "jobs": status_counts(Job.objects.filter(workspace_id=workspace_id), JOB_STATES),
         "outboxes": status_counts(outboxes, OUTBOX_STATES),
         "pre_dispatch_attempts": status_counts(attempts, ATTEMPT_STATES),
-        "expired_leased_attempts": attempts.filter(
-            status="leased", expires_at__lte=now
-        ).count(),
+        "expired_leased_attempts": attempts.filter(status="leased", expires_at__lte=now).count(),
         "expired_pending_outboxes": outboxes.filter(
             status="pending", expires_at__isnull=False, expires_at__lte=now
         ).count(),
