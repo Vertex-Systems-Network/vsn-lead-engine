@@ -852,9 +852,20 @@ async function run(origin) {
             '(() => location.pathname === "/account/sign-in" && new URLSearchParams(location.search).get("notice") === "invalid" && !!document.querySelector("main [role=alert]"))()',
             "Wrong-password POST must show generic invalid notice",
           );
-          await inspectPrivate("/dashboard", "Sign in to see your workspaces.", [
-            "Synthetic signup workspace", "Foreign private marker",
-          ]);
+          await cdp.send("Page.navigate", {url: target.origin + "/dashboard"});
+          await waitForInteraction(
+            '(() => location.pathname === "/dashboard" && document.readyState === "complete" && !!document.querySelector("main h1"))()',
+            "Wrong password must not grant a private dashboard",
+          );
+          const deniedContent = await cdp.js('document.querySelector("main")?.textContent || ""');
+          for (const privateMarker of [
+            "Synthetic signup workspace", "Foreign private marker", "Synthetic bakery",
+          ]) {
+            assert.equal(
+              deniedContent.includes(privateMarker), false,
+              "Invalid login revealed a private tenant marker",
+            );
+          }
           await openNativeLogin();
           assert.equal(await fillNativeLogin("Field#river75-polar%evergreen"), true);
           await clickVisible('main form[method="post"] button[type="submit"]');
