@@ -35,6 +35,7 @@ reservations or starts provider dispatch.</p></section>
 <dt>{{ state }}</dt><dd>{{ count }}</dd>
 {% endfor %}
 <dt>Pending intents past expiry</dt><dd>{{ report.expired_pending_outboxes }}</dd>
+<dt>Pending intents with retained dispatch evidence</dt><dd>{{ report.pending_possible_effect_intents }}</dd>
 <dt>Dispatch outcome recorded as unknown</dt><dd>{{ report.unknown_dispatch_operations }}</dd>
 <dt>Outstanding reserved usage intents</dt><dd>{{ report.reserved_usage_intents }}</dd>
 </dl>
