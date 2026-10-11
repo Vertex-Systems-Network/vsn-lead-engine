@@ -1,7 +1,13 @@
+import os
 import re
+import subprocess
+import sys
+from contextlib import redirect_stdout
+from io import StringIO
+from pathlib import Path
 
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from .models import User
 
@@ -44,3 +50,49 @@ class PasswordResetTests(TestCase):
         response = self.request_reset()
         self.assertContains(response, "Too many requests", status_code=429)
         self.assertEqual(len(mail.outbox), 10)
+
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.dummy.EmailBackend")
+class UndeliverablePasswordResetTests(TestCase):
+    """No SMTP: reset secrets must not go into process output."""
+
+    def test_reset_remains_generic_and_never_prints_a_bearer_link(self):
+        User.objects.create_user(
+            username="no-smtp-user",
+            email="no-smtp@synthetic.invalid",
+            password="synthetic-local-passphrase",
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            known = self.client.post(
+                "/accounts/password-reset/", {"email": "no-smtp@synthetic.invalid"}
+            )
+            unknown = self.client.post(
+                "/accounts/password-reset/", {"email": "unknown@synthetic.invalid"}
+            )
+        self.assertEqual(known.status_code, unknown.status_code)
+        self.assertEqual(known.url, unknown.url)
+        self.assertEqual(known.url, "/accounts/password-reset/sent/")
+        self.assertEqual(output.getvalue(), "")
+        self.assertEqual(mail.outbox, [])
+
+    def test_non_debug_settings_select_discard_backend_without_smtp(self):
+        env = {
+            **os.environ,
+            "SAAS_DEBUG": "0",
+            "SAAS_SECRET_KEY": "synthetic-test-setting-not-a-production-secret",
+            "SAAS_EMAIL_HOST": "",
+        }
+        result = subprocess.run(
+            [sys.executable, "-c", "from lead_saas import settings; print(settings.EMAIL_BACKEND)"],
+            cwd=Path(__file__).resolve().parents[1],
+            env=env,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=15,
+        )
+        self.assertEqual(
+            result.stdout.strip(), "django.core.mail.backends.dummy.EmailBackend"
+        )
+        self.assertEqual(result.stderr, "")
