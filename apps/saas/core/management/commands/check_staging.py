@@ -43,10 +43,9 @@ def configuration_issues(config):
         )
     ):
         issues.append("Require HTTPS, secure cookies and nosniff headers.")
-    dashboard = urlsplit(config.WEB    # Accept exactly the canonical externally visible HTTPS URL, without an
-    # explicit port (even :443), userinfo, encodings, URL parameters or an
-    # alternate spelling of the staging hostname. Comparing to a constructed
-    # constant also avoids URL parser exceptions from malformed inputs.
+    # Require exactly the canonical, portless HTTPS dashboard origin.
+    # A literal match rejects malformed URLs, alternate encodings/case,
+    # credentials, explicit ports, extra path elements and query/fragment.
     dashboard = config.WEB_DASHBOARD_URL or ""
     expected_origin = f"https://{next(iter(hosts))}" if len(hosts) == 1 else None
     dashboard_valid = (
@@ -54,7 +53,8 @@ def configuration_issues(config):
         and expected_origin is not None
         and dashboard == expected_origin + "/dashboard"
     )
- issues.append(
+    if not dashboard_valid:
+        issues.append(
             "Route Django and Next through the same public HTTPS host; "
             "set SAAS_WEB_ORIGIN to that shared origin."
         )
