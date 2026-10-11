@@ -5,6 +5,7 @@ import {
   operationalHealth,
   invitationHealthStates,
   operationalOutboxStates,
+  preDispatchAttemptStates,
   jobStates,
   memberRoles,
   uuid,
@@ -97,6 +98,23 @@ export default async function OperationalHealthPage({
               </div>
             ))}
           </dl>
+        </section>
+        <section className="card" aria-labelledby="lease-health">
+          <h2 id="lease-health">Pre-dispatch lease attempts</h2>
+          <dl>
+            {preDispatchAttemptStates.map((status) => (
+              <div key={status}>
+                <dt>{status}</dt>
+                <dd>{report.pre_dispatch_attempts[status]}</dd>
+              </div>
+            ))}
+            <dt>Leases past expiry, still recorded as leased</dt>
+            <dd>{report.expired_leased_attempts}</dd>
+          </dl>
+          <p className="muted">
+            Expired leases are diagnostic evidence only. No automatic retry,
+            refund, release or dispatch is initiated by this screen.
+          </p>
         </section>
         <section className="card" aria-labelledby="outbox-health">
           <h2 id="outbox-health">Outbox states</h2>
