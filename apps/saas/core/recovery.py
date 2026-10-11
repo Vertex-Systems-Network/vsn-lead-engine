@@ -4,6 +4,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
+from .jobs import has_possible_effect_evidence
 from .models import Job, JobAttempt, JobOutbox, UsageReservation, Workspace
 
 
@@ -25,6 +26,7 @@ def expire_one(intent_id):
         or reservation.status != "reserved"
         or reservation.workspace_id != job.workspace_id
         or job.revision >= 2147483647
+        or has_possible_effect_evidence(intent)
     ):
         return False
     reservation.status = "released"

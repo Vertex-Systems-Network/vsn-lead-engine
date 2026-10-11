@@ -12,8 +12,8 @@ from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
 from .attempts import check_pre_dispatch, claim_pre_dispatch
-from .jobs import RevisionConflict, enqueue_job
-from .models import JobAttempt, JobOutbox, Membership, UsageCounter
+from .jobs import RevisionConflict, cancel_pending_job, enqueue_job
+from .models import DispatchOperation, JobAttempt, JobOutbox, Membership, UsageCounter
 from .recovery import expire_one, expire_pending_intents
 from .services import create_draft
 from .test_jobs import fixture
@@ -79,6 +79,54 @@ class RecoveryTests(TestCase):
         self.assertFalse(expire_one(self.intent.id))
         self.assertEqual(expire_pending_intents()["expired"], 0)
         self.assertEqual(UsageCounter.objects.get(workspace=self.workspace).jobs, 1)
+
+    def test_mismatched_write_ahead_dispatch_evidence_blocks_all_release_paths(self):
+        """A retained possible-effect record overrides stale pending flags."""
+        lease = claim_pre_dispatch(self.intent.id)
+        operation = DispatchOperation.objects.create(
+            workspace=self.workspace,
+            job=self.job,
+            outbox=self.intent,
+            attempt=lease,
+            source_code="fixture",
+            request_hash=self.job.request_hash,
+            policy_version=1,
+            policy_fingerprint="a" * 64,
+            call_limit=1,
+            status="unknown",
+            unknown_at=timezone.now(),
+        )
+        self.overdue()
+        self.assertFalse(expire_one(self.intent.id))
+        self.assertEqual(expire_pending_intents(), {"examined": 1, "expired": 0})
+        with self.assertRaises(RevisionConflict):
+            cancel_pending_job(self.user, self.workspace.id, self.job.id, 1)
+        self.intent.refresh_from_db()
+        self.job.refresh_from_db()
+        self.intent.reservation.refresh_from_db()
+        lease.refresh_from_db()
+        self.assertEqual((self.job.status, self.job.revision), ("queued", 1))
+        self.assertEqual(self.intent.status, "pending")
+        self.assertEqual(self.intent.reservation.status, "reserved")
+        self.assertEqual(lease.status, "leased")
+        self.assertTrue(DispatchOperation.objects.filter(pk=operation.id).exists())
+
+    def test_started_attempt_without_operation_blocks_release_after_restore(self):
+        """A started lease without its ledger cannot justify a refund."""
+        lease = claim_pre_dispatch(self.intent.id)
+        JobAttempt.objects.filter(pk=lease.id).update(status="started")
+        self.overdue()
+        self.assertFalse(expire_one(self.intent.id))
+        with self.assertRaises(RevisionConflict):
+            cancel_pending_job(self.user, self.workspace.id, self.job.id, 1)
+        self.assertEqual(expire_pending_intents(), {"examined": 1, "expired": 0})
+        self.intent.refresh_from_db()
+        self.intent.reservation.refresh_from_db()
+        self.job.refresh_from_db()
+        self.assertEqual((self.intent.status, self.job.status), ("pending", "queued"))
+        self.assertEqual(self.intent.reservation.status, "reserved")
+        self.assertEqual(JobAttempt.objects.get(pk=lease.pk).status, "started")
+        self.assertFalse(DispatchOperation.objects.exists())
 
     def test_batch_bound_and_operator_command(self):
         self.overdue()
