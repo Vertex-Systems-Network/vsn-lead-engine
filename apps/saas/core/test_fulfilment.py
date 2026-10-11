@@ -117,11 +117,30 @@ class FulfilmentTests(TestCase):
 
     def test_adapter_failure_leaves_outcome_unknown_and_reservation_held(self):
         job = queued_job(self.user, self.workspace)
-        with patch("core.sources.FixtureSource.fetch", side_effect=RuntimeError("boom")):
+        injected = "api-token=should-never-appear-in-logs"
+        with (
+            patch("core.sources.FixtureSource.fetch", side_effect=RuntimeError(injected)),
+            self.assertLogs("core.fulfilment", level="WARNING") as captured,
+        ):
             self.assertEqual(run_pending()["unknown"], 1)
+        self.assertNotIn(injected, " ".join(captured.output))
         self.assertEqual(DispatchOperation.objects.get(job=job).status, "unknown")
         self.assertEqual(UsageReservation.objects.get(jobs=1).status, "reserved")
         self.assertFalse(AcceptedResult.objects.exists())
+
+    def test_preflight_exceptions_do_not_echo_adapter_secrets_or_identifiers(self):
+        job = queued_job(self.user, self.workspace)
+        injected = "authorization-header=private-test-marker"
+        with (
+            patch("core.fulfilment.claim_pre_dispatch", side_effect=RuntimeError(injected)),
+            self.assertLogs("core.fulfilment", level="WARNING") as captured,
+        ):
+            self.assertEqual(run_pending(limit=1)["conflict"], 1)
+        logs = " ".join(captured.output)
+        self.assertNotIn(injected, logs)
+        self.assertNotIn(str(job.pk), logs)
+        self.assertEqual(JobOutbox.objects.get(job=job).status, "pending")
+        self.assertFalse(DispatchOperation.objects.filter(job=job).exists())
 
     def test_inactive_entitlement_is_refused_before_dispatch(self):
         job = queued_job(self.user, self.workspace)
