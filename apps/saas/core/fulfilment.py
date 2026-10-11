@@ -140,12 +140,14 @@ def select_records(operation, policy, search, leads, cap):
 
 def _admin(workspace_id):
     membership = (
-        Membership.objects.filter(workspace_id=workspace_id, role__in=["owner", "admin"])
+        Membership.objects.filter(
+            workspace_id=workspace_id, role__in=["owner", "admin"], user__is_active=True
+        )
         .select_related("user")
         .order_by("-role", "id")
         .first()
     )
-    if membership is None or not membership.user.is_active:
+    if membership is None:
         raise ImproperlyConfigured("Workspace has no active administrator to settle results.")
     return membership.user
 
