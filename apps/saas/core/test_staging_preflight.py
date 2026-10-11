@@ -83,6 +83,42 @@ class ConfigurationPreflightTests(SimpleTestCase):
         self.assertEqual(len(issues), 1)
         self.assertIn("same public HTTPS host", issues[0])
 
+    def test_dashboard_origin_requires_canonical_portless_https_url(self):
+        for url in (
+            "https://saas.staging.example:443/dashboard",
+            "https://saas.staging.example:8443/dashboard",
+            "https://saas.staging.example:bad/dashboard",
+            "https://SAAS.staging.example/dashboard",
+            "https://saas.staging.example./dashboard",
+            "https://saas.staging.example/dashboard/",
+            "https://saas.staging.example//dashboard",
+            "https://saas.staging.example/%64ashboard",
+            "https://saas.staging.example/dashboard#fragment",
+            "https://[malformed/dashboard",
+            "https://saas.staging.example\\dashboard",
+            "http://saas.staging.example/dashboard",
+        ):
+            with self.subTest(url=url):
+                issues = configuration_issues(secure_config(WEB_DASHBOARD_URL=url))
+                self.assertEqual(len(issues), 1)
+                self.assertIn("same public HTTPS host", issues[0])
+                self.assertNotIn(url, str(issues))
+        self.assertEqual(configuration_issues(secure_config()), [])
+
+    def test_canonical_origin_requires_exact_only_csrf_trust(self):
+        for origins in (
+            ["https://saas.staging.example:443"],
+            ["https://saas.staging.example:8443"],
+            ["https://SAAS.staging.example"],
+            ["https://saas.staging.example/"],
+            ["https://saas.staging.example", "https://SAAS.staging.example"],
+        ):
+            with self.subTest(origins=origins):
+                issues = configuration_issues(secure_config(CSRF_TRUSTED_ORIGINS=origins))
+                self.assertEqual(
+                    issues, ["Trust only the exact shared HTTPS origin for browser CSRF."]
+                )
+
     def test_csrf_trust_must_be_exact_shared_https_origin(self):
         for origins in (
             [],
