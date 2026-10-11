@@ -1,3 +1,6 @@
+from unittest.mock import patch
+
+from django.db import IntegrityError, transaction
 from django.test import TestCase, override_settings
 
 from .models import Entitlement, LoginBucket, Membership, User, Workspace
@@ -68,6 +71,64 @@ class SignUpTests(TestCase):
         self.assertEqual(taken.url, "http://localhost:3000/account/sign-up?notice=taken")
         taken_email = self.post(native_signup="1", username="another", email="Owner@Acme.example")
         self.assertEqual(taken_email.url, "http://localhost:3000/account/sign-up?notice=taken")
+
+    def test_database_rejects_mixed_case_duplicate_email_even_outside_signup(self):
+        User.objects.create_user(
+            username="direct-first", email="Contact@Acme.Example", password=PASSWORD
+        )
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                User.objects.create_user(
+                    username="direct-second", email="contact@acme.example", password=PASSWORD
+                )
+        self.assertEqual(User.objects.count(), 1)
+
+    def test_legacy_blank_email_accounts_can_coexist(self):
+        User.objects.create_user(username="first-no-email", password=PASSWORD)
+        User.objects.create_user(username="second-no-email", password=PASSWORD)
+        self.assertEqual(User.objects.filter(email="").count(), 2)
+
+    def test_signup_race_rolls_back_new_workspace_and_returns_generic_conflict(self):
+        from .signup import register
+
+        for native, email in (
+            (False, "race-browser@synthetic.invalid"),
+            (True, "race-native@synthetic.invalid"),
+        ):
+            with self.subTest(native=native):
+                competing_username = "competing-native" if native else "competing-browser"
+
+                def register_after_competitor(form):
+                    User.objects.create_user(
+                        username=competing_username,
+                        email=email.upper(),
+                        password=PASSWORD,
+                    )
+                    return register(form)
+
+                with patch("core.signup.register", side_effect=register_after_competitor):
+                    response = self.post(
+                        username="raced-native" if native else "raced-browser",
+                        email=email,
+                        native_signup="1" if native else "0",
+                    )
+                if native:
+                    with override_settings(
+                        WEB_DASHBOARD_URL="http://localhost:3000/dashboard"
+                    ):
+                        # Native notice is only enabled with a trusted configured origin.
+                        pass
+                    self.assertEqual(response.status_code, 400)
+                else:
+                    self.assertEqual(response.status_code, 400)
+                    self.assertContains(
+                        response, "An account already uses these details.", status_code=400
+                    )
+                self.assertEqual(User.objects.filter(email__iexact=email).count(), 1)
+                self.assertFalse(Workspace.objects.exists())
+                self.assertFalse(Membership.objects.exists())
+                self.assertFalse(Entitlement.objects.exists())
+                self.assertNotIn("_auth_user_id", self.client.session)
 
     def test_attempts_are_rate_limited(self):
         for i in range(20):
