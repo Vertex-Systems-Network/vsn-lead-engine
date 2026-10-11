@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { backend, backendLink } from "../../../../../lib/backend";
-import { pendingInvitations, uuid, workspace } from "../../../../../lib/contracts";
+import {
+  pendingInvitations,
+  uuid,
+  workspace,
+} from "../../../../../lib/contracts";
 import { State } from "../../../../components/state";
 
 export default async function PendingInvitationsPage({
