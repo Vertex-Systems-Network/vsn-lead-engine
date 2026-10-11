@@ -9,7 +9,7 @@ from django.http import Http404
 from django.utils import timezone
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
-from .models import Entitlement, Job, JobAttempt, JobOutbox, SourcePolicy, UsageReservation
+from .models import DispatchOperation, Entitlement, Job, JobAttempt, JobOutbox, SourcePolicy, UsageReservation
 from .serializers import SearchSerializer
 from .usage import _release_locked, lock_workspace, reserve_usage
 
@@ -21,6 +21,19 @@ class RevisionConflict(APIException):
     status_code = 409
     default_detail = "Job state or revision changed. Refresh the job."
     default_code = "revision_conflict"
+
+
+def has_possible_effect_evidence(outbox):
+    """Fail closed if any durable sign of a potentially started dispatch exists.
+
+    The caller must hold the workspace row lock. A recorded operation or
+    started/done attempt takes precedence over apparently pending job/outbox
+    statuses, including after partial restore or a legacy status mismatch.
+    """
+    return (
+        DispatchOperation.objects.filter(outbox=outbox).exists()
+        or JobAttempt.objects.filter(outbox=outbox, status__in=("started", "done")).exists()
+    )
 
 
 def revision(value):
@@ -158,7 +171,11 @@ def cancel_pending_job(user, workspace_id, job_id, expected_revision):
         raise RevisionConflict()
     outbox = JobOutbox.objects.select_for_update().filter(job=job).first()
     if job.status == "queued":
-        if outbox is None or outbox.status != "pending":
+        if (
+            outbox is None
+            or outbox.status != "pending"
+            or has_possible_effect_evidence(outbox)
+        ):
             raise RevisionConflict()
         reservation = UsageReservation.objects.select_for_update().get(
             pk=outbox.reservation_id, workspace_id=workspace_id
