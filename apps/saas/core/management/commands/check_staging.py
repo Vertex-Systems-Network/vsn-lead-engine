@@ -31,7 +31,7 @@ def configuration_issues(config):
         or any(
             host in unsafe_hosts
             or host.startswith(".")
-            or any(char in host for char in "*/: \\t\\r\\n")
+            or any(char in "*/:" or char.isspace() for char in host)
             for host in hosts
         )
     ):
