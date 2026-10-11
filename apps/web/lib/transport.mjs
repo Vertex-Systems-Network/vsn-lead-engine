@@ -48,6 +48,15 @@ const memberAuditPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/member-audit\/(?:\?offset=(?:0|[1-9][0-9]{0,5}))?$/;
 const formPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/(?:cancel-form|submit-form|export-form)\/)$/;
+/** @returns {{ kind: "unavailable" }} */
+function unavailable(reason) {
+  // Only local disposable HTTP smoke may expose a coarse reason, never URLs,
+  // headers, cookies, response bodies, user records or provider data.
+  if (process.env.SAAS_SQLITE_SMOKE === "1") {
+    console.error(`VSN_HTTP_SMOKE_DIAG:${reason}`);
+  }
+  return { kind: "unavailable" };
+}
 export async function readBackend(
   origin,
   path,
@@ -86,52 +95,63 @@ export async function readBackend(
   if (!publicForm && !/^[a-z0-9]{32}$/.test(session ?? ""))
     return { kind: "signin" };
   if (form && !/^[A-Za-z0-9]{32}$/.test(csrf ?? "")) return { kind: "denied" };
-  try {
-    const response = await fetcher(new URL(path, trustedOrigin(origin)), {
-      headers: {
-        Accept: "application/json",
-        Cookie: publicForm
-          ? `csrftoken=${csrf}`
-          : `sessionid=${session}${form ? `; csrftoken=${csrf}` : ""}`,
-      },
-      cache: "no-store",
-      redirect: "manual",
-      signal: AbortSignal.timeout(5000),
-    });
-    if (response.status === 401 || response.status === 403)
-      return { kind: "denied" };
-    if (response.status === 404) return { kind: "missing" };
-    if (
-      !response.ok ||
-      !response.headers.get("content-type")?.includes("application/json")
-    )
-      return { kind: "unavailable" };
-    if (!response.body) return { kind: "unavailable" };
-    const reader = response.body.getReader();
-    const chunks = [];
-    let size = 0;
+  // Read-only calls may race the redirect from Django to Next under a busy
+  // backend. Retry only once, and never retry authorization or 4xx results.
+  for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      while (true) {
-        const part = await reader.read();
-        if (part.done) break;
-        size += part.value.byteLength;
-        if (size > 131072) {
-          await reader.cancel();
-          return { kind: "unavailable" };
-        }
-        chunks.push(part.value);
+      const response = await fetcher(new URL(path, trustedOrigin(origin)), {
+        headers: {
+          Accept: "application/json",
+          Cookie: publicForm
+            ? `csrftoken=${csrf}`
+            : `sessionid=${session}${form ? `; csrftoken=${csrf}` : ""}`,
+        },
+        cache: "no-store",
+        redirect: "manual",
+        signal: AbortSignal.timeout(5000),
+      });
+      if (response.status === 401 || response.status === 403)
+        return { kind: "denied" };
+      if (response.status === 404) return { kind: "missing" };
+      if (
+        !response.ok ||
+        !response.headers.get("content-type")?.includes("application/json")
+      ) {
+        if (attempt === 0 && response.status >= 500) continue;
+        return unavailable(response.ok ? "non_json" : "http_error");
       }
-    } finally {
-      reader.releaseLock();
+      if (!response.body) return unavailable("no_body");
+      const reader = response.body.getReader();
+      const chunks = [];
+      let size = 0;
+      try {
+        while (true) {
+          const part = await reader.read();
+          if (part.done) break;
+          size += part.value.byteLength;
+          if (size > 131072) {
+            await reader.cancel();
+            return unavailable("too_large");
+          }
+          chunks.push(part.value);
+        }
+      } finally {
+        reader.releaseLock();
+      }
+      const data = new Uint8Array(size);
+      let offset = 0;
+      for (const chunk of chunks) {
+        data.set(chunk, offset);
+        offset += chunk.length;
+      }
+      return { kind: "ok", data: JSON.parse(new TextDecoder().decode(data)) };
+    } catch (error) {
+      if (attempt === 1) {
+        const kind = error instanceof Error ? error.name : "Unknown";
+        const safe = ["TimeoutError", "AbortError", "TypeError", "SyntaxError"];
+        return unavailable(safe.includes(kind) ? kind : "Other");
+      }
     }
-    const data = new Uint8Array(size);
-    let offset = 0;
-    for (const chunk of chunks) {
-      data.set(chunk, offset);
-      offset += chunk.length;
-    }
-    return { kind: "ok", data: JSON.parse(new TextDecoder().decode(data)) };
-  } catch {
-    return { kind: "unavailable" };
   }
+  return unavailable("retry_exhausted");
 }

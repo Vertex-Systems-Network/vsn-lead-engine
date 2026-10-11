@@ -368,10 +368,18 @@ async function run(origin) {
         }
       }
     }
+    const publicRequests = cdp.browserRequests.slice();
     // Disposable test-only Django session: no login to external services, no
     // real credentials, and never expose the cookie in arguments or logs.
     const privateSession = process.env.VSN_BROWSER_SMOKE_SESSION;
     const privateCsrf = process.env.VSN_BROWSER_SMOKE_CSRF;
+    const draftPostOrigin = process.env.VSN_BROWSER_SMOKE_DRAFT_POST_ORIGIN;
+    if (draftPostOrigin) {
+      const posted = new URL(draftPostOrigin);
+      assert.equal(posted.protocol, "http:");
+      assert.equal(posted.hostname, target.hostname);
+      assert.ok(posted.port && posted.pathname === "/" && !posted.search && !posted.hash);
+    }
     const ownWorkspace = process.env.VSN_BROWSER_SMOKE_OWN_WORKSPACE;
     const foreignWorkspace = process.env.VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE;
     const ownJob = process.env.VSN_BROWSER_SMOKE_OWN_JOB;
@@ -452,11 +460,15 @@ async function run(origin) {
         }
       }
       async function waitForInteraction(condition, description) {
-        for (let attempt = 0; attempt < 100; attempt++) {
+        for (let attempt = 0; attempt < (description.includes("draft POST") ? 250 : 100); attempt++) {
           if (await cdp.js(condition)) return;
           await delay(80);
         }
-        assert.fail(`Browser interaction did not reach expected state: ${description}`);
+        const state = await cdp.js(`(() => ({
+          path: location.pathname,
+          heading: document.querySelector("main h1")?.textContent.trim() || null,
+        }))()`);
+        assert.fail(`Browser interaction did not reach expected state: ${description}; state=${JSON.stringify(state)}`);
       }
 
       for (const width of [320, 1280]) {
@@ -609,6 +621,53 @@ async function run(origin) {
           "Saved search",
           ["Foreign private marker"],
         );
+        if (draftPostOrigin && width === 1280) {
+          // Genuine browser POST -> Django 303 -> first Next detail render.
+          // Disposable synthetic form only; no job submission or source dispatch.
+          await inspectPrivate(
+            `/dashboard/workspaces/${ownWorkspace}/search/new`,
+            "Create draft search",
+            ["Foreign private marker"],
+          );
+          const prepared = await cdp.js(`(() => {
+            const form = document.querySelector('form.search-form[method="post"]');
+            const category = form?.querySelector('textarea[name="categories"]');
+            const canada = form?.querySelector('input[name="countries"][value="CA"]');
+            const token = form?.querySelector('input[name="draft_token"]');
+            if (!form || !category || !canada || !token?.value) return false;
+            category.value = "Synthetic browser-post salon";
+            category.dispatchEvent(new Event("input", {bubbles: true}));
+            return form.checkValidity();
+          })()`);
+          assert.equal(prepared, true, "Synthetic search form must validate before POST");
+          await clickVisible('input[name="countries"][value="CA"]');
+          const canadaSelected = await cdp.js(
+            'document.querySelector(\'input[name="countries"][value="CA"]\')?.checked',
+          );
+          assert.equal(canadaSelected, true, "Canada must be selected by a real browser click.");
+          await clickVisible('form.search-form button[type="submit"]');
+          await waitForInteraction(
+            `(() => {
+              const prefix = ${JSON.stringify(`/dashboard/workspaces/${ownWorkspace}/jobs/`)};
+              return location.pathname.startsWith(prefix)
+                && location.pathname.length === prefix.length + 36
+                && document.querySelector("main h1")?.textContent.trim() === "Saved search"
+                && document.querySelector("main")?.textContent.includes("Synthetic browser-post salon");
+            })()`,
+            "First redirected draft POST must render the saved job",
+          );
+          const created = await cdp.js(`(() => ({
+            id: location.pathname.split("/").at(-1),
+            state: document.querySelector("main span.badge")?.textContent.trim(),
+            foreign: document.querySelector("main")?.textContent.includes("Foreign private marker"),
+          }))()`);
+          assert.ok(uuid.test(created.id));
+          assert.notEqual(created.id, ownJob);
+          assert.equal(created.state, "draft");
+          assert.equal(created.foreign, false);
+          console.log("PASS: cross-origin browser draft POST -> initial Next job detail");
+        }
+
         await inspectPrivate(
           `/dashboard/workspaces/${foreignWorkspace}`,
           "Information unavailable",
@@ -644,11 +703,20 @@ async function run(origin) {
     }
     // Fail closed if an anonymous page initiates ANY remote HTTP(S) or WS(S)
     // request. Loopback-only Next static assets are the sole network authority.
-    const remote = cdp.browserRequests.filter((url) => {
+    const remotePublic = publicRequests.filter((url) => {
       if (!/^https?:|^wss?:/i.test(url)) return false;
       return new URL(url).origin !== target.origin;
     });
-    assert.deepEqual(remote, [], "Anonymous marketing must not contact external origins.");
+    assert.deepEqual(remotePublic, [], "Anonymous marketing must not contact external origins.");
+    const localOrigins = new Set([
+      target.origin,
+      ...(draftPostOrigin ? [new URL(draftPostOrigin).origin] : []),
+    ]);
+    const remotePrivate = cdp.browserRequests.filter((url) => {
+      if (!/^https?:|^wss?:/i.test(url)) return false;
+      return !localOrigins.has(new URL(url).origin);
+    });
+    assert.deepEqual(remotePrivate, [], "Private browser contacted an unauthorized origin.");
     console.log(
       `PASS: ${viewports.length * paths.length} Chromium page/viewport checks; skip-link keyboard, FAQ click/focus, reduced motion, no overflow, 44px navigation/actions, zero external requests and no private markers; ${contrastSamples} text-contrast samples >=4.5:1; max ${peakRequests} first-party requests, ${(peakBytes / 1024 / 1024).toFixed(2)} MiB transfer`,
     );

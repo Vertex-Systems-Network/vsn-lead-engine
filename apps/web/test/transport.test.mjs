@@ -787,3 +787,50 @@ test("daily source readiness is session-only at exact plan path", async () => {
   );
   assert.equal(anonymous.kind, "signin");
 });
+
+test("read-only backend retries one transient failure without relaxing authentication", async () => {
+  let calls = 0;
+  const result = await readBackend(
+    "http://localhost:8000",
+    "/api/v1/workspaces/",
+    session,
+    async (_, options) => {
+      calls += 1;
+      assert.equal(options.headers.Cookie, `sessionid=${session}`);
+      assert.equal(options.cache, "no-store");
+      if (calls === 1) throw Error("synthetic one-shot transport outage");
+      return new Response('{"results":[]}', {
+        headers: { "content-type": "application/json" },
+      });
+    },
+  );
+  assert.equal(result.kind, "ok");
+  assert.equal(calls, 2);
+});
+
+test("backend retries one 5xx but never retries denied, missing, or persistent failures", async () => {
+  const path = "/api/v1/workspaces/";
+  for (const statuses of [[503, 200], [500, 500], [403], [404]]) {
+    let calls = 0;
+    const result = await readBackend(
+      "http://localhost:8000",
+      path,
+      session,
+      async () => {
+        const status = statuses[calls++];
+        return new Response(status === 200 ? "{}" : "unavailable", {
+          status,
+          headers: {
+            "content-type": status === 200 ? "application/json" : "text/plain",
+          },
+        });
+      },
+    );
+    assert.equal(calls, statuses.length);
+    let expected = "unavailable";
+    if (statuses[0] === 403) expected = "denied";
+    else if (statuses[0] === 404) expected = "missing";
+    else if (statuses.at(-1) === 200) expected = "ok";
+    assert.equal(result.kind, expected);
+  }
+});

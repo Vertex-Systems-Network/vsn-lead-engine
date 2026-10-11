@@ -4,6 +4,7 @@ import json
 import os
 import signal
 import socket
+from socketserver import ThreadingMixIn
 import subprocess
 import sys
 import tempfile
@@ -16,7 +17,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import HTTPCookieProcessor, HTTPRedirectHandler, Request, build_opener, urlopen
-from wsgiref.simple_server import WSGIRequestHandler, make_server
+from wsgiref.simple_server import WSGIRequestHandler, WSGIServer, make_server
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "saas"))
@@ -150,7 +151,15 @@ def main():
             def log_message(self, format, *args):
                 pass
 
-        server = make_server("localhost", 0, get_wsgi_application(), handler_class=Quiet)
+        class ConcurrentSmokeServer(ThreadingMixIn, WSGIServer):
+            # A redirect may overlap with the immediate Next server-side API GET.
+            # Default single-thread wsgiref can starve that read for >5 seconds.
+            daemon_threads = True
+
+        server = make_server(
+            "localhost", 0, get_wsgi_application(),
+            server_class=ConcurrentSmokeServer, handler_class=Quiet,
+        )
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         with socket.socket() as sock:
@@ -307,21 +316,53 @@ def main():
                 before_browser_outboxes = JobOutbox.objects.filter(
                     job__workspace=workspace
                 ).count()
-                subprocess.run(
-                    ["node", "scripts/browser-smoke.mjs", origin],
-                    cwd=ROOT / "web",
-                    env={
-                        **os.environ,
-                        "VSN_BROWSER_SMOKE_SESSION": session,
-                        "VSN_BROWSER_SMOKE_CSRF": browser_csrf_cookie,
-                        "VSN_BROWSER_SMOKE_OWN_WORKSPACE": str(workspace.id),
-                        "VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE": str(other.id),
-                        "VSN_BROWSER_SMOKE_OWN_JOB": str(saved[0].id),
-                    },
-                    check=True,
-                    timeout=140,
+                try:
+                    subprocess.run(
+                        ["node", "scripts/browser-smoke.mjs", origin],
+                        cwd=ROOT / "web",
+                        env={
+                            **os.environ,
+                            "VSN_BROWSER_SMOKE_SESSION": session,
+                            "VSN_BROWSER_SMOKE_CSRF": browser_csrf_cookie,
+                            "VSN_BROWSER_SMOKE_OWN_WORKSPACE": str(workspace.id),
+                            "VSN_BROWSER_SMOKE_FOREIGN_WORKSPACE": str(other.id),
+                            "VSN_BROWSER_SMOKE_OWN_JOB": str(saved[0].id),
+                            "VSN_BROWSER_SMOKE_DRAFT_POST_ORIGIN": backend,
+                        },
+                        check=True,
+                        timeout=175,
+                    )
+                except subprocess.CalledProcessError:
+                    # Only coarse internal failure labels from disposable Next;
+                    # never echo private cookies, response payloads or form data.
+                    log_lines = (
+                        (Path(directory) / "next.log")
+                        .read_text(errors="replace")
+                        .splitlines()
+                    )
+                    markers = [
+                        line.split("VSN_HTTP_SMOKE_DIAG:", 1)[1].split()[0]
+                        for line in log_lines
+                        if "VSN_HTTP_SMOKE_DIAG:" in line
+                    ]
+                    print(
+                        "Synthetic Next read failure classes:",
+                        markers[-12:],
+                        file=sys.stderr,
+                    )
+                    raise
+                created_by_browser = list(
+                    Job.objects.filter(workspace=workspace).exclude(
+                        id__in=[job.id for job in saved]
+                    )
                 )
-                assert Job.objects.filter(workspace=workspace).count() == before_browser_jobs
+                assert len(created_by_browser) == 1
+                assert created_by_browser[0].status == "draft"
+                assert created_by_browser[0].search["categories"] == [
+                    "Synthetic browser-post salon"
+                ]
+                assert created_by_browser[0].search["countries"] == ["CA", "US"]
+                assert Job.objects.filter(workspace=workspace).count() == before_browser_jobs + 1
                 assert (
                     UsageReservation.objects.filter(workspace=workspace).count()
                     == before_browser_reservations
@@ -342,7 +383,7 @@ def main():
                 assert "Synthetic bakery" in page and "Next page" in page
                 assert "Job status summary" in page
                 assert "saved searches across all pages" in page
-                assert ">27" in page
+                assert f">{before_browser_jobs + 1}" in page
                 assert 'href="?status=draft"' in page
                 assert 'href="?status=completed"' in page
                 assert "Active workspace:" in page
