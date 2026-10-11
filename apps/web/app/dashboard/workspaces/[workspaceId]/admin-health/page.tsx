@@ -80,6 +80,8 @@ export default async function OperationalHealthPage({
           <dl>
             <dt>Pending intents past expiry</dt>
             <dd>{report.expired_pending_outboxes}</dd>
+            <dt>Pending intents with retained dispatch evidence</dt>
+            <dd>{report.pending_possible_effect_intents}</dd>
             <dt>Unknown dispatch outcomes</dt>
             <dd>{report.unknown_dispatch_operations}</dd>
             <dt>Outstanding reserved usage intents</dt>
