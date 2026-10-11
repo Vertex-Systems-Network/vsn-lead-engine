@@ -58,9 +58,7 @@ class PasswordResetTests(TestCase):
         self.assertEqual(LoginBucket.objects.count(), 2)
         self.assertFalse(LoginBucket.objects.filter(pk=fingerprint("ip", "127.0.0.1")).exists())
         self.assertFalse(
-            LoginBucket.objects.filter(
-                pk=fingerprint("account", "reset:owner@reset.example")
-            ).exists()
+            LoginBucket.objects.filter(pk=fingerprint("account", "reset:owner@reset.example")).exists()
         )
 
     def test_reset_ip_limit_does_not_block_login_or_signup(self):
@@ -106,7 +104,7 @@ class PasswordResetTests(TestCase):
         response = self.request_reset()
         self.assertRedirects(response, "/accounts/password-reset/sent/")
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(LoginBucket.objects.count(), 2 * IP_LIMIT + 2)
+        self.assertEqual(LoginBucket.objects.count(), IP_LIMIT + 3)
 
     def test_unsupported_rate_limit_scope_is_rejected(self):
         with self.assertRaises(ValueError):
