@@ -131,9 +131,7 @@ class PasswordChangeTests(TestCase):
         self.assertTrue(self.user.check_password(OLD))
         self.assertIn("_auth_user_id", self.other_browser.session)
         self.assertEqual(LoginBucket.objects.count(), 2)
-        self.assertFalse(
-            LoginBucket.objects.filter(pk=fingerprint("ip", "127.0.0.1")).exists()
-        )
+        self.assertFalse(LoginBucket.objects.filter(pk=fingerprint("ip", "127.0.0.1")).exists())
         self.assertFalse(
             LoginBucket.objects.filter(
                 pk=fingerprint("account", self.user.username.casefold())
