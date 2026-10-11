@@ -246,7 +246,7 @@ def fulfil_outbox(outbox_id):
         )
         return "completed"
     except Exception:
-        logger.exception("Fulfilment of job %s failed; outcome left unknown.", job.id)
+        logger.warning("Fulfilment outcome is unknown; authorized review is required.")
         mark_outcome_unknown(actor, job.workspace_id, operation.id)
         return "unknown"
 
@@ -302,6 +302,6 @@ def run_pending(limit=25):
         except Exception:
             # Lease/preflight refusals (expired intent, inactive entitlement, changed
             # policy) leave the intent pending for normal expiry; nothing was started.
-            logger.warning("Job intent %s was not dispatched.", outbox_id, exc_info=True)
+            logger.warning("A queued intent was rejected by the bounded pre-dispatch gates.")
             counts["conflict"] += 1
     return counts
