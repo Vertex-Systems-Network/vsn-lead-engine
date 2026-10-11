@@ -76,6 +76,57 @@ class ConfigurationPreflightTests(SimpleTestCase):
             [],
         )
 
+    def test_rejects_noncanonical_and_nondns_staging_hosts_without_echoing_them(self):
+        invalid_hosts = (
+            ["SAAS.staging.example"],
+            [" saas.staging.example"],
+            ["saas.staging.example "],
+            ["saas.staging.example?token=private"],
+            ["saas.staging.example#private"],
+            ["saas.staging.example@other.example"],
+            ["saas.staging.example."],
+            ["saas..example"],
+            ["-saas.staging.example"],
+            ["saas-.staging.example"],
+            ["saas.staging.example_"],
+            ["saas.staging.example\\\\redirect"],
+            ["127.0.0.2"],
+            ["10.0.0.1"],
+            ["saas.123"],
+            ["a" * 64 + ".staging.example"],
+            ["a" * 250 + ".example"],
+            [None],
+            "saas.staging.example",
+            None,
+        )
+        for hosts in invalid_hosts:
+            with self.subTest(hosts=hosts):
+                issues = configuration_issues(secure_config(ALLOWED_HOSTS=hosts))
+                self.assertIn(
+                    "Set SAAS_ALLOWED_HOSTS to one exact non-local staging hostname.",
+                    issues,
+                )
+                self.assertTrue(all("private" not in issue for issue in issues))
+
+    def test_canonical_dns_staging_hosts_remain_eligible(self):
+        for host in (
+            "saas.staging.example",
+            "staging-2.example",
+            "app.xn--bcher-kva.example",
+            "a" * 63 + ".staging.example",
+        ):
+            with self.subTest(host=host):
+                self.assertEqual(
+                    configuration_issues(
+                        secure_config(
+                            ALLOWED_HOSTS=[host],
+                            WEB_DASHBOARD_URL=f"https://{host}/dashboard",
+                            CSRF_TRUSTED_ORIGINS=[f"https://{host}"],
+                        )
+                    ),
+                    [],
+                )
+
     def test_cross_origin_dashboard_cannot_share_host_only_sessions(self):
         issues = configuration_issues(
             secure_config(WEB_DASHBOARD_URL="https://other.staging.example/dashboard")
