@@ -888,9 +888,10 @@ test("pending invitation review permits one exact authenticated read-only path",
       });
       assert.equal(options.cache, "no-store");
       assert.equal(options.redirect, "manual");
-      return new Response(`{"workspace_id":"${ws}","read_only":true,"limit":10,"results":[]}`, {
-        headers: { "content-type": "application/json" },
-      });
+      return new Response(
+        `{"workspace_id":"${ws}","read_only":true,"limit":10,"results":[]}`,
+        { headers: { "content-type": "application/json" } },
+      );
     },
   );
   assert.equal(result.kind, "ok");
@@ -900,7 +901,9 @@ test("pending invitation review permits one exact authenticated read-only path",
     `${path}issue/`,
     `${path}../`,
   ]) {
-    await assert.rejects(readBackend("http://localhost:8000", candidate, session));
+    await assert.rejects(
+      readBackend("http://localhost:8000", candidate, session),
+    );
   }
   assert.equal(
     (
