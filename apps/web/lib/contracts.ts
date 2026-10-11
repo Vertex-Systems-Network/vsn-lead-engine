@@ -705,8 +705,18 @@ export function sourceCatalog(v: unknown): v is SourceCatalog {
   );
 }
 
-export const invitationHealthStates = ["pending", "accepted", "revoked", "expired"] as const;
-export const operationalOutboxStates = ["pending", "cancelled", "started", "done"] as const;
+export const invitationHealthStates = [
+  "pending",
+  "accepted",
+  "revoked",
+  "expired",
+] as const;
+export const operationalOutboxStates = [
+  "pending",
+  "cancelled",
+  "started",
+  "done",
+] as const;
 
 function exactCountMap(v: unknown, names: readonly string[]): boolean {
   if (!object(v) || Object.keys(v).length !== names.length) return false;
@@ -755,7 +765,8 @@ export function operationalHealth(v: unknown): v is OperationalHealth {
     v.expired_pending_outboxes <= 2147483647 &&
     v.unknown_dispatch_operations <= 2147483647 &&
     v.reserved_usage_intents <= 2147483647 &&
-    (v.outboxes as OperationalHealth["outboxes"]).pending >= v.expired_pending_outboxes
+    (v.outboxes as OperationalHealth["outboxes"]).pending >=
+      v.expired_pending_outboxes
   );
 }
 
