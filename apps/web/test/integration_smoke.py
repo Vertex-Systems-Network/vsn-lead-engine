@@ -430,6 +430,7 @@ def main():
                 assert "Sign in to see your workspaces" in anonymous
                 dashboard, headers = read("/dashboard")
                 assert "Synthetic &lt;workspace&gt;" in dashboard
+                assert backend + "/accounts/password-change/" in dashboard
                 assert "Foreign private marker" not in dashboard
                 assert "no-store" in headers.get("Cache-Control", "")
                 assert headers.get("X-Robots-Tag") == "noindex, nofollow, noarchive"
