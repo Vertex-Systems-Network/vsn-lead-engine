@@ -5,8 +5,6 @@ reverse-proxy behavior, source coverage, SMTP delivery, backups or launch consen
 No credentials, hostnames, queries or exception messages are printed.
 """
 
-from urllib.parse import urlsplit
-
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
@@ -45,25 +43,24 @@ def configuration_issues(config):
         )
     ):
         issues.append("Require HTTPS, secure cookies and nosniff headers.")
-    dashboard = urlsplit(config.WEB_DASHBOARD_URL or "")
+    dashboard = urlsplit(config.WEB    # Accept exactly the canonical externally visible HTTPS URL, without an
+    # explicit port (even :443), userinfo, encodings, URL parameters or an
+    # alternate spelling of the staging hostname. Comparing to a constructed
+    # constant also avoids URL parser exceptions from malformed inputs.
+    dashboard = config.WEB_DASHBOARD_URL or ""
+    expected_origin = f"https://{next(iter(hosts))}" if len(hosts) == 1 else None
     dashboard_valid = (
-        dashboard.scheme == "https"
-        and dashboard.hostname in hosts
-        and dashboard.username is None
-        and dashboard.password is None
-        and dashboard.path == "/dashboard"
-        and not dashboard.query
-        and not dashboard.fragment
+        isinstance(dashboard, str)
+        and expected_origin is not None
+        and dashboard == expected_origin + "/dashboard"
     )
-    if not dashboard_valid:
-        issues.append(
+ issues.append(
             "Route Django and Next through the same public HTTPS host; "
             "set SAAS_WEB_ORIGIN to that shared origin."
         )
     else:
         # Public form POSTs require the identical HTTPS origin. Never allow
         # broad suffix/wildcard trust or unrelated browser origins at staging.
-        expected_origin = f"https://{dashboard.netloc}"
         trusted = getattr(config, "CSRF_TRUSTED_ORIGINS", None)
         if not isinstance(trusted, (list, tuple)) or list(trusted) != [expected_origin]:
             issues.append("Trust only the exact shared HTTPS origin for browser CSRF.")
