@@ -106,21 +106,23 @@ class SignUpTests(TestCase):
                     )
                     return register(form)
 
-                with patch("core.signup.register", side_effect=register_after_competitor):
+                with (
+                    override_settings(
+                        WEB_DASHBOARD_URL="http://localhost:3000/dashboard" if native else ""
+                    ),
+                    patch("core.signup.register", side_effect=register_after_competitor),
+                ):
                     response = self.post(
                         username="raced-native" if native else "raced-browser",
                         email=email,
                         native_signup="1" if native else "0",
                     )
                 if native:
-                    with override_settings(
-                        WEB_DASHBOARD_URL="http://localhost:3000/dashboard"
-                    ):
-                        # Native notice is only enabled with a trusted configured origin.
-                        pass
-                    self.assertEqual(response.status_code, 400)
+                    self.assertEqual(response.status_code, 303)
+                    self.assertEqual(
+                        response.url, "http://localhost:3000/account/sign-up?notice=taken"
+                    )
                 else:
-                    self.assertEqual(response.status_code, 400)
                     self.assertContains(
                         response, "An account already uses these details.", status_code=400
                     )
