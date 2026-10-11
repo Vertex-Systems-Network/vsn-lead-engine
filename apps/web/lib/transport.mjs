@@ -145,8 +145,11 @@ export async function readBackend(
         offset += chunk.length;
       }
       return { kind: "ok", data: JSON.parse(new TextDecoder().decode(data)) };
-    } catch {
-      if (attempt === 1) return unavailable("fetch_or_parse_exception");
+    } catch (error) {
+      if (attempt === 1) {
+        const kind = error instanceof Error ? error.name : "Unknown";
+        return unavailable(["TimeoutError", "AbortError", "TypeError", "SyntaxError"].includes(kind) ? kind : "Other");
+      }
     }
   }
   return unavailable("retry_exhausted");
