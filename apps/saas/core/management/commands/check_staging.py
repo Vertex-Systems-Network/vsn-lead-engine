@@ -22,8 +22,20 @@ def configuration_issues(config):
         issues.append("Disable SAAS_DEBUG before staging.")
     if len(config.SECRET_KEY) < 50:
         issues.append("Configure a strong, independently generated SAAS_SECRET_KEY.")
-    if not hosts or hosts & unsafe_hosts:
-        issues.append("Set SAAS_ALLOWED_HOSTS to explicit non-local staging hostnames.")
+    # Both browser apps are served through one trusted staging HTTPS host. A
+    # second host, dotted suffix, wildcard or port in Django's host allowlist
+    # could expose account/session routes via an unintended proxy vhost.
+    if (
+        len(config.ALLOWED_HOSTS) != 1
+        or len(hosts) != 1
+        or any(
+            host in unsafe_hosts
+            or host.startswith(".")
+            or any(char in host for char in "*/: \\t\\r\\n")
+            for host in hosts
+        )
+    ):
+        issues.append("Set SAAS_ALLOWED_HOSTS to one exact non-local staging hostname.")
     if not all(
         (
             config.SECURE_SSL_REDIRECT,
