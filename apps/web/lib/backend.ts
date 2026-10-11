@@ -24,7 +24,9 @@ export async function backend<T>(
     jar.get("csrftoken")?.value,
   );
   if (result.kind !== "ok") return result as Result<T>;
-  return validate(result.data)
-    ? { kind: "ok", data: result.data }
-    : { kind: "unavailable" };
+  if (validate(result.data)) return { kind: "ok", data: result.data };
+  if (process.env.SAAS_SQLITE_SMOKE === "1") {
+    console.error("VSN_HTTP_SMOKE_DIAG:contract_mismatch");
+  }
+  return { kind: "unavailable" };
 }
