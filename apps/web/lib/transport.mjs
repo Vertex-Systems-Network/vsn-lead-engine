@@ -54,7 +54,7 @@ function unavailable(reason) {
   if (process.env.SAAS_SQLITE_SMOKE === "1") {
     console.error(`VSN_HTTP_SMOKE_DIAG:${reason}`);
   }
-  return unavailable("retry_exhausted");
+  return { kind: "unavailable" };
 }
 export async function readBackend(
   origin,
@@ -148,5 +148,5 @@ export async function readBackend(
       if (attempt === 1) return unavailable("fetch_or_parse_exception");
     }
   }
-  return { kind: "unavailable" };
+  return unavailable("retry_exhausted");
 }
