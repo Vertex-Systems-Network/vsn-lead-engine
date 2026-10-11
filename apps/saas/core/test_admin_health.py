@@ -261,51 +261,85 @@ class AdminOperationalHealthTests(TestCase):
         first = JobOutbox.objects.get(job=job)
         now = timezone.now()
         first_attempt = JobAttempt.objects.create(
-            outbox=first, number=1, job_revision=0,
-            status="started", expires_at=now - timedelta(seconds=30),
+            outbox=first,
+            number=1,
+            job_revision=0,
+            status="started",
+            expires_at=now - timedelta(seconds=30),
         )
         op = DispatchOperation.objects.create(
-            workspace=self.workspace, job=job, outbox=first,
-            attempt=first_attempt, source_code="synthetic",
-            request_hash=job.request_hash, policy_version=1,
-            policy_fingerprint="f" * 64, call_limit=1,
-            status="unknown", unknown_at=now,
+            workspace=self.workspace,
+            job=job,
+            outbox=first,
+            attempt=first_attempt,
+            source_code="synthetic",
+            request_hash=job.request_hash,
+            policy_version=1,
+            policy_fingerprint="f" * 64,
+            call_limit=1,
+            status="unknown",
+            unknown_at=now,
         )
         second_job = Job.objects.create(
-            workspace=self.workspace, created_by=self.owner,
-            status="queued", search={}, idempotency_key="second-safe-health",
+            workspace=self.workspace,
+            created_by=self.owner,
+            status="queued",
+            search={},
+            idempotency_key="second-safe-health",
             request_hash="e" * 64,
         )
         second_reservation = UsageReservation.objects.create(
-            workspace=self.workspace, key="second-health-reservation",
-            request_hash="e" * 64, leads=1, jobs=1, status="reserved",
+            workspace=self.workspace,
+            key="second-health-reservation",
+            request_hash="e" * 64,
+            leads=1,
+            jobs=1,
+            status="reserved",
         )
         second = JobOutbox.objects.create(
-            job=second_job, reservation=second_reservation,
-            submitted_by=self.owner, submitted_revision=0,
-            source_snapshot=[], status="pending",
+            job=second_job,
+            reservation=second_reservation,
+            submitted_by=self.owner,
+            submitted_revision=0,
+            source_snapshot=[],
+            status="pending",
         )
         JobAttempt.objects.create(
-            outbox=second, number=1, job_revision=0,
-            status="done", expires_at=now - timedelta(seconds=10),
+            outbox=second,
+            number=1,
+            job_revision=0,
+            status="done",
+            expires_at=now - timedelta(seconds=10),
         )
         foreign_job = Job.objects.get(workspace=self.foreign_workspace)
         foreign_reservation = UsageReservation.objects.create(
-            workspace=self.foreign_workspace, key="foreign-protected-reservation",
-            request_hash="d" * 64, leads=1, jobs=1, status="reserved",
+            workspace=self.foreign_workspace,
+            key="foreign-protected-reservation",
+            request_hash="d" * 64,
+            leads=1,
+            jobs=1,
+            status="reserved",
         )
         foreign_outbox = JobOutbox.objects.create(
-            job=foreign_job, reservation=foreign_reservation,
-            submitted_by=self.foreign, submitted_revision=0,
-            source_snapshot=[], status="pending",
+            job=foreign_job,
+            reservation=foreign_reservation,
+            submitted_by=self.foreign,
+            submitted_revision=0,
+            source_snapshot=[],
+            status="pending",
         )
         foreign_attempt = JobAttempt.objects.create(
-            outbox=foreign_outbox, number=1, job_revision=0,
-            status="started", expires_at=now - timedelta(seconds=20),
+            outbox=foreign_outbox,
+            number=1,
+            job_revision=0,
+            status="started",
+            expires_at=now - timedelta(seconds=20),
         )
         before = (
-            JobAttempt.objects.count(), DispatchOperation.objects.count(),
-            UsageReservation.objects.count(), JobOutbox.objects.count(),
+            JobAttempt.objects.count(),
+            DispatchOperation.objects.count(),
+            UsageReservation.objects.count(),
+            JobOutbox.objects.count(),
         )
         api = f"/api/v1/workspaces/{self.workspace.id}/admin/health/"
         for actor in (self.owner, self.admin):
@@ -326,8 +360,10 @@ class AdminOperationalHealthTests(TestCase):
         self.assertEqual(
             before,
             (
-                JobAttempt.objects.count(), DispatchOperation.objects.count(),
-                UsageReservation.objects.count(), JobOutbox.objects.count(),
+                JobAttempt.objects.count(),
+                DispatchOperation.objects.count(),
+                UsageReservation.objects.count(),
+                JobOutbox.objects.count(),
             ),
         )
 
