@@ -108,6 +108,7 @@ class AdminOperationalHealthTests(TestCase):
             self.assertEqual(report["jobs"]["failed"], 0)
             self.assertEqual(report["outboxes"]["pending"], 1)
             self.assertEqual(report["expired_pending_outboxes"], 1)
+            self.assertEqual(report["eligible_expired_pending_intents"], 1)
             self.assertEqual(report["pending_possible_effect_intents"], 0)
             self.assertEqual(report["unknown_dispatch_operations"], 0)
             self.assertEqual(report["reserved_usage_intents"], 1)
@@ -147,6 +148,7 @@ class AdminOperationalHealthTests(TestCase):
             self.assertEqual(report["jobs"]["failed"], 0)
             self.assertEqual(report["outboxes"]["pending"], 1)
             self.assertEqual(report["expired_pending_outboxes"], 1)
+            self.assertEqual(report["eligible_expired_pending_intents"], 1)
             self.assertEqual(report["reserved_usage_intents"], 1)
             body = response.content.decode()
             for forbidden in (
@@ -239,6 +241,7 @@ class AdminOperationalHealthTests(TestCase):
             )
             self.assertEqual(report["expired_leased_attempts"], 0)
             self.assertEqual(report["pending_possible_effect_intents"], 1)
+            self.assertEqual(report["eligible_expired_pending_intents"], 0)
             self.assertNotIn(str(active.token), response.content.decode())
             self.assertNotIn(str(foreign_attempt.pk), response.content.decode())
             self.assertNotIn("foreign-secret-lease-reservation", response.content.decode())
@@ -347,6 +350,7 @@ class AdminOperationalHealthTests(TestCase):
             response = self.client.get(api)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.json()["pending_possible_effect_intents"], 2)
+            self.assertEqual(response.json()["eligible_expired_pending_intents"], 0)
             self.assertEqual(response.json()["outboxes"]["pending"], 2)
             self.assertEqual(response.json()["unknown_dispatch_operations"], 1)
             self.assertNotIn(str(op.provider_key), response.content.decode())
@@ -367,6 +371,77 @@ class AdminOperationalHealthTests(TestCase):
             ),
         )
 
+    def test_expired_recheck_eligibility_tracks_current_evidence_without_mutations(self):
+        job = self.seed()
+        outbox = JobOutbox.objects.get(job=job)
+        api_path = f"/api/v1/workspaces/{self.workspace.id}/admin/health/"
+        self.client.force_login(self.owner)
+        before = self.client.get(api_path)
+        self.assertEqual(before.status_code, 200)
+        self.assertEqual(before.json()["eligible_expired_pending_intents"], 1)
+        self.assertContains(
+            self.client.get(self.path),
+            "Expired intents eligible for safety recheck",
+        )
+        JobAttempt.objects.create(
+            outbox=outbox,
+            number=1,
+            job_revision=0,
+            status="started",
+            expires_at=timezone.now() - timedelta(minutes=2),
+        )
+        foreign_job = Job.objects.get(workspace=self.foreign_workspace)
+        foreign_job.status = "queued"
+        foreign_job.save(update_fields=["status"])
+        foreign_reservation = UsageReservation.objects.create(
+            workspace=self.foreign_workspace,
+            key="foreign-expired-recheck-marker",
+            request_hash="b" * 64,
+            leads=1,
+            jobs=1,
+            status="reserved",
+        )
+        JobOutbox.objects.create(
+            job=foreign_job,
+            reservation=foreign_reservation,
+            submitted_by=self.foreign,
+            submitted_revision=0,
+            source_snapshot=[],
+            status="pending",
+            expires_at=timezone.now() - timedelta(minutes=1),
+        )
+        baseline = (
+            JobOutbox.objects.count(),
+            JobAttempt.objects.count(),
+            UsageReservation.objects.count(),
+        )
+        for actor in (self.owner, self.admin):
+            self.client.force_login(actor)
+            response = self.client.get(api_path)
+            self.assertEqual(response.status_code, 200)
+            report = response.json()
+            self.assertEqual(report["expired_pending_outboxes"], 1)
+            self.assertEqual(report["eligible_expired_pending_intents"], 0)
+            self.assertEqual(report["pending_possible_effect_intents"], 1)
+            self.assertNotIn("foreign-expired-recheck-marker", response.content.decode())
+        self.client.force_login(self.foreign)
+        foreign_report = self.client.get(
+            f"/api/v1/workspaces/{self.foreign_workspace.id}/admin/health/"
+        )
+        self.assertEqual(foreign_report.json()["eligible_expired_pending_intents"], 1)
+        self.assertEqual(
+            baseline,
+            (
+                JobOutbox.objects.count(),
+                JobAttempt.objects.count(),
+                UsageReservation.objects.count(),
+            ),
+        )
+        outbox.refresh_from_db()
+        outbox.reservation.refresh_from_db()
+        self.assertEqual(outbox.status, "pending")
+        self.assertEqual(outbox.reservation.status, "reserved")
+
     def test_no_invites_or_jobs_stays_explicit_zero(self):
         self.client.force_login(self.owner)
         report = self.client.get(self.path).context["report"]
@@ -374,6 +449,7 @@ class AdminOperationalHealthTests(TestCase):
         self.assertEqual(sum(report["outboxes"].values()), 0)
         self.assertEqual(sum(report["invitations"].values()), 0)
         self.assertEqual(report["expired_pending_outboxes"], 0)
+        self.assertEqual(report["eligible_expired_pending_intents"], 0)
         self.assertEqual(report["unknown_dispatch_operations"], 0)
         self.assertEqual(sum(report["pre_dispatch_attempts"].values()), 0)
         self.assertEqual(report["expired_leased_attempts"], 0)
