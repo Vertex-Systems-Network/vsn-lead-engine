@@ -697,6 +697,63 @@ async function run(origin) {
           ["Synthetic <workspace>", "Foreign private marker", "Synthetic bakery"],
         );
       }
+
+      if (draftPostOrigin) {
+        // Synthetic browser-created account, never a real signup or email.
+        // Prior authenticated fixture session was explicitly deleted above.
+        await inspectPrivate("/account/sign-up", "Create account", [
+          "Foreign private marker",
+          "Synthetic bakery",
+        ]);
+        const signupReady = await cdp.js(`(() => {
+          const form = document.querySelector("main form[method=post]");
+          if (!form || !form.elements.namedItem("csrfmiddlewaretoken")?.value
+              || form.elements.namedItem("native_signup")?.value !== "1") return false;
+          const values = {
+            username: "synthetic-browser-account",
+            email: "browser-account@synthetic.invalid",
+            workspace_name: "Synthetic signup workspace",
+            password1: "Field#river75-polar%evergreen",
+            password2: "Field#river75-polar%evergreen",
+          };
+          for (const [name, value] of Object.entries(values)) {
+            const field = form.elements.namedItem(name);
+            if (!field) return false;
+            field.value = value;
+            field.dispatchEvent(new Event("input", {bubbles: true}));
+          }
+          return form.checkValidity();
+        })()`);
+        assert.equal(signupReady, true, "Browser account form must validate before POST.");
+        await clickVisible('main form[method="post"] button[type="submit"]');
+        await waitForInteraction(
+          `(() => location.pathname === "/dashboard"
+            && document.querySelector("main h1")?.textContent.trim() === "Workspaces"
+            && document.querySelector("main")?.textContent.includes("Synthetic signup workspace"))()`,
+          "Synthetic signup POST must create a private workspace and sign in",
+        );
+        const newAccount = await cdp.js(`(() => ({
+          foreign: document.querySelector("main")?.textContent.includes("Foreign private marker"),
+          oldAccount: document.querySelector("main")?.textContent.includes("Synthetic bakery"),
+        }))()`);
+        assert.equal(newAccount.foreign, false);
+        assert.equal(newAccount.oldAccount, false);
+        await inspectPrivate(
+          "/dashboard/workspaces/" + ownWorkspace,
+          "Information unavailable",
+          ["Synthetic bakery", "Synthetic signup workspace", "Foreign private marker"],
+        );
+        await cdp.send("Network.deleteCookies", {
+          name: "sessionid",
+          url: target.origin,
+        });
+        await inspectPrivate("/dashboard", "Sign in to see your workspaces.", [
+          "Synthetic signup workspace",
+          "Synthetic bakery",
+        ]);
+        console.log("PASS: real Chromium signup POST -> new isolated workspace -> logout denial");
+      }
+
       console.log(
         "PASS: 2 Chromium private viewports: anonymous/foreign/cookie deletion deny access; own workspace/job, read-only draft form, actual filter submit/Next/First links, source catalog and daily plans",
       );
