@@ -86,6 +86,9 @@ export async function readBackend(
   if (!publicForm && !/^[a-z0-9]{32}$/.test(session ?? ""))
     return { kind: "signin" };
   if (form && !/^[A-Za-z0-9]{32}$/.test(csrf ?? "")) return { kind: "denied" };
+  // Read-only calls may race the redirect from Django to Next under a busy
+  // backend. Retry only once, and never retry authorization or 4xx results.
+  for (let attempt = 0; attempt < 2; attempt++) {
   try {
     const response = await fetcher(new URL(path, trustedOrigin(origin)), {
       headers: {
@@ -104,8 +107,10 @@ export async function readBackend(
     if (
       !response.ok ||
       !response.headers.get("content-type")?.includes("application/json")
-    )
+    ) {
+      if (attempt === 0 && response.status >= 500) continue;
       return { kind: "unavailable" };
+    }
     if (!response.body) return { kind: "unavailable" };
     const reader = response.body.getReader();
     const chunks = [];
@@ -132,6 +137,8 @@ export async function readBackend(
     }
     return { kind: "ok", data: JSON.parse(new TextDecoder().decode(data)) };
   } catch {
-    return { kind: "unavailable" };
+    if (attempt === 1) return { kind: "unavailable" };
   }
+  }
+  return { kind: "unavailable" };
 }
