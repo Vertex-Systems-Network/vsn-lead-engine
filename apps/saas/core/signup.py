@@ -4,7 +4,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
@@ -84,6 +84,21 @@ def sign_up_page(request):
             ) or ("email" in form.errors and User.objects.filter(email__iexact=email).exists())
             return HttpResponseRedirect(sign_up_return("taken" if taken else "invalid"), status=303)
         return render(request, "registration/sign_up.html", {"form": form}, status=400)
-    user = register(form)
+    try:
+        user = register(form)
+    except IntegrityError:
+        # A competing registration may win after SignUpForm.clean_email.
+        # register() rolls back all account/workspace/entitlement writes.
+        # Do not turn unrelated database faults into a duplicate warning.
+        duplicate = (
+            User.objects.filter(email__iexact=form.cleaned_data["email"]).exists()
+            or User.objects.filter(username__iexact=form.cleaned_data["username"]).exists()
+        )
+        if not duplicate:
+            raise
+        if native:
+            return HttpResponseRedirect(sign_up_return("taken"), status=303)
+        form.add_error(None, "An account already uses these details.")
+        return render(request, "registration/sign_up.html", {"form": form}, status=400)
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     return HttpResponseRedirect(settings.WEB_DASHBOARD_URL or "/", status=303)
