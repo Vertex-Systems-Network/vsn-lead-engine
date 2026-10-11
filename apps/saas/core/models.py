@@ -11,6 +11,8 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta:
+        verbose_name = "user"
+        verbose_name_plural = "users"
         constraints = [
             # Password resets must never select multiple active email identities.
             # Blank email stays allowed for test/operator-created legacy users.
