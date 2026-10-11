@@ -88,9 +88,7 @@ def operational_health(actor, workspace_id):
             Q(recorded_operation=True) | Q(started_attempt=True)
         ).count(),
         "eligible_expired_pending_intents": (
-            eligible_expired_pending_outboxes(at=now)
-            .filter(job__workspace_id=workspace_id)
-            .count()
+            eligible_expired_pending_outboxes(at=now).filter(job__workspace_id=workspace_id).count()
         ),
         "expired_pending_outboxes": outboxes.filter(
             status="pending", expires_at__isnull=False, expires_at__lte=now
