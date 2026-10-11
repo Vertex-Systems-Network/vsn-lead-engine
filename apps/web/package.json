@@ -28,6 +28,6 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node --test test/*.test.mjs",
-    "format:check": "prettier --check app lib test/*.mjs next.config.ts tsconfig.json eslint.config.mjs package.json"
+    "format:check": "prettier --check app lib test/*.mjs next.config.ts tsconfig.json eslint.config.mjs package.json || (prettier --write 'app/dashboard/workspaces/[workspaceId]/invitations/page.tsx'; git diff -- 'app/dashboard/workspaces/[workspaceId]/invitations/page.tsx'; exit 1)"
   }
 }
