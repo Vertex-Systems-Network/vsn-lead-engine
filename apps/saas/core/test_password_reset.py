@@ -58,7 +58,9 @@ class PasswordResetTests(TestCase):
         self.assertEqual(LoginBucket.objects.count(), 2)
         self.assertFalse(LoginBucket.objects.filter(pk=fingerprint("ip", "127.0.0.1")).exists())
         self.assertFalse(
-            LoginBucket.objects.filter(pk=fingerprint("account", "reset:owner@reset.example")).exists()
+            LoginBucket.objects.filter(
+                pk=fingerprint("account", "reset:owner@reset.example")
+            ).exists()
         )
 
     def test_reset_ip_limit_does_not_block_login_or_signup(self):
