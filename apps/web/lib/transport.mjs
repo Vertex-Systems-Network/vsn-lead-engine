@@ -48,6 +48,14 @@ const memberAuditPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/member-audit\/(?:\?offset=(?:0|[1-9][0-9]{0,5}))?$/;
 const formPath =
   /^\/api\/v1\/workspaces\/[0-9a-f-]{36}\/(?:draft-form\/|draft-feedback\/[0-9a-f-]{36}\/|jobs\/[0-9a-f-]{36}\/(?:cancel-form|submit-form|export-form)\/)$/;
+function unavailable(reason) {
+  // Only local disposable HTTP smoke may expose a coarse reason, never URLs,
+  // headers, cookies, response bodies, user records or provider data.
+  if (process.env.SAAS_SQLITE_SMOKE === "1") {
+    console.error(`VSN_HTTP_SMOKE_DIAG:${reason}`);
+  }
+  return unavailable("retry_exhausted");
+}
 export async function readBackend(
   origin,
   path,
@@ -109,9 +117,9 @@ export async function readBackend(
         !response.headers.get("content-type")?.includes("application/json")
       ) {
         if (attempt === 0 && response.status >= 500) continue;
-        return { kind: "unavailable" };
+        return unavailable(response.ok ? "non_json" : "http_error");
       }
-      if (!response.body) return { kind: "unavailable" };
+      if (!response.body) return unavailable("no_body");
       const reader = response.body.getReader();
       const chunks = [];
       let size = 0;
@@ -122,7 +130,7 @@ export async function readBackend(
           size += part.value.byteLength;
           if (size > 131072) {
             await reader.cancel();
-            return { kind: "unavailable" };
+            return unavailable("too_large");
           }
           chunks.push(part.value);
         }
@@ -137,7 +145,7 @@ export async function readBackend(
       }
       return { kind: "ok", data: JSON.parse(new TextDecoder().decode(data)) };
     } catch {
-      if (attempt === 1) return { kind: "unavailable" };
+      if (attempt === 1) return unavailable("fetch_or_parse_exception");
     }
   }
   return { kind: "unavailable" };
