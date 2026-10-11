@@ -777,14 +777,14 @@ async function run(origin) {
             '(() => location.pathname === "/accounts/password-reset/" && document.querySelector("main h1")?.textContent === "Reset your password")()',
             "Recovery link must reach the Django reset form",
           );
-          const unknownReady = await cdp.js('(() => {
+          const unknownReady = await cdp.js(`(() => {
             const form = document.querySelector("main form[method=post]");
             const email = form?.elements.namedItem("email");
             if (!email || !form?.elements.namedItem("csrfmiddlewaretoken")?.value) return false;
             email.value = "unknown-recovery@synthetic.invalid";
             email.dispatchEvent(new Event("input", {bubbles: true}));
             return form.checkValidity();
-          })()');
+          })()`);
           assert.equal(unknownReady, true, "CSRF-protected email form must validate.");
           await clickVisible('main form button[type="submit"]');
           await waitForInteraction(
@@ -796,7 +796,7 @@ async function run(origin) {
             '(() => location.pathname.endsWith("/set-password/") && document.querySelector("main h1")?.textContent === "Choose a new password")()',
             "Local email token must open one-use password form",
           );
-          const ready = await cdp.js('(() => {
+          const ready = await cdp.js(`(() => {
             const form = document.querySelector("main form[method=post]");
             if (!form?.elements.namedItem("csrfmiddlewaretoken")?.value) return false;
             for (const name of ["new_password1", "new_password2"]) {
@@ -806,7 +806,7 @@ async function run(origin) {
               input.dispatchEvent(new Event("input", {bubbles: true}));
             }
             return form.checkValidity();
-          })()');
+          })()`);
           assert.equal(ready, true, "New-password form must validate.");
           await clickVisible('main form button[type="submit"]');
           await waitForInteraction(
