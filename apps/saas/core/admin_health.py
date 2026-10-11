@@ -70,13 +70,9 @@ def operational_health(actor, workspace_id):
     outboxes = JobOutbox.objects.filter(job__workspace_id=workspace_id)
     attempts = JobAttempt.objects.filter(outbox__job__workspace_id=workspace_id)
     unsafe_pending = outboxes.filter(status="pending").annotate(
-        recorded_operation=Exists(
-            DispatchOperation.objects.filter(outbox_id=OuterRef("pk"))
-        ),
+        recorded_operation=Exists(DispatchOperation.objects.filter(outbox_id=OuterRef("pk"))),
         started_attempt=Exists(
-            JobAttempt.objects.filter(
-                outbox_id=OuterRef("pk"), status__in=("started", "done")
-            )
+            JobAttempt.objects.filter(outbox_id=OuterRef("pk"), status__in=("started", "done"))
         ),
     )
     return {
