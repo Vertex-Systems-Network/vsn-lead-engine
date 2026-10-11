@@ -1,11 +1,14 @@
 """Synthetic account-security regressions using real sessions and Django forms."""
 
 import re
+from unittest.mock import patch
 
 from django.contrib.auth import authenticate
 from django.core import mail
 from django.test import Client, TestCase, override_settings
+from django.utils import timezone
 
+from .login_security import ACCOUNT_LIMIT, WINDOW, fingerprint
 from .models import LoginBucket, User
 
 OLD = "original-account-passphrase-5521"
@@ -105,7 +108,73 @@ class PasswordChangeTests(TestCase):
         self.assertIn("private", done["Cache-Control"])
         self.assertEqual(self.other_browser.get("/api/v1/workspaces/").status_code, 403)
         self.assertEqual(self.other_browser.get("/accounts/password-change/done/").status_code, 302)
-        self.assertFalse(LoginBucket.objects.exists())
+        self.assertEqual(LoginBucket.objects.count(), 2)
+
+    def test_authenticated_change_attempts_are_bounded_before_password_validation(self):
+        self.browser.get("/accounts/password-change/")
+        old = self.browser.session.session_key
+        for index in range(ACCOUNT_LIMIT):
+            response = self.post(old_password=f"incorrect-pass-{index}")
+            self.assertEqual(response.status_code, 200)
+        with patch(
+            "django.contrib.auth.forms.PasswordChangeForm.is_valid",
+            side_effect=AssertionError("No password validation after rate limit"),
+        ):
+            response = self.post(old_password="secret-must-not-be-reflected")
+        self.assertContains(response, "Too many password change attempts", status_code=429)
+        self.assertEqual(response["Retry-After"], str(int(WINDOW.total_seconds())))
+        self.assertIn("no-store", response["Cache-Control"])
+        self.assertIn("private", response["Cache-Control"])
+        self.assertNotContains(response, "secret-must-not-be-reflected", status_code=429)
+        self.assertEqual(self.browser.session.session_key, old)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password(OLD))
+        self.assertIn("_auth_user_id", self.other_browser.session)
+        self.assertEqual(LoginBucket.objects.count(), 2)
+        self.assertFalse(LoginBucket.objects.filter(pk=fingerprint("ip", "127.0.0.1")).exists())
+        self.assertFalse(
+            LoginBucket.objects.filter(
+                pk=fingerprint("account", self.user.username.casefold())
+            ).exists()
+        )
+
+    def test_rate_limit_cannot_be_bypassed_with_forwarded_ip_or_guest_request(self):
+        self.browser.get("/accounts/password-change/")
+        for index in range(ACCOUNT_LIMIT):
+            self.assertEqual(
+                self.browser.post(
+                    "/accounts/password-change/",
+                    self.valid(old_password="wrong"),
+                    HTTP_X_CSRFTOKEN=self.browser.cookies["csrftoken"].value,
+                    HTTP_X_FORWARDED_FOR=f"198.51.100.{index}",
+                ).status_code,
+                200,
+            )
+        denial = self.browser.post(
+            "/accounts/password-change/",
+            self.valid(old_password=OLD),
+            HTTP_X_CSRFTOKEN=self.browser.cookies["csrftoken"].value,
+            HTTP_X_FORWARDED_FOR="203.0.113.5",
+        )
+        self.assertEqual(denial.status_code, 429)
+        self.assertEqual(Client().post("/accounts/password-change/", self.valid()).status_code, 302)
+        self.assertEqual(LoginBucket.objects.count(), 2)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password(OLD))
+
+    def test_attempt_budget_expires_after_fixed_window(self):
+        self.browser.get("/accounts/password-change/")
+        now = timezone.now()
+        with patch("core.login_security.timezone.now", return_value=now):
+            for _ in range(ACCOUNT_LIMIT):
+                self.assertEqual(self.post(old_password="wrong").status_code, 200)
+            self.assertEqual(self.post().status_code, 429)
+        with patch("core.login_security.timezone.now", return_value=now + WINDOW):
+            recovered = self.post()
+        self.assertEqual(recovered.status_code, 302)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password(NEW))
+        self.assertIn("_auth_user_id", self.browser.session)
 
     def test_change_invalidates_existing_email_reset_token(self):
         self.browser.get("/accounts/password-reset/")
