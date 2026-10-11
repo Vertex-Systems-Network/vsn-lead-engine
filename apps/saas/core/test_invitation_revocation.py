@@ -93,9 +93,7 @@ class InvitationRevocationPageTests(TestCase):
             expires_at=timezone.now() - timedelta(seconds=1)
         )
         self.assertEqual(len(self.client.get(path).json()["results"]), 1)
-        WorkspaceInvitation.objects.filter(pk=admin_invitation.pk).update(
-            revoked_at=timezone.now()
-        )
+        WorkspaceInvitation.objects.filter(pk=admin_invitation.pk).update(revoked_at=timezone.now())
         self.assertEqual(self.client.get(path).json()["results"], [])
 
     def test_native_review_rejects_foreign_viewer_anonymous_queries_and_writes(self):
