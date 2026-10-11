@@ -8,7 +8,7 @@ from django.core import mail
 from django.test import Client, TestCase, override_settings
 from django.utils import timezone
 
-from .login_security import ACCOUNT_LIMIT, WINDOW
+from .login_security import ACCOUNT_LIMIT, WINDOW, fingerprint
 from .models import LoginBucket, User
 
 OLD = "original-account-passphrase-5521"
@@ -73,7 +73,7 @@ class PasswordChangeTests(TestCase):
         )
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password(OLD))
-        self.assertEqual(LoginBucket.objects.count(), 2)
+        self.assertFalse(LoginBucket.objects.exists())
 
     def test_wrong_or_weak_password_does_not_mutate_or_end_session(self):
         self.browser.get("/accounts/password-change/")
@@ -131,6 +131,14 @@ class PasswordChangeTests(TestCase):
         self.assertTrue(self.user.check_password(OLD))
         self.assertIn("_auth_user_id", self.other_browser.session)
         self.assertEqual(LoginBucket.objects.count(), 2)
+        self.assertFalse(
+            LoginBucket.objects.filter(pk=fingerprint("ip", "127.0.0.1")).exists()
+        )
+        self.assertFalse(
+            LoginBucket.objects.filter(
+                pk=fingerprint("account", self.user.username.casefold())
+            ).exists()
+        )
 
     def test_rate_limit_cannot_be_bypassed_with_forwarded_ip_or_guest_request(self):
         self.browser.get("/accounts/password-change/")
