@@ -55,6 +55,27 @@ class ConfigurationPreflightTests(SimpleTestCase):
         self.assertTrue(any("synthetic" in issue for issue in issues))
         self.assertTrue(any("fulfilment keys" in issue for issue in issues))
 
+    def test_rejects_secondary_wildcard_and_malformed_staging_hosts(self):
+        for hosts in (
+            ["saas.staging.example", "another.staging.example"],
+            ["saas.staging.example", "saas.staging.example"],
+            [".staging.example"],
+            ["*.staging.example"],
+            ["saas.staging.example:443"],
+            ["saas.staging.ex ample"],
+            [],
+        ):
+            with self.subTest(hosts=hosts):
+                issues = configuration_issues(secure_config(ALLOWED_HOSTS=hosts))
+                self.assertIn(
+                    "Set SAAS_ALLOWED_HOSTS to one exact non-local staging hostname.",
+                    issues,
+                )
+        self.assertEqual(
+            configuration_issues(secure_config(ALLOWED_HOSTS=["saas.staging.example"])),
+            [],
+        )
+
     def test_cross_origin_dashboard_cannot_share_host_only_sessions(self):
         issues = configuration_issues(
             secure_config(WEB_DASHBOARD_URL="https://other.staging.example/dashboard")
