@@ -13,7 +13,7 @@ from rest_framework.exceptions import ValidationError
 
 from .attempts import check_pre_dispatch, claim_pre_dispatch
 from .jobs import RevisionConflict, cancel_pending_job, enqueue_job
-from .models import DispatchOperation, JobAttempt, JobOutbox, Membership, UsageCounter
+from .models import DispatchOperation, Job, JobAttempt, JobOutbox, Membership, UsageCounter
 from .recovery import expire_one, expire_pending_intents
 from .services import create_draft
 from .test_jobs import fixture
@@ -98,7 +98,7 @@ class RecoveryTests(TestCase):
         )
         self.overdue()
         self.assertFalse(expire_one(self.intent.id))
-        self.assertEqual(expire_pending_intents(), {"examined": 1, "expired": 0})
+        self.assertEqual(expire_pending_intents(), {"examined": 0, "expired": 0})
         with self.assertRaises(RevisionConflict):
             cancel_pending_job(self.user, self.workspace.id, self.job.id, 1)
         self.intent.refresh_from_db()
@@ -119,7 +119,7 @@ class RecoveryTests(TestCase):
         self.assertFalse(expire_one(self.intent.id))
         with self.assertRaises(RevisionConflict):
             cancel_pending_job(self.user, self.workspace.id, self.job.id, 1)
-        self.assertEqual(expire_pending_intents(), {"examined": 1, "expired": 0})
+        self.assertEqual(expire_pending_intents(), {"examined": 0, "expired": 0})
         self.intent.refresh_from_db()
         self.intent.reservation.refresh_from_db()
         self.job.refresh_from_db()
@@ -127,6 +127,102 @@ class RecoveryTests(TestCase):
         self.assertEqual(self.intent.reservation.status, "reserved")
         self.assertEqual(JobAttempt.objects.get(pk=lease.pk).status, "started")
         self.assertFalse(DispatchOperation.objects.exists())
+
+    def test_blocked_possible_effect_rows_cannot_starve_safe_expiry_batches(self):
+        """Two older unsafe rows must not hide a later eligible row at limit=1."""
+        now = timezone.now()
+        first_attempt = JobAttempt.objects.create(
+            outbox=self.intent,
+            number=1,
+            job_revision=1,
+            status="started",
+            expires_at=now - timedelta(days=3),
+        )
+        DispatchOperation.objects.create(
+            workspace=self.workspace,
+            job=self.job,
+            outbox=self.intent,
+            attempt=first_attempt,
+            source_code="fixture",
+            request_hash=self.job.request_hash,
+            policy_version=1,
+            policy_fingerprint="a" * 64,
+            call_limit=1,
+            status="unknown",
+            unknown_at=now - timedelta(days=3),
+        )
+        JobOutbox.objects.filter(pk=self.intent.pk).update(
+            expires_at=now - timedelta(days=3)
+        )
+        blocked_job, _ = create_draft(
+            self.user, self.workspace.id, self.job.search, "blocked-started"
+        )
+        enqueue_job(self.user, self.workspace.id, blocked_job.pk, 0)
+        blocked_outbox = JobOutbox.objects.get(job=blocked_job)
+        blocked_attempt = JobAttempt.objects.create(
+            outbox=blocked_outbox,
+            number=1,
+            job_revision=1,
+            status="done",
+            expires_at=now - timedelta(days=2),
+        )
+        JobOutbox.objects.filter(pk=blocked_outbox.pk).update(
+            expires_at=now - timedelta(days=2)
+        )
+        safe_job, _ = create_draft(
+            self.user, self.workspace.id, self.job.search, "releasable"
+        )
+        enqueue_job(self.user, self.workspace.id, safe_job.pk, 0)
+        safe_outbox = JobOutbox.objects.get(job=safe_job)
+        safe_lease = JobAttempt.objects.create(
+            outbox=safe_outbox,
+            number=1,
+            job_revision=1,
+            status="leased",
+            expires_at=now - timedelta(days=1),
+        )
+        JobOutbox.objects.filter(pk=safe_outbox.pk).update(
+            expires_at=now - timedelta(days=1)
+        )
+
+        self.assertEqual(expire_pending_intents(limit=1), {"examined": 1, "expired": 1})
+        self.assertEqual(expire_pending_intents(limit=1), {"examined": 0, "expired": 0})
+        call_output = StringIO()
+        call_command("expire_pending_intents", limit=1, stdout=call_output)
+        self.assertIn("Examined 0; expired 0.", call_output.getvalue())
+        self.intent.refresh_from_db()
+        blocked_outbox.refresh_from_db()
+        safe_outbox.refresh_from_db()
+        safe_job.refresh_from_db()
+        safe_lease.refresh_from_db()
+        self.intent.reservation.refresh_from_db()
+        blocked_outbox.reservation.refresh_from_db()
+        safe_outbox.reservation.refresh_from_db()
+        blocked_attempt.refresh_from_db()
+        self.assertEqual(self.intent.status, "pending")
+        self.assertEqual(blocked_outbox.status, "pending")
+        self.assertEqual(self.intent.reservation.status, "reserved")
+        self.assertEqual(blocked_outbox.reservation.status, "reserved")
+        self.assertEqual(blocked_attempt.status, "done")
+        self.assertEqual(safe_outbox.status, "cancelled")
+        self.assertEqual(safe_job.status, "cancelled")
+        self.assertEqual(safe_outbox.reservation.status, "released")
+        self.assertEqual(safe_lease.status, "cancelled")
+        self.assertEqual(DispatchOperation.objects.count(), 1)
+
+    def test_unreleasable_revision_does_not_starve_later_expired_intents(self):
+        self.overdue()
+        Job.objects.filter(pk=self.job.pk).update(revision=2147483647)
+        second, _ = create_draft(self.user, self.workspace.id, self.job.search, "eligible")
+        enqueue_job(self.user, self.workspace.id, second.pk, 0)
+        JobOutbox.objects.filter(job=second).update(expires_at=timezone.now())
+        self.assertEqual(expire_pending_intents(limit=1), {"examined": 1, "expired": 1})
+        self.assertEqual(expire_pending_intents(limit=1), {"examined": 0, "expired": 0})
+        self.intent.refresh_from_db()
+        self.job.refresh_from_db()
+        self.intent.reservation.refresh_from_db()
+        self.assertEqual((self.intent.status, self.job.revision), ("pending", 2147483647))
+        self.assertEqual(self.intent.reservation.status, "reserved")
 
     def test_batch_bound_and_operator_command(self):
         self.overdue()
