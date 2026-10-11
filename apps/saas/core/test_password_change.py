@@ -48,7 +48,9 @@ class PasswordChangeTests(TestCase):
         self.assertTrue(response.url.startswith("/accounts/login/?next="))
         self.assertEqual(anon.post("/accounts/password-change/", self.valid()).status_code, 302)
         self.assertEqual(anon.get("/accounts/password-change/done/").status_code, 302)
-        self.assertEqual(self.browser.post("/accounts/password-change/", self.valid()).status_code, 403)
+        self.assertEqual(
+            self.browser.post("/accounts/password-change/", self.valid()).status_code, 403
+        )
 
         page = self.browser.get("/accounts/password-change/")
         self.assertContains(page, "Change your password")
@@ -106,14 +108,10 @@ class PasswordChangeTests(TestCase):
         self.assertFalse(LoginBucket.objects.exists())
 
     def test_change_invalidates_existing_email_reset_token(self):
-        response = self.browser.post(
-            "/accounts/password-reset/", {"email": self.user.email}
-        )
+        response = self.browser.post("/accounts/password-reset/", {"email": self.user.email})
         self.assertRedirects(response, "/accounts/password-reset/sent/")
         self.assertEqual(len(mail.outbox), 1)
-        link = re.search(
-            r"https?://[^/\s]+(/accounts/reset/\S+/)", mail.outbox[0].body
-        ).group(1)
+        link = re.search(r"https?://[^/\s]+(/accounts/reset/\S+/)", mail.outbox[0].body).group(1)
         self.browser.get("/accounts/password-change/")
         self.assertEqual(self.post().status_code, 302)
         expired = self.browser.get(link, follow=True)
