@@ -93,6 +93,7 @@ def main():
             JobOutbox,
             Membership,
             MembershipAudit,
+            WorkspaceInvitation,
             SourcePolicy,
             UsageReservation,
             User,
@@ -600,6 +601,39 @@ def main():
                     f"/dashboard/workspaces/{workspace.id}/members"
                 )
                 assert "Workspace members" in members_page
+                invitation_target = User.objects.create_user(
+                    username="synthetic-pending-recipient"
+                )
+                invitation = WorkspaceInvitation.objects.create(
+                    workspace=workspace,
+                    target=invitation_target,
+                    created_by=user,
+                    role="viewer",
+                    token_hash="c" * 64,
+                    expires_at=timezone.now() + timedelta(hours=1),
+                )
+                invitations_path = (
+                    f"/dashboard/workspaces/{workspace.id}/invitations"
+                )
+                assert f'href="{invitations_path}"' in members_page
+                pending_page, pending_headers = read(invitations_path)
+                assert "Pending workspace invitations" in pending_page
+                assert "synthetic-pending-recipient" in pending_page
+                assert "Review revocation" in pending_page
+                assert (
+                    backend
+                    + f"/workspaces/{workspace.id}/invitations/{invitation.pk}/revoke/"
+                    in pending_page
+                )
+                assert invitation.token_hash not in pending_page
+                assert "Foreign private marker" not in pending_page
+                assert "no-store" in pending_headers.get("Cache-Control", "")
+                foreign_pending, _ = read(
+                    f"/dashboard/workspaces/{other.id}/invitations"
+                )
+                assert "Pending workspace invitations" not in foreign_pending
+                assert "synthetic-pending-recipient" not in foreign_pending
+                assert WorkspaceInvitation.objects.get(pk=invitation.pk).revoked_at is None
                 assert "Review member role change history" in members_page
                 assert "Review role change" in members_page
                 assert "Review removal" in members_page
