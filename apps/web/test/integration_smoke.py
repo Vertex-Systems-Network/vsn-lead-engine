@@ -90,6 +90,7 @@ def main():
             DailySchedule,
             Entitlement,
             Job,
+            JobAttempt,
             JobOutbox,
             Membership,
             MembershipAudit,
@@ -449,6 +450,29 @@ def main():
                 assert (
                     f'href="/dashboard/workspaces/{workspace.id}/daily-plans"' in page
                 )
+                health_reservation = UsageReservation.objects.create(
+                    workspace=workspace,
+                    key="synthetic-health-lease",
+                    request_hash="c" * 64,
+                    leads=1,
+                    jobs=1,
+                    status="reserved",
+                )
+                health_outbox = JobOutbox.objects.create(
+                    job=saved[0],
+                    reservation=health_reservation,
+                    submitted_by=user,
+                    submitted_revision=0,
+                    source_snapshot=[],
+                    status="pending",
+                )
+                health_attempt = JobAttempt.objects.create(
+                    outbox=health_outbox,
+                    number=1,
+                    job_revision=0,
+                    status="leased",
+                    expires_at=timezone.now() - timedelta(seconds=1),
+                )
                 health_path = f"/dashboard/workspaces/{workspace.id}/admin-health"
                 assert f'href="{health_path}"' in page
                 health_page, health_headers = read(health_path)
@@ -456,6 +480,9 @@ def main():
                 assert "Pending intents past expiry" in health_page
                 assert "Unknown dispatch outcomes" in health_page
                 assert "Outstanding reserved usage intents" in health_page
+                assert "Pre-dispatch lease attempts" in health_page
+                assert "Leases past expiry, still recorded as leased" in health_page
+                assert str(health_attempt.token) not in health_page
                 assert "read-only, advisory snapshot" in health_page.lower()
                 assert "Foreign private marker" not in health_page
                 assert "Private bakery marker" not in health_page
@@ -465,6 +492,9 @@ def main():
                 )
                 assert "Workspace operational health" not in foreign_health
                 assert "Foreign private marker" not in foreign_health
+                JobAttempt.objects.filter(pk=health_attempt.pk).delete()
+                JobOutbox.objects.filter(pk=health_outbox.pk).delete()
+                UsageReservation.objects.filter(pk=health_reservation.pk).delete()
                 plans_page, plans_headers = read(
                     f"/dashboard/workspaces/{workspace.id}/daily-plans"
                 )
