@@ -825,10 +825,10 @@ export function operationalHealth(v: unknown): v is OperationalHealth {
     v.pending_possible_effect_intents <= 2147483647 &&
     (v.outboxes as Record<string, number>).pending >=
       v.pending_possible_effect_intents &&
+    count(v.expired_pending_outboxes) &&
     count(v.eligible_expired_pending_intents) &&
     v.eligible_expired_pending_intents <= 2147483647 &&
     v.eligible_expired_pending_intents <= v.expired_pending_outboxes &&
-    count(v.expired_pending_outboxes) &&
     count(v.unknown_dispatch_operations) &&
     count(v.reserved_usage_intents) &&
     v.expired_pending_outboxes <= 2147483647 &&
