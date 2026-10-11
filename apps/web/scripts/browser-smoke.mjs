@@ -705,7 +705,7 @@ async function run(origin) {
           "Foreign private marker",
           "Synthetic bakery",
         ]);
-        const signupReady = await cdp.js('(() => {
+        const signupReady = await cdp.js(`(() => {
           const form = document.querySelector("main form[method=post]");
           if (!form || !form.elements.namedItem("csrfmiddlewaretoken")?.value
               || form.elements.namedItem("native_signup")?.value !== "1") return false;
@@ -723,19 +723,19 @@ async function run(origin) {
             field.dispatchEvent(new Event("input", {bubbles: true}));
           }
           return form.checkValidity();
-        })()');
+        })()`);
         assert.equal(signupReady, true, "Browser account form must validate before POST.");
         await clickVisible('main form[method="post"] button[type="submit"]');
         await waitForInteraction(
-          '(() => location.pathname === "/dashboard"
+          `(() => location.pathname === "/dashboard"
             && document.querySelector("main h1")?.textContent.trim() === "Workspaces"
-            && document.querySelector("main")?.textContent.includes("Synthetic signup workspace"))()',
+            && document.querySelector("main")?.textContent.includes("Synthetic signup workspace"))()`,
           "Synthetic signup POST must create a private workspace and sign in",
         );
-        const newAccount = await cdp.js('(() => ({
+        const newAccount = await cdp.js(`(() => ({
           foreign: document.querySelector("main")?.textContent.includes("Foreign private marker"),
           oldAccount: document.querySelector("main")?.textContent.includes("Synthetic bakery"),
-        }))()');
+        }))()`);
         assert.equal(newAccount.foreign, false);
         assert.equal(newAccount.oldAccount, false);
         await inspectPrivate(
