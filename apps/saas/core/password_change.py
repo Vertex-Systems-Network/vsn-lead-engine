@@ -18,8 +18,11 @@ class PrivatePasswordChangeView(auth_views.PasswordChangeView):
         # LoginRequiredMixin in PasswordChangeView.dispatch authenticates first.
         # Rate limit before hashing/validating submitted passwords; never store
         # plaintext credentials or a raw account/IP identifier in the bucket.
-        key = f"password-change:{request.user.pk}"
-        if not allow_login(key, request.META.get("REMOTE_ADDR", "")):
+        if not allow_login(
+            str(request.user.pk),
+            request.META.get("REMOTE_ADDR", ""),
+            bucket_scope="password-change",
+        ):
             form = self.get_form_class()(user=request.user)
             response = self.render_to_response(self.get_context_data(form=form, limited=True))
             response.status_code = 429
