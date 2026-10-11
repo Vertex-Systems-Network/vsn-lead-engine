@@ -9,7 +9,8 @@ from pathlib import Path
 from django.core import mail
 from django.test import TestCase, override_settings
 
-from .models import User
+from .login_security import ACCOUNT_LIMIT, IP_LIMIT, allow_login, fingerprint
+from .models import LoginBucket, User
 
 PASSWORD = "original-passphrase-5521"
 NEW = "replacement-passphrase-8812"
@@ -44,12 +45,72 @@ class PasswordResetTests(TestCase):
         self.assertRedirects(response, "/accounts/password-reset/sent/")
         self.assertEqual(mail.outbox, [])
 
-    def test_requests_are_rate_limited(self):
-        for _ in range(10):
-            self.request_reset()
-        response = self.request_reset()
+    def test_requests_are_rate_limited_across_case_variants(self):
+        for index in range(ACCOUNT_LIMIT):
+            response = self.request_reset(
+                "OWNER@RESET.EXAMPLE" if index % 2 else "owner@reset.example"
+            )
+            self.assertEqual(response.status_code, 302)
+        response = self.request_reset("Owner@Reset.Example")
         self.assertContains(response, "Too many requests", status_code=429)
-        self.assertEqual(len(mail.outbox), 10)
+        self.assertEqual(response["Retry-After"], "900")
+        self.assertEqual(len(mail.outbox), ACCOUNT_LIMIT)
+        self.assertEqual(LoginBucket.objects.count(), 2)
+        self.assertFalse(LoginBucket.objects.filter(pk=fingerprint("ip", "127.0.0.1")).exists())
+        self.assertFalse(
+            LoginBucket.objects.filter(
+                pk=fingerprint("account", "reset:owner@reset.example")
+            ).exists()
+        )
+
+    def test_reset_ip_limit_does_not_block_login_or_signup(self):
+        for index in range(IP_LIMIT):
+            response = self.client.post(
+                "/accounts/password-reset/",
+                {"email": f"unknown-{index}@synthetic.invalid"},
+                HTTP_X_FORWARDED_FOR=f"198.51.100.{index}",
+            )
+            self.assertEqual(response.status_code, 302)
+        denied = self.client.post(
+            "/accounts/password-reset/",
+            {"email": "never-seen@synthetic.invalid"},
+            HTTP_X_FORWARDED_FOR="203.0.113.9",
+        )
+        self.assertContains(denied, "Too many requests", status_code=429)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(
+            self.client.post(
+                "/accounts/login/",
+                {"username": self.user.username, "password": PASSWORD},
+            ).status_code,
+            302,
+        )
+        self.client.logout()
+        with override_settings(SAAS_SIGNUP_ENABLED=True, SAAS_STARTER_ENTITLEMENT={}):
+            signup = self.client.post(
+                "/accounts/sign-up/",
+                {
+                    "username": "new-after-reset",
+                    "email": "new-after-reset@synthetic.invalid",
+                    "password1": "extra-long-unique-signup-passphrase-9431",
+                    "password2": "extra-long-unique-signup-passphrase-9431",
+                    "workspace_name": "Recovery-safe test",
+                },
+            )
+        self.assertEqual(signup.status_code, 303)
+        self.assertTrue(User.objects.filter(username="new-after-reset").exists())
+
+    def test_exhausted_login_budget_does_not_block_recovery(self):
+        for index in range(IP_LIMIT):
+            self.assertTrue(allow_login(f"no-such-user-{index}", "127.0.0.1"))
+        response = self.request_reset()
+        self.assertRedirects(response, "/accounts/password-reset/sent/")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(LoginBucket.objects.count(), IP_LIMIT + 3)
+
+    def test_unsupported_rate_limit_scope_is_rejected(self):
+        with self.assertRaises(ValueError):
+            allow_login(self.user.email, "127.0.0.1", bucket_scope="unscoped")
 
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.dummy.EmailBackend")

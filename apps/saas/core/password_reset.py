@@ -16,7 +16,11 @@ class LimitedPasswordResetView(auth_views.PasswordResetView):
 
     def post(self, request, *args, **kwargs):
         email = request.POST.get("email", "")
-        if not allow_login("reset:" + email, request.META.get("REMOTE_ADDR", "")):
+        if not allow_login(
+            email,
+            request.META.get("REMOTE_ADDR", ""),
+            bucket_scope="password-reset",
+        ):
             response = self.render_to_response(
                 self.get_context_data(form=self.get_form_class()(), limited=True)
             )

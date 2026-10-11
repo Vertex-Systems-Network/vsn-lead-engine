@@ -29,12 +29,13 @@ def allow_login(username, remote_addr, *, now=None, bucket_scope="login"):
     fresh bucket. Counts are not reset on success. PostgreSQL serializes all
     increments; SQLite remains a local smoke mode only.
     """
-    if bucket_scope not in {"login", "password-change"}:
+    if bucket_scope not in {"login", "password-change", "password-reset"}:
         raise ValueError("Unsupported credential-attempt bucket scope")
-    # Preserve historical login/signup/reset fingerprints, while isolating
-    # authenticated password changes so they cannot exhaust login/signup's
-    # shared IP budget during a normal cross-flow browser journey.
-    prefix = "" if bucket_scope == "login" else "password-change:"
+    # Preserve historical login/signup fingerprints. Credential recovery and
+    # authenticated password changes need separate account AND connection-IP
+    # budgets: exhausting either must not deny an unrelated account action.
+    # Legacy reset buckets age out under RETENTION; do not read their plaintext.
+    prefix = "" if bucket_scope == "login" else bucket_scope + ":"
     now = now or timezone.now()
     LoginBucket.objects.filter(started_at__lt=now - RETENTION).delete()
     keys = [
