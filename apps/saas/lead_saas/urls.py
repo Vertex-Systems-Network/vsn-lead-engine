@@ -16,6 +16,7 @@ from core.login_security import ProtectedLoginView
 from core.member_removal_page import member_removal_page
 from core.member_role_page import member_role_change_page
 from core.password_reset import urlpatterns as password_reset_urls
+from core.readiness import internal_readiness
 from core.search_assistance_page import search_assistance_page
 from core.search_assistance_review_page import search_assistance_review_page
 from core.signup import sign_up_page
@@ -41,6 +42,7 @@ urlpatterns = [
         views.ResultList.as_view(),
     ),
     path("health/", views.health),
+    path("internal/readiness/", internal_readiness, name="internal-readiness"),
     path("", views.overview),
     path("accounts/start-sign-in/", start_sign_in),
     path("accounts/sign-up/", sign_up_page, name="sign-up-page"),

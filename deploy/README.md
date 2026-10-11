@@ -60,6 +60,15 @@ these services and this PR never creates or connects to them.
   `manage.py check_staging`; neither migrates, tests real email delivery
   or exercises actual proxy trust.
 
+The optional Django `/internal/readiness/` route is **disabled by default**. Do not
+set `SAAS_INTERNAL_READINESS_ENABLED=1` until the actual staging ingress has
+been verified to deny all public/client access to this route. An authorized
+internal GET runs one read-only DB `SELECT 1` and returns a generic ready (200)
+or unavailable (503) response without error details. The opt-in route must not
+be used as proof of migration completion, SMTP, backup, scheduler, Overture,
+payment or production readiness; its internal-only routing has **not** been
+certified against a real TLS proxy.
+
 The API `/health/` endpoint is an unauthenticated liveness marker;
 it does **not** prove Postgres access, worker/scheduler health or readiness.
 Fail closed on any real deployment acceptance gap. Pin and review Docker
