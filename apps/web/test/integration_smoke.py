@@ -4,6 +4,7 @@ import json
 import os
 import signal
 import socket
+from socketserver import ThreadingMixIn
 import subprocess
 import sys
 import tempfile
@@ -16,7 +17,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import HTTPCookieProcessor, HTTPRedirectHandler, Request, build_opener, urlopen
-from wsgiref.simple_server import WSGIRequestHandler, make_server
+from wsgiref.simple_server import WSGIRequestHandler, WSGIServer, make_server
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "saas"))
@@ -150,7 +151,15 @@ def main():
             def log_message(self, format, *args):
                 pass
 
-        server = make_server("localhost", 0, get_wsgi_application(), handler_class=Quiet)
+        class ConcurrentSmokeServer(ThreadingMixIn, WSGIServer):
+            # A redirect may overlap with the immediate Next server-side API GET.
+            # Default single-thread wsgiref can starve that read for >5 seconds.
+            daemon_threads = True
+
+        server = make_server(
+            "localhost", 0, get_wsgi_application(),
+            server_class=ConcurrentSmokeServer, handler_class=Quiet,
+        )
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         with socket.socket() as sock:
