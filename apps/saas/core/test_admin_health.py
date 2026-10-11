@@ -124,6 +124,55 @@ class AdminOperationalHealthTests(TestCase):
             },
         )
 
+    def test_json_snapshot_matches_tenant_counts_without_exposing_private_rows(self):
+        self.seed()
+        api_path = f"/api/v1/workspaces/{self.workspace.id}/admin/health/"
+        for actor in (self.owner, self.admin):
+            self.client.force_login(actor)
+            response = self.client.get(api_path)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("no-store", response["Cache-Control"])
+            self.assertEqual(response["Content-Type"], "application/json")
+            report = response.json()
+            self.assertEqual(report["workspace_id"], str(self.workspace.id))
+            self.assertTrue(report["advisory_only"])
+            self.assertEqual(report["member_roles"], {"owner": 1, "admin": 1, "member": 0, "viewer": 1})
+            self.assertEqual(report["invitations"]["pending"], 1)
+            self.assertEqual(report["jobs"]["queued"], 1)
+            self.assertEqual(report["jobs"]["failed"], 0)
+            self.assertEqual(report["outboxes"]["pending"], 1)
+            self.assertEqual(report["expired_pending_outboxes"], 1)
+            self.assertEqual(report["reserved_usage_intents"], 1)
+            body = response.content.decode()
+            for forbidden in (
+                "Private health",
+                "Secret synthetic industry",
+                "Foreign confidential marker",
+                "Foreign private industry",
+                "health-report-reservation",
+                "f" * 64,
+            ):
+                self.assertNotIn(forbidden, body)
+        self.assertEqual(Job.objects.count(), 2)
+        self.assertEqual(JobOutbox.objects.count(), 1)
+        self.assertEqual(UsageReservation.objects.count(), 1)
+        self.assertEqual(WorkspaceInvitation.objects.count(), 1)
+
+    def test_json_snapshot_rejects_anonymous_viewer_foreign_queries_and_writes(self):
+        api_path = f"/api/v1/workspaces/{self.workspace.id}/admin/health/"
+        self.assertIn(self.client.get(api_path).status_code, (401, 403))
+        self.client.force_login(self.viewer)
+        self.assertEqual(self.client.get(api_path).status_code, 403)
+        self.client.force_login(self.foreign)
+        self.assertEqual(self.client.get(api_path).status_code, 404)
+        self.client.force_login(self.owner)
+        self.assertEqual(self.client.get(api_path + "?all=true").status_code, 400)
+        self.assertEqual(self.client.post(api_path, {}).status_code, 405)
+        self.assertEqual(self.client.patch(api_path, {}).status_code, 405)
+        self.assertEqual(self.client.delete(api_path).status_code, 405)
+        self.assertEqual(self.client.get(api_path).json()["jobs"]["queued"], 0)
+        self.assertFalse(Job.objects.exists())
+
     def test_no_invites_or_jobs_stays_explicit_zero(self):
         self.client.force_login(self.owner)
         report = self.client.get(self.path).context["report"]
