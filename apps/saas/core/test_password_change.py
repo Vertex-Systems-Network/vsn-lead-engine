@@ -112,7 +112,7 @@ class PasswordChangeTests(TestCase):
         self.assertRedirects(response, "/accounts/password-reset/sent/")
         self.assertEqual(len(mail.outbox), 1)
         link = re.search(
-            r"https?://[^/\\s]+(/accounts/reset/\\S+/)", mail.outbox[0].body
+            r"https?://[^/\s]+(/accounts/reset/\S+/)", mail.outbox[0].body
         ).group(1)
         self.browser.get("/accounts/password-change/")
         self.assertEqual(self.post().status_code, 302)
