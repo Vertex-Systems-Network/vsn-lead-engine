@@ -21,6 +21,7 @@ def secure_config(**changes):
         "CSRF_COOKIE_SECURE": True,
         "SECURE_CONTENT_TYPE_NOSNIFF": True,
         "WEB_DASHBOARD_URL": "https://saas.staging.example/dashboard",
+        "CSRF_TRUSTED_ORIGINS": ["https://saas.staging.example"],
         "DATABASES": {"default": {"ENGINE": "django.db.backends.postgresql"}},
         "EMAIL_BACKEND": "django.core.mail.backends.smtp.EmailBackend",
         "DEFAULT_FROM_EMAIL": "no-reply@staging.example",
@@ -60,6 +61,39 @@ class ConfigurationPreflightTests(SimpleTestCase):
         )
         self.assertEqual(len(issues), 1)
         self.assertIn("same public HTTPS host", issues[0])
+
+    def test_csrf_trust_must_be_exact_shared_https_origin(self):
+        for origins in (
+            [],
+            ["https://another.example"],
+            ["https://*.staging.example"],
+            ["https://saas.staging.example", "https://another.example"],
+        ):
+            with self.subTest(origins=origins):
+                issues = configuration_issues(
+                    secure_config(CSRF_TRUSTED_ORIGINS=origins)
+                )
+                self.assertEqual(
+                    issues, ["Trust only the exact shared HTTPS origin for browser CSRF."]
+                )
+        self.assertEqual(
+            configuration_issues(
+                secure_config(CSRF_TRUSTED_ORIGINS=("https://saas.staging.example",))
+            ),
+            [],
+        )
+
+    def test_dashboard_origin_cannot_include_credentials_or_query(self):
+        for url in (
+            "https://user:pass@saas.staging.example/dashboard",
+            "https://saas.staging.example/dashboard?token=secret",
+            "https://saas.staging.example/other",
+        ):
+            with self.subTest(route=url.split("?")[0].rsplit("/", 1)[-1]):
+                issues = configuration_issues(secure_config(WEB_DASHBOARD_URL=url))
+                self.assertEqual(len(issues), 1)
+                self.assertIn("same public HTTPS host", issues[0])
+                self.assertNotIn("secret", str(issues))
 
     def test_refuses_console_email_and_missing_next_origin(self):
         issues = configuration_issues(
