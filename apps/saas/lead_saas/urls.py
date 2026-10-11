@@ -15,6 +15,7 @@ from core.invitation_revocation_pages import pending_invitations_page, revoke_in
 from core.login_security import ProtectedLoginView
 from core.member_removal_page import member_removal_page
 from core.member_role_page import member_role_change_page
+from core.password_change import PrivatePasswordChangeDoneView, PrivatePasswordChangeView
 from core.password_reset import urlpatterns as password_reset_urls
 from core.readiness import internal_readiness
 from core.search_assistance_page import search_assistance_page
@@ -79,6 +80,16 @@ urlpatterns = [
     ),
     path("api/v1/account/sign-in-form/", sign_in_form),
     path("accounts/login/", ProtectedLoginView.as_view()),
+    path(
+        "accounts/password-change/",
+        PrivatePasswordChangeView.as_view(),
+        name="password_change",
+    ),
+    path(
+        "accounts/password-change/done/",
+        PrivatePasswordChangeDoneView.as_view(),
+        name="password_change_done",
+    ),
     path("accounts/check-session/", views.check_session_page, name="check-session-page"),
     path("api/v1/workspaces/<uuid:workspace_id>/draft-form/", DraftFormContext.as_view()),
     path(
