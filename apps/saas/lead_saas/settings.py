@@ -13,6 +13,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Reuse the repository's pure SaaS policy contracts without importing collector services.
 sys.path.insert(0, str(BASE_DIR.parent.parent / "src"))
 DEBUG = os.environ.get("SAAS_DEBUG", "0") == "1"
+# Private-ingress-only DB reachability marker; never activated by default.
+SAAS_INTERNAL_READINESS_ENABLED = os.environ.get("SAAS_INTERNAL_READINESS_ENABLED", "0") == "1"
 SECRET_KEY = os.environ.get("SAAS_SECRET_KEY", "")
 if not SECRET_KEY:
     raise ImproperlyConfigured("SAAS_SECRET_KEY is required")
