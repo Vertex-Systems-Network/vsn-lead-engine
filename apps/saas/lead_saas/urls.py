@@ -42,6 +42,11 @@ urlpatterns = [
         "api/v1/workspaces/<uuid:workspace_id>/jobs/<uuid:job_id>/results/",
         views.ResultList.as_view(),
     ),
+    path(
+        "api/v1/workspaces/<uuid:workspace_id>/admin/health/",
+        views.OperationalHealth.as_view(),
+        name="operational-health-api",
+    ),
     path("health/", views.health),
     path("internal/readiness/", internal_readiness, name="internal-readiness"),
     path("", views.overview),
