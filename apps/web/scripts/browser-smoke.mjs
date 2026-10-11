@@ -637,11 +637,14 @@ async function run(origin) {
             if (!form || !category || !canada || !token?.value) return false;
             category.value = "Synthetic browser-post salon";
             category.dispatchEvent(new Event("input", {bubbles: true}));
-            canada.checked = true;
-            canada.dispatchEvent(new Event("change", {bubbles: true}));
-            return form.checkValidity() && canada.checked;
+            return form.checkValidity();
           })()`);
           assert.equal(prepared, true, "Synthetic search form must validate before POST");
+          await clickVisible('input[name="countries"][value="CA"]');
+          const canadaSelected = await cdp.js(
+            'document.querySelector(\'input[name="countries"][value="CA"]\')?.checked',
+          );
+          assert.equal(canadaSelected, true, "Canada must be selected by a real browser click.");
           await clickVisible('form.search-form button[type="submit"]');
           await waitForInteraction(
             `(() => {
