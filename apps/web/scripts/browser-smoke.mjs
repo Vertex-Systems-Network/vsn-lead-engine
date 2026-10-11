@@ -818,6 +818,78 @@ async function run(origin) {
             '(() => document.querySelector("main h1")?.textContent === "Link expired")()',
             "Used reset token must not open another form",
           );
+          // A real invalid-login POST must never authenticate, while a later
+          // valid POST must establish only the new account workspace session.
+          // The sign-out is a real CSRF-protected browser POST to Django.
+          async function openNativeLogin() {
+            await cdp.send("Page.navigate", {
+              url: new URL("/accounts/start-sign-in/", draftPostOrigin).href,
+            });
+            await waitForInteraction(
+              '(() => location.pathname === "/account/sign-in" && document.querySelector("main h1")?.textContent === "Sign in" && !!document.querySelector("main form[method=post]"))()',
+              "Native sign-in must render after CSRF bootstrap",
+            );
+          }
+          async function fillNativeLogin(password) {
+            return cdp.js(`(() => {
+              const form = document.querySelector("main form[method=post]");
+              if (!form?.elements.namedItem("csrfmiddlewaretoken")?.value
+                || form.elements.namedItem("native_login")?.value !== "1") return false;
+              const name = form.elements.namedItem("username");
+              const secret = form.elements.namedItem("password");
+              if (!name || !secret) return false;
+              name.value = "synthetic-browser-account";
+              secret.value = ${JSON.stringify(password)};
+              name.dispatchEvent(new Event("input", {bubbles: true}));
+              secret.dispatchEvent(new Event("input", {bubbles: true}));
+              return form.checkValidity();
+            })()`);
+          }
+          await openNativeLogin();
+          assert.equal(await fillNativeLogin("deliberately-incorrect-password"), true);
+          await clickVisible('main form[method="post"] button[type="submit"]');
+          await waitForInteraction(
+            '(() => location.pathname === "/account/sign-in" && new URLSearchParams(location.search).get("notice") === "invalid" && !!document.querySelector("main [role=alert]"))()',
+            "Wrong-password POST must show generic invalid notice",
+          );
+          await cdp.send("Page.navigate", {url: target.origin + "/dashboard"});
+          await waitForInteraction(
+            '(() => location.pathname === "/dashboard" && document.readyState === "complete" && !!document.querySelector("main h1"))()',
+            "Wrong password must not grant a private dashboard",
+          );
+          const deniedContent = await cdp.js('document.querySelector("main")?.textContent || ""');
+          for (const privateMarker of [
+            "Synthetic signup workspace", "Foreign private marker", "Synthetic bakery",
+          ]) {
+            assert.equal(
+              deniedContent.includes(privateMarker), false,
+              "Invalid login revealed a private tenant marker",
+            );
+          }
+          await openNativeLogin();
+          assert.equal(await fillNativeLogin("Field#river75-polar%evergreen"), true);
+          await clickVisible('main form[method="post"] button[type="submit"]');
+          await waitForInteraction(
+            '(() => location.pathname === "/dashboard" && document.querySelector("main h1")?.textContent === "Workspaces" && document.querySelector("main")?.textContent.includes("Synthetic signup workspace"))()',
+            "Valid account login must reach its own workspace",
+          );
+          await inspectPrivate("/dashboard/workspaces/" + ownWorkspace,
+            "Information unavailable",
+            ["Synthetic signup workspace", "Foreign private marker", "Synthetic bakery"],
+          );
+          await inspectPrivate("/account/sign-out", "End your session", [
+            "Foreign private marker", "Synthetic bakery",
+          ]);
+          assert.equal(await cdp.js('(() => !!document.querySelector(\'main form[method="post"] input[name="csrfmiddlewaretoken"][value]\'))()'), true);
+          await clickVisible('main form[method="post"] button[type="submit"]');
+          await waitForInteraction(
+            '(() => location.pathname === "/dashboard" && document.querySelector("main")?.textContent.includes("Sign in to see your workspaces."))()',
+            "CSRF sign-out must remove the active browser session",
+          );
+          await inspectPrivate("/dashboard", "Sign in to see your workspaces.", [
+            "Synthetic signup workspace", "Foreign private marker",
+          ]);
+          console.log("PASS: native browser invalid-login denial, own account login, foreign isolation and CSRF sign-out");
           console.log("PASS: browser recovery link, generic response, email token redemption and replay rejection");
         }
       }
