@@ -34,6 +34,20 @@ def health(request):
 
 
 @method_decorator(never_cache, name="dispatch")
+class OperationalHealth(APIView):
+    """Current owner/admin-only observational counts, never mutation or recovery."""
+
+    def get(self, request, workspace_id):
+        from rest_framework.exceptions import ValidationError
+
+        from .admin_health import operational_health
+
+        if request.query_params:
+            raise ValidationError("Operational health does not accept query parameters.")
+        return Response(operational_health(request.user, workspace_id))
+
+
+@method_decorator(never_cache, name="dispatch")
 class ResultExportDownload(APIView):
     def post(self, request, workspace_id, job_id):
         from rest_framework.exceptions import ValidationError

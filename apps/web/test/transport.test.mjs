@@ -834,3 +834,41 @@ test("backend retries one 5xx but never retries denied, missing, or persistent f
     assert.equal(result.kind, expected);
   }
 });
+
+test("operational health is an exact, cookie-only, no-store admin read", async () => {
+  const ws = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const path = `/api/v1/workspaces/${ws}/admin/health/`;
+  const result = await readBackend(
+    "http://localhost:8000",
+    path,
+    session,
+    async (url, options) => {
+      assert.equal(url.pathname + url.search, path);
+      assert.deepEqual(options.headers, {
+        Accept: "application/json",
+        Cookie: `sessionid=${session}`,
+      });
+      assert.equal(options.cache, "no-store");
+      assert.equal(options.redirect, "manual");
+      return new Response(`{"workspace_id":"${ws}","advisory_only":true}`, {
+        headers: { "content-type": "application/json" },
+      });
+    },
+  );
+  assert.equal(result.kind, "ok");
+  for (const bad of [
+    `${path}?all=true`,
+    `${path}?workspace=all`,
+    `${path}retry/`,
+    `${path}../`,
+  ])
+    await assert.rejects(readBackend("http://localhost:8000", bad, session));
+  assert.equal(
+    (
+      await readBackend("http://localhost:8000", path, undefined, () => {
+        throw Error("anonymous operational report must not reach Django");
+      })
+    ).kind,
+    "signin",
+  );
+});

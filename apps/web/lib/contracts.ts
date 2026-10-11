@@ -705,6 +705,27 @@ export function sourceCatalog(v: unknown): v is SourceCatalog {
   );
 }
 
+export const invitationHealthStates = [
+  "pending",
+  "accepted",
+  "revoked",
+  "expired",
+] as const;
+export const operationalOutboxStates = [
+  "pending",
+  "cancelled",
+  "started",
+  "done",
+] as const;
+
+function exactCountMap(v: unknown, names: readonly string[]): boolean {
+  if (!object(v) || Object.keys(v).length !== names.length) return false;
+  return names.every((name) => {
+    const value = v[name];
+    return count(value) && value <= 2147483647;
+  });
+}
+
 export const jobStates = [
   "draft",
   "queued",
@@ -717,6 +738,37 @@ export const jobStates = [
 ] as const;
 export const jobState = (v: unknown): v is (typeof jobStates)[number] =>
   typeof v === "string" && jobStates.some((s) => s === v);
+
+export type OperationalHealth = {
+  workspace_id: string;
+  member_roles: Record<(typeof memberRoles)[number], number>;
+  invitations: Record<(typeof invitationHealthStates)[number], number>;
+  jobs: Record<(typeof jobStates)[number], number>;
+  outboxes: Record<(typeof operationalOutboxStates)[number], number>;
+  expired_pending_outboxes: number;
+  unknown_dispatch_operations: number;
+  reserved_usage_intents: number;
+  advisory_only: true;
+};
+export function operationalHealth(v: unknown): v is OperationalHealth {
+  return (
+    object(v) &&
+    uuid(v.workspace_id) &&
+    v.advisory_only === true &&
+    exactCountMap(v.member_roles, memberRoles) &&
+    exactCountMap(v.invitations, invitationHealthStates) &&
+    exactCountMap(v.jobs, jobStates) &&
+    exactCountMap(v.outboxes, operationalOutboxStates) &&
+    count(v.expired_pending_outboxes) &&
+    count(v.unknown_dispatch_operations) &&
+    count(v.reserved_usage_intents) &&
+    v.expired_pending_outboxes <= 2147483647 &&
+    v.unknown_dispatch_operations <= 2147483647 &&
+    v.reserved_usage_intents <= 2147483647 &&
+    (v.outboxes as OperationalHealth["outboxes"]).pending >=
+      v.expired_pending_outboxes
+  );
+}
 
 export type JobStatusSummary = {
   workspace_id: string;
