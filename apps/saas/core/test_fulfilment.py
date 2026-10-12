@@ -11,6 +11,7 @@ from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from lead_saas.local_fulfilment import LOCAL_SOURCES, SOURCE_CODE, verifier_settings
+from rest_framework.exceptions import PermissionDenied
 
 from .fulfilment import fulfil_outbox, run_pending
 from .jobs import enqueue_job
@@ -248,10 +249,8 @@ class FulfilmentTests(TestCase):
         job = queued_job(self.user, self.workspace)
         self.user.is_active = False
         self.user.save(update_fields=["is_active"])
-        with self.assertLogs("core.fulfilment", level="WARNING") as logged:
-            result = run_pending(limit=1)
-        self.assertEqual(result["conflict"], 1)
-        self.assertNotIn(str(job.pk), " ".join(logged.output))
+        result = run_pending(limit=1)
+        self.assertEqual(result, dict.fromkeys(result, 0))
         self.assertFalse(DispatchOperation.objects.filter(job=job).exists())
         self.assertFalse(JobAttempt.objects.filter(outbox__job=job).exists())
         self.assertEqual(JobOutbox.objects.get(job=job).reservation.status, "reserved")
@@ -261,9 +260,72 @@ class FulfilmentTests(TestCase):
     def test_inactive_entitlement_is_refused_before_dispatch(self):
         job = queued_job(self.user, self.workspace)
         Entitlement.objects.filter(workspace=self.workspace).update(active=False)
-        self.assertEqual(run_pending()["conflict"], 1)
+        self.assertEqual(run_pending(), dict.fromkeys(run_pending(), 0))
         self.assertFalse(DispatchOperation.objects.filter(job=job).exists())
         self.assertEqual(JobOutbox.objects.get(job=job).status, "pending")
+
+    def test_inactive_submitter_is_denied_even_with_active_workspace_owner(self):
+        member = User.objects.create_user(username="fulfil-disabled-submitter")
+        Membership.objects.create(workspace=self.workspace, user=member, role="member")
+        blocked = queued_job(member, self.workspace)
+        blocked_outbox = JobOutbox.objects.get(job=blocked)
+        member.is_active = False
+        member.save(update_fields=["is_active"])
+        with self.assertRaises(PermissionDenied):
+            fulfil_outbox(blocked_outbox.pk)
+
+        healthy = queued_job(self.user, self.workspace)
+        result = run_pending(limit=1)
+        self.assertEqual(result["completed"], 1)
+        self.assertEqual(result["conflict"], 0)
+        healthy.refresh_from_db()
+        self.assertEqual(healthy.status, "completed")
+        blocked.refresh_from_db()
+        self.assertEqual(blocked.status, "queued")
+        self.assertFalse(JobAttempt.objects.filter(outbox=blocked_outbox).exists())
+        self.assertFalse(DispatchOperation.objects.filter(outbox=blocked_outbox).exists())
+        self.assertEqual(blocked_outbox.reservation.status, "reserved")
+
+    def test_revoked_submitter_does_not_starve_next_valid_job(self):
+        member = User.objects.create_user(username="fulfil-revoked-submitter")
+        membership = Membership.objects.create(workspace=self.workspace, user=member, role="member")
+        blocked = queued_job(member, self.workspace)
+        blocked_outbox = JobOutbox.objects.get(job=blocked)
+        membership.delete()
+        healthy = queued_job(self.user, self.workspace)
+
+        result = run_pending(limit=1)
+        self.assertEqual((result["completed"], result["conflict"]), (1, 0))
+        healthy.refresh_from_db()
+        self.assertEqual(healthy.status, "completed")
+        self.assertFalse(JobAttempt.objects.filter(outbox=blocked_outbox).exists())
+        self.assertFalse(DispatchOperation.objects.filter(outbox=blocked_outbox).exists())
+        self.assertEqual(blocked_outbox.reservation.status, "reserved")
+
+    def test_lapsed_entitlement_does_not_starve_healthy_workspace(self):
+        blocked = queued_job(self.user, self.workspace)
+        blocked_outbox = JobOutbox.objects.get(job=blocked)
+        Entitlement.objects.filter(workspace=self.workspace).update(
+            valid_until=timezone.now() - timedelta(seconds=1)
+        )
+        other = User.objects.create_user(username="fulfil-healthy-tenant")
+        another_workspace = create_workspace(
+            other, {"name": "Healthy workspace", "timezone": "UTC"}
+        )
+        Entitlement.objects.create(
+            workspace=another_workspace,
+            active=True,
+            lead_limit=100,
+            job_limit=5,
+            provider_call_limit=5,
+        )
+        healthy = queued_job(other, another_workspace)
+        result = run_pending(limit=1)
+        self.assertEqual((result["completed"], result["conflict"]), (1, 0))
+        healthy.refresh_from_db()
+        self.assertEqual(healthy.status, "completed")
+        self.assertFalse(DispatchOperation.objects.filter(outbox=blocked_outbox).exists())
+        self.assertEqual(blocked_outbox.reservation.status, "reserved")
 
     def test_expired_and_retained_possible_effect_rows_do_not_starve_fulfilment(self):
         expired = queued_job(self.user, self.workspace)

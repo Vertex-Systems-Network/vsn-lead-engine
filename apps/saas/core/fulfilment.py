@@ -294,8 +294,10 @@ def dispatch_candidate_outboxes(*, at):
     """Read-only pre-selection, never substitute for locked dispatch preflight.
 
     Expired or uncertain pending rows can remain in the table until operator
-    review. Do not let them repeatedly consume a bounded worker batch. A
-    live lease also needs to expire before the claimant can be retried.
+    review. Do not let revoked/disabled submitters, inactive entitlements, or
+    unstaffed workspaces repeatedly consume the bounded worker batch. These
+    checks are advisory: the locked preflight still checks full entitlement,
+    current membership and source rights before any dispatch.
     """
     return (
         JobOutbox.objects.filter(
@@ -303,11 +305,32 @@ def dispatch_candidate_outboxes(*, at):
             job__status="queued",
             job__revision__lt=2147483647,
             result_protocol=2,
+            submitted_by__is_active=True,
             reservation__status="reserved",
             reservation__workspace_id=F("job__workspace_id"),
         )
         .filter(Q(expires_at__isnull=True) | Q(expires_at__gt=at))
         .filter(
+            Exists(
+                Membership.objects.filter(
+                    workspace_id=OuterRef("job__workspace_id"),
+                    user_id=OuterRef("submitted_by_id"),
+                    role__in=("owner", "admin", "member"),
+                )
+            ),
+            Exists(
+                Membership.objects.filter(
+                    workspace_id=OuterRef("job__workspace_id"),
+                    role__in=("owner", "admin"),
+                    user__is_active=True,
+                )
+            ),
+            Exists(
+                Entitlement.objects.filter(
+                    workspace_id=OuterRef("job__workspace_id"),
+                    active=True,
+                ).filter(Q(valid_until__isnull=True) | Q(valid_until__gt=at))
+            ),
             ~Exists(DispatchOperation.objects.filter(outbox_id=OuterRef("pk"))),
             ~Exists(
                 JobAttempt.objects.filter(outbox_id=OuterRef("pk"), status__in=("started", "done"))

@@ -24,6 +24,10 @@ def preflight(outbox, *, allow_batch_enrollment=False):
     if outbox.result_protocol != 2 and not allow_batch_enrollment:
         raise PermissionDenied("Batch dispatch is not available.")
     job = outbox.job
+    # An old persisted membership is not permission to dispatch work on behalf
+    # of a deactivated account. Recheck while the workspace is serialized.
+    if not outbox.submitted_by.is_active:
+        raise PermissionDenied("The submitting account is inactive.")
     lock_workspace(outbox.submitted_by, job.workspace_id)
     if (
         job.status != "queued"
