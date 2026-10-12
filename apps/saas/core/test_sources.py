@@ -122,7 +122,7 @@ class OvertureFulfilmentTests(TestCase):
                 place(1, phone={"private": "not-a-phone"}),
                 place(2, website="https://[broken"),
                 place(3, source_id=None),
-                place(4, business_name="Valid place"),
+                place(4, business_name="Valid place", website=""),
             ]
         )
         adapter = OvertureSource(place_source=fake, geographies_for=GEOS.get)
