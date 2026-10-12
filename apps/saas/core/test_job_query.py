@@ -28,6 +28,7 @@ class JobQueryTests(TestCase):
         page = self.client.get(self.url, {"status": "cancelled"}).json()
         self.assertEqual(len(page["results"]), 25)
         self.assertTrue(all(j["status"] == "cancelled" for j in page["results"]))
+        self.assertTrue(all(j["execution_review_required"] is False for j in page["results"]))
         second = self.client.get(self.url, {"status": "cancelled", "after": page["next"]}).json()
         self.assertEqual(len(second["results"]), 2)
         self.assertIsNone(second["next"])
