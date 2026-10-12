@@ -144,6 +144,32 @@ class FulfilmentTests(TestCase):
         )
         self.assertEqual(JobOutbox.objects.get(job=job).reservation.status, "settled")
 
+    def test_unsafe_website_rows_cannot_enter_signed_results_or_poison_valid_rows(self):
+        job = queued_job(self.user, self.workspace)
+        first, second = FixtureSource().fetch(job.search, 10)[:2]
+        invalid = [
+            {**first, "website": "javascript:alert(1)"},
+            {**first, "website": "https://user:password@salon.example"},
+            {**first, "website": "//salon.example"},
+            {**first, "website": "https://127.0.0.1/private"},
+            {**first, "website": "https://[broken"},
+        ]
+        with patch("core.sources.FixtureSource.fetch", return_value=invalid + [first, second]):
+            outcome = run_pending(limit=1)
+        self.assertEqual(outcome["completed"], 1)
+        self.assertEqual(outcome["unknown"], 0)
+        self.assertEqual(AcceptedResult.objects.filter(job=job).count(), 2)
+        self.assertEqual(
+            set(AcceptedResult.objects.filter(job=job).values_list("record_ref", flat=True)),
+            {first["source_id"], second["source_id"]},
+        )
+        self.assertTrue(
+            all(
+                not row.fields.get("website") or row.fields["website"].startswith("https://")
+                for row in AcceptedResult.objects.filter(job=job)
+            )
+        )
+
     def test_source_row_without_optional_city_is_eligible_and_deduped(self):
         job = queued_job(self.user, self.workspace)
         row = FixtureSource().fetch(job.search, 10)[0].copy()
