@@ -141,6 +141,24 @@ class OvertureAdapterTests(SimpleTestCase):
         self.assertNotIn("address", leads[2])
         self.assertEqual(leads[-1]["business_name"], "Salon 8")
 
+    def test_source_identifiers_never_collide_after_normalization_or_truncation(self):
+        colliding_before = [
+            place(1, source_id="abc/id"),
+            place(2, source_id="abcid"),
+            place(3, source_id="x" * 94),
+            place(4, source_id="x" * 93),
+            place(5, source_id="abc\\ndef"),
+            place(6, source_id="valid.a:b-1"),
+        ]
+        source = OvertureSource(place_source=FakePlaces(colliding_before), geographies_for=GEOS.get)
+        leads = source.fetch({"countries": ["US"], "categories": ["Salon"]}, 10)
+        self.assertEqual(
+            [lead["source_id"] for lead in leads],
+            ["ov-abcid", "ov-" + "x" * 93, "ov-valid.a:b-1"],
+        )
+        self.assertEqual(len({lead["source_id"] for lead in leads}), 3)
+        self.assertTrue(all(len(lead["source_id"]) <= 96 for lead in leads))
+
     def test_keeps_searching_past_known_leads_and_bounds_queries(self):
         fake = FakePlaces([place(i) for i in range(1, 4)])
         source = OvertureSource(place_source=fake, geographies_for=GEOS.get)
@@ -188,6 +206,32 @@ class OvertureFulfilmentTests(TestCase):
         rows = AcceptedResult.objects.filter(job=job)
         self.assertEqual(rows.count(), 2)
         self.assertTrue(all("website" not in row.fields for row in rows))
+
+    def test_distinct_overture_ids_survive_colliding_untrusted_id_inputs(self):
+        call_command("seed_local_source", "--source", OVERTURE, stdout=StringIO())
+        user = User.objects.create_user(username="overture-safe-id-owner")
+        workspace = create_workspace(user, {"name": "Overture IDs", "timezone": "UTC"})
+        Entitlement.objects.create(
+            workspace=workspace, active=True, lead_limit=50, job_limit=5, provider_call_limit=5
+        )
+        job = queued_job(user, workspace, source_codes=[OVERTURE], result_limit=2)
+        places = FakePlaces(
+            [
+                place(1, source_id="xy/z"),
+                place(2, source_id="xyz"),
+                place(3, source_id="x" * 94),
+                place(4, source_id="x" * 93),
+            ]
+        )
+        adapter = OvertureSource(place_source=places, geographies_for=GEOS.get)
+        with patch("core.fulfilment.adapter_for", return_value=adapter):
+            summary = run_pending(limit=1)
+        self.assertEqual((summary["completed"], summary["unknown"]), (1, 0))
+        self.assertEqual(
+            set(AcceptedResult.objects.filter(job=job).values_list("record_ref", flat=True)),
+            {"ov-xyz", "ov-" + "x" * 93},
+        )
+        self.assertEqual(AcceptedResult.objects.filter(job=job).count(), 2)
 
     def test_overture_job_fulfils_end_to_end_with_injected_places(self):
         call_command("seed_local_source", "--source", OVERTURE, stdout=StringIO())
