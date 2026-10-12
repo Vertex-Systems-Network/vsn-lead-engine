@@ -33,7 +33,7 @@ from .models import (
     SourcePolicy,
 )
 from .receipts import reconcile_receipt
-from .sources import adapter_for
+from .sources import adapter_for, valid_public_website
 
 logger = logging.getLogger(__name__)
 
@@ -120,12 +120,8 @@ def valid_source_lead(lead, search):
     if not lead["business_name"].strip():
         return False
     website = lead.get("website")
-    if website:
-        try:
-            if not urlparse(website).hostname and "://" in website:
-                return False
-        except ValueError:
-            return False
+    if website and not valid_public_website(website):
+        return False
     return True
 
 
