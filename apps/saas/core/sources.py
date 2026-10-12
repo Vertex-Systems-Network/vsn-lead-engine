@@ -99,6 +99,44 @@ def clean_place_text(raw, max_length):
     return raw.strip()[:max_length]
 
 
+WEB_HOST = re.compile(
+    r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?"
+    r"(?:\\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+"
+)
+
+
+def valid_public_website(url):
+    """Conservative untrusted lead-website check; never fetches any URL.
+
+    Accept only explicit HTTP(S) URLs with unambiguous DNS names. A string
+    accepted here is not proof a website exists, is owned by the business or
+    is safe to visit. Signed rights and result checks remain independent.
+    """
+    if (
+        not isinstance(url, str)
+        or not 1 <= len(url) <= 2000
+        or not url.startswith(("https://", "http://"))
+        or any(char.isspace() or ord(char) < 32 or ord(char) == 127 for char in url)
+        or "\\\\" in url
+    ):
+        return False
+    try:
+        parsed = urlparse(url)
+        host = parsed.hostname
+        return (
+            parsed.scheme in {"https", "http"}
+            and host is not None
+            and len(host) <= 253
+            and WEB_HOST.fullmatch(host) is not None
+            and any(char.isalpha() for char in host.rsplit(".", 1)[-1])
+            and parsed.username is None
+            and parsed.password is None
+            and (parsed.port is None or 1 <= parsed.port <= 65535)
+        )
+    except ValueError:
+        return False
+
+
 class OvertureSource:
     """Overture Maps Places through the production collector's query code.
 
@@ -166,19 +204,7 @@ class OvertureSource:
             "address": clean_place_text(getattr(place, "street_address", None), 500),
         }
         website = clean_place_text(getattr(place, "website", None), 500)
-        if website:
-            try:
-                parsed = urlparse(website)
-                if "://" in website and (
-                    parsed.scheme not in {"http", "https"}
-                    or not parsed.hostname
-                    or parsed.username is not None
-                    or parsed.password is not None
-                ):
-                    website = ""
-            except ValueError:
-                website = ""
-        if website:
+        if website and valid_public_website(website):
             lead["website"] = website
         return {key: value for key, value in lead.items() if value}
 
