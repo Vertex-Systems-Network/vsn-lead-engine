@@ -43,6 +43,8 @@ class JobExecutionReviewVisibilityTests(TestCase):
         pending = self.client.get(self.url(job))
         self.assertEqual(pending.status_code, 200)
         self.assertIs(pending.json()["execution_review_required"], False)
+        native_path = f"/workspaces/{self.workspace.id}/jobs/{job.id}/"
+        self.assertContains(self.client.get(native_path), 'http-equiv="refresh"')
 
         secret = "private-provider-secret-must-not-be-exposed"
         with patch("core.sources.FixtureSource.fetch", side_effect=RuntimeError(secret)):
@@ -62,6 +64,12 @@ class JobExecutionReviewVisibilityTests(TestCase):
         data = response.json()
         self.assertIs(data["execution_review_required"], True)
         self.assertEqual(data["status"], "running")
+        native = self.client.get(native_path)
+        self.assertEqual(native.status_code, 200)
+        self.assertContains(native, "needs authorized operator review")
+        self.assertContains(native, 'role="status"')
+        self.assertNotContains(native, 'http-equiv="refresh"')
+        self.assertNotContains(native, "refreshes every 15 seconds")
         for forbidden in (
             secret,
             str(operation.id),
@@ -86,6 +94,10 @@ class JobExecutionReviewVisibilityTests(TestCase):
         viewer = self.client.get(self.url(job))
         self.assertEqual(viewer.status_code, 200)
         self.assertIs(viewer.json()["execution_review_required"], True)
+        viewer_native = self.client.get(native_path)
+        self.assertContains(viewer_native, "needs authorized operator review")
+        self.assertNotContains(viewer_native, 'http-equiv="refresh"')
+        self.assertNotContains(viewer_native, str(operation.provider_key))
 
     def test_unrelated_and_revoked_users_cannot_read_review_signal(self):
         job = queued_job(self.owner, self.workspace)
@@ -93,12 +105,15 @@ class JobExecutionReviewVisibilityTests(TestCase):
         denied = self.client.get(self.url(job))
         self.assertEqual(denied.status_code, 404)
         self.assertNotIn(b"execution_review_required", denied.content)
+        native_path = f"/workspaces/{self.workspace.id}/jobs/{job.id}/"
+        self.assertEqual(self.client.get(native_path).status_code, 404)
 
         self.client.force_login(self.viewer)
         Membership.objects.filter(workspace=self.workspace, user=self.viewer).delete()
         revoked = self.client.get(self.url(job))
         self.assertEqual(revoked.status_code, 404)
         self.assertNotIn(b"execution_review_required", revoked.content)
+        self.assertEqual(self.client.get(native_path).status_code, 404)
 
     def test_healthy_completion_and_foreign_unknown_do_not_trigger_review(self):
         blocked = queued_job(self.owner, self.workspace)
