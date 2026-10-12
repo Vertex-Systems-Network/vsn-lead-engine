@@ -71,7 +71,7 @@ class OvertureAdapterTests(SimpleTestCase):
                 place(4, website="https://[unbalanced"),
                 place(5, website="https://user:secret@provider.example"),
                 place(6, city={"bad": "data"}, region=[], street_address=123),
-                place(7, business_name="CRLF\\nInjected"),
+                place(7, business_name="CRLF\nInjected"),
                 place(8),
             ]
         )
