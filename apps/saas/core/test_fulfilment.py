@@ -132,7 +132,7 @@ class FulfilmentTests(TestCase):
         registry_reads = []
 
         def capture_registry_queries(execute, sql, params, many, context):
-            if "core_acceptedfingerprint" in sql and "SELECT" in sql.upper():
+            if "core_acceptedfingerprint" in sql and sql.lstrip().upper().startswith("SELECT"):
                 registry_reads.append((sql, params))
             return execute(sql, params, many, context)
 
