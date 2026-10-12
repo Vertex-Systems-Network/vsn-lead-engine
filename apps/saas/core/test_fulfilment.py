@@ -152,9 +152,7 @@ class FulfilmentTests(TestCase):
             result = run_pending(limit=1)
         self.assertEqual(result["completed"], 1)
         self.assertEqual(AcceptedResult.objects.filter(job=job).count(), 1)
-        self.assertEqual(
-            AcceptedResult.objects.get(job=job).record_ref, row["source_id"]
-        )
+        self.assertEqual(AcceptedResult.objects.get(job=job).record_ref, row["source_id"])
 
     def test_source_candidate_scan_is_bounded_even_with_bad_input(self):
         job = queued_job(self.user, self.workspace)
