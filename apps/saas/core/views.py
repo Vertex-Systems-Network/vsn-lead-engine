@@ -268,7 +268,20 @@ class JobList(APIView):
         from .job_query import job_page
 
         rows, next_cursor = job_page(workspace_id, request.query_params)
-        return Response({"results": JobSerializer(rows, many=True).data, "next": next_cursor})
+        # A bounded page (at most 25 jobs) gets one scoped ledger lookup.
+        # Do not leak provider/operation IDs or alter job state on GET.
+        review_ids = {
+            str(job_id)
+            for job_id in DispatchOperation.objects.filter(
+                workspace_id=workspace_id,
+                job_id__in=[row.pk for row in rows],
+                status="unknown",
+            ).values_list("job_id", flat=True)
+        }
+        results = JobSerializer(rows, many=True).data
+        for record in results:
+            record["execution_review_required"] = record["id"] in review_ids
+        return Response({"results": results, "next": next_cursor})
 
     def post(self, request, workspace_id):
         membership_for(request.user, workspace_id)
