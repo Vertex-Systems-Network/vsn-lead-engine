@@ -11,6 +11,7 @@ import json
 import os
 import re
 from pathlib import Path
+from urllib.parse import urlparse
 
 from lead_saas.local_fulfilment import OVERTURE
 from lead_saas.local_fulfilment import SOURCE_CODE as LOCAL_FIXTURE
@@ -72,7 +73,9 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 def nanp_e164(raw):
     """+1NXXNXXXXXX for a well-formed US/Canada number, else empty."""
-    digits = re.sub(r"\D", "", raw or "")
+    if not isinstance(raw, str):
+        return ""
+    digits = re.sub(r"\D", "", raw)
     if len(digits) == 11 and digits.startswith("1"):
         digits = digits[1:]
     if not re.fullmatch(r"[2-9][0-9]{2}[2-9][0-9]{6}", digits):
@@ -87,6 +90,13 @@ def geographies(country):
         path = REPO_ROOT / path
     name = COUNTRY_NAMES[country]
     return [g for g in json.loads(path.read_text())["geographies"] if g.get("country") == name]
+
+
+def clean_place_text(raw, max_length):
+    """Ignore malformed optional upstream fields without stringifying their objects."""
+    if not isinstance(raw, str) or any(ord(ch) < 32 or ord(ch) == 127 for ch in raw):
+        return ""
+    return raw.strip()[:max_length]
 
 
 class OvertureSource:
@@ -137,22 +147,39 @@ class OvertureSource:
 
     @staticmethod
     def _lead(country, category, place):
-        phone = nanp_e164(place.phone)
-        ref = re.sub(r"[^A-Za-z0-9._:-]", "", f"ov-{place.source_id}")[:96]
-        if not phone or not place.business_name.strip() or ref == "ov-":
+        raw_id = getattr(place, "source_id", None)
+        if not isinstance(raw_id, str) or not raw_id.strip():
+            return None
+        phone = nanp_e164(getattr(place, "phone", None))
+        name = clean_place_text(getattr(place, "business_name", None), 300)
+        ref = re.sub(r"[^A-Za-z0-9._:-]", "", f"ov-{raw_id}")[:96]
+        if not phone or not name or ref == "ov-":
             return None
         lead = {
             "source_id": ref,
             "country": country,
             "category": category,
-            "business_name": place.business_name.strip()[:300],
+            "business_name": name,
             "phone": phone,
-            "city": (place.city or "").strip()[:200],
-            "region": (place.region or "").strip()[:200],
-            "address": (place.street_address or "").strip()[:500],
+            "city": clean_place_text(getattr(place, "city", None), 200),
+            "region": clean_place_text(getattr(place, "region", None), 200),
+            "address": clean_place_text(getattr(place, "street_address", None), 500),
         }
-        if place.website:
-            lead["website"] = place.website.strip()[:500]
+        website = clean_place_text(getattr(place, "website", None), 500)
+        if website:
+            try:
+                parsed = urlparse(website)
+                if "://" in website and (
+                    parsed.scheme not in {"http", "https"}
+                    or not parsed.hostname
+                    or parsed.username is not None
+                    or parsed.password is not None
+                ):
+                    website = ""
+            except ValueError:
+                website = ""
+        if website:
+            lead["website"] = website
         return {key: value for key, value in lead.items() if value}
 
 

@@ -46,6 +46,8 @@ class OvertureAdapterTests(SimpleTestCase):
         self.assertEqual(nanp_e164("+1 512 555 1234"), "+15125551234")
         for bad in ("", "555-1234", "+44 20 7946 0958", "(112) 555-1234", "512 055 1234"):
             self.assertEqual(nanp_e164(bad), "")
+        for malformed in (None, 5125551234, [], {}, False):
+            self.assertEqual(nanp_e164(malformed), "")
 
     def test_maps_places_to_lead_dicts_and_skips_unusable_rows(self):
         fake = FakePlaces([place(1), place(2), place(3, phone="n/a"), place(4, business_name=" ")])
@@ -59,6 +61,32 @@ class OvertureAdapterTests(SimpleTestCase):
         self.assertNotIn("website", leads[0])
         self.assertEqual(leads[1]["website"], "https://salon2.example")
         self.assertEqual(leads[1]["address"], "2 Congress Ave")
+
+    def test_malformed_place_isolated_and_bad_optional_fields_discarded(self):
+        fake = FakePlaces(
+            [
+                place(1, phone=5125551001),
+                place(2, business_name=None),
+                place(3, source_id=None),
+                place(4, website="https://[unbalanced"),
+                place(5, website="https://user:secret@provider.example"),
+                place(6, city={"bad": "data"}, region=[], street_address=123),
+                place(7, business_name="CRLF\nInjected"),
+                place(8),
+            ]
+        )
+        source = OvertureSource(place_source=fake, geographies_for=GEOS.get)
+        leads = source.fetch({"countries": ["US"], "categories": ["Salon"]}, 10)
+        self.assertEqual(
+            [item["source_id"] for item in leads],
+            ["ov-08f2a0004abc", "ov-08f2a0005abc", "ov-08f2a0006abc", "ov-08f2a0008abc"],
+        )
+        self.assertNotIn("website", leads[0])
+        self.assertNotIn("website", leads[1])
+        self.assertNotIn("city", leads[2])
+        self.assertNotIn("region", leads[2])
+        self.assertNotIn("address", leads[2])
+        self.assertEqual(leads[-1]["business_name"], "Salon 8")
 
     def test_keeps_searching_past_known_leads_and_bounds_queries(self):
         fake = FakePlaces([place(i) for i in range(1, 4)])
@@ -81,6 +109,33 @@ class OvertureAdapterTests(SimpleTestCase):
 
 @override_settings(**LOCAL)
 class OvertureFulfilmentTests(TestCase):
+    def test_malformed_upstream_place_does_not_block_valid_synthetic_overture_job(self):
+        call_command("seed_local_source", "--source", OVERTURE, stdout=StringIO())
+        user = User.objects.create_user(username="overture-partial-record-owner")
+        workspace = create_workspace(user, {"name": "Overture partial", "timezone": "UTC"})
+        Entitlement.objects.create(
+            workspace=workspace, active=True, lead_limit=50, job_limit=5, provider_call_limit=5
+        )
+        job = queued_job(user, workspace, source_codes=[OVERTURE], result_limit=2)
+        fake = FakePlaces(
+            [
+                place(1, phone={"private": "not-a-phone"}),
+                place(2, website="https://[broken"),
+                place(3, source_id=None),
+                place(4, business_name="Valid place", website=""),
+            ]
+        )
+        adapter = OvertureSource(place_source=fake, geographies_for=GEOS.get)
+        with patch("core.fulfilment.adapter_for", return_value=adapter):
+            counts = run_pending(limit=1)
+        self.assertEqual(counts["completed"], 1)
+        self.assertEqual(counts["unknown"], 0)
+        job.refresh_from_db()
+        self.assertEqual((job.status, job.result_count), ("completed", 2))
+        rows = AcceptedResult.objects.filter(job=job)
+        self.assertEqual(rows.count(), 2)
+        self.assertTrue(all("website" not in row.fields for row in rows))
+
     def test_overture_job_fulfils_end_to_end_with_injected_places(self):
         call_command("seed_local_source", "--source", OVERTURE, stdout=StringIO())
         user = User.objects.create_user(username="overture-owner")
