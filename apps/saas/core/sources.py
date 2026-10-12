@@ -186,13 +186,16 @@ class OvertureSource:
     @staticmethod
     def _lead(country, category, place):
         raw_id = getattr(place, "source_id", None)
-        if not isinstance(raw_id, str) or not raw_id.strip():
+        # Do not strip punctuation or silently truncate identity: e.g. "a/b"
+        # and "ab", or distinct long IDs, would otherwise alias the same
+        # dedupe/source reference and hide legitimate records.
+        if not isinstance(raw_id, str) or re.fullmatch(r"[A-Za-z0-9._:-]{1,93}", raw_id) is None:
             return None
         phone = nanp_e164(getattr(place, "phone", None))
         name = clean_place_text(getattr(place, "business_name", None), 300)
-        ref = re.sub(r"[^A-Za-z0-9._:-]", "", f"ov-{raw_id}")[:96]
-        if not phone or not name or ref == "ov-":
+        if not phone or not name:
             return None
+        ref = f"ov-{raw_id}"
         lead = {
             "source_id": ref,
             "country": country,
