@@ -9,7 +9,7 @@ from lead_saas.local_fulfilment import OVERTURE
 from .fulfilment import run_pending
 from .models import AcceptedResult, Entitlement, User
 from .services import create_workspace
-from .sources import OvertureSource, adapter_for, geographies, nanp_e164
+from .sources import OvertureSource, adapter_for, geographies, nanp_e164, valid_public_website
 from .test_fulfilment import LOCAL, queued_job
 
 
@@ -48,6 +48,59 @@ class OvertureAdapterTests(SimpleTestCase):
             self.assertEqual(nanp_e164(bad), "")
         for malformed in (None, 5125551234, [], {}, False):
             self.assertEqual(nanp_e164(malformed), "")
+
+    def test_public_lead_website_check_is_conservative_and_never_fetches(self):
+        for valid in (
+            "https://salon2.example",
+            "http://shop.example.com/",
+            "https://www.example.ca/path?q=hello#about",
+            "https://xn--bcher-kva.example",
+            "https://salon.example:8443/catalog",
+        ):
+            with self.subTest(valid=valid):
+                self.assertTrue(valid_public_website(valid))
+        for invalid in (
+            None,
+            ["https://salon.example"],
+            "",
+            "salon.example",
+            "//salon.example",
+            "javascript:alert(1)",
+            "data:text/html,hello",
+            "file:///etc/passwd",
+            "ftp://salon.example",
+            "https://user:secret@salon.example",
+            "https://[broken",
+            "https://localhost",
+            "https://127.0.0.1/private",
+            "https://domain.123",
+            "https://salon.example:99999",
+            "https://salon.example:abc",
+            "https://salon.example\\\\@fake.example",
+            "https://salon.example/path\\nnewline",
+            "https://salon.example/path with spaces",
+            "https://salon.example./",
+            "https://-salon.example",
+        ):
+            with self.subTest(invalid=invalid):
+                self.assertFalse(valid_public_website(invalid))
+
+    def test_unsafe_optional_overture_websites_are_omitted_not_fatal(self):
+        bad = (
+            "javascript:alert(1)",
+            "//provider.example",
+            "shop.example.com",
+            "http://127.0.0.1/internal",
+            "https://user:pass@provider.example",
+            "ftp://provider.example",
+            "https://[broken",
+            "https://provider.example\\\\@invalid.example",
+        )
+        fake = FakePlaces([place(i + 10, website=url) for i, url in enumerate(bad)])
+        adapter = OvertureSource(place_source=fake, geographies_for=GEOS.get)
+        leads = adapter.fetch({"countries": ["US"], "categories": ["Salon"]}, 10)
+        self.assertEqual(len(leads), len(bad))
+        self.assertTrue(all("website" not in lead for lead in leads))
 
     def test_maps_places_to_lead_dicts_and_skips_unusable_rows(self):
         fake = FakePlaces([place(1), place(2), place(3, phone="n/a"), place(4, business_name=" ")])
