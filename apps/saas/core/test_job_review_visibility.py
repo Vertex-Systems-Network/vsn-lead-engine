@@ -75,9 +75,7 @@ class JobExecutionReviewVisibilityTests(TestCase):
         self.assertEqual(data["status"], "running")
         held_list = self.client.get(list_path)
         self.assertEqual(held_list.status_code, 200)
-        held_row = next(
-            row for row in held_list.json()["results"] if row["id"] == str(job.id)
-        )
+        held_row = next(row for row in held_list.json()["results"] if row["id"] == str(job.id))
         self.assertIs(held_row["execution_review_required"], True)
         self.assertEqual(held_row["status"], "running")
         self.assertNotIn(secret, held_list.content.decode())
