@@ -288,9 +288,7 @@ class FulfilmentTests(TestCase):
 
     def test_revoked_submitter_does_not_starve_next_valid_job(self):
         member = User.objects.create_user(username="fulfil-revoked-submitter")
-        membership = Membership.objects.create(
-            workspace=self.workspace, user=member, role="member"
-        )
+        membership = Membership.objects.create(workspace=self.workspace, user=member, role="member")
         blocked = queued_job(member, self.workspace)
         blocked_outbox = JobOutbox.objects.get(job=blocked)
         membership.delete()
