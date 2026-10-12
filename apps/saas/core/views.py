@@ -567,12 +567,18 @@ def job_detail_page(request, workspace_id, job_id):
     from .job_history import detail_snapshot
 
     workspace, job = detail_snapshot(request.user, workspace_id, job_id)
+    # Match the customer API's held-effect review signal without leaking
+    # operation identities. A review-required page must stop auto-refreshing.
+    execution_review_required = DispatchOperation.objects.filter(
+        workspace_id=workspace_id, job_id=job.pk, status="unknown"
+    ).exists()
     return render(
         request,
         "core/job_detail.html",
         {
             "workspace": workspace,
             "job": job,
+            "execution_review_required": execution_review_required,
             "can_cancel_pending": job.status in {"draft", "queued"}
             and membership_for(request.user, workspace_id).role in {"owner", "admin", "member"},
             "can_submit": job.status == "draft"
