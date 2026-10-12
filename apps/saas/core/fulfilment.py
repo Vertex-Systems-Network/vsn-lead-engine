@@ -104,9 +104,7 @@ def valid_source_lead(lead, search):
         or PHONE.fullmatch(lead["phone"]) is None
     ):
         return False
-    if not isinstance(lead.get("city", ""), str) or not isinstance(
-        lead.get("region", ""), str
-    ):
+    if not isinstance(lead.get("city", ""), str) or not isinstance(lead.get("region", ""), str):
         return False
     for key in (*RECORD_FIELDS, "region"):
         value = lead.get(key)
