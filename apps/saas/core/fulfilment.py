@@ -126,19 +126,21 @@ def valid_source_lead(lead, search):
 
 
 def select_records(operation, policy, search, leads, cap):
-    """Eligible, in-scope, batch- and workspace-unique records, at most ``cap``."""
+    """Bound the workspace fingerprint read to tokens of eligible input rows.
+
+    At most MAX_BATCH * 4 source rows are inspected. Fetch only fingerprints
+    corresponding to the candidate tokens, never the tenant's entire registry.
+    Batch duplicates are still checked in input order; the signed acceptance
+    transaction remains the authoritative uniqueness and rights gate.
+    """
     rights = policy.controls["result_contract"]
     allowed = set(rights["display_fields"]) & set(rights["storage_fields"])
     required = {"business_name" if f == "name" else f for f in search["required_fields"]}
-    seen = set(
-        AcceptedFingerprint.objects.filter(workspace_id=operation.workspace_id).values_list(
-            "token", flat=True
-        )
-    )
     now = int(timezone.now().timestamp())
-    selected = []
+    candidates = []
+    candidate_tokens = set()
     for index, lead in enumerate(leads):
-        if len(selected) >= cap or index >= MAX_BATCH * 4:
+        if index >= MAX_BATCH * 4:
             break
         if not valid_source_lead(lead, search):
             continue
@@ -153,11 +155,8 @@ def select_records(operation, policy, search, leads, cap):
             continue
         lead = {**lead, "website": fields.get("website", "")}
         tokens = _tokens(operation.source_code, lead)
-        if seen.intersection(tokens):
-            continue
-        seen.update(tokens)
         ref = lead["source_id"]
-        selected.append(
+        candidates.append(
             (
                 {
                     "record_ref": ref,
@@ -172,6 +171,23 @@ def select_records(operation, policy, search, leads, cap):
                 tokens,
             )
         )
+        candidate_tokens.update(tokens)
+    if not candidate_tokens:
+        return []
+    known = set(
+        AcceptedFingerprint.objects.filter(
+            workspace_id=operation.workspace_id, token__in=candidate_tokens
+        ).values_list("token", flat=True)
+    )
+    selected = []
+    seen = set()
+    for record, tokens in candidates:
+        if known.intersection(tokens) or seen.intersection(tokens):
+            continue
+        seen.update(tokens)
+        selected.append((record, tokens))
+        if len(selected) >= cap:
+            break
     return selected
 
 
@@ -205,16 +221,23 @@ def fulfil_outbox(outbox_id):
         policy = SourcePolicy.objects.get(pk=operation.source_code)
         entitlement = Entitlement.objects.get(workspace_id=job.workspace_id)
         cap = min(MAX_BATCH, job.search["result_limit"], entitlement.lead_limit)
-        known = set(
-            AcceptedFingerprint.objects.filter(workspace_id=job.workspace_id).values_list(
-                "token", flat=True
-            )
-        )
-        leads = adapter.fetch(
-            job.search,
-            cap,
-            is_new=lambda lead: not known.intersection(_tokens(operation.source_code, lead)),
-        )
+        rights = policy.controls["result_contract"]
+        allowed = set(rights["display_fields"]) & set(rights["storage_fields"])
+
+        def is_new(lead):
+            # A source can scan past already-known businesses, but its read
+            # must never materialize an unbounded workspace registry. Reject
+            # malformed input before hashing and use the same rights-limited
+            # identity as select_records.
+            if not valid_source_lead(lead, job.search):
+                return False
+            identity = {**lead, "website": lead.get("website", "") if "website" in allowed else ""}
+            tokens = _tokens(operation.source_code, identity)
+            return not AcceptedFingerprint.objects.filter(
+                workspace_id=job.workspace_id, token__in=tokens
+            ).exists()
+
+        leads = adapter.fetch(job.search, cap, is_new=is_new)
         selected = select_records(operation, policy, job.search, leads, cap)
         identity = _identity(operation)
         now = int(timezone.now().timestamp())
