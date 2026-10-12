@@ -101,7 +101,7 @@ def clean_place_text(raw, max_length):
 
 WEB_HOST = re.compile(
     r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?"
-    r"(?:\\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+"
+    r"(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+"
 )
 
 
@@ -117,7 +117,7 @@ def valid_public_website(url):
         or not 1 <= len(url) <= 2000
         or not url.startswith(("https://", "http://"))
         or any(char.isspace() or ord(char) < 32 or ord(char) == 127 for char in url)
-        or "\\\\" in url
+        or "\\" in url
     ):
         return False
     try:
