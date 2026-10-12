@@ -154,8 +154,12 @@ class FulfilmentTests(TestCase):
         duplicates = [
             first,
             {**second, "phone": first["phone"]},
-            {**third, "business_name": first["business_name"], "city": first["city"],
-             "region": first["region"]},
+            {
+                **third,
+                "business_name": first["business_name"],
+                "city": first["city"],
+                "region": first["region"],
+            },
             second,
             third,
         ]
