@@ -563,6 +563,7 @@ export type Job = {
   revision: number;
   search: { countries: string[]; categories: string[] };
   created_at: string;
+  execution_review_required?: boolean;
 };
 export type Jobs = { results: Job[]; next: string | null };
 export function job(v: unknown): v is Job {
@@ -571,6 +572,8 @@ export function job(v: unknown): v is Job {
     uuid(v.id) &&
     uuid(v.workspace_id) &&
     typeof v.status === "string" &&
+    (v.execution_review_required === undefined ||
+      typeof v.execution_review_required === "boolean") &&
     count(v.result_count) &&
     count(v.revision) &&
     typeof v.created_at === "string" &&

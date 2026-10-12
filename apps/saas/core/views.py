@@ -17,7 +17,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Job, Membership, MembershipAudit, Workspace
+from .models import DispatchOperation, Job, Membership, MembershipAudit, Workspace
 from .serializers import (
     JobSerializer,
     MembershipAuditSerializer,
@@ -290,7 +290,14 @@ class JobDetail(APIView):
     def get(self, request, workspace_id, job_id):
         membership_for(request.user, workspace_id)
         job = get_object_or_404(Job, workspace_id=workspace_id, id=job_id)
-        return Response(JobSerializer(job).data)
+        data = JobSerializer(job).data
+        # An outcome held for operator review must not appear to customers as
+        # active collection. Only publish a tenant-scoped boolean, not the
+        # operation ledger, provider identities or reserved usage amounts.
+        data["execution_review_required"] = DispatchOperation.objects.filter(
+            workspace_id=workspace_id, job_id=job.pk, status="unknown"
+        ).exists()
+        return Response(data)
 
 
 class MemberList(generics.ListAPIView):

@@ -17,7 +17,11 @@ export default async function Detail({
   );
   if (result.kind !== "ok") return <State kind={result.kind} />;
   const j = result.data;
-  if (j.workspace_id !== workspaceId || j.id !== jobId)
+  if (
+    j.workspace_id !== workspaceId ||
+    j.id !== jobId ||
+    typeof j.execution_review_required !== "boolean"
+  )
     return <State kind="unavailable" />;
   return (
     <>
@@ -64,7 +68,13 @@ export default async function Detail({
             </a>
           </p>
         ) : null}
-        {["queued", "running"].includes(j.status) ? (
+        {j.execution_review_required ? (
+          <p className="notice" role="status">
+            The collection outcome needs authorized operator review. Available
+            results and reserved allowance may be held while it is checked. Do
+            not assume a retry or refund is safe.
+          </p>
+        ) : ["queued", "running"].includes(j.status) ? (
           <p className="notice">
             {j.status === "queued"
               ? "Queued for collection. This page updates automatically."
