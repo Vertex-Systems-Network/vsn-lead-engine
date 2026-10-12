@@ -21,6 +21,7 @@ from django.utils import timezone
 from .accepted_results import accept_results
 from .attempts import MAX_ATTEMPTS, claim_pre_dispatch
 from .candidate_events import record_candidate_review
+from .candidate_records import token
 from .dispatch import begin_dispatch, mark_outcome_unknown
 from .models import (
     AcceptedFingerprint,
@@ -65,7 +66,7 @@ def _tokens(source_code, lead):
     tokens = [
         _token("s", f"{source_code}|{lead['source_id']}"),
         _token("n", lead["phone"]),
-        _token("l", f"{name}|{lead['city'].lower()}|{lead.get('region', '').lower()}"),
+        _token("l", f"{name}|{lead.get('city', '').lower()}|{lead.get('region', '').lower()}"),
     ]
     if lead.get("website"):
         host = (urlparse(lead["website"]).hostname or lead["website"]).lower()
@@ -85,6 +86,51 @@ def _identity(operation):
     }
 
 
+def valid_source_lead(lead, search):
+    """Reject malformed untrusted source records before tokenization/attestation.
+
+    The signed candidate verifier remains authoritative. An invalid optional
+    field, identity or URL must not invalidate otherwise eligible source rows.
+    """
+    if not isinstance(lead, dict) or not token(lead.get("source_id")):
+        return False
+    if (
+        type(lead.get("country")) is not str
+        or lead["country"] not in search["countries"]
+        or type(lead.get("category")) is not str
+        or lead["category"] not in search["categories"]
+        or type(lead.get("business_name")) is not str
+        or type(lead.get("phone")) is not str
+        or PHONE.fullmatch(lead["phone"]) is None
+    ):
+        return False
+    if not isinstance(lead.get("city", ""), str) or not isinstance(
+        lead.get("region", ""), str
+    ):
+        return False
+    for key in (*RECORD_FIELDS, "region"):
+        value = lead.get(key)
+        if value is None or value == "":
+            continue
+        if (
+            not isinstance(value, str)
+            or not value.strip()
+            or len(value) > 2000
+            or any(ord(char) < 32 or ord(char) == 127 for char in value)
+        ):
+            return False
+    if not lead["business_name"].strip():
+        return False
+    website = lead.get("website")
+    if website:
+        try:
+            if not urlparse(website).hostname and "://" in website:
+                return False
+        except ValueError:
+            return False
+    return True
+
+
 def select_records(operation, policy, search, leads, cap):
     """Eligible, in-scope, batch- and workspace-unique records, at most ``cap``."""
     rights = policy.controls["result_contract"]
@@ -97,13 +143,10 @@ def select_records(operation, policy, search, leads, cap):
     )
     now = int(timezone.now().timestamp())
     selected = []
-    for lead in leads:
-        if len(selected) >= cap:
+    for index, lead in enumerate(leads):
+        if len(selected) >= cap or index >= MAX_BATCH * 4:
             break
-        if (
-            lead["country"] not in search["countries"]
-            or lead["category"] not in search["categories"]
-        ):
+        if not valid_source_lead(lead, search):
             continue
         fields = {k: lead[k] for k in RECORD_FIELDS if lead.get(k) and k in allowed}
         if search["statuses"]:
