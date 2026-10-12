@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.db import connection
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from lead_saas.local_fulfilment import LOCAL_SOURCES, SOURCE_CODE, verifier_settings
@@ -110,6 +111,62 @@ class FulfilmentTests(TestCase):
         third.refresh_from_db()
         self.assertEqual(third.status, "failed")
         self.assertEqual(JobOutbox.objects.get(job=third).reservation.status, "released")
+
+    def test_growing_registry_is_queried_only_for_bounded_candidate_tokens(self):
+        first = queued_job(self.user, self.workspace)
+        self.assertEqual(run_pending(limit=1)["completed"], 1)
+        existing = AcceptedResult.objects.filter(job=first).first()
+        # An existing tenant can have far more fingerprints than the 25-row
+        # worker batch. Artificial unrelated tokens must not be read en masse.
+        AcceptedFingerprint.objects.bulk_create(
+            [
+                AcceptedFingerprint(
+                    workspace=self.workspace,
+                    result=existing,
+                    token=f"n:{index:024x}",
+                )
+                for index in range(1500)
+            ]
+        )
+        second = queued_job(self.user, self.workspace)
+        registry_reads = []
+
+        def capture_registry_queries(execute, sql, params, many, context):
+            if "core_acceptedfingerprint" in sql and "SELECT" in sql.upper():
+                registry_reads.append((sql, params))
+            return execute(sql, params, many, context)
+
+        with connection.execute_wrapper(capture_registry_queries):
+            outcome = run_pending(limit=1)
+        self.assertEqual(outcome["completed"], 1)
+        self.assertEqual(outcome["unknown"], 0)
+        self.assertEqual(AcceptedResult.objects.filter(job=second).count(), 10)
+        self.assertTrue(registry_reads)
+        for sql, params in registry_reads:
+            with self.subTest(sql=sql[:80]):
+                self.assertIn('"token" IN (', sql)
+                self.assertLessEqual(len(params), 4 * 100 + 2)
+        self.assertEqual(JobOutbox.objects.get(job=second).reservation.status, "settled")
+
+    def test_duplicate_tokens_inside_source_batch_are_still_rejected(self):
+        job = queued_job(self.user, self.workspace)
+        first, second, third = FixtureSource().fetch(job.search, 10)[:3]
+        duplicates = [
+            first,
+            {**second, "phone": first["phone"]},
+            {**third, "business_name": first["business_name"], "city": first["city"],
+             "region": first["region"]},
+            second,
+            third,
+        ]
+        with patch("core.sources.FixtureSource.fetch", return_value=duplicates):
+            outcome = run_pending(limit=1)
+        self.assertEqual((outcome["completed"], outcome["unknown"]), (1, 0))
+        self.assertEqual(
+            set(AcceptedResult.objects.filter(job=job).values_list("record_ref", flat=True)),
+            {first["source_id"], second["source_id"], third["source_id"]},
+        )
+        self.assertEqual(AcceptedResult.objects.filter(job=job).count(), 3)
 
     def test_malformed_source_rows_are_skipped_without_poisoning_valid_leads(self):
         job = queued_job(self.user, self.workspace)
