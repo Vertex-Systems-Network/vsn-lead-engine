@@ -43,6 +43,15 @@ class JobExecutionReviewVisibilityTests(TestCase):
         pending = self.client.get(self.url(job))
         self.assertEqual(pending.status_code, 200)
         self.assertIs(pending.json()["execution_review_required"], False)
+        list_path = f"/api/v1/workspaces/{self.workspace.id}/jobs/"
+        pending_list = self.client.get(list_path)
+        self.assertEqual(pending_list.status_code, 200)
+        self.assertIs(
+            next(row for row in pending_list.json()["results"] if row["id"] == str(job.id))[
+                "execution_review_required"
+            ],
+            False,
+        )
         native_path = f"/workspaces/{self.workspace.id}/jobs/{job.id}/"
         self.assertContains(self.client.get(native_path), 'http-equiv="refresh"')
 
@@ -64,6 +73,13 @@ class JobExecutionReviewVisibilityTests(TestCase):
         data = response.json()
         self.assertIs(data["execution_review_required"], True)
         self.assertEqual(data["status"], "running")
+        held_list = self.client.get(list_path)
+        self.assertEqual(held_list.status_code, 200)
+        held_row = next(row for row in held_list.json()["results"] if row["id"] == str(job.id))
+        self.assertIs(held_row["execution_review_required"], True)
+        self.assertEqual(held_row["status"], "running")
+        self.assertNotIn(secret, held_list.content.decode())
+        self.assertNotIn(str(operation.provider_key), held_list.content.decode())
         native = self.client.get(native_path)
         self.assertEqual(native.status_code, 200)
         self.assertContains(native, "needs authorized operator review")
@@ -94,6 +110,14 @@ class JobExecutionReviewVisibilityTests(TestCase):
         viewer = self.client.get(self.url(job))
         self.assertEqual(viewer.status_code, 200)
         self.assertIs(viewer.json()["execution_review_required"], True)
+        viewer_list = self.client.get(list_path)
+        self.assertEqual(viewer_list.status_code, 200)
+        self.assertTrue(
+            any(
+                row["id"] == str(job.id) and row["execution_review_required"] is True
+                for row in viewer_list.json()["results"]
+            )
+        )
         viewer_native = self.client.get(native_path)
         self.assertContains(viewer_native, "needs authorized operator review")
         self.assertNotContains(viewer_native, 'http-equiv="refresh"')

@@ -590,7 +590,10 @@ export function jobs(v: unknown): v is Jobs {
     object(v) &&
     Array.isArray(v.results) &&
     v.results.length <= 25 &&
-    v.results.every(job) &&
+    v.results.every(
+      (row: unknown) =>
+        job(row) && typeof row.execution_review_required === "boolean",
+    ) &&
     (v.next === null || uuid(v.next))
   );
 }

@@ -186,6 +186,12 @@ export default async function Workspace({
             <h3>{j.search.categories.join(", ")}</h3>
             <p>{j.search.countries.join(" · ")}</p>
             <p className="muted">{j.result_count} recorded results</p>
+            {j.execution_review_required ? (
+              <p className="notice" role="status">
+                Collection outcome needs authorized operator review. Available
+                results and reserved allowance may remain held.
+              </p>
+            ) : null}
             <Link href={`/dashboard/workspaces/${workspaceId}/jobs/${j.id}`}>
               View search
             </Link>
