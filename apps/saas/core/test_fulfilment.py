@@ -29,6 +29,7 @@ from .models import (
 from .result_query import results_snapshot
 from .serializers import SearchSerializer
 from .services import create_draft, create_workspace
+from .sources import FixtureSource
 
 COUNTER = iter(range(1, 1000))
 
@@ -108,6 +109,63 @@ class FulfilmentTests(TestCase):
         third.refresh_from_db()
         self.assertEqual(third.status, "failed")
         self.assertEqual(JobOutbox.objects.get(job=third).reservation.status, "released")
+
+    def test_malformed_source_rows_are_skipped_without_poisoning_valid_leads(self):
+        job = queued_job(self.user, self.workspace)
+        good, other = FixtureSource().fetch(job.search, 10)[:2]
+        bad_rows = [
+            None,
+            "not-a-record",
+            {"country": "US", "source_id": "missing-fields"},
+            {**good, "source_id": "bad/ref?secret"},
+            {**good, "source_id": "x" * 97},
+            {**good, "business_name": []},
+            {**good, "business_name": "x" * 2001},
+            {**good, "phone": 12345},
+            {**good, "city": 42},
+            {**good, "region": []},
+            {**good, "website": "http://[unbalanced"},
+            {**good, "website": ["invalid"]},
+            {**good, "address": "second\\nline"},
+        ]
+        # Source payloads are untrusted. No invalid record ID, contact or
+        # traceback may turn the otherwise valid batch into an unknown effect.
+        with patch("core.sources.FixtureSource.fetch", return_value=bad_rows + [good, other]):
+            result = run_pending(limit=1)
+        self.assertEqual(result["completed"], 1)
+        self.assertEqual(result["unknown"], 0)
+        self.assertEqual(AcceptedResult.objects.filter(job=job).count(), 2)
+        self.assertEqual(
+            set(AcceptedResult.objects.filter(job=job).values_list("record_ref", flat=True)),
+            {good["source_id"], other["source_id"]},
+        )
+        self.assertFalse(
+            AcceptedResult.objects.filter(job=job, record_ref="bad/ref?secret").exists()
+        )
+        self.assertEqual(JobOutbox.objects.get(job=job).reservation.status, "settled")
+
+    def test_source_row_without_optional_city_is_eligible_and_deduped(self):
+        job = queued_job(self.user, self.workspace)
+        row = FixtureSource().fetch(job.search, 10)[0].copy()
+        row.pop("city", None)
+        with patch("core.sources.FixtureSource.fetch", return_value=[row]):
+            result = run_pending(limit=1)
+        self.assertEqual(result["completed"], 1)
+        self.assertEqual(AcceptedResult.objects.filter(job=job).count(), 1)
+        self.assertEqual(AcceptedResult.objects.get(job=job).record_ref, row["source_id"])
+
+    def test_source_candidate_scan_is_bounded_even_with_bad_input(self):
+        job = queued_job(self.user, self.workspace)
+        row = FixtureSource().fetch(job.search, 10)[0]
+        with patch(
+            "core.sources.FixtureSource.fetch",
+            return_value=[None] * 100 + [row],
+        ):
+            result = run_pending(limit=1)
+        self.assertEqual(result["empty"], 1)
+        self.assertEqual(result["unknown"], 0)
+        self.assertFalse(AcceptedResult.objects.filter(job=job).exists())
+        self.assertEqual(JobOutbox.objects.get(job=job).reservation.status, "released")
 
     def test_required_website_filters_records(self):
         job = queued_job(self.user, self.workspace, required_fields=["website"])
