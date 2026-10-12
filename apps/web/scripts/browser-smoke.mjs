@@ -979,9 +979,34 @@ async function run(origin) {
     );
   } finally {
     if (ws) ws.close();
-    if (chrome && chrome.exitCode === null) chrome.kill("SIGTERM");
-    await delay(150);
-    await rm(dir, { recursive: true, force: true });
+    // Chrome writes its profile asynchronously during shutdown. A fixed sleep
+    // can race with that write and fail an otherwise-passing smoke on ENOTEMPTY.
+    // Wait for the spawned process to close, with a bounded SIGKILL fallback.
+    if (chrome && chrome.exitCode === null && chrome.signalCode === null) {
+      await new Promise((resolve) => {
+        const force = setTimeout(() => {
+          if (chrome.exitCode === null && chrome.signalCode === null)
+            chrome.kill("SIGKILL");
+        }, 3000);
+        chrome.once("close", () => {
+          clearTimeout(force);
+          resolve();
+        });
+        chrome.once("error", () => {
+          clearTimeout(force);
+          resolve();
+        });
+        chrome.kill("SIGTERM");
+      });
+    }
+    // Native bounded retry is specifically for transient Chromium profile
+    // cleanup races; a persistent cleanup error still fails the smoke.
+    await rm(dir, {
+      recursive: true,
+      force: true,
+      maxRetries: 5,
+      retryDelay: 100,
+    });
   }
 }
 
