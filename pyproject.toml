@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools==84.0.0", "wheel==0.48.0"]
+requires = ["setuptools==84.2.1", "wheel==0.48.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,7 +9,7 @@ description = "Zero-paid-API US + Canada business lead engine"
 requires-python = ">=3.11"
 dependencies = [
   "boto3>=1.37,<2",
-  "duckdb>=1.5.5,<2",
+  "duckdb>=1.5.5,<3",
   "google-api-python-client>=2.149,<3",
   "google-auth>=2.35,<3",
   "phonenumbers>=8.13,<10",
